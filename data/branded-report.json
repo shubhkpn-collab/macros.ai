@@ -1,159 +1,125 @@
 {
  "barcode": {
-  "conflictedIdentifiers": 50,
-  "exactLookupCorrect": 500,
+  "conflictedIdentifiers": 3,
+  "correctlyRefusedAmbiguous": 1,
+  "exactLookupCorrect": 499,
   "exactLookupPercent": 100.0,
   "malformedResolved": 0,
-  "sampled": 500
+  "sampled": 500,
+  "wrongProductResolved": 0
  },
  "coverage": [
   {
-   "known": 197318,
+   "known": 80495,
    "nutrientId": "fiber",
-   "percent": 81.2,
-   "total": 243004
+   "percent": 82.0,
+   "total": 98199
   },
   {
-   "known": 226356,
+   "known": 92355,
    "nutrientId": "total_sugars",
-   "percent": 93.1,
-   "total": 243004
+   "percent": 94.0,
+   "total": 98199
   },
   {
-   "known": 47569,
+   "known": 12629,
    "nutrientId": "added_sugars",
-   "percent": 19.6,
-   "total": 243004
+   "percent": 12.9,
+   "total": 98199
   },
   {
-   "known": 206483,
+   "known": 83930,
    "nutrientId": "saturated_fat",
-   "percent": 85.0,
-   "total": 243004
+   "percent": 85.5,
+   "total": 98199
   },
   {
-   "known": 201563,
+   "known": 82045,
    "nutrientId": "cholesterol",
-   "percent": 82.9,
-   "total": 243004
+   "percent": 83.5,
+   "total": 98199
   },
   {
-   "known": 242034,
+   "known": 97823,
    "nutrientId": "sodium",
    "percent": 99.6,
-   "total": 243004
+   "total": 98199
   },
   {
-   "known": 73338,
+   "known": 26998,
    "nutrientId": "potassium",
-   "percent": 30.2,
-   "total": 243004
+   "percent": 27.5,
+   "total": 98199
   },
   {
-   "known": 194275,
+   "known": 79246,
    "nutrientId": "calcium",
-   "percent": 79.9,
-   "total": 243004
+   "percent": 80.7,
+   "total": 98199
   },
   {
-   "known": 195370,
+   "known": 79814,
    "nutrientId": "iron",
-   "percent": 80.4,
-   "total": 243004
+   "percent": 81.3,
+   "total": 98199
   },
   {
-   "known": 6169,
-   "nutrientId": "magnesium",
-   "percent": 2.5,
-   "total": 243004
-  },
-  {
-   "known": 4662,
-   "nutrientId": "zinc",
-   "percent": 1.9,
-   "total": 243004
-  },
-  {
-   "known": 92,
+   "known": 0,
    "nutrientId": "vitamin_a",
    "percent": 0.0,
-   "total": 243004
+   "total": 98199
   },
   {
-   "known": 148487,
+   "known": 66285,
    "nutrientId": "vitamin_c",
-   "percent": 61.1,
-   "total": 243004
+   "percent": 67.5,
+   "total": 98199
   },
   {
-   "known": 362,
+   "known": 1,
    "nutrientId": "vitamin_d",
-   "percent": 0.1,
-   "total": 243004
-  },
-  {
-   "known": 11394,
-   "nutrientId": "thiamin",
-   "percent": 4.7,
-   "total": 243004
-  },
-  {
-   "known": 10970,
-   "nutrientId": "riboflavin",
-   "percent": 4.5,
-   "total": 243004
-  },
-  {
-   "known": 11811,
-   "nutrientId": "niacin",
-   "percent": 4.9,
-   "total": 243004
-  },
-  {
-   "known": 7007,
-   "nutrientId": "vitamin_b6",
-   "percent": 2.9,
-   "total": 243004
-  },
-  {
-   "known": 4807,
-   "nutrientId": "folate",
-   "percent": 2.0,
-   "total": 243004
-  },
-  {
-   "known": 4974,
-   "nutrientId": "vitamin_b12",
-   "percent": 2.0,
-   "total": 243004
+   "percent": 0.0,
+   "total": 98199
   }
  ],
- "gtinPolicyVersion": "gtin@1.0.0",
- "gtinRejections": {
-  "bad_check_digit": 1543,
-  "non_digit": 10,
-  "unsupported_length": 6462
+ "fieldClassification": {
+  "factual": [
+   "sourceDescription",
+   "brandName",
+   "subbrandName",
+   "category",
+   "servingGrams",
+   "servingUnit",
+   "householdServingText",
+   "ingredientsText",
+   "packageWeight"
+  ],
+  "lifecycle": [
+   "discontinuedDate",
+   "gtin14"
+  ],
+  "provenanceOnly": [
+   "sourceRecordId",
+   "dataSource",
+   "marketCountry",
+   "tradeChannels",
+   "publicationDate",
+   "availableDate",
+   "modifiedDate",
+   "priorSourceRecordIds"
+  ]
  },
- "identifierConflictCount": 82,
+ "gtinLifecyclePolicy": "branded-gtin-lifecycle@1.0.0",
+ "gtinRejections": {
+  "bad_check_digit": 1043,
+  "non_digit": 10,
+  "unsupported_length": 1518
+ },
+ "identifierConflictCount": 3,
  "identifierConflicts": [
   {
    "brands": [
-    "learninghorizons",
-    "lidl"
-   ],
-   "descriptions": [
-    "ORIGINAL COCKTAIL SAUCE, ORIGINAL COCKTAIL",
-    "ORIGINAL COCKTAIL SAUCE, ORIGINAL"
-   ],
-   "gtin14": "00000020733322",
-   "sourceRecordIds": [
-    "2156980",
-    "1079905"
-   ]
-  },
-  {
-   "brands": [
-    "mondelezusa",
+    "mondelez",
     "trident"
    ],
    "descriptions": [
@@ -161,254 +127,64 @@
     "ORIGINAL FLAVOR SUGAR FREE GUM WITH XYLITOL, ORIGINAL"
    ],
    "gtin14": "00012546612296",
+   "semanticallyCompatible": false,
    "sourceRecordIds": [
     "1458374",
     "1047043"
-   ]
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
   },
   {
    "brands": [
-    "nestleusafrozenfooddivision",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
+    "bigdrum",
+    "wonka"
    ],
    "descriptions": [
-    "SALISBURY STEAK ROASTED PATTY MADE WITH BEEF TOPPED WITH ONIONS & GRAV",
-    "STOUFFER'S Classics Salisbury Steak Frozen Entre 9.625 oz"
+    "WONKA, POPPIN' POPS!, FRUITY BLAST ICE POPS, STRAWBERRY, ORANGE & LEMO",
+    "SLTEST_DISCONTINUED_USI_NESTLE POPPIN' POPS"
    ],
-   "gtin14": "00013800100702",
+   "gtin14": "00072554267116",
+   "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "2109140",
-    "2747399"
-   ]
+    "1911373",
+    "584329"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
   },
   {
    "brands": [
-    "nestleusafrozenfooddivision",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
+    "conagra",
+    "conagrapackaged"
    ],
    "descriptions": [
-    "VEGETABLE LASAGNA WITH CARROTS, SPINACH, BROCCOLI, ONIONS AND CREAMY C",
-    "Stouffers Party Size Veggie Lovers Lasagna Frozen Entre 96oz"
+    "MEDIUM SLOW-BRAISED PORK CHILE VERDE WITH ROASTED POBLANOS, ONIONS, JA",
+    "MEDIUM SLOW-BRAISED PORK CHILE VERDE WITH ROASTED POBLANOS, ONIONS, JA"
    ],
-   "gtin14": "00013800190024",
+   "gtin14": "00604183160522",
+   "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "2109209",
-    "2747392"
-   ]
-  },
+    "722910",
+    "1728515"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  }
+ ],
+ "identityVersion": "branded-identity@2.0.0",
+ "lifecycle": {
+  "confirmed_update": 10,
+  "identifier_reassignment_conflict": 3,
+  "no_gtin_isolated": 2528,
+  "probable_update_needs_review": 7,
+  "single_record": 95641
+ },
+ "needsReviewCount": 7,
+ "needsReviewGroups": [
   {
    "brands": [
-    "nestleusafrozenfooddivision",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
-   ],
-   "descriptions": [
-    "CAULI FLOWER CRUST CHICKEN MOZZARELLA PIADA CAULIFLOWER CRUST TOPPED W",
-    "LIFE CUISINE Vital Pursuit Chicken Mozz Flatbread Melt 10x6oz Box"
-   ],
-   "gtin14": "00013800527936",
-   "sourceRecordIds": [
-    "2180066",
-    "2747397"
-   ]
-  },
-  {
-   "brands": [
-    "nestleusafrozenfooddivision",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
-   ],
-   "descriptions": [
-    "CAULI FLOWER CRUST CHICKEN BACON RANCH PIADA CAULIFOWER CRUST TOPPED W",
-    "LIFE CUISINE  Frozen Meal Cauliflower Chicken Bacon Ranch 6oz Box"
-   ],
-   "gtin14": "00013800661999",
-   "sourceRecordIds": [
-    "2215019",
-    "2747409"
-   ]
-  },
-  {
-   "brands": [
-    "nestleusafrozenfooddivision",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
-   ],
-   "descriptions": [
-    "THREE MEAT CAULIFLOWER CRUST TOPPED WITH PEPPERONI, SAUSAGE, BEEF AND ",
-    "LIFE CUISINE Frozen Meal Three Meat Pizza 6oz"
-   ],
-   "gtin14": "00013800785206",
-   "sourceRecordIds": [
-    "1998585",
-    "2747402"
-   ]
-  },
-  {
-   "brands": [
-    "bayvalleyfoods",
-    "rivianafoodsinc"
-   ],
-   "descriptions": [
-    "ENRICHED MACARONI PRODUCT, RIGATONI",
-    "Creamette 16 Oz Rigatoni Pasta"
-   ],
-   "gtin14": "00015100000416",
-   "sourceRecordIds": [
-    "2030840",
-    "2747408"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "CHOCOLATE CHEWY BARS, CHOCOLATE",
-    "Fiber One 70 Calorie Chocolate Chewy Bars 5 Count"
-   ],
-   "gtin14": "00016000261648",
-   "sourceRecordIds": [
-    "1631640",
-    "2747449"
-   ]
-  },
-  {
-   "brands": [
-    "fiberone",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "CHOCOLATE PEANUT BUTTER CHEWY BARS, CHOCOLATE PEANUT BUTTER",
-    "Fiber One 70 Calorie Chocolate Peanut Butter Chewy Bars 5 Count"
-   ],
-   "gtin14": "00016000261655",
-   "sourceRecordIds": [
-    "1058397",
-    "2747450"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "OATS & CHOCOLATE CHEWY BARS, OATS & CHOCOLATE",
-    "Fiber One Oats and Chocolate Chewy Granola Bars Value Pack 10 Count"
-   ],
-   "gtin14": "00016000281660",
-   "sourceRecordIds": [
-    "1636222",
-    "2747452"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "PROTEIN CHEWY BARS, PEANUT BUTTER DARK CHOCOLATE",
-    "Nature Valley Protein Peanut Butter Dark Chocolate Chewy Bars 16 Count"
-   ],
-   "gtin14": "00016000318496",
-   "sourceRecordIds": [
-    "1664253",
-    "2747388"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "PROTEIN CHEWY BARS, CARAMEL NUT",
-    "Fiber One Caramel Nut Protein Chewy Bars 10 Count"
-   ],
-   "gtin14": "00016000405974",
-   "sourceRecordIds": [
-    "1632035",
-    "2747328"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "CHOCOLATE CARAMEL & PRETZEL CHEWY BARS, CHOCOLATE CARAMEL & PRETZEL",
-    "Fiber One 70 Calorie Chocolate Caramel & Pretzel Chewy Bars 5 Count"
-   ],
-   "gtin14": "00016000415447",
-   "sourceRecordIds": [
-    "1635974",
-    "2747330"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "FIBER ONE, CHEWY BARS, CHOCOLATE PEANUT BUTTER, CHOCOLATE PEANUT BUTTE",
-    "Fiber One 70 Calorie Chocolate Peanut Butter Chewy Bars 10 Count"
-   ],
-   "gtin14": "00016000420250",
-   "sourceRecordIds": [
-    "1635929",
-    "2747331"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "PROTEIN CHEWY BARS, PEANUT BUTTER DARK CHOCOLATE",
-    "Nature Valley Protein Peanut Butter Dark Chocolate Chewy Bars 30 Count"
-   ],
-   "gtin14": "00016000439627",
-   "sourceRecordIds": [
-    "1636149",
-    "2747335"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "PROTEIN CHEWY BARS, PEANUT BUTTER DARK CHOCOLATE",
-    "Nature Valley Protein Peanut Butter Dark Chocolate Chewy Bars 26 Count"
-   ],
-   "gtin14": "00016000450769",
-   "sourceRecordIds": [
-    "1636046",
-    "2747339"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
-   ],
-   "descriptions": [
-    "PEANUT BUTTER DARK CHOCOLATE PROTEIN CHEWY BARS, PEANUT BUTTER DARK CH",
-    "Nature Valley Peanut Butter Dark Chocolate Gluten-Free Protein Bars 10"
-   ],
-   "gtin14": "00016000458918",
-   "sourceRecordIds": [
-    "1631425",
-    "2747324"
-   ]
-  },
-  {
-   "brands": [
-    "bettylousinc",
+    "bettylous",
     "bettylousinccom"
    ],
    "descriptions": [
@@ -416,601 +192,242 @@
     "ORIGINAL ORGANIC POWDERED PEANUT BUTTER, ORIGINAL"
    ],
    "gtin14": "00016073123454",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
     "386045",
     "1861140"
-   ]
-  },
-  {
-   "brands": [
-    "generalmillsinc",
-    "generalmillssalesinc"
    ],
-   "descriptions": [
-    "CINNAMON ROLLS WITH ICING, ORIGINAL",
-    "Pillsbury Cinnamon Rolls Original with Icing 8 Count 2 Pack"
-   ],
-   "gtin14": "00018000456758",
-   "sourceRecordIds": [
-    "1636145",
-    "2747346"
-   ]
-  },
-  {
-   "brands": [
-    "conagrabrandsinc",
-    "gianteagleinc"
-   ],
-   "descriptions": [
-    "TAPIOCA PUDDING SNACKS, TAPIOCA",
-    "GIANT EAGLE Tapioca Pudding, 13 OZ"
-   ],
-   "gtin14": "00030034083533",
-   "sourceRecordIds": [
-    "2074427",
-    "2747622"
-   ]
-  },
-  {
-   "brands": [
-    "conagrabrandsinc",
-    "gianteagleinc"
-   ],
-   "descriptions": [
-    "BUTTERSCOTCH PUDDING SNACKS, BUTTERSCOTCH",
-    "GIANT EAGLE Butterscotch Pudding, 13 OZ"
-   ],
-   "gtin14": "00030034083595",
-   "sourceRecordIds": [
-    "2074435",
-    "2747623"
-   ]
-  },
-  {
-   "brands": [
-    "counterpointinternational",
-    "oceanspraycranberriesinc"
-   ],
-   "descriptions": [
-    "OCEAN SPRAY, 100% JUICE, 100% GRAPEFRUIT, NO SUGAR ADDED",
-    "100% GRAPEFRUIT JUICE FROM CONCENTRATE, GRAPEFRUIT"
-   ],
-   "gtin14": "00031200029997",
-   "sourceRecordIds": [
-    "2038773",
-    "2038751"
-   ]
-  },
-  {
-   "brands": [
-    "dannoncompany",
-    "danoneusllc"
-   ],
-   "descriptions": [
-    "DANNON, DANONINO, DAIRY SNACK, STRAWBERRY, STRAWBERRY BANANA & PEACH, ",
-    "Danonino Dannon Yogurt Strawberry, Strawberry Banana & Peach Dairy Sna"
-   ],
-   "gtin14": "00036632027252",
-   "sourceRecordIds": [
-    "2187436",
-    "2747481"
-   ]
-  },
-  {
-   "brands": [
-    "dannoncompany",
-    "danoneusllc"
-   ],
-   "descriptions": [
-    "STRAWBERRY BANANA FLAVOR LOWFAT YOGURT DRINK, STRAWBERRY BANANA",
-    "Activia Dannon Strawberry Banana Probiotic Dairy Drink 7 fl. oz. Bottl"
-   ],
-   "gtin14": "00036632035981",
-   "sourceRecordIds": [
-    "2069970",
-    "2747484"
-   ]
-  },
-  {
-   "brands": [
-    "lindt",
-    "lindtsprunglischweizag"
-   ],
-   "descriptions": [
-    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE",
-    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE"
-   ],
-   "gtin14": "00037466044415",
-   "sourceRecordIds": [
-    "898532",
-    "2083013"
-   ]
-  },
-  {
-   "brands": [
-    "kelloggcompanyus",
-    "thekelloggcompany"
-   ],
-   "descriptions": [
-    "FROSTED STRAWBERRY FLAVORED BITES, FROSTED STRAWBERRY",
-    "Kellogg's Pop-Tarts Frosted Strawberry Bites 7oz"
-   ],
-   "gtin14": "00038000202995",
-   "sourceRecordIds": [
-    "2140506",
-    "2747562"
-   ]
-  },
-  {
-   "brands": [
-    "shawsmarketfresh",
-    "westcoastgrocerycompany"
-   ],
-   "descriptions": [
-    "SHAW'S MARKETFRESH, SUGAR COOKIE",
-    "SHAW'S MARKET FRESH, SUGAR COOKIES"
-   ],
-   "gtin14": "00041144996835",
-   "sourceRecordIds": [
-    "432666",
-    "2040986"
-   ]
-  },
-  {
-   "brands": [
-    "shoprite",
-    "wakefernfoodcorporation"
-   ],
-   "descriptions": [
-    "SEEDED ORGANIC BREAD, SEEDED",
-    "ORGANIC, SEEDED BREAD, SEEDED"
-   ],
-   "gtin14": "00041190407873",
-   "sourceRecordIds": [
-    "1143162",
-    "2167563"
-   ]
-  },
-  {
-   "brands": [
-    "publix",
-    "publixsupermarketsinc"
-   ],
-   "descriptions": [
-    "MEATLOAF SEASONING MIX, MEATLOAF",
-    "MEATLOAF SEASONING MIX, MEATLOAF"
-   ],
-   "gtin14": "00041415034082",
-   "sourceRecordIds": [
-    "1043651",
-    "2146105"
-   ]
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
     "notabrandeditem",
-    "publixsupermarketsinc"
+    "publixsupermarkets"
    ],
    "descriptions": [
     "MEDIUM SHRIMP PLATTER WITH TANGY COCKTAIL SAUCE, TANGY COCKTAIL SAUCE",
     "MEDIUM SHRIMP PLATTER WITH TANGY COCKTAIL SAUCE, TANGY COCKTAIL SAUCE"
    ],
    "gtin14": "00041415037458",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
     "1047109",
     "1973851"
-   ]
-  },
-  {
-   "brands": [
-    "publix",
-    "publixsupermarketsinc"
    ],
-   "descriptions": [
-    "SEA SALT",
-    "SEA SALT"
-   ],
-   "gtin14": "00041415080317",
-   "sourceRecordIds": [
-    "1046403",
-    "2155653"
-   ]
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
     "bakery",
-    "publixsupermarketsinc"
+    "publixsupermarkets"
    ],
    "descriptions": [
     "CRANBERRY PISTACHIO FLAVORED BISCOTTI, CRANBERRY PISTACHIO",
     "CRANBERRY PISTACHIO FLAVORED BISCOTTI, CRANBERRY PISTACHIO"
    ],
    "gtin14": "00041415330917",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
     "1045043",
     "1974408"
-   ]
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
     "publix",
-    "publixsupermarketsinc"
+    "publixsupermarkets"
    ],
    "descriptions": [
     "PANKO BUTTERFLY CRISPY SEASONED SHRIMP, PANKO BUTTERFLY",
     "PANKO BUTTERFLY CRISPY SEASONED SHRIMP, PANKO BUTTERFLY"
    ],
    "gtin14": "00041415416451",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
     "1043633",
     "1718442"
-   ]
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "cocacolausaoperations",
-    "sprite"
+    "hummus",
+    "ithaca"
    ],
    "descriptions": [
-    "LEMON-LIME ZERO SUGAR SODA, LEMON-LIME",
-    "LEMON-LIME SODA, LEMON-LIME"
+    "SMOKED CHIPOTLE HUMMUS, SMOKED CHIPOTLE",
+    "SMOKED CHIPOTLE HUMMUS, SMOKED CHIPOTLE"
    ],
-   "gtin14": "00049000050172",
+   "gtin14": "00853883006054",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "1045007",
-    "2211089"
-   ]
+    "718666",
+    "1975508"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "cocacolausaoperations",
-    "fanta"
+    "hummus",
+    "ithacacoldcrafted"
    ],
    "descriptions": [
-    "ORANGE SODA, ORANGE",
-    "ORANGE FLAVORED SODA, ORANGE"
+    "FRESH LEMON BEET",
+    "LEMON BEET HUMMUS, LEMON BEET"
    ],
-   "gtin14": "00049000050257",
+   "gtin14": "00853883006078",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "1045001",
-    "2211097"
-   ]
+    "719296",
+    "1975507"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "nestleusainc",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
+    "bantambagels",
+    "tmarzetti"
    ],
    "descriptions": [
-    "CHILI CON CARNE WITH BEANS, CON CARNE WITH BEANS",
-    "CHEF-MATE Chili Con Carne With Beans 6lb 11oz. Can"
+    "MINI STUFFED BAGELS",
+    "EVERYBODY'S FAVORITE EVERYTHING BAGEL STUFFED WITH VEGGIE CREAM CHEESE"
    ],
-   "gtin14": "00050000052684",
+   "gtin14": "00856617005170",
+   "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "2087096",
-    "2747101"
-   ]
-  },
-  {
-   "brands": [
-    "nestleusainc",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
+    "719216",
+    "1977031"
    ],
-   "descriptions": [
-    "SWEETENED ORIGINAL CONCENTRATED COFFEE CREAMER, SWEETENED ORIGINAL",
-    "NESTLE COFFEE-MATE Coffee Creamer Sweetened Original, Liquid Concentra"
-   ],
-   "gtin14": "00050000114757",
-   "sourceRecordIds": [
-    "2086620",
-    "2747102"
-   ]
-  },
-  {
-   "brands": [
-    "nestleusainc",
-    "soci\u00e9t\u00e9desproduitsnestl\u00e9sa"
-   ],
-   "descriptions": [
-    "TURKEY GRAVY MIX, TURKEY",
-    "TRIO Turkey Gravy 20oz"
-   ],
-   "gtin14": "00050000385522",
-   "sourceRecordIds": [
-    "2159403",
-    "2747040"
-   ]
-  },
-  {
-   "brands": [
-    "stonyfield",
-    "stonyfieldfarminc"
-   ],
-   "descriptions": [
-    "WHOLE MILK YOGURT, PEAR SPINACH MANGO",
-    "PEAR SPINACH MANGO WHOLE MILK YOGURT, PEAR SPINACH MANGO"
-   ],
-   "gtin14": "00052159703363",
-   "sourceRecordIds": [
-    "719182",
-    "2163699"
-   ]
-  },
-  {
-   "brands": [
-    "campbellsoupcompany",
-    "pacificfoodsoforegoninc"
-   ],
-   "descriptions": [
-    "ORGANIC CREAMY BUTTERNUT SQUASH SOUP, CREAMY BUTTERNUT SQUASH",
-    "Pacific Foods Organic Butternut Squash Soup, 32 oz Carton"
-   ],
-   "gtin14": "00052603041805",
-   "sourceRecordIds": [
-    "2084590",
-    "2746991"
-   ]
-  },
-  {
-   "brands": [
-    "conagrabrandsinc",
-    "pinnaclefoodsgroupllc"
-   ],
-   "descriptions": [
-    "HEARTY HOMESTYLE CORNED BEEF HASH, HEARTY HOMESTYLE CORNED BEEF",
-    "ARMOUR STAR Corned Beef Hash"
-   ],
-   "gtin14": "00054100019370",
-   "sourceRecordIds": [
-    "2037820",
-    "2746955"
-   ]
-  },
-  {
-   "brands": [
-    "conagrabrandsinc",
-    "pinnaclefoodsgroupllc"
-   ],
-   "descriptions": [
-    "NO BEANS CHILI, NO BEANS",
-    "ARMOUR STAR Chili No Beans"
-   ],
-   "gtin14": "00054100029034",
-   "sourceRecordIds": [
-    "2037984",
-    "2746957"
-   ]
-  },
-  {
-   "brands": [
-    "conagrabrandsinc",
-    "pinnaclefoodsgroupllc"
-   ],
-   "descriptions": [
-    "MILWAUKEE'S, WISCONSIN'S BABY DILL PICKLES",
-    "Milwaukee's Baby Dill Pickles, 32 fl oz."
-   ],
-   "gtin14": "00054100172907",
-   "sourceRecordIds": [
-    "2339391",
-    "2746962"
-   ]
-  },
-  {
-   "brands": [
-    "abbottlaboratoriesinc",
-    "thespicehunterinc"
-   ],
-   "descriptions": [
-    "ORIGINAL NUTRITION SHAKE",
-    "ABBOTT, ENSURE, ORIGINAL NUTRITION SHAKE, MILK CHOCOLATE, MILK CHOCOLA"
-   ],
-   "gtin14": "00070074536231",
-   "sourceRecordIds": [
-    "2103392",
-    "2214364"
-   ]
-  },
-  {
-   "brands": [
-    "abbottlaboratoriesinc",
-    "glucerna"
-   ],
-   "descriptions": [
-    "RICH CHOCOLATE SHAKE, RICH CHOCOLATE",
-    "RICH CHOCOLATE SHAKE, RICH CHOCOLATE"
-   ],
-   "gtin14": "00070074629339",
-   "sourceRecordIds": [
-    "1048119",
-    "2214342"
-   ]
-  },
-  {
-   "brands": [
-    "abbottlaboratoriesinc",
-    "thespicehunterinc"
-   ],
-   "descriptions": [
-    "HIGH PROTEIN NUTRITION SHAKE",
-    "ABBOTT, ENSURE, HIGH PROTEIN NUTRITION SHAKE, MILK CHOCOLATE, MILK CHO"
-   ],
-   "gtin14": "00070074642758",
-   "sourceRecordIds": [
-    "2125874",
-    "1838327"
-   ]
-  },
-  {
-   "brands": [
-    "owens",
-    "owensfoodsinc"
-   ],
-   "descriptions": [
-    "SAUSAGE & CHEESE SANDWICHES, SAUSAGE & CHEESE",
-    "SAUSAGE & CHEESE SANDWICHES, SAUSAGE & CHEESE"
-   ],
-   "gtin14": "00070110050196",
-   "sourceRecordIds": [
-    "1042085",
-    "2053388"
-   ]
-  },
-  {
-   "brands": [
-    "owens",
-    "owensfoodsinc"
-   ],
-   "descriptions": [
-    "SAUSAGE GRAVY & BISCUITS",
-    "SAUSAGE GRAVY & BISCUITS"
-   ],
-   "gtin14": "00070110058291",
-   "sourceRecordIds": [
-    "1042339",
-    "2053427"
-   ]
-  },
-  {
-   "brands": [
-    "bibibop",
-    "tmarzetticompany"
-   ],
-   "descriptions": [
-    "HONEY GOCHUJANG SAVORY, SWEET & SPICY SAUCE, HONEY GOCHUJANG",
-    "HONEY GOCHUJANG SAVORY, SWEET & SPICY SAUCE, HONEY GOCHUJANG"
-   ],
-   "gtin14": "00070200790049",
-   "sourceRecordIds": [
-    "1042385",
-    "2161588"
-   ]
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
   }
  ],
- "productVersions": 243035,
- "publishedProducts": 243004,
+ "noGtinProducts": 2528,
+ "productVersions": 98206,
+ "publishedProducts": 98199,
  "search": {
   "brandQueries": {
    "detail": [
     {
-     "brand": "Wal-Mart Stores, Inc.",
-     "records": 4283,
-     "top1BrandCorrect": false
-    },
-    {
-     "brand": "The Kroger Co.",
-     "records": 4012,
-     "top1BrandCorrect": true
-    },
-    {
-     "brand": "Hy-Vee, Inc.",
-     "records": 3328,
-     "top1BrandCorrect": false
-    },
-    {
      "brand": "Ahold USA, Inc.",
-     "records": 2818,
-     "top1BrandCorrect": false
-    },
-    {
-     "brand": "Wegmans Food Markets, Inc.",
-     "records": 2560,
+     "records": 2271,
      "top1BrandCorrect": true
-    },
-    {
-     "brand": "Weis Markets, Inc.",
-     "records": 2441,
-     "top1BrandCorrect": false
     },
     {
      "brand": "Kraft Heinz Foods Company",
-     "records": 2395,
+     "records": 1904,
      "top1BrandCorrect": true
     },
     {
-     "brand": "Giant Eagle, Inc.",
-     "records": 2088,
+     "brand": "Wegmans Food Markets, Inc.",
+     "records": 1330,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Pepsico Inc.",
+     "records": 1306,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "The Kroger Co.",
+     "records": 1289,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Beaver Street Fisheries Inc.",
+     "records": 1276,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Wal-Mart Stores, Inc.",
+     "records": 1246,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Frito-Lay Company",
+     "records": 1231,
      "top1BrandCorrect": true
     }
    ],
-   "top1BrandCorrect": 4,
+   "top1BrandCorrect": 8,
    "total": 8
   },
-  "corpusSize": 242550,
-  "falsePositives": 1,
-  "misses": [
-   "coconut water"
-  ],
-  "mrr": 0.859,
+  "corpusSize": 97813,
+  "falsePositives": 0,
+  "misses": [],
+  "mrr": 0.981,
   "scoredQueries": 26,
-  "top1": 20,
-  "top1Percent": 76.9,
-  "top4": 25,
-  "top4Percent": 96.2,
+  "top1": 25,
+  "top1Percent": 96.2,
+  "top4": 26,
+  "top4Percent": 100.0,
   "totalQueries": 28,
   "zeroResult": {
-   "correct": 1,
+   "correct": 2,
    "total": 2
   }
  },
  "servingUnits": {
-  "g": 211326,
-  "grm": 365,
-  "ml": 31477,
-  "mlt": 31
+  "g": 84713,
+  "ml": 13496
  },
  "source": {
   "archiveBytes": 203831000,
   "archiveSha256": "71e15ee6cbf2c1de2ff4879fc4a00516d4bab81b91334ec2863661e55bd828fc",
   "dataType": "Branded",
-  "extractedBytesApprox": 3315545761,
-  "ingestionStrategy": "streamed via unzip -p, brace-depth record split, per-record JSON parse; extracted JSON never materialised",
+  "ingestionStrategy": "streamed via unzip -p; extracted JSON never materialised",
   "provider": "USDA FoodData Central",
   "release": "April 2026",
-  "windowRecords": 250000
+  "windowRecords": 100000
  },
  "stats": {
-  "discontinued": 456,
-  "distinctGtin": 235211,
-  "duplicateGtinGroups": 113,
-  "identifierConflicts": 82,
-  "ingredientsPresent": 240861,
-  "invalidGtin": 8015,
-  "recordsInDuplicateGroups": 226,
-  "recordsRead": 250000,
-  "rejectedMissingCore": 6801,
-  "servingGramsAvailable": 211324,
-  "servingUnavailable": 367,
-  "servingVolumeOnly": 31508,
-  "validGtin": 241985
+  "discontinued": 387,
+  "distinctGtin": 95661,
+  "duplicateGtinGroups": 20,
+  "ingredientsPresent": 95952,
+  "invalidGtin": 2571,
+  "recordsRead": 100000,
+  "rejectedMissingCore": 1791,
+  "servingGramsAvailable": 84713,
+  "servingVolumeOnly": 13496,
+  "updateLogEdges": 249287,
+  "validGtin": 97429
  },
  "topCategories": {
-  "Breads & Buns": 5422,
-  "Cakes, Cupcakes, Snack Cakes": 5379,
-  "Candy": 14134,
-  "Cheese": 8322,
-  "Chips, Pretzels & Snacks": 6439,
-  "Chocolate": 6229,
-  "Cookies & Biscuits": 7994,
-  "Ice Cream & Frozen Yogurt": 7322,
-  "Pickles, Olives, Peppers & Relishes": 6215,
-  "Popcorn, Peanuts, Seeds & Related Snacks": 12339
+  "Cakes, Cupcakes, Snack Cakes": 2277,
+  "Candy": 5300,
+  "Cheese": 3085,
+  "Chips, Pretzels & Snacks": 3389,
+  "Chocolate": 2527,
+  "Cookies & Biscuits": 3401,
+  "Fruit & Vegetable Juice, Nectars & Fruit Drinks": 2286,
+  "Ice Cream & Frozen Yogurt": 3559,
+  "Popcorn, Peanuts, Seeds & Related Snacks": 4712,
+  "Snack, Energy & Granola Bars": 2173
  },
  "unmappedNutrientIds": {
-  "1007": 885,
-  "1051": 921,
-  "1063": 368,
-  "1072": 657,
-  "1082": 2244,
-  "1084": 1769,
-  "1086": 1992,
-  "1098": 1978,
-  "1100": 527,
-  "1101": 1947,
-  "1103": 1073,
-  "1124": 1745,
-  "1170": 1402,
-  "1185": 876,
-  "1186": 2588
- }
+  "1007": 880,
+  "1051": 918,
+  "1072": 324,
+  "1082": 1422,
+  "1084": 1185,
+  "1086": 800,
+  "1098": 904,
+  "1100": 321,
+  "1101": 892,
+  "1103": 635,
+  "1124": 1742,
+  "1158": 97,
+  "1170": 786,
+  "1185": 496,
+  "1186": 1315
+ },
+ "versionPolicy": "branded-version-fingerprint@1.0.0"
 }

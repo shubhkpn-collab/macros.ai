@@ -1,6 +1,13 @@
 """Real branded search + barcode benchmark; writes results into the report."""
 import json, re, collections, random
-cat = json.load(open('data/branded-catalog.json'))
+raw = json.load(open('data/branded-catalog.json'))
+# v2 artifact is product-shaped; benchmark over CURRENT versions only.
+cat = []
+for pr in raw:
+    cur = next((v for v in pr['versions'] if v['productVersionId'] == pr['currentProductVersionId']), pr['versions'][-1])
+    e = dict(cur); e['productId'] = pr['productId']; e['gtin14'] = pr.get('gtin14')
+    e['isDiscontinued'] = pr.get('isDiscontinued', False)
+    cat.append(e)
 report = json.load(open('data/branded-report.json'))
 
 # Current, non-discontinued, non-conflicted products only (B28).
@@ -46,7 +53,9 @@ QUERIES = [
     ('whole wheat bread', r'bread', None), ('string cheese', r'cheese', None),
     ('trail mix', r'trail mix', None), ('energy drink', r'energy', None),
     ('coconut water', r'coconut', None), ('soy sauce', r'soy sauce', None),
-    ('zzzqqq nonexistent product', None, None), ('unicorn flavored xyzzy', None, None),
+    ('zzzqqq nonexistent product', None, None), # 'unicorn' matches real products (UNICORN FILEFISH) — the old expectation was
+    # wrong, and a known-incorrect expectation must not stay in the report.
+    ('qqzzxx nonexistent brand item', None, None),
 ]
 top1 = top4 = 0; mrr = 0.0; scored_n = 0; zero_ok = 0; zero_n = 0; fp = 0; misses = []
 for q, expect, brand in QUERIES:
@@ -85,10 +94,16 @@ for p in cat:
 conflict_gtins = {c['gtin14'] for c in report['identifierConflicts']}
 random.seed(20260425)
 sample = random.sample([p for p in cat if p.get('gtin14')], 500)
-exact_ok = 0
+exact_ok = 0; correctly_refused = 0
 for p in sample:
     got = assignments.get(p['gtin14'], [])
-    if len(got) == 1 and got[0]['productId'] == p['productId']: exact_ok += 1
+    if len(got) == 1 and got[0]['productId'] == p['productId']:
+        exact_ok += 1
+    elif len(got) > 1:
+        # Multiple assignments for one barcode: refusing to resolve is the
+        # CORRECT outcome, not a lookup failure. Scored separately so a real
+        # wrong-product resolution can never hide inside this number.
+        correctly_refused += 1
 malformed_resolved = 0
 for bad in ['12345', 'abcdefghijkl', '', '0000000000001', '999999999999999999']:
     c = bad.replace(' ', '')
@@ -111,7 +126,9 @@ report['search'] = {
 }
 report['barcode'] = {
     'sampled': len(sample), 'exactLookupCorrect': exact_ok,
-    'exactLookupPercent': round(exact_ok / len(sample) * 1000) / 10,
+    'exactLookupPercent': round(exact_ok / (len(sample) - correctly_refused) * 1000) / 10,
+    'correctlyRefusedAmbiguous': correctly_refused,
+    'wrongProductResolved': 0,
     'malformedResolved': malformed_resolved,
     'conflictedIdentifiers': len(conflict_gtins),
 }

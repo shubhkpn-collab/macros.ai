@@ -170,7 +170,12 @@ if (r.missingArchives.length > 0) {
   p(`- Depth reflects all supplied archives (${r.archives.map((a: any) => a.dataset).join(' + ')}).`);
 }
 p(`- ${q.misses.length} search misses are catalog gaps, not ranking failures.`);
-p('- Overlap assessment is implemented and tested but had no cross-source pairs.');
+if (r.crossSource.conceptConvergence.count > 0) {
+  p(`- Cross-source identity is validated: ${r.crossSource.conceptConvergence.count} convergences, with`);
+  p(`  source priority upheld ${r.crossSource.sourcePriorityAudit.preferredSourceKept}/${r.crossSource.sourcePriorityAudit.convergencesAudited}.`);
+} else {
+  p('- Overlap assessment is implemented and tested but had no cross-source pairs.');
+}
 p('- Search metrics come from a human-authored regression corpus, not real users.');
 
 writeFileSync('/mnt/user-data/outputs/macros-architecture/27-generic-catalog-semantic-integrity-and-search.md', L.join('\n') + '\n');
