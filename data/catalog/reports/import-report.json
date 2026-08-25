@@ -1,0 +1,62 @@
+{
+  "sourceKey": "synthetic_test.fixture_v1",
+  "releaseId": "fixture-2026-08",
+  "sourceFileHash": "e73d8476c4f6ae9b1e8b3722c4a98713713832c503806047da0027845f9953a2",
+  "recordsRead": 5,
+  "accepted": 3,
+  "rejected": 0,
+  "needsCuration": 2,
+  "newProducts": 3,
+  "newVersions": 0,
+  "unchanged": 0,
+  "records": [
+    {
+      "sourceRecordId": "SYN-001",
+      "outcome": "accepted",
+      "reasons": [
+        "ok"
+      ],
+      "flags": [],
+      "action": "new_product",
+      "productVersionId": "syn-chicken-breast@v1"
+    },
+    {
+      "sourceRecordId": "SYN-002",
+      "outcome": "accepted",
+      "reasons": [
+        "ok"
+      ],
+      "flags": [],
+      "action": "new_product",
+      "productVersionId": "syn-chicken-breast-raw@v1"
+    },
+    {
+      "sourceRecordId": "SYN-003",
+      "outcome": "accepted",
+      "reasons": [
+        "ok"
+      ],
+      "flags": [],
+      "action": "new_product",
+      "productVersionId": "syn-white-rice@v1"
+    },
+    {
+      "sourceRecordId": "SYN-900",
+      "outcome": "needs_curation",
+      "reasons": [
+        "ambiguous_preparation_state"
+      ],
+      "flags": [],
+      "action": "none"
+    },
+    {
+      "sourceRecordId": "SYN-901",
+      "outcome": "needs_curation",
+      "reasons": [
+        "ok"
+      ],
+      "flags": [],
+      "action": "none"
+    }
+  ]
+}

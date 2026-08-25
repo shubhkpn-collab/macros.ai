@@ -1,0 +1,147 @@
+{
+  "$comment": "COMPONENT MODEL. TEE = BMR + ACTIVE + TEF. There is no PAL term anywhere. Supersedes energy-baseline.json, which regression-locked BMR x PAL and has been deleted.",
+  "calcVersion": "energy@2.0.0-component",
+  "sharedProfile": { "ageYears": 35, "sex": "male", "bodyWeightKg": 80, "heightCm": 180 },
+  "sharedDerivation": "BMR (Mifflin-St Jeor) = 800 + 1125 - 175 + 5 = 1755. At 12:00 UTC on a local calendar day (midnight boundary), elapsed = 0.5, so basalSoFar = 877.5.",
+  "sharedIntake": { "kcal": 1200, "proteinG": 90, "carbohydrateG": 120, "fatG": 40 },
+  "sharedTefDerivation": "TEST policy (0.25 / 0.075 / 0.02). proteinE 360, carbE 480, fatE 360 -> 90 + 36 + 7.2 = 133.2 kcal estimated TEF.",
+  "asOf": "2026-08-11T12:00:00.000Z",
+  "timezone": "UTC",
+  "rolloverHour": 0,
+
+  "cases": [
+    {
+      "name": "Case 1 — typical day: profile + simulated active energy + intake + synthetic TEF policy",
+      "derivation": "expenditureSoFar = 877.5 + 500 + 0 = 1377.5; current = 1200 - 1377.5 = -177.5; projected = 1755 + 500 + 133.2 = 2388.2; remaining = 2388.2 + 250 - 1200 = 1438.2",
+      "activeKcalSoFar": 500,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": 250,
+      "tefPolicy": "test",
+      "expected": {
+        "basalSoFarKcal": 877.5,
+        "activeSoFarKcal": 500,
+        "tefAccruedKcal": 0,
+        "expenditureSoFarKcal": 1377.5,
+        "tefEstimatedTotalKcal": 133.2,
+        "projectedTefKcal": 133.2,
+        "projectedTotalExpenditureKcal": 2388.2,
+        "currentBalanceKcal": -177.5,
+        "remainingIntakeKcal": 1438.2,
+        "ifNoMoreFoodBalanceKcal": -1188.2,
+        "energyCompleteness": "complete",
+        "energyQuality": "observed_activity"
+      }
+    },
+    {
+      "name": "Case 2 — LOW-activity day: same person, same food, less movement",
+      "derivation": "expenditureSoFar = 877.5 + 150 = 1027.5; projected = 1755 + 150 + 133.2 = 2038.2; remaining = 2038.2 + 250 - 1200 = 1088.2",
+      "activeKcalSoFar": 150,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": 250,
+      "tefPolicy": "test",
+      "expected": {
+        "basalSoFarKcal": 877.5,
+        "activeSoFarKcal": 150,
+        "expenditureSoFarKcal": 1027.5,
+        "projectedTotalExpenditureKcal": 2038.2,
+        "currentBalanceKcal": 172.5,
+        "remainingIntakeKcal": 1088.2,
+        "energyCompleteness": "complete"
+      }
+    },
+    {
+      "name": "Case 3 — HIGH-activity day: same person, same food, hiking",
+      "derivation": "expenditureSoFar = 877.5 + 1100 = 1977.5; projected = 1755 + 1100 + 133.2 = 2988.2; remaining = 2988.2 + 250 - 1200 = 2038.2",
+      "activeKcalSoFar": 1100,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": 250,
+      "tefPolicy": "test",
+      "expected": {
+        "basalSoFarKcal": 877.5,
+        "activeSoFarKcal": 1100,
+        "expenditureSoFarKcal": 1977.5,
+        "projectedTotalExpenditureKcal": 2988.2,
+        "currentBalanceKcal": -777.5,
+        "remainingIntakeKcal": 2038.2,
+        "energyCompleteness": "complete"
+      }
+    },
+    {
+      "name": "Case 4 — no production TEF policy: explicit incomplete state, never a silent zero-TEF completeness claim",
+      "derivation": "TEF is not computed at all. projected = 1755 + 500 + 0 = 2255. The result must say WHY it is incomplete.",
+      "activeKcalSoFar": 500,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": 250,
+      "tefPolicy": "none",
+      "expected": {
+        "expenditureSoFarKcal": 1377.5,
+        "tefStatus": "policy_unavailable",
+        "tefEstimatedTotalKcal": null,
+        "projectedTefKcal": 0,
+        "projectedTotalExpenditureKcal": 2255,
+        "currentBalanceKcal": -177.5,
+        "remainingIntakeKcal": 1305,
+        "energyCompleteness": "incomplete",
+        "completenessGaps": ["tef_policy_missing"]
+      }
+    },
+    {
+      "name": "Case 5 — accrual v1: TEF accrues zero now, but projected TEF exists",
+      "derivation": "tefAccrued 0 excludes TEF from CURRENT; tefEstimatedTotal 133.2 and projectedTef 133.2 still appear in the forecast",
+      "activeKcalSoFar": 500,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": 250,
+      "tefPolicy": "test",
+      "expected": {
+        "tefAccruedKcal": 0,
+        "tefEstimatedTotalKcal": 133.2,
+        "projectedTefKcal": 133.2,
+        "expenditureSoFarKcal": 1377.5
+      }
+    },
+    {
+      "name": "Case 6 — current balance identity",
+      "derivation": "current = intake - (basal + active + tefAccrued) = 1200 - 1377.5",
+      "activeKcalSoFar": 500,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": 0,
+      "tefPolicy": "test",
+      "expected": {
+        "expenditureSoFarKcal": 1377.5,
+        "currentBalanceKcal": -177.5
+      }
+    },
+    {
+      "name": "Case 7 — target delta changes remaining intake but NOT expenditure",
+      "derivation": "same expenditure 1377.5 as Case 6; remaining = 2388.2 + (-400) - 1200 = 788.2, i.e. 650 lower than Case 1's +250 target",
+      "activeKcalSoFar": 500,
+      "projectedRemainingActiveKcal": 0,
+      "targetDeltaKcal": -400,
+      "tefPolicy": "test",
+      "expected": {
+        "expenditureSoFarKcal": 1377.5,
+        "currentBalanceKcal": -177.5,
+        "projectedTotalExpenditureKcal": 2388.2,
+        "remainingIntakeKcal": 788.2
+      }
+    },
+    {
+      "name": "Case 8 — activity raises expenditure without changing BMR",
+      "derivation": "basalSoFar stays 877.5 exactly as in Cases 1-3; only the active component moves",
+      "activeKcalSoFar": 800,
+      "projectedRemainingActiveKcal": 200,
+      "targetDeltaKcal": 250,
+      "tefPolicy": "test",
+      "expected": {
+        "basalSoFarKcal": 877.5,
+        "projectedBasalKcal": 1755,
+        "activeSoFarKcal": 800,
+        "projectedRemainingActiveKcal": 200,
+        "projectedActiveKcal": 1000,
+        "expenditureSoFarKcal": 1677.5,
+        "projectedTotalExpenditureKcal": 2888.2,
+        "remainingIntakeKcal": 1938.2
+      }
+    }
+  ]
+}

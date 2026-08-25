@@ -1,0 +1,54 @@
+{
+  "$comment": "Provenance metadata. A licence class is asserted ONLY for a source whose terms someone actually reviewed.",
+  "sources": [
+    {
+      "sourceKey": "usda_fdc.foundation_foods",
+      "provider": "usda_fdc",
+      "dataType": "foundation_foods",
+      "releaseId": "PENDING_SOURCE_FILE",
+      "licenseClass": "public_domain_cc0",
+      "attribution": "U.S. Department of Agriculture, Agricultural Research Service, FoodData Central",
+      "licenseVerification": {
+        "verifiedBy": "owner",
+        "verifiedOn": "2026-08-17",
+        "reference": "USDA FoodData Central official documentation"
+      },
+      "status": "REGISTERED \u2014 NO SOURCE FILE PRESENT. Adapter unimplemented pending inspected schema."
+    },
+    {
+      "sourceKey": "usda_fdc.sr_legacy",
+      "provider": "usda_fdc",
+      "dataType": "sr_legacy",
+      "releaseId": "PENDING_SOURCE_FILE",
+      "licenseClass": "public_domain_cc0",
+      "attribution": "U.S. Department of Agriculture, Agricultural Research Service, FoodData Central",
+      "licenseVerification": {
+        "verifiedBy": "owner",
+        "verifiedOn": "2026-08-17",
+        "reference": "USDA FoodData Central official documentation"
+      },
+      "status": "REGISTERED \u2014 NO SOURCE FILE PRESENT."
+    },
+    {
+      "sourceKey": "synthetic_test.fixture_v1",
+      "provider": "synthetic_test",
+      "dataType": "synthetic",
+      "releaseId": "fixture-2026-08",
+      "licenseClass": "synthetic_test_data",
+      "attribution": "MACROS.AI synthetic test fixtures \u2014 NOT USDA, NOT real food data",
+      "licenseVerification": {
+        "verifiedBy": "engineering",
+        "verifiedOn": "2026-08-17",
+        "reference": "authored in-house for automated tests"
+      },
+      "status": "TEST ONLY. Never publishable as source-backed nutrition."
+    }
+  ],
+  "$blocked": {
+    "open_food_facts": "NOT INGESTED. ODbL/crowd-sourced \u2014 blocked pending licensing and legal review.",
+    "retailers_manufacturers": "NOT INGESTED. No reviewed terms.",
+    "commercial_databases": "NOT INGESTED. No reviewed terms.",
+    "images": "NOT INGESTED. Image rights are a separate sourcing concern.",
+    "usda_branded": "OUT OF SCOPE this milestone. Brand identity, GTIN, serving labels and manufacturer updates are a distinct problem."
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$comment": "Computed with TEST_TEF_POLICY (SYNTHETIC, protein 0.25 / carb 0.075 / fat 0.02 / alcohol 0.15). These coefficients are ARTIFICIAL and prove arithmetic only — they are not physiologically approved values.",
+  "policyVersion": "tef@0.0.0-SYNTHETIC-TEST",
+  "cases": [
+    {
+      "name": "high-protein meal — chicken breast cooked 200 g",
+      "derivation": "proteinE 62*4=248; carbE 0; fatE 7.2*9=64.8; base = 248*0.25 + 0 + 64.8*0.02 = 62 + 1.296 = 63.296",
+      "nutrition": { "kcal": 330, "proteinG": 62, "carbohydrateG": 0, "fatG": 7.2 },
+      "expectedBaseMacroTefKcal": 63.296,
+      "expectedIndividualAdjustmentKcal": 0,
+      "expectedConfidence": "basic"
+    },
+    {
+      "name": "isocaloric high-FAT meal — same 330 kcal, far lower thermic cost",
+      "derivation": "proteinE 5*4=20; carbE 5*4=20; fatE 34.4*9=309.6; base = 5 + 1.5 + 6.192 = 12.692",
+      "nutrition": { "kcal": 330, "proteinG": 5, "carbohydrateG": 5, "fatG": 34.4 },
+      "expectedBaseMacroTefKcal": 12.692,
+      "expectedIndividualAdjustmentKcal": 0,
+      "expectedConfidence": "basic"
+    },
+    {
+      "name": "mixed full day — must land in the 5-15% sanity band",
+      "derivation": "proteinE 480; carbE 880; fatE 603; base = 120 + 66 + 12.06 = 198.06 = 9.9% of 2000 kcal",
+      "nutrition": { "kcal": 2000, "proteinG": 120, "carbohydrateG": 220, "fatG": 67 },
+      "expectedBaseMacroTefKcal": 198.06,
+      "expectedIndividualAdjustmentKcal": 0,
+      "expectedConfidence": "basic"
+    },
+    {
+      "name": "meal including alcohol",
+      "derivation": "proteinE 40; carbE 120; fatE 90; alcoholE 14*7=98; base = 10 + 9 + 1.8 + 14.7 = 35.5",
+      "nutrition": { "kcal": 400, "proteinG": 10, "carbohydrateG": 30, "fatG": 10, "alcoholG": 14 },
+      "expectedBaseMacroTefKcal": 35.5,
+      "expectedIndividualAdjustmentKcal": 0,
+      "expectedConfidence": "basic"
+    },
+    {
+      "name": "nothing logged yet",
+      "derivation": "all macro energies zero",
+      "nutrition": { "kcal": 0, "proteinG": 0, "carbohydrateG": 0, "fatG": 0 },
+      "expectedBaseMacroTefKcal": 0,
+      "expectedIndividualAdjustmentKcal": 0,
+      "expectedConfidence": "basic"
+    }
+  ]
+}

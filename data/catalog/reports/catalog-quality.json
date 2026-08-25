@@ -1,0 +1,16 @@
+{
+  "catalogSize": 3,
+  "activeProducts": 3,
+  "totalVersions": 3,
+  "preparationStateDistribution": {
+    "cooked": 2,
+    "raw": 1
+  },
+  "sourceDistribution": {
+    "synthetic_test": 3
+  },
+  "missingNutrientRate": 1,
+  "duplicateCandidateCount": 0,
+  "unresolvedCurationCount": 2,
+  "search": null
+}

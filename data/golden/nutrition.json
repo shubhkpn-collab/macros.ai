@@ -1,0 +1,48 @@
+{
+  "$comment": "Hand-derived. totals = basis x (grams / 100), after reducing any volume basis to the per-100 g mass basis.",
+  "calcVersion": "nutrition@1.0.0",
+  "cases": [
+    {
+      "name": "tofu 247 g — the brief's own scale reading",
+      "derivation": "factor 2.47; 144*2.47=355.68; 15.6*2.47=38.532; 3.9*2.47=9.633; 8.7*2.47=21.489",
+      "basis": { "kind": "per_100g", "kcal": 144, "proteinG": 15.6, "carbohydrateG": 3.9, "fatG": 8.7, "fiberG": 2.3, "sodiumMg": 14 },
+      "grams": 247,
+      "expected": { "kcal": 355.68, "proteinG": 38.532, "carbohydrateG": 9.633, "fatG": 21.489, "fiberG": 5.681, "sodiumMg": 34.58 }
+    },
+    {
+      "name": "chicken breast COOKED 200 g — must equal the brief's spoken confirmation",
+      "derivation": "factor 2.0; 165*2=330; 31*2=62; 3.6*2=7.2",
+      "basis": { "kind": "per_100g", "kcal": 165, "proteinG": 31, "carbohydrateG": 0, "fatG": 3.6 },
+      "grams": 200,
+      "expected": { "kcal": 330, "proteinG": 62, "carbohydrateG": 0, "fatG": 7.2 }
+    },
+    {
+      "name": "chicken breast RAW 200 g — same mass, different preparation state",
+      "derivation": "factor 2.0; 120*2=240; 22.5*2=45; 2.6*2=5.2",
+      "basis": { "kind": "per_100g", "kcal": 120, "proteinG": 22.5, "carbohydrateG": 0, "fatG": 2.6 },
+      "grams": 200,
+      "expected": { "kcal": 240, "proteinG": 45, "carbohydrateG": 0, "fatG": 5.2 }
+    },
+    {
+      "name": "olive oil 13.74 g (= 15 ml x 0.916) from a per_100ml basis",
+      "derivation": "normalise: 809.744/0.916=884 kcal per 100 g; 91.6/0.916=100 g fat per 100 g; factor 0.1374 -> 121.4616 kcal, 13.74 g fat",
+      "basis": { "kind": "per_100ml", "densityGPerMl": 0.916, "kcal": 809.744, "proteinG": 0, "carbohydrateG": 0, "fatG": 91.6 },
+      "grams": 13.74,
+      "expected": { "kcal": 121.4616, "proteinG": 0, "carbohydrateG": 0, "fatG": 13.74 }
+    },
+    {
+      "name": "zero grams logs nothing",
+      "derivation": "factor 0",
+      "basis": { "kind": "per_100g", "kcal": 144, "proteinG": 15.6, "carbohydrateG": 3.9, "fatG": 8.7 },
+      "grams": 0,
+      "expected": { "kcal": 0, "proteinG": 0, "carbohydrateG": 0, "fatG": 0 }
+    },
+    {
+      "name": "sub-gram mass still scales linearly",
+      "derivation": "factor 0.005; 400*0.005=2",
+      "basis": { "kind": "per_100g", "kcal": 400, "proteinG": 10, "carbohydrateG": 60, "fatG": 12 },
+      "grams": 0.5,
+      "expected": { "kcal": 2, "proteinG": 0.05, "carbohydrateG": 0.3, "fatG": 0.06 }
+    }
+  ]
+}

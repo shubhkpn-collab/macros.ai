@@ -1,0 +1,53 @@
+{
+  "$comment": "SEARCH metadata only. Editing an alias must never create a nutrition ProductVersion.",
+  "aliasSets": [
+    {
+      "productId": "syn-chicken-breast",
+      "aliases": [
+        "chicken breast",
+        "cooked chicken",
+        "chicken",
+        "chicken breast fillet"
+      ],
+      "curatedBy": "engineering",
+      "curatedAt": "2026-08-17"
+    },
+    {
+      "productId": "syn-chicken-breast-raw",
+      "aliases": [
+        "raw chicken",
+        "chicken breast raw"
+      ],
+      "curatedBy": "engineering",
+      "curatedAt": "2026-08-17"
+    },
+    {
+      "productId": "syn-white-rice",
+      "aliases": [
+        "rice",
+        "white rice"
+      ],
+      "curatedBy": "engineering",
+      "curatedAt": "2026-08-17"
+    },
+    {
+      "productId": "syn-almonds",
+      "aliases": [
+        "almonds",
+        "almond"
+      ],
+      "curatedBy": "engineering",
+      "curatedAt": "2026-08-17"
+    },
+    {
+      "productId": "syn-firm-tofu",
+      "aliases": [
+        "tofu",
+        "firm tofu",
+        "bean curd"
+      ],
+      "curatedBy": "engineering",
+      "curatedAt": "2026-08-17"
+    }
+  ]
+}

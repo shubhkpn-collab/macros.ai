@@ -1,0 +1,7 @@
+# SYNTHETIC TEST FIXTURE — NOT USDA, NOT REAL FOOD DATA.
+# id | displayName | prep | kcal | protein | carb | fat
+SYN-001 | Chicken breast, cooked | cooked | 165 | 31   | 0  | 3.6
+SYN-002 | Chicken breast, raw    | raw    | 120 | 22.5 | 0  | 2.6
+SYN-003 | White rice, cooked     | cooked | 130 | 2.7  | 28 | 0.3
+SYN-900 | Ambiguous food        | ???    | 100 | 5    | 10 | 2
+SYN-901 | Rejected food         | cooked | 100 | 5    | 10 | 2

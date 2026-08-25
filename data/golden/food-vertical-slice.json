@@ -1,0 +1,54 @@
+{
+  "$comment": "END-TO-END GOLDEN SCENARIO. Uses SYNTHETIC test fixtures only — this is NOT commercial catalog data and must never be presented as such.",
+  "scenario": "One user logs 200 g of cooked chicken breast captured on the scale, then 150 g of cooked white rice entered manually.",
+
+  "profile": { "ageYears": 35, "sex": "male", "bodyWeightKg": 80, "heightCm": 180 },
+  "timezone": "America/Chicago",
+  "targetDeltaKcal": 250,
+  "activeKcalSoFar": 500,
+  "projectedRemainingActiveKcal": 0,
+
+  "derivation": {
+    "bmr": "Mifflin-St Jeor male = 10*80 + 6.25*180 - 5*35 + 5 = 1755 kcal",
+    "localDay": "2026-08-11T17:00:00Z in America/Chicago (CDT, UTC-5) is 12:00 local on 2026-08-11; elapsed = 0.5 of the local calendar day",
+    "basal": "1755 * 0.5 = 877.5 kcal accrued"
+  },
+
+  "step1": {
+    "name": "200 g cooked chicken breast, scale capture",
+    "productVersionId": "syn-chicken-breast@cooked-v1",
+    "basisPer100g": { "kcal": 165, "proteinG": 31, "carbohydrateG": 0, "fatG": 3.6 },
+    "grams": 200,
+    "derivation": "factor 2.0 -> 165*2 = 330 kcal; 31*2 = 62 g protein; 3.6*2 = 7.2 g fat",
+    "expectedSnapshot": { "kcal": 330, "proteinG": 62, "carbohydrateG": 0, "fatG": 7.2 },
+    "expectedIntake": { "kcal": 330, "proteinG": 62, "carbohydrateG": 0, "fatG": 7.2, "itemCount": 1 },
+    "expectedTefDerivation": "TEST policy (0.25/0.075/0.02): proteinE 248, carbE 0, fatE 64.8 -> 62 + 0 + 1.296 = 63.296 kcal",
+    "expectedTefKcal": 63.296,
+    "expectedExpenditureSoFar": 1377.5,
+    "expectedCurrentBalance": -1047.5,
+    "expectedProjectedTotal": 2318.296,
+    "expectedRemainingIntake": 2238.296
+  },
+
+  "step2": {
+    "name": "150 g cooked white rice, manual entry",
+    "productVersionId": "syn-white-rice@cooked-v1",
+    "basisPer100g": { "kcal": 130, "proteinG": 2.7, "carbohydrateG": 28, "fatG": 0.3 },
+    "grams": 150,
+    "derivation": "factor 1.5 -> 130*1.5 = 195 kcal; 2.7*1.5 = 4.05 g protein; 28*1.5 = 42 g carb; 0.3*1.5 = 0.45 g fat",
+    "expectedSnapshot": { "kcal": 195, "proteinG": 4.05, "carbohydrateG": 42, "fatG": 0.45 },
+    "expectedIntake": { "kcal": 525, "proteinG": 66.05, "carbohydrateG": 42, "fatG": 7.65, "itemCount": 2 },
+    "expectedTefDerivation": "proteinE 264.2, carbE 168, fatE 68.85 -> 66.05 + 12.6 + 1.377 = 80.027 kcal",
+    "expectedTefKcal": 80.027,
+    "expectedExpenditureSoFar": 1377.5,
+    "expectedCurrentBalance": -852.5,
+    "expectedProjectedTotal": 2335.027,
+    "expectedRemainingIntake": 2060.027
+  },
+
+  "invariants": [
+    "expenditureSoFar = basal(877.5) + active(500) + tefAccrued(0) = 1377.5, and is IDENTICAL in both steps: logging food does not change expenditure under accrual policy v1",
+    "activeKcalSoFar is identical before and after logging",
+    "projectedTotal = BMR + active + projectedRemainingActive + projectedTef"
+  ]
+}

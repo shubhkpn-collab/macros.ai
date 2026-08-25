@@ -1,0 +1,61 @@
+{
+  "manifestVersion": "curation@1.0.0-synthetic",
+  "$comment": "Curation decisions for the SYNTHETIC fixture source. productId is assigned by MACROS.AI \u2014 it is NOT the source record id, which is provenance only.",
+  "entries": [
+    {
+      "sourceKey": "synthetic_test.fixture_v1",
+      "sourceRecordId": "SYN-001",
+      "productId": "syn-chicken-breast",
+      "decision": "publish",
+      "displayName": "Chicken breast, cooked",
+      "preparationState": "cooked",
+      "category": "protein",
+      "aliases": [
+        "chicken breast",
+        "cooked chicken",
+        "chicken"
+      ]
+    },
+    {
+      "sourceKey": "synthetic_test.fixture_v1",
+      "sourceRecordId": "SYN-002",
+      "productId": "syn-chicken-breast-raw",
+      "decision": "publish",
+      "displayName": "Chicken breast, raw",
+      "preparationState": "raw",
+      "category": "protein",
+      "aliases": [
+        "raw chicken",
+        "chicken breast raw"
+      ]
+    },
+    {
+      "sourceKey": "synthetic_test.fixture_v1",
+      "sourceRecordId": "SYN-003",
+      "productId": "syn-white-rice",
+      "decision": "publish",
+      "displayName": "White rice, cooked",
+      "preparationState": "cooked",
+      "category": "grain",
+      "aliases": [
+        "rice",
+        "white rice"
+      ]
+    },
+    {
+      "sourceKey": "synthetic_test.fixture_v1",
+      "sourceRecordId": "SYN-900",
+      "productId": "syn-unresolved-prep",
+      "decision": "publish",
+      "displayName": "Ambiguous food",
+      "category": "unknown"
+    },
+    {
+      "sourceKey": "synthetic_test.fixture_v1",
+      "sourceRecordId": "SYN-901",
+      "productId": "syn-rejected",
+      "decision": "reject",
+      "notes": "a curator declining to publish an available source record"
+    }
+  ]
+}

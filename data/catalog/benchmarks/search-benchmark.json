@@ -1,0 +1,183 @@
+{
+  "corpusVersion": "search-benchmark@1.0.0-synthetic",
+  "$comment": "HAND-AUTHORED queries against the SYNTHETIC fixture catalog, written as a person would type. Deliberately NOT derived from the catalog \u2014 a benchmark generated from the data it scores proves nothing. A real corpus replaces this when a real catalog is loaded.",
+  "cases": [
+    {
+      "query": "Chicken breast, cooked",
+      "category": "exact_canonical",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1"
+      ],
+      "preferredProductVersionId": "syn-chicken-breast@cooked-v1"
+    },
+    {
+      "query": "chicken breast",
+      "category": "short_common_name",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1",
+        "syn-chicken-breast-raw@raw-v1"
+      ]
+    },
+    {
+      "query": "chicken",
+      "category": "short_common_name",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1",
+        "syn-chicken-breast-raw@raw-v1"
+      ]
+    },
+    {
+      "query": "cooked chicken",
+      "category": "word_order",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1"
+      ],
+      "preferredProductVersionId": "syn-chicken-breast@cooked-v1",
+      "notes": "word order reversed vs the canonical name"
+    },
+    {
+      "query": "CHICKEN BREAST COOKED",
+      "category": "case",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1"
+      ]
+    },
+    {
+      "query": "  chicken   breast,,  cooked ",
+      "category": "spacing_punctuation",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1"
+      ]
+    },
+    {
+      "query": "chicken-breast (cooked)",
+      "category": "spacing_punctuation",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1"
+      ]
+    },
+    {
+      "query": "raw chicken",
+      "category": "preparation_state",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast-raw@raw-v1"
+      ],
+      "preferredProductVersionId": "syn-chicken-breast-raw@raw-v1",
+      "mustNotReturn": [
+        "syn-chicken-breast@cooked-v1"
+      ],
+      "notes": "logging cooked values for raw chicken is a ~35% error"
+    },
+    {
+      "query": "chicken breast raw",
+      "category": "raw_cooked_ambiguity",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast-raw@raw-v1"
+      ],
+      "preferredProductVersionId": "syn-chicken-breast-raw@raw-v1"
+    },
+    {
+      "query": "rice",
+      "category": "short_common_name",
+      "acceptableProductVersionIds": [
+        "syn-white-rice@cooked-v1"
+      ]
+    },
+    {
+      "query": "white rice",
+      "category": "short_common_name",
+      "acceptableProductVersionIds": [
+        "syn-white-rice@cooked-v1"
+      ]
+    },
+    {
+      "query": "almonds",
+      "category": "plural_singular",
+      "acceptableProductVersionIds": [
+        "syn-almonds@v1"
+      ],
+      "notes": "catalog name singular-ish; query plural"
+    },
+    {
+      "query": "almond",
+      "category": "plural_singular",
+      "acceptableProductVersionIds": [
+        "syn-almonds@v1"
+      ]
+    },
+    {
+      "query": "tofu",
+      "category": "short_common_name",
+      "acceptableProductVersionIds": [
+        "syn-firm-tofu@v1"
+      ]
+    },
+    {
+      "query": "firm tofu",
+      "category": "exact_canonical",
+      "acceptableProductVersionIds": [
+        "syn-firm-tofu@v1"
+      ]
+    },
+    {
+      "query": "Synthetic Brand",
+      "category": "brand",
+      "acceptableProductVersionIds": [
+        "syn-firm-tofu@v1"
+      ],
+      "notes": "the only fixture carrying a brand"
+    },
+    {
+      "query": "qwertyuiop",
+      "category": "nonsense",
+      "acceptableProductVersionIds": [],
+      "expectZeroResults": true
+    },
+    {
+      "query": "zzzz not a food",
+      "category": "nonsense",
+      "acceptableProductVersionIds": [],
+      "expectZeroResults": true
+    },
+    {
+      "query": "chicken zzzz",
+      "category": "dangerous_false_match",
+      "acceptableProductVersionIds": [],
+      "expectZeroResults": true,
+      "notes": "one real token plus nonsense must NOT silently match chicken"
+    },
+    {
+      "query": "olive oil",
+      "category": "inactive_head",
+      "acceptableProductVersionIds": [],
+      "expectZeroResults": true,
+      "notes": "the olive-oil head is inactive; de-listed foods must not appear"
+    },
+    {
+      "query": "bean curd",
+      "category": "alias_only",
+      "acceptableProductVersionIds": [
+        "syn-firm-tofu@v1"
+      ],
+      "preferredProductVersionId": "syn-firm-tofu@v1",
+      "notes": "NO catalog name contains these words. Only a curated alias can satisfy it \u2014 this is what aliases are for."
+    },
+    {
+      "query": "chicken breast fillet",
+      "category": "alias_only",
+      "acceptableProductVersionIds": [
+        "syn-chicken-breast@cooked-v1"
+      ],
+      "preferredProductVersionId": "syn-chicken-breast@cooked-v1",
+      "notes": "kitchen shorthand absent from the canonical name"
+    },
+    {
+      "query": "bean",
+      "category": "dangerous_false_match",
+      "acceptableProductVersionIds": [
+        "syn-firm-tofu@v1"
+      ],
+      "notes": "a partial alias token; acceptable to surface tofu, but it must not outrank an exact-name match elsewhere"
+    }
+  ]
+}
