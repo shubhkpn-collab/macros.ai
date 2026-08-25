@@ -181,6 +181,26 @@ The archive reported as re-supplied is absent from uploads; only Foundation
 | CA-14 | **Preparation-aware retrieval.** "cooked ground turkey" misses because the record reads "pan-broiled crumbles" — search matches display text, not `preparationState`. Measured, not guessed. | Touches the frozen search domain; 1 of 12, and no wrong-preparation outranking. | Search ranking milestone |
 | CA-15 | Administrative source-text normalization (e.g. "Includes foods for USDA's Food Distribution Program") — rule not written because no such text exists in Foundation. | Needs SR evidence to design against. | With CA-8 |
 
+## From TWO-SOURCE CATALOG CLOSURE (2026-08-25)
+
+**CA-8 RESOLVED** — 6,876 published foods from Foundation + SR Legacy.
+**CA-11 RESOLVED** — 92 cross-source concept convergences measured; identity is
+source-independent in practice, not just by construction.
+**CA-12 RESOLVED** — tortilla and whole-wheat bread now available; 48/48 common
+concepts covered.
+**CA-14 RESOLVED** — preparation-aware retrieval matches canonical state;
+30/30 preparation-sensitive queries correct, zero wrong-state outranking.
+**CA-15 RESOLVED** — administrative-text rule derived from real SR evidence
+(57 annotated records), with the 871 meaningful-parenthesis records untouched.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| CA-16 | **Cross-comma display repetition** (40 cases, e.g. "cooked in skin, skin"). Mostly USDA's own wording; within-phrase inversion duplication is 0. | Cosmetic; editing risks removing real qualifiers. | Display polish |
+| CA-17 | **170 possible-duplicate pairs** retained as a steward queue ("Flour, soy, defatted" vs "Soy flour, defatted"). Never auto-merged. | Needs human curation. | Curation tooling |
+| CA-18 | **"green beans"** is the sole remaining search miss (USDA writes "Beans, snap, green"). | One alias would fix it; adding after the benchmark froze would be fitting to the test. | Next alias pass |
+| CA-13 | Typo/fuzzy matching — still no demonstrated need at 98.8% Top-1. | Measurement first. | If a benchmark demands it |
+| RC-5 | Recommendation quality — engineering evaluation only. | Needs real users. | Post-pilot |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
