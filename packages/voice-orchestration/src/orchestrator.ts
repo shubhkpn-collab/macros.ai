@@ -14,6 +14,7 @@ import {
 import type { AssistantInterpreter } from '@macros/assistant-core';
 import type { CorrelatedVoiceDelivery } from '@macros/domain-voice';
 import type { RecommendationSet, RecommendationStatus } from '@macros/domain-recommendation';
+import type { DailyNutrientTotals } from '@macros/domain-nutrients';
 
 /** Deterministic phrasing for a recommendation that produced no options. */
 const RECOMMENDATION_STATUS_SPEECH: Readonly<Record<RecommendationStatus, string>> = {
@@ -68,6 +69,8 @@ export class VoiceOrchestrator {
     interpreter: AssistantInterpreter | null = null,
     /** Supplies trusted recommendations. Absent means the feature is off. */
     private readonly recommendations: (() => RecommendationSet) | null = null,
+    /** Supplies trusted daily nutrient totals with coverage. */
+    private readonly nutrients: (() => DailyNutrientTotals) | null = null,
   ) {
     this.router = new AssistantRouter(app, interpreter);
   }
@@ -211,6 +214,7 @@ export class VoiceOrchestrator {
       case 'repeat_options': return this.repeatOptions();
       case 'help': return this.help();
       case 'recommend_food': return this.recommendFood();
+      case 'ask_nutrient': return this.askNutrient(intent.nutrientId);
     }
   }
 
@@ -511,6 +515,49 @@ export class VoiceOrchestrator {
         ...(r.brandName !== undefined ? { brandName: r.brandName } : {}),
         preparationState: r.preparationState,
       })),
+    };
+  }
+
+  /**
+   * "How much fiber have I had today?"
+   *
+   * The amount comes from trusted aggregated nutrient state. Where coverage is
+   * partial, the response SAYS SO — reporting a partial total as if it were the
+   * whole day would be a confident wrong number.
+   */
+  private askNutrient(nutrientId: string): VoiceResponse {
+    const provider = this.nutrients;
+    if (provider === null) {
+      return { kind: 'error', speech: "I'm not tracking that yet.", reason: 'nutrients_unavailable' };
+    }
+    const daily = provider();
+    const total = daily.totals[nutrientId as keyof typeof daily.totals];
+
+    if (total === undefined) {
+      // No food today reported it. That is NOT zero.
+      return {
+        kind: 'informational',
+        speech: "I don't have data for that from today's foods.",
+        data: { nutrientId, coverage: 'none' },
+      };
+    }
+
+    const amount = Math.round(total.knownAmount * 10) / 10;
+    const unitSpoken = total.unit === 'ug' ? 'micrograms' : total.unit === 'mg' ? 'milligrams' : total.unit === 'g' ? 'grams' : total.unit;
+    const partial = total.complete
+      ? ''
+      : ` That's from ${total.itemsWithData} of ${total.itemsTotal} foods — the rest didn't report it.`;
+
+    return {
+      kind: 'informational',
+      speech: `${amount} ${unitSpoken} of ${total.displayName.toLowerCase()} today.${partial}`,
+      data: {
+        nutrientId,
+        knownAmount: total.knownAmount,
+        unit: total.unit,
+        itemsWithData: total.itemsWithData,
+        itemsTotal: total.itemsTotal,
+      },
     };
   }
 

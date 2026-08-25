@@ -33,6 +33,7 @@
       "@macros/runtime-config": ["packages/runtime-config/src/index.ts"],
       "@macros/runtime-api": ["packages/runtime-api/src/index.ts"],
       "@macros/assistant-core": ["packages/assistant-core/src/index.ts"],
+      "@macros/domain-nutrients": ["packages/domain-nutrients/src/index.ts"],
       "@macros/domain-recommendation": ["packages/domain-recommendation/src/index.ts"],
       "@macros/domain-voice": ["packages/domain-voice/src/index.ts"],
       "@macros/voice-orchestration": ["packages/voice-orchestration/src/index.ts"],

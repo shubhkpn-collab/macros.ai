@@ -9,6 +9,21 @@ import type { Grams, Kcal } from './primitives.js';
  */
 export type BasisKind = 'per_100g' | 'per_100ml';
 
+/**
+ * Extended per-basis nutrients, keyed by canonical MACROS.AI nutrient id.
+ *
+ * Deliberately a MAP, not dozens of optional columns: a food may report five
+ * nutrients or a hundred, and ABSENT MEANS UNKNOWN. Structurally identical to
+ * `NutrientMap` in @macros/domain-nutrients, declared here so contracts stay
+ * dependency-free.
+ */
+export type ExtendedNutrients = Readonly<Record<string, {
+  readonly nutrientId: string;
+  readonly amount: number;
+  readonly unit: string;
+  readonly source?: Readonly<Record<string, unknown>>;
+}>>;
+
 export interface NutrientBasis {
   readonly kind: BasisKind;
   /** Required when kind === 'per_100ml'. Grams per millilitre. */
@@ -20,6 +35,12 @@ export interface NutrientBasis {
   readonly fatG: number;
 
   readonly fiberG?: number;
+  /**
+   * Everything beyond the core four, per basis. Never zero-filled.
+   * Fiber also appears here canonically; it does NOT add energy of its own,
+   * because the source kcal already accounts for the food's declared energy.
+   */
+  readonly extended?: ExtendedNutrients;
   readonly sugarG?: number;
   readonly sodiumMg?: number;
   readonly saturatedFatG?: number;

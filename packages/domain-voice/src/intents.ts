@@ -22,7 +22,12 @@ export type VoiceIntent =
    * "What should I eat?" — a READ-ONLY request. It returns candidates for the
    * user to choose from and never selects, weighs or logs anything.
    */
-  | { readonly kind: 'recommend_food' };
+  | { readonly kind: 'recommend_food' }
+  /**
+   * "How much fiber have I had today?" — ONE extensible intent carrying a
+   * canonical nutrient id, rather than a new intent per nutrient.
+   */
+  | { readonly kind: 'ask_nutrient'; readonly nutrientId: string };
 
 export type NutrientQuery = 'calories' | 'protein' | 'carbohydrate' | 'fat';
 

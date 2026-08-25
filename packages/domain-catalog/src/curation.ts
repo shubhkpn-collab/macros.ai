@@ -112,6 +112,30 @@ export interface FingerprintInput {
   readonly servingLabelProteinG?: number;
   readonly servingLabelCarbohydrateG?: number;
   readonly servingLabelFatG?: number;
+
+  /**
+   * EXTENDED NUTRIENTS participate in factual version identity.
+   *
+   * A corrected sodium, fiber, Vitamin D or calcium value is a real change to
+   * what MACROS.AI publishes about the food, even when the four macros are
+   * untouched. Leaving these outside identity meant a micronutrient correction
+   * produced no new version and was silently discarded.
+   *
+   * Serialized canonically (sorted by nutrient id) so key order can never alter
+   * the fingerprint.
+   */
+  readonly extended?: Readonly<Record<string, { readonly amount: number; readonly unit: string }>>;
+}
+
+/** Deterministic, order-independent serialization of extended nutrients. */
+export function canonicalExtended(
+  extended: FingerprintInput['extended'],
+): string {
+  if (extended === undefined) return '';
+  return Object.keys(extended)
+    .sort()
+    .map((k) => `${k}=${extended[k]!.amount}${extended[k]!.unit}`)
+    .join(',');
 }
 
 export function fingerprintOf(input: FingerprintInput): string {
@@ -128,6 +152,7 @@ export function fingerprintOf(input: FingerprintInput): string {
     input.servingLabelProteinG,
     input.servingLabelCarbohydrateG,
     input.servingLabelFatG,
+    canonicalExtended(input.extended),
   ];
   return parts.map((p) => (p === undefined || p === '' ? '~' : String(p))).join('|');
 }
@@ -161,5 +186,18 @@ export function canonicalFingerprint(
       ? { servingLabelCarbohydrateG: c.labelFacts.carbohydrateGPerServing } : {}),
     ...(c.labelFacts?.fatGPerServing !== undefined
       ? { servingLabelFatG: c.labelFacts.fatGPerServing } : {}),
+    ...(c.per100g.extended !== undefined
+      ? { extended: extendedForFingerprint(c.per100g.extended) } : {}),
   });
+}
+
+/** Only the factual amount and unit matter to identity — provenance does not. */
+export function extendedForFingerprint(
+  extended: Readonly<Record<string, { readonly amount: number; readonly unit: string }>>,
+): Readonly<Record<string, { readonly amount: number; readonly unit: string }>> {
+  const out: Record<string, { amount: number; unit: string }> = {};
+  for (const [k, v] of Object.entries(extended)) {
+    out[k] = { amount: v.amount, unit: v.unit };
+  }
+  return out;
 }

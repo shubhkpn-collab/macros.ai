@@ -1,4 +1,5 @@
-import type { NutrientBasis, NutritionTotals } from './nutrition.js';
+import type {
+  ExtendedNutrients, NutrientBasis, NutritionTotals } from './nutrition.js';
 import type { Instant } from './primitives.js';
 
 /**
@@ -110,4 +111,11 @@ export interface NutritionSnapshot {
   readonly basisKind: NutrientBasis['kind'];
   readonly calcVersion: string;
   readonly computedAt: Instant;
+  /**
+   * Extended nutrients AS THEY WERE at log time, already scaled to the consumed
+   * mass. Frozen with the rest of the snapshot: if the product is later
+   * corrected, or a source adds Vitamin C it never previously reported, this
+   * historical log keeps exactly what the user was told they ate.
+   */
+  readonly extended?: ExtendedNutrients;
 }

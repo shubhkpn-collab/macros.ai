@@ -37,6 +37,12 @@ export const TOOL_REGISTRY: Readonly<Record<ProposalKind, ToolSpec>> = {
    * everything.
    */
   recommend_food: { kind: 'recommend_food', stateChanging: false, allowedArguments: [] },
+  /**
+   * READ-ONLY. The model may name WHICH nutrient is being asked about; the
+   * trusted nutrient state supplies the amount and the coverage. A model-
+   * supplied amount is rejected like any other nutrition field.
+   */
+  ask_nutrient: { kind: 'ask_nutrient', stateChanging: false, allowedArguments: ['nutrientId'] },
 };
 
 export const isKnownTool = (name: string): name is ProposalKind =>

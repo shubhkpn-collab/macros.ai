@@ -39,6 +39,9 @@ const PURE_DOMAIN = [
   // Deterministic candidate/filter/rank. No LLM, no network, no clock, no
   // randomness — recommendation must be reproducible from its inputs alone.
   'packages/domain-recommendation',
+  // Canonical nutrient registry, units, aggregation and view preferences.
+  // Pure: no clock, no IO, no LLM — a nutrient value is never invented here.
+  'packages/domain-nutrients',
   // Assistant proposal contracts, tool registry, validation and decision policy
   // are pure: no LLM SDK, no network, no database, no clock, no randomness.
   'packages/assistant-core',

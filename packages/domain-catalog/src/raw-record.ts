@@ -38,6 +38,16 @@ export interface NormalizedCandidate {
     readonly fiberG?: number;
     readonly sugarG?: number;
     readonly sodiumMg?: number;
+    /**
+     * Everything beyond the legacy shorthand fields, keyed by canonical
+     * MACROS.AI nutrient id. Absent means the source did not report it.
+     */
+    readonly extended?: Readonly<Record<string, {
+      readonly nutrientId: string;
+      readonly amount: number;
+      readonly unit: string;
+      readonly source?: Readonly<Record<string, unknown>>;
+    }>>;
   };
   /** Branded identification, label and package facts, when the source has them. */
   readonly manufacturerName?: string;

@@ -64,6 +64,25 @@ const SEARCH_PREFIXES = [
 const GRAM_UNITS = ['grams', 'gram', 'g'];
 const UNSUPPORTED_UNITS = ['ounces', 'ounce', 'oz', 'pounds', 'pound', 'lb', 'lbs', 'cups', 'cup', 'tablespoons', 'tbsp', 'teaspoons', 'tsp', 'ml', 'millilitres', 'milliliters'];
 
+/**
+ * Spoken nutrient names → canonical nutrient ids. Extending tracking to a new
+ * nutrient only requires a phrase here, never a new intent.
+ */
+const EXTENDED_NUTRIENT_PHRASES: readonly (readonly [string, string])[] = [
+  ['fiber', 'fiber'], ['fibre', 'fiber'],
+  ['sodium', 'sodium'], ['salt', 'sodium'],
+  ['potassium', 'potassium'], ['calcium', 'calcium'], ['iron', 'iron'],
+  ['magnesium', 'magnesium'], ['zinc', 'zinc'], ['selenium', 'selenium'],
+  ['phosphorus', 'phosphorus'], ['cholesterol', 'cholesterol'],
+  ['sugar', 'total_sugars'], ['sugars', 'total_sugars'],
+  ['vitamin d', 'vitamin_d'], ['vitamin c', 'vitamin_c'], ['vitamin a', 'vitamin_a'],
+  ['vitamin e', 'vitamin_e'], ['vitamin k', 'vitamin_k'],
+  ['vitamin b12', 'vitamin_b12'], ['b12', 'vitamin_b12'],
+  ['vitamin b6', 'vitamin_b6'], ['b6', 'vitamin_b6'],
+  ['folate', 'folate'], ['thiamin', 'thiamin'], ['riboflavin', 'riboflavin'],
+  ['niacin', 'niacin'], ['choline', 'choline'],
+];
+
 const NUTRIENTS: Readonly<Record<string, NutrientQuery>> = {
   calories: 'calories', calorie: 'calories', kcal: 'calories', energy: 'calories',
   protein: 'protein',
@@ -166,6 +185,16 @@ export class DeterministicVoiceParser implements VoiceParser {
     if (!isQuestion) return null;
 
     if (/\bmacros\b/.test(text)) return understood({ kind: 'ask_macros' }, transcript);
+
+    // Extended nutrients are matched BEFORE the core four, since "sugar" and
+    // "sodium" are not macro-state fields and must route to nutrient state.
+    // Longest phrase first so "vitamin b12" beats a bare "b12".
+    const extended = [...EXTENDED_NUTRIENT_PHRASES]
+      .sort((a, b) => b[0].length - a[0].length)
+      .find(([phrase]) => new RegExp(`\\b${phrase}\\b`).test(text));
+    if (extended !== undefined) {
+      return understood({ kind: 'ask_nutrient', nutrientId: extended[1] }, transcript);
+    }
 
     const nutrientWord = Object.keys(NUTRIENTS).find((n) => new RegExp(`\\b${n}\\b`).test(text));
     if (nutrientWord === undefined) return null;

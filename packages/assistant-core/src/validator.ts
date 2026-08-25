@@ -1,5 +1,6 @@
 import { DeterministicVoiceParser, type VoiceIntent, type VoiceParser } from '@macros/domain-voice';
 import type { AssistantInterpretationInput, IntentProposal, ProposalKind } from './interpreter.js';
+import { isNutrientId } from '@macros/domain-nutrients';
 import { PROHIBITED_ARGUMENTS, TOOL_REGISTRY, isKnownTool, looksLikeInjection } from './registry.js';
 
 /**
@@ -123,6 +124,16 @@ export function validateProposal(
         return { status: 'rejected', reason: 'option_not_current', detail: normalized };
       }
       return { status: 'accepted', intent: { kind: 'select_option', optionLabel: normalized } };
+    }
+
+    case 'ask_nutrient': {
+      const nutrientId = args['nutrientId'];
+      // Must be a known canonical id. An arbitrary string is refused rather
+      // than passed through to a lookup that would quietly miss.
+      if (typeof nutrientId !== 'string' || !isNutrientId(nutrientId)) {
+        return { status: 'rejected', reason: 'invalid_nutrient', detail: String(nutrientId) };
+      }
+      return { status: 'accepted', intent: { kind: 'ask_nutrient', nutrientId } };
     }
 
     case 'manual_weight':

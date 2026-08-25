@@ -71,6 +71,8 @@ export class AssistantRouter {
       'ask_consumed', 'ask_remaining', 'ask_macros', 'help',
       // Read-only: it returns candidates the user must still choose from.
       'recommend_food',
+      // Read-only nutrient query; trusted state supplies the number.
+      'ask_nutrient',
     ];
     const actions: ProposalKind[] = ['search_food', 'cancel', ...readOnly];
 
