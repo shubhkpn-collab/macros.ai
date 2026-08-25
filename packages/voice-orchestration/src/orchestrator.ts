@@ -22,6 +22,7 @@ const RECOMMENDATION_STATUS_SPEECH: Readonly<Record<RecommendationStatus, string
   insufficient_state: "I don't have enough of today's numbers to suggest anything yet.",
   no_eligible_candidates: "I don't have a suitable food to suggest right now.",
   energy_budget_exhausted: "You've reached your calorie target for today, so I'm not suggesting more food.",
+  subject_mismatch: "I couldn't confirm whose data that was, so I didn't suggest anything.",
 };
 import type { TabletAppController } from '@macros/tablet-app-core';
 import { AssistantRouter, type AssistantTrace } from './assistant-router.js';

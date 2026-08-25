@@ -68,6 +68,7 @@ async function harness(interpreter: AssistantInterpreter | null = null) {
     return buildRecommendations({
       userId: USER_A,
       nowIso: START,
+      localDate: app.getState().dashboard!.localDate,
       energy: d?.energy ?? null,
       macros: d?.macros ?? null,
       candidates: CANDIDATES,
@@ -201,6 +202,7 @@ describe('B19 — voice respects an exhausted budget', () => {
       h.app, new DeterministicVoiceParser(), null,
       () => buildRecommendations({
         userId: USER_A, nowIso: START,
+        localDate: h.app.getState().dashboard!.localDate,
         energy: { ...h.app.getState().dashboard!.energy, remainingIntakeKcal: 0 as never },
         macros: h.app.getState().dashboard!.macros,
         candidates: CANDIDATES, effectiveLogs: [], preferences: null, environment: 'test',

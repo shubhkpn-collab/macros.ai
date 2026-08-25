@@ -7,7 +7,7 @@ import {
   CAPABILITY_MATRIX, FakeAuthSessionProvider, MemoryLogSink, MemoryTimingRecorder,
   PERFORMANCE_BUDGETS, StructuredLogger, allowsSyntheticProviders,
   appError, assertImplementationAllowed, checksumOf, computeHealth, fromUnknown,
-  loadRuntimeConfig, loadRoleConfig, orderMigrations, planComposition, redactConfig, runMigrations,
+  loadRoleConfig, orderMigrations, planComposition, redactConfig, runMigrations,
   privilegedDatabaseAuthority, createPrivilegedDatabaseFactory,
   subjectFromSession, subjectRef, toWireError,
   type AppliedMigration, type MigrationDriver, type MigrationFile, type RuntimeConfig,
@@ -30,10 +30,10 @@ const baseRaw = {
   maxRequestBytes: 65536,
 };
 const okConfig = (over: Record<string, unknown> = {}): RuntimeConfig => {
-  const r = loadRuntimeConfig({ ...baseRaw, ...over });
+  const r = loadRoleConfig('server', { ...baseRaw, ...over });
   assert.equal(r.ok, true);
   if (!r.ok) throw new Error('config invalid');
-  return r.config;
+  return r.config as RuntimeConfig;
 };
 
 // ---------------------------------------------------------------------------
@@ -41,21 +41,21 @@ const okConfig = (over: Record<string, unknown> = {}): RuntimeConfig => {
 describe('B5/B6 — production refuses synthetic providers', () => {
   for (const field of ['auth', 'assistant', 'scale', 'activity', 'catalog']) {
     test(`synthetic ${field} fails production startup`, () => {
-      const r = loadRuntimeConfig({ ...baseRaw, [field]: 'synthetic' });
+      const r = loadRoleConfig('server', { ...baseRaw, [field]: 'synthetic' });
       assert.equal(r.ok, false);
       if (r.ok) return;
       assert.ok(r.violations.some((v) => v.field === field && /forbidden/.test(v.problem)));
     });
 
     test(`synthetic ${field} is allowed in development`, () => {
-      const r = loadRuntimeConfig({ ...baseRaw, environment: 'development', [field]: 'synthetic' });
+      const r = loadRoleConfig('server', { ...baseRaw, environment: 'development', [field]: 'synthetic' });
       assert.equal(r.ok, true);
     });
   }
 
   test('staging is treated as production for synthetic guards', () => {
     assert.equal(allowsSyntheticProviders('staging'), false);
-    const r = loadRuntimeConfig({ ...baseRaw, environment: 'staging', assistant: 'synthetic' });
+    const r = loadRoleConfig('server', { ...baseRaw, environment: 'staging', assistant: 'synthetic' });
     assert.equal(r.ok, false);
   });
 
@@ -78,19 +78,19 @@ describe('B5/B6 — production refuses synthetic providers', () => {
   });
 
   test('debug logging is forbidden in production', () => {
-    const r = loadRuntimeConfig({ ...baseRaw, logLevel: 'debug' });
+    const r = loadRoleConfig('server', { ...baseRaw, logLevel: 'debug' });
     assert.equal(r.ok, false);
   });
 
   test('an unknown environment is refused outright', () => {
-    const r = loadRuntimeConfig({ ...baseRaw, environment: 'prod' });
+    const r = loadRoleConfig('server', { ...baseRaw, environment: 'prod' });
     assert.equal(r.ok, false);
   });
 
   test('missing required production config fails fast', () => {
     const { databaseAppUrl, ...without } = baseRaw;
     void databaseAppUrl;
-    const r = loadRuntimeConfig(without);
+    const r = loadRoleConfig('server', without);
     assert.equal(r.ok, false);
     if (!r.ok) assert.ok(r.violations.some((v) => v.field === 'databaseAppUrl'));
   });
@@ -111,7 +111,7 @@ describe('B7 — secrets never surface', () => {
   });
 
   test('config validation errors never echo a secret value', () => {
-    const r = loadRuntimeConfig({ ...baseRaw, assistant: 'synthetic' });
+    const r = loadRoleConfig('server', { ...baseRaw, assistant: 'synthetic' });
     assert.equal(r.ok, false);
     if (r.ok) return;
     assert.ok(!JSON.stringify(r.violations).includes('secret'));

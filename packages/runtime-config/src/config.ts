@@ -189,7 +189,7 @@ export function loadRoleConfig(
 
   // A tablet has no database fields, so common validation is given inert
   // placeholders for them; they are discarded below and never surfaced.
-  const base = loadRuntimeConfig(
+  const base = loadCommonConfig(
     role === 'tablet'
       ? { ...raw, databaseAppUrl: 'unused', expectedSchemaVersion: 'unused' }
       : raw,
@@ -239,7 +239,15 @@ export function loadRoleConfig(
   };
 }
 
-export function loadRuntimeConfig(raw: Readonly<Record<string, unknown>>): ConfigResult {
+/**
+ * INTERNAL common validation, deliberately NOT exported.
+ *
+ * A role-less config is not a valid production shape: it is the only object in
+ * which a tablet could structurally hold a database credential. Callers must go
+ * through `loadRoleConfig`, which resolves to Server or Tablet. Validation logic
+ * lives here once and is shared, rather than duplicated per role.
+ */
+function loadCommonConfig(raw: Readonly<Record<string, unknown>>): ConfigResult {
   const violations: ConfigViolation[] = [];
   const push = (field: string, problem: string): void => { violations.push({ field, problem }); };
 

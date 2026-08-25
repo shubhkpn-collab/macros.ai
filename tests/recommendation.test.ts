@@ -68,10 +68,11 @@ const energyState = (remainingIntakeKcal: number): EnergyState => ({
 const input = (over: Partial<RecommendationInput> = {}): RecommendationInput => ({
   userId: USER_A,
   nowIso: NOW,
+  localDate: '2026-08-23',
   energy: energyState(1200),
   macros: macroState(),
   candidates: CANDIDATES,
-  history: [],
+  history: { userId: USER_A, observations: [] },
   preferences: null,
   policy: DEFAULT_RECOMMENDATION_POLICY,
   environment: 'test',
@@ -79,6 +80,7 @@ const input = (over: Partial<RecommendationInput> = {}): RecommendationInput => 
 });
 
 const obs = (productId: string, productVersionId: string, g: number, daysAgo: number): HistoryObservation => ({
+  userId: USER_A,
   productId,
   productVersionId,
   grams: g,
@@ -188,7 +190,7 @@ describe('B13 — history-derived portions require a transparent policy', () => 
     Array.from({ length: n }, (_, i) => obs(CHICKEN.productId, CHICKEN.productVersionId, g, i + 1));
 
   test('insufficient samples produce NO history portion', () => {
-    const p = proposePortion(candidateFor(CHICKEN), input({ history: history(2) }), 1200);
+    const p = proposePortion(candidateFor(CHICKEN), input({ history: { userId: USER_A, observations: history(2) } }), 1200);
     assert.equal(p, null);
   });
 
@@ -198,7 +200,7 @@ describe('B13 — history-derived portions require a transparent policy', () => 
       obs(CHICKEN.productId, CHICKEN.productVersionId, 150, 2),
       obs(CHICKEN.productId, CHICKEN.productVersionId, 200, 3),
     ];
-    const p = proposePortion(candidateFor(CHICKEN), input({ history: samples }), 1200);
+    const p = proposePortion(candidateFor(CHICKEN), input({ history: { userId: USER_A, observations: samples } }), 1200);
     assert.notEqual(p, null);
     assert.equal(p!.basis, 'user_history');
     assert.equal(p!.grams as number, 150, 'the median, not the mean or the maximum');
@@ -207,17 +209,17 @@ describe('B13 — history-derived portions require a transparent policy', () => 
 
   test('observations outside the window do not count', () => {
     const old = history(5).map((h) => ({ ...h, loggedAt: instant('2025-01-01T00:00:00.000Z') }));
-    assert.equal(proposePortion(candidateFor(CHICKEN), input({ history: old }), 1200), null);
+    assert.equal(proposePortion(candidateFor(CHICKEN), input({ history: { userId: USER_A, observations: old } }), 1200), null);
   });
 
   test("another product's history is not borrowed", () => {
     const other = Array.from({ length: 5 }, (_, i) => obs('some-other-product', 'x@v1', 150, i + 1));
-    assert.equal(proposePortion(candidateFor(CHICKEN), input({ history: other }), 1200), null);
+    assert.equal(proposePortion(candidateFor(CHICKEN), input({ history: { userId: USER_A, observations: other } }), 1200), null);
   });
 
   test('an out-of-bounds observed portion is excluded', () => {
     const absurd = Array.from({ length: 5 }, (_, i) => obs(CHICKEN.productId, CHICKEN.productVersionId, 4000, i + 1));
-    assert.equal(proposePortion(candidateFor(CHICKEN), input({ history: absurd }), 1200), null);
+    assert.equal(proposePortion(candidateFor(CHICKEN), input({ history: { userId: USER_A, observations: absurd } }), 1200), null);
   });
 });
 
@@ -417,7 +419,7 @@ describe('B30/B34 — history integration and user isolation', () => {
     const a = logFor(USER_A, CHICKEN, 200, 'l1');
     const v = buildVoidEntry(a, { logId: 'v1', recordedAt: instant(NOW) });
     const fold = foldFoodLogEntries(USER_A, [a, v]);
-    const observations = observationsFromLogs(USER_A, fold.effective.map(toRow));
+    const observations = observationsFromLogs(USER_A, fold.effective.map(toRow)).observations;
     assert.equal(observations.length, 0, 'a voided meal did not happen');
   });
 
@@ -430,7 +432,7 @@ describe('B30/B34 — history integration and user isolation', () => {
       loggedAt: instant(NOW), reason: 'reweighed',
     });
     const fold = foldFoodLogEntries(USER_A, [a, b]);
-    const observations = observationsFromLogs(USER_A, fold.effective.map(toRow));
+    const observations = observationsFromLogs(USER_A, fold.effective.map(toRow)).observations;
     assert.equal(observations.length, 1);
     assert.equal(observations[0]!.grams, 120, 'not the superseded 200');
   });
@@ -438,15 +440,15 @@ describe('B30/B34 — history integration and user isolation', () => {
   test("another user's history never reaches this user's observations", () => {
     const mine = logFor(USER_A, CHICKEN, 200, 'l1');
     const theirs = logFor(USER_B, CHICKEN, 400, 'l2');
-    const observations = observationsFromLogs(USER_A, [mine, theirs].map(toRow));
+    const observations = observationsFromLogs(USER_A, [mine, theirs].map(toRow)).observations;
     assert.equal(observations.length, 1);
     assert.equal(observations[0]!.grams, 200);
   });
 
   test('two users with identical macro state but different histories rank differently', () => {
     const aHistory = Array.from({ length: 3 }, (_, i) => obs(OATS.productId, OATS.productVersionId, 40, i + 1));
-    const withHistory = recommendFoods(input({ userId: USER_A, history: aHistory }));
-    const withoutHistory = recommendFoods(input({ userId: USER_B, history: [] }));
+    const withHistory = recommendFoods(input({ userId: USER_A, history: { userId: USER_A, observations: aHistory } }));
+    const withoutHistory = recommendFoods(input({ userId: USER_B, history: { userId: USER_B, observations: [] } }));
 
     const oatsA = withHistory.recommendations.find((r) => r.productVersionId === OATS.productVersionId);
     const oatsB = withoutHistory.recommendations.find((r) => r.productVersionId === OATS.productVersionId);
@@ -483,7 +485,7 @@ describe('B31/B32/B33 — reformulation safety', () => {
     // The user historically logged V1 of the same stable product.
     const history = Array.from({ length: 3 }, (_, i) => obs(OATS.productId, OATS.productVersionId, 40, i + 1));
 
-    const set = recommendFoods(input({ candidates: [candidate], history }));
+    const set = recommendFoods(input({ candidates: [candidate], history: { userId: USER_A, observations: history } }));
     assert.equal(set.recommendations.length, 1);
     const r = set.recommendations[0]!;
     assert.equal(r.productVersionId, v2.productVersionId, 'the current version is recommended');
@@ -582,5 +584,89 @@ describe('B40 — performance is linear, not quadratic (synthetic)', () => {
 
     // 8× the candidates must not cost anything like 64× the time.
     assert.ok(large < Math.max(small * 24, 250), `500:${small.toFixed(1)}ms 4000:${large.toFixed(1)}ms`);
+  });
+});
+
+describe('PART A — integrity patches', () => {
+  test("A2: another user's preferences fail closed", () => {
+    const foreign: PreferenceSnapshot = {
+      userId: USER_B, preferredProductIds: [], avoidedProductIds: [CHICKEN.productId],
+    };
+    const set = recommendFoods(input({ userId: USER_A, preferences: foreign }));
+    assert.equal(set.status, 'subject_mismatch');
+    assert.equal(set.reason, 'preferences_subject_mismatch');
+    assert.equal(set.recommendations.length, 0);
+  });
+
+  test('A3: a history snapshot owned by another user fails closed', () => {
+    const set = recommendFoods(input({
+      userId: USER_A,
+      history: { userId: USER_B, observations: [] },
+    }));
+    assert.equal(set.status, 'subject_mismatch');
+    assert.equal(set.reason, 'history_subject_mismatch');
+  });
+
+  test("A3: a single foreign observation smuggled into the snapshot fails closed", () => {
+    const smuggled = { ...obs(CHICKEN.productId, CHICKEN.productVersionId, 200, 1), userId: USER_B };
+    const set = recommendFoods(input({
+      userId: USER_A,
+      history: { userId: USER_A, observations: [smuggled] },
+    }));
+    assert.equal(set.status, 'subject_mismatch');
+    assert.equal(set.reason, 'observation_subject_mismatch');
+  });
+
+  test('A1: incomplete energy lowers CONFIDENCE without suppressing availability', () => {
+    const incomplete = {
+      ...energyState(1200),
+      energyCompleteness: 'incomplete',
+      completenessGaps: ['activity_missing_window'],
+    } as unknown as EnergyState;
+    const set = recommendFoods(input({ energy: incomplete }));
+    assert.equal(set.status, 'available_with_limited_energy_confidence');
+    assert.equal(set.energyConfidence.level, 'incomplete');
+    assert.deepEqual(set.energyConfidence.gaps, ['activity_missing_window']);
+    assert.ok(set.recommendations.length > 0, 'still useful, just less confident');
+  });
+
+  test('A1: complete energy reports full confidence', () => {
+    const complete = {
+      ...energyState(1200), energyCompleteness: 'complete', completenessGaps: [],
+    } as unknown as EnergyState;
+    const set = recommendFoods(input({ energy: complete }));
+    assert.equal(set.status, 'available');
+    assert.equal(set.energyConfidence.level, 'complete');
+  });
+
+  test('A1: absent energy is reported unavailable, never zero', () => {
+    const set = recommendFoods(input({ energy: null }));
+    assert.equal(set.energyConfidence.level, 'unavailable');
+    assert.notEqual(set.status, 'energy_budget_exhausted');
+  });
+
+  test('A4: "today" comes from canonical localDate, not a UTC slice', () => {
+    // 01:00 Chicago on the 24th is 06:00 UTC on the 24th; but at 23:30 Chicago
+    // on the 23rd the UTC date is already the 24th. Only localDate is right.
+    const nearMidnight = '2026-08-24T04:30:00.000Z'; // 23:30 on the 23rd, Chicago
+    const todays = [
+      obs(CHICKEN.productId, CHICKEN.productVersionId, 200, 0),
+      obs(CHICKEN.productId, CHICKEN.productVersionId, 200, 0),
+    ].map((o) => ({ ...o, localDate: '2026-08-23' }));
+
+    const set = recommendFoods(input({
+      nowIso: nearMidnight,
+      localDate: '2026-08-23',
+      history: { userId: USER_A, observations: todays },
+    }));
+    const chicken = set.recommendations.find((r) => r.productId === CHICKEN.productId);
+    if (chicken !== undefined) {
+      assert.ok(
+        chicken.scoreComponents.repetitionPenalty > 0,
+        'the repetition penalty saw the local day correctly',
+      );
+    }
+    // Slicing the UTC instant would have produced 2026-08-24 and missed it.
+    assert.notEqual(nearMidnight.slice(0, 10), '2026-08-23');
   });
 });

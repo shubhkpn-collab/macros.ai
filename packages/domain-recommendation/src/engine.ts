@@ -1,8 +1,9 @@
 import { SCALE_RANGE_G, grams as toGrams, type Grams, type ProductVersion } from '@macros/contracts';
 import { calculateNutrition } from '@macros/domain-nutrition';
 import type {
-  HistoryObservation, PortionProposal, RationaleCode, Recommendation,
-  RecommendationCandidate, RecommendationInput, RecommendationSet, ScoreComponents,
+  EnergyConfidence, HistoryObservation, PortionProposal, RationaleCode, Recommendation,
+  RecommendationCandidate, RecommendationHistorySnapshot, RecommendationInput,
+  RecommendationSet, ScoreComponents,
 } from './contracts.js';
 import type { RecommendationPolicy } from './policy.js';
 
@@ -165,7 +166,7 @@ export function proposePortion(
 
   // The user's own behaviour with THIS product, keyed by stable productId so a
   // reformulation does not discard their history.
-  const samples = input.history
+  const samples = input.history.observations
     .filter((h) => h.productId === v.productId)
     .filter((h) => daysBetween(h.loggedAt, input.nowIso) <= policy.history.windowDays)
     .map((h) => h.grams)
@@ -197,11 +198,25 @@ const kcalFor = (v: ProductVersion, g: number): number =>
 
 export function recommendFoods(input: RecommendationInput): RecommendationSet {
   const { policy } = input;
+  const energyConfidence = confidenceOf(input);
   const base = {
     policyVersion: policy.version,
     generatedAt: input.nowIso,
     recommendations: [] as readonly Recommendation[],
+    energyConfidence,
   };
+
+  // OWNERSHIP, verified here rather than assumed of the caller. Preferences and
+  // history belonging to another subject can never influence this user.
+  if (input.preferences !== null && input.preferences.userId !== input.userId) {
+    return { ...base, status: 'subject_mismatch', reason: 'preferences_subject_mismatch' };
+  }
+  if (input.history.userId !== input.userId) {
+    return { ...base, status: 'subject_mismatch', reason: 'history_subject_mismatch' };
+  }
+  if (input.history.observations.some((o) => o.userId !== input.userId)) {
+    return { ...base, status: 'subject_mismatch', reason: 'observation_subject_mismatch' };
+  }
 
   // Missing state is never filled in. A recommendation built on assumed
   // expenditure would be a confident wrong answer.
@@ -251,9 +266,11 @@ export function recommendFoods(input: RecommendationInput): RecommendationSet {
 
   return {
     ...base,
-    status: energy === null
-      ? 'available_with_limited_energy_confidence'
-      : 'available',
+    // Availability and energy confidence are separate axes: an incomplete
+    // energy picture limits confidence without suppressing the suggestion.
+    status: energyConfidence.level === 'complete'
+      ? 'available'
+      : 'available_with_limited_energy_confidence',
     recommendations: ranked.slice(0, policy.maxResults),
   };
 }
@@ -328,7 +345,7 @@ function scoreCandidate(
 
   // History and preference are RANKING nudges only — never nutrition authority
   // and never able to override a materially better nutritional fit on their own.
-  const recent = input.history.filter(
+  const recent = input.history.observations.filter(
     (h) => h.productId === v.productId &&
       daysBetween(h.loggedAt, input.nowIso) <= policy.history.recencyWindowDays,
   );
@@ -340,7 +357,7 @@ function scoreCandidate(
   if (preferred) rationale.push('preferred');
 
   // Discourage suggesting what the user has already eaten repeatedly today.
-  const todayCount = input.history.filter(
+  const todayCount = input.history.observations.filter(
     (h) => h.productId === v.productId && h.localDate === todayOf(input),
   ).length;
   const repetitionPenalty = todayCount >= 2 ? policy.penalties.repetition : 0;
@@ -373,7 +390,24 @@ function scoreCandidate(
   };
 }
 
-const todayOf = (input: RecommendationInput): string => input.nowIso.slice(0, 10);
+/** The canonical local day, supplied by daily state. Never sliced from UTC. */
+const todayOf = (input: RecommendationInput): string => input.localDate;
+
+/**
+ * Read canonical completeness. Missing activity or unavailable TEF lowers
+ * confidence; it is never silently treated as zero, and no PAL is substituted.
+ */
+function confidenceOf(input: RecommendationInput): EnergyConfidence {
+  const e = input.energy as unknown as {
+    energyCompleteness?: 'complete' | 'incomplete';
+    completenessGaps?: readonly string[];
+  } | null;
+  if (e === null) return { level: 'unavailable', gaps: ['energy_state_unavailable'] };
+  if (e.energyCompleteness === 'incomplete') {
+    return { level: 'incomplete', gaps: [...(e.completenessGaps ?? [])] };
+  }
+  return { level: 'complete', gaps: [] };
+}
 
 /**
  * Project effective food-log entries into history observations.
@@ -387,16 +421,20 @@ export function observationsFromLogs(
     userId: string; productId: string; productVersionId: string;
     grams: number; loggedAt: string; localDate: string;
   }[],
-): readonly HistoryObservation[] {
-  return logs
-    .filter((l) => l.userId === userId)
-    .map((l) => ({
-      productId: l.productId,
-      productVersionId: l.productVersionId,
-      grams: l.grams,
-      loggedAt: l.loggedAt,
-      localDate: l.localDate,
-    }));
+): RecommendationHistorySnapshot {
+  return {
+    userId,
+    observations: logs
+      .filter((l) => l.userId === userId)
+      .map((l) => ({
+        userId: l.userId,
+        productId: l.productId,
+        productVersionId: l.productVersionId,
+        grams: l.grams,
+        loggedAt: l.loggedAt,
+        localDate: l.localDate,
+      })),
+  };
 }
 
 export type { Grams };

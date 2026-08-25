@@ -16,6 +16,8 @@ import type { ProductVersion } from '@macros/contracts';
 export interface RecommendationContext {
   readonly userId: string;
   readonly nowIso: string;
+  /** Canonical local calendar day from daily state. */
+  readonly localDate: string;
   readonly energy: Parameters<typeof recommendFoods>[0]['energy'];
   readonly macros: Parameters<typeof recommendFoods>[0]['macros'];
   readonly candidates: readonly RecommendationCandidate[];
@@ -31,6 +33,7 @@ export function buildRecommendations(context: RecommendationContext): Recommenda
   return recommendFoods({
     userId: context.userId,
     nowIso: context.nowIso,
+    localDate: context.localDate,
     energy: context.energy,
     macros: context.macros,
     candidates: context.candidates,
