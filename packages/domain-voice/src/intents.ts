@@ -31,6 +31,19 @@ export interface VoiceUtterance {
   readonly transcript: string;
   readonly receivedAt: string;
   readonly userId: string;
+  /**
+   * Optional STT delivery identity.
+   *
+   * A speech pipeline can deliver the SAME recognition result more than once —
+   * a retried callback, a duplicated event, a reconnect replay. When the
+   * pipeline supplies a stable id for one recognition, the orchestrator treats
+   * a repeat as a REPLAY of an already-handled utterance rather than a fresh
+   * command.
+   *
+   * Absent when the pipeline cannot supply one, in which case the timestamp
+   * window applies instead.
+   */
+  readonly utteranceId?: string;
 }
 
 /**

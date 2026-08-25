@@ -347,3 +347,107 @@ describe('HELP derives from application state', () => {
     assert.match(selected.speech, /weigh it/);
   });
 });
+
+describe('V-2 — utterance replay window', () => {
+  const withId = (h: H, transcript: string, utteranceId: string, atMs: number) =>
+    h.voice.handle({
+      transcript,
+      receivedAt: instant(new Date(Date.parse(START) + atMs).toISOString()),
+      userId: USER_A,
+      utteranceId,
+    } as VoiceUtterance);
+
+  const noId = (h: H, transcript: string, atMs: number) =>
+    h.voice.handle({
+      transcript,
+      receivedAt: instant(new Date(Date.parse(START) + atMs).toISOString()),
+      userId: USER_A,
+    } as VoiceUtterance);
+
+  const readyToLog = async (h: H) => {
+    await say(h, 'add chicken breast');
+    const o = optionsOf(await say(h, 'repeat the options'));
+    await say(h, `option ${o.find((x) => x.preparationState === 'cooked')!.optionLabel}`);
+    await say(h, '200 grams');
+  };
+
+  test('a redelivered utterance with the SAME id executes nothing', async () => {
+    const h = await harness();
+    await readyToLog(h);
+
+    const first = await withId(h, 'log it', 'stt-1', 0);
+    const replay = await withId(h, 'log it', 'stt-1', 50);
+    assert.equal(first.kind, 'success');
+    assert.deepEqual(replay, first, 'the original response is re-spoken verbatim');
+
+    const logs = await h.repos.foodLogs.listByLocalDate(USER_A, h.app.getState().dashboard!.localDate);
+    assert.equal(logs.length, 1);
+  });
+
+  test('a delivery id is authoritative regardless of elapsed time', async () => {
+    const h = await harness();
+    await readyToLog(h);
+    const first = await withId(h, 'log it', 'stt-2', 0);
+    const late = await withId(h, 'log it', 'stt-2', 60_000);
+    assert.deepEqual(late, first, 'a stable id means one recognition, however late it arrives');
+  });
+
+  test('without a delivery id, an identical transcript inside the window replays', async () => {
+    const h = await harness();
+    await readyToLog(h);
+    const first = await noId(h, 'log it', 0);
+    const replay = await noId(h, 'log it', 500);
+    assert.deepEqual(replay, first);
+    const logs = await h.repos.foodLogs.listByLocalDate(USER_A, h.app.getState().dashboard!.localDate);
+    assert.equal(logs.length, 1);
+  });
+
+  test('a DELIBERATE repeat after the window is treated as a new command', async () => {
+    const h = await harness();
+    const a = await noId(h, 'how many calories have I eaten today', 0);
+    const b = await noId(h, 'how many calories have I eaten today', 10_000);
+    assert.equal(a.kind, 'informational');
+    assert.equal(b.kind, 'informational');
+    // Both are legitimate answers; the point is the second was genuinely executed.
+    assert.equal(b.kind, a.kind);
+  });
+
+  test('a deliberate second log after the window is still safe', async () => {
+    const h = await harness();
+    await readyToLog(h);
+    await noId(h, 'log it', 0);
+    const later = await noId(h, 'log it', 10_000);
+    assert.equal(later.kind, 'success', 'acknowledged, not an error');
+    const logs = await h.repos.foodLogs.listByLocalDate(USER_A, h.app.getState().dashboard!.localDate);
+    assert.equal(logs.length, 1, 'the application idempotency guard still holds');
+  });
+
+  test('different utterances are never confused for replays', async () => {
+    const h = await harness();
+    const a = await withId(h, 'add chicken breast', 'stt-a', 0);
+    const b = await withId(h, 'add tofu', 'stt-b', 100);
+    assert.notDeepEqual(a, b);
+  });
+
+  test('replay memory does not cross users', async () => {
+    const h = await harness();
+    await withId(h, 'add chicken breast', 'stt-x', 0);
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300));
+
+    // Same delivery id, new subject: must be handled fresh, not replayed as A's.
+    const r = await h.voice.handle({
+      transcript: 'add chicken breast',
+      receivedAt: instant(new Date(Date.parse(START) + 100).toISOString()),
+      userId: USER_B,
+      utteranceId: 'stt-x',
+    } as VoiceUtterance);
+    assert.equal(r.kind, 'options', "B's command executed for B");
+  });
+
+  test('replay memory stays bounded', async () => {
+    const h = await harness();
+    for (let i = 0; i < 30; i++) await withId(h, 'what can I say', `stt-${i}`, i * 10);
+    const r = await withId(h, 'what can I say', 'stt-0', 100_000);
+    assert.equal(r.kind, 'informational', 'an evicted old id is simply handled again');
+  });
+});

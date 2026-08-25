@@ -62,7 +62,9 @@ export function findCuration(
  *   basis (per 100 g)    the nutrition itself
  *   brandName            a different brand is a different product, not a relabel
  *   variant              "Nonfat" vs "Whole" is a different formulation
- *   labelFacts servings  the declared serving basis is a source fact we retain
+ *   declared label       serving description, serving mass and the full declared
+ *                        per-serving macros. The printed label is a product fact
+ *                        the user reads; a label-only correction is a real change.
  *
  * MUTABLE METADATA — deliberately NOT part of version identity:
  *   category             a curation/browse decision
@@ -88,9 +90,28 @@ export interface FingerprintInput {
   readonly brandName?: string;
   readonly variant?: string;
   readonly per100g: NormalizedCandidate['per100g'];
-  /** Declared serving basis, when the source supplied one. A source fact. */
+
+  /**
+   * DECLARED LABEL FACTS — part of version identity (V-1 ruling).
+   *
+   * The printed label is what the user reads on the package and what a support
+   * conversation is argued from, so a corrected label is a real product change
+   * even when per-100 g values are unchanged. Leaving these outside identity
+   * meant a label-only correction produced no new version and the stale label
+   * was served indefinitely.
+   *
+   * `servingDescription` is included because the household measure ("1/2 cup
+   * dry" vs "1 cup dry") changes what the label MEANS, not merely how it reads.
+   *
+   * Absent stays absent: a source that never declared a label contributes
+   * nothing here and its fingerprint is unaffected.
+   */
+  readonly servingDescription?: string;
   readonly servingGrams?: number;
   readonly servingLabelKcal?: number;
+  readonly servingLabelProteinG?: number;
+  readonly servingLabelCarbohydrateG?: number;
+  readonly servingLabelFatG?: number;
 }
 
 export function fingerprintOf(input: FingerprintInput): string {
@@ -101,8 +122,12 @@ export function fingerprintOf(input: FingerprintInput): string {
     (input.brandName ?? '').trim().toLowerCase(),
     (input.variant ?? '').trim().toLowerCase(),
     n.kcal, n.proteinG, n.carbohydrateG, n.fatG, n.fiberG, n.sugarG, n.sodiumMg,
+    (input.servingDescription ?? '').trim().toLowerCase(),
     input.servingGrams,
     input.servingLabelKcal,
+    input.servingLabelProteinG,
+    input.servingLabelCarbohydrateG,
+    input.servingLabelFatG,
   ];
   return parts.map((p) => (p === undefined || p === '' ? '~' : String(p))).join('|');
 }
@@ -126,7 +151,15 @@ export function canonicalFingerprint(
     ...(c.brandName !== undefined ? { brandName: c.brandName } : {}),
     ...(c.variant !== undefined ? { variant: c.variant } : {}),
     per100g: c.per100g,
+    ...(c.labelFacts?.servingDescription !== undefined
+      ? { servingDescription: c.labelFacts.servingDescription } : {}),
     ...(c.labelFacts?.servingGrams !== undefined ? { servingGrams: c.labelFacts.servingGrams } : {}),
     ...(c.labelFacts?.kcalPerServing !== undefined ? { servingLabelKcal: c.labelFacts.kcalPerServing } : {}),
+    ...(c.labelFacts?.proteinGPerServing !== undefined
+      ? { servingLabelProteinG: c.labelFacts.proteinGPerServing } : {}),
+    ...(c.labelFacts?.carbohydrateGPerServing !== undefined
+      ? { servingLabelCarbohydrateG: c.labelFacts.carbohydrateGPerServing } : {}),
+    ...(c.labelFacts?.fatGPerServing !== undefined
+      ? { servingLabelFatG: c.labelFacts.fatGPerServing } : {}),
   });
 }

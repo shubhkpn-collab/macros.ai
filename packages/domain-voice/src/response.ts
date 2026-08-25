@@ -8,6 +8,10 @@ import type { ClarificationReason, InvalidReason } from './intents.js';
  * values stay in `data`; `speech` is presentation only and is NEVER written
  * back into nutrition or logs.
  */
+/**
+ * A response may be marked as a replay of an earlier delivery. The payload is
+ * the ORIGINAL response, re-spoken — never a re-execution of the command.
+ */
 export type VoiceResponse =
   | { readonly kind: 'informational'; readonly speech: string; readonly data?: Readonly<Record<string, number | string>> }
   | { readonly kind: 'options'; readonly speech: string; readonly options: readonly VoiceOption[] }

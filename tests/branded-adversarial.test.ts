@@ -146,47 +146,60 @@ describe('§49 — can a card display a fact the source never supplied?', () => 
   });
 });
 
-describe('V-1 — label fact coverage in version identity (KNOWN GAP, reported not silently changed)', () => {
+describe('V-1 — declared label facts ARE part of version identity (gap closed)', () => {
   const base = {
     displayName: 'Old Fashioned Oats', preparationState: 'as_sold',
     brandName: 'Demo Brand', variant: 'Original',
     per100g: { kcal: 375, proteinG: 12.5, carbohydrateG: 67.5, fatG: 7.5 },
-    servingGrams: 40, servingLabelKcal: 150,
+    servingDescription: '1/2 cup dry',
+    servingGrams: 40,
+    servingLabelKcal: 150,
+    servingLabelProteinG: 5,
+    servingLabelCarbohydrateG: 27,
+    servingLabelFatG: 3,
   };
 
-  test('COVERED: serving mass and label energy are part of version identity', () => {
+  test('serving mass and label energy remain covered', () => {
     assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, servingGrams: 45 }));
     assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, servingLabelKcal: 140 }));
   });
 
-  /**
-   * NOT COVERED, and this test exists to make the gap falsifiable rather than
-   * invisible.
-   *
-   * `ProductVersion.labelFacts` stores declared per-serving PROTEIN, CARB and
-   * FAT, plus the serving description — all immutable source facts. None is an
-   * input to the fingerprint. So a source that corrects only a printed label
-   * macro, leaving per-100 g and label kcal unchanged, produces NO new version,
-   * and the catalog keeps serving the stale label indefinitely.
-   *
-   * Reported rather than changed: A7 is a closed classification, and widening
-   * the fingerprint is an owner decision, not a drive-by edit.
-   */
-  test('GAP: declared label macros can change without changing the fingerprint', () => {
-    // The fingerprint has no input for label protein/carb/fat at all, so two
-    // products whose printed labels disagree on protein are indistinguishable.
-    assert.equal(
+  test('CLOSED: a label-only protein correction now produces a new version', () => {
+    // per-100 g unchanged; only the printed label protein was corrected.
+    assert.notEqual(
       fingerprintOf(base),
-      fingerprintOf({ ...base }),
-      'documented: label macros are outside version identity',
-    );
-    assert.ok(
-      !Object.keys(base).includes('servingLabelProteinG'),
-      'no label-macro input exists on FingerprintInput — this is the gap',
+      fingerprintOf({ ...base, servingLabelProteinG: 6 }),
+      'a corrected label is a real product change',
     );
   });
 
-  test('GAP: the serving description can change without a new version', () => {
-    assert.ok(!Object.keys(base).includes('servingDescription'));
+  test('CLOSED: label carbohydrate and fat corrections produce a new version', () => {
+    assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, servingLabelCarbohydrateG: 26 }));
+    assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, servingLabelFatG: 2.5 }));
+  });
+
+  test('CLOSED: a changed household measure produces a new version', () => {
+    assert.notEqual(
+      fingerprintOf(base),
+      fingerprintOf({ ...base, servingDescription: '1 cup dry' }),
+      'the household measure changes what the label means',
+    );
+  });
+
+  test('a product with NO declared label is unaffected', () => {
+    const unlabelled = {
+      displayName: 'Chicken breast, cooked', preparationState: 'cooked',
+      per100g: { kcal: 165, proteinG: 31, carbohydrateG: 0, fatG: 3.6 },
+    };
+    assert.equal(fingerprintOf(unlabelled), fingerprintOf({ ...unlabelled }));
+  });
+
+  test('package descriptor and GTIN remain OUTSIDE version identity', () => {
+    const noisy = { ...base, packageDescriptor: '24 oz box', gtin: '00099000000011' } as typeof base;
+    assert.equal(fingerprintOf(base), fingerprintOf(noisy));
+  });
+
+  test('the fingerprint stays deterministic', () => {
+    assert.equal(fingerprintOf(base), fingerprintOf({ ...base }));
   });
 });
