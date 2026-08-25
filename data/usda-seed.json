@@ -3862,7 +3862,7 @@
  {
   "productId": "food_67a84850f33506f5",
   "conceptKey": "beef|breakfast sausage|pre cooked|sausage|unprepared#cooked",
-  "displayName": "Breakfast sausage sausage, beef, pre-cooked, unprepared",
+  "displayName": "Breakfast sausage, beef, pre-cooked, unprepared",
   "sourceDescription": "Sausage, breakfast sausage, beef, pre-cooked, unprepared",
   "aliases": [],
   "preparationState": "cooked",
@@ -5384,7 +5384,7 @@
  {
   "productId": "food_12cb6cbf84d088ec",
   "conceptKey": "cashew nuts|nuts|raw#raw",
-  "displayName": "Cashew nuts nuts, raw",
+  "displayName": "Cashew nuts, raw",
   "sourceDescription": "Nuts, cashew nuts, raw",
   "aliases": [],
   "preparationState": "raw",
@@ -8207,7 +8207,7 @@
   "sourceDescription": "Crustaceans, crab, blue swimming, lump, pasteurized, refrigerated",
   "aliases": [],
   "preparationState": "as_sold",
-  "preparationRule": "whole_food_category_no_preparation",
+  "preparationRule": "as_sold_form_term",
   "category": "Finfish and Shellfish Products",
   "categoryEligibility": "default_catalog",
   "recommendable": true,
@@ -18129,7 +18129,7 @@
  {
   "productId": "food_4e2fb3f58ed1c764",
   "conceptKey": "macadamia nuts|nuts|raw#raw",
-  "displayName": "Macadamia nuts nuts, raw",
+  "displayName": "Macadamia nuts, raw",
   "sourceDescription": "Nuts, macadamia nuts, raw",
   "aliases": [],
   "preparationState": "raw",
@@ -22432,7 +22432,7 @@
  {
   "productId": "food_e1225f4311f4073e",
   "conceptKey": "nuts|pine nuts|raw#raw",
-  "displayName": "Pine nuts nuts, raw",
+  "displayName": "Pine nuts, raw",
   "sourceDescription": "Nuts, pine nuts, raw",
   "aliases": [],
   "preparationState": "raw",
@@ -22891,7 +22891,7 @@
  {
   "productId": "food_fd81f12cc7e38876",
   "conceptKey": "nuts|pistachio nuts|raw#raw",
-  "displayName": "Pistachio nuts nuts, raw",
+  "displayName": "Pistachio nuts, raw",
   "sourceDescription": "Nuts, pistachio nuts, raw",
   "aliases": [],
   "preparationState": "raw",
@@ -29696,7 +29696,7 @@
   "sourceDescription": "Ham, sliced, restaurant",
   "aliases": [],
   "preparationState": "as_sold",
-  "preparationRule": "whole_food_category_no_preparation",
+  "preparationRule": "as_sold_form_term",
   "category": "Pork Products",
   "categoryEligibility": "default_catalog",
   "recommendable": true,

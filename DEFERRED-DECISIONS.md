@@ -167,6 +167,20 @@ unresolved fell from 4,459-equivalent to 5 of 395.
 | CA-13 | **Typo tolerance / embeddings.** Not added — the expanded benchmark shows no failure class lexical matching cannot handle. | Measurement first. | If a benchmark demands it |
 | RC-5 | **Recommendation quality on real foods** — 7 scenarios reviewed, all sensible (protein gap → lean fish, fat gap → cream/nuts). Not user-validated. | Needs real users. | Post-pilot |
 
+## From CATALOG INTEGRITY PATCH (2026-08-25, second pass)
+
+**CA-8 / CA-11 / CA-12 REMAIN OPEN — SR Legacy was not present this session.**
+The archive reported as re-supplied is absent from uploads; only Foundation
+(`27d1fe3f…`) is available. Its contents were not synthesized or recalled.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| CA-8 | Catalog depth — 307 published from Foundation alone. | SR Legacy archive absent. | Owner re-upload |
+| CA-11 | Cross-source overlap resolution. Logic and source priority implemented and unit-tested; **no cross-source pairs existed to resolve**. | Requires both archives. | With CA-8 |
+| CA-12 | Search misses ("tortilla", "whole wheat bread") are catalog gaps. | Source lacks them. | With CA-8 |
+| CA-14 | **Preparation-aware retrieval.** "cooked ground turkey" misses because the record reads "pan-broiled crumbles" — search matches display text, not `preparationState`. Measured, not guessed. | Touches the frozen search domain; 1 of 12, and no wrong-preparation outranking. | Search ranking milestone |
+| CA-15 | Administrative source-text normalization (e.g. "Includes foods for USDA's Food Distribution Program") — rule not written because no such text exists in Foundation. | Needs SR evidence to design against. | With CA-8 |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**

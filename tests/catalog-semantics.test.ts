@@ -304,3 +304,137 @@ describe('B24 — nutrient integrity survives expansion', () => {
     assert.ok(someMissing, 'partial coverage should be visible in the catalog');
   });
 });
+
+describe('SECTION 1/24 — metric scope is unambiguous', () => {
+  test('preparation counts are SCOPED to their population', () => {
+    // An unscoped `preparationCounts` left the denominator ambiguous and was
+    // mis-cited in a closure report. Both populations are now named.
+    assert.equal(report.stats.preparationCounts, undefined, 'the ambiguous name is gone');
+    assert.ok(report.stats.sourcePreparationCounts !== undefined);
+    assert.ok(report.stats.publishedPreparationCounts !== undefined);
+  });
+
+  test('published counts sum to the published catalog, source counts do not', () => {
+    const published = Object.values(report.stats.publishedPreparationCounts as Record<string, number>)
+      .reduce((a, b) => a + b, 0);
+    assert.equal(published, seeds.length, 'published distribution covers exactly the catalog');
+
+    const source = Object.values(report.stats.sourcePreparationCounts as Record<string, number>)
+      .reduce((a, b) => a + b, 0);
+    assert.ok(source >= published, 'the source population is larger — which is why scoping matters');
+  });
+
+  test('the published distribution matches the actual catalog file', () => {
+    const actual: Record<string, number> = {};
+    for (const s of seeds) actual[s.preparationState] = (actual[s.preparationState] ?? 0) + 1;
+    assert.deepEqual(report.stats.publishedPreparationCounts, actual);
+    assert.deepEqual(report.search.publishedPreparationDistribution, actual);
+  });
+});
+
+describe('SECTION 4 — as_sold never conceals raw/cooked uncertainty', () => {
+  test('a preparation-critical category with NO signal goes to curation', () => {
+    for (const [description, category] of [
+      ['Beef, ground, 80% lean', 'Beef Products'],
+      ['Pork, shoulder', 'Pork Products'],
+      ['Chicken, thigh, boneless', 'Poultry Products'],
+      ['Fish, tilapia, fillet', 'Finfish and Shellfish Products'],
+    ] as const) {
+      const c = classifyPreparation(description, category);
+      assert.equal(c.state, 'unresolved', `${description} must not become as_sold`);
+      assert.equal(c.rule, 'preparation_critical_category_without_signal');
+    }
+  });
+
+  test('an explicit FORM term still resolves those categories honestly', () => {
+    assert.equal(classifyPreparation('Ham, sliced, restaurant', 'Pork Products').state, 'as_sold');
+    assert.equal(classifyPreparation('Crustaceans, crab, pasteurized', 'Finfish and Shellfish Products').state, 'as_sold');
+  });
+
+  test('an explicit preparation term always wins over category caution', () => {
+    assert.equal(classifyPreparation('Beef, ground, raw', 'Beef Products').state, 'raw');
+    assert.equal(classifyPreparation('Beef, ground, cooked, broiled', 'Beef Products').state, 'cooked');
+  });
+
+  test('dairy, produce and oils remain legitimately as_sold', () => {
+    assert.equal(classifyPreparation('Buttermilk, low fat', 'Dairy and Egg Products').state, 'as_sold');
+    assert.equal(classifyPreparation('Spinach, baby', 'Vegetables and Vegetable Products').state, 'as_sold');
+  });
+
+  test('no published meat or fish record was resolved by bare category fallback', () => {
+    const CRITICAL = /\b(beef|pork|poultry|lamb|veal|sausage|luncheon|finfish|shellfish)\b/i;
+    for (const s of seeds) {
+      if (s.category !== null && CRITICAL.test(s.category)) {
+        assert.notEqual(
+          s.preparationRule, 'whole_food_category_no_preparation',
+          `${s.sourceDescription} resolved by category alone`,
+        );
+      }
+    }
+  });
+});
+
+describe('SECTION 11 — productId collision invariant', () => {
+  test('two different concepts never share one id in the published catalog', () => {
+    const byId = new Map<string, string>();
+    for (const s of seeds) {
+      const existing = byId.get(s.productId);
+      if (existing !== undefined) assert.equal(existing, s.conceptKey, `collision on ${s.productId}`);
+      byId.set(s.productId, s.conceptKey);
+    }
+    assert.equal(byId.size, seeds.length);
+  });
+
+  test('distinct concept keys produce distinct ids', () => {
+    const a = genericProductId(conceptKeyFor('Chicken, breast', 'raw'));
+    const b = genericProductId(conceptKeyFor('Chicken, thigh', 'raw'));
+    assert.notEqual(a, b);
+  });
+});
+
+describe('SECTION 16 — preparation-sensitive search is actually measured', () => {
+  test('preparation correctness is no longer 0/0', () => {
+    const p = report.search.preparationSensitive;
+    assert.ok(p.total >= 10, `expected real preparation queries, got ${p.total}`);
+    assert.equal(report.search.preparationChecked, undefined, 'the unmeasured field is gone');
+  });
+
+  test('NO wrong-preparation result outranks a correct one', () => {
+    const p = report.search.preparationSensitive;
+    assert.equal(p.wrongPreparationOutranked, 0,
+      `wrong preparation outranked correct for: ${p.failures.join(', ')}`);
+  });
+});
+
+describe('SECTION 19 — display names are not deterministically ugly', () => {
+  test('no display name repeats a word through the inversion', () => {
+    // "Mahi mahi" is a real food name, not a formatting artifact — the defect
+    // is duplication CREATED by comma inversion, which is what this checks.
+    const GENUINE_REPEATS = /mahi mahi|couscous|bonbon/i;
+    for (const s of seeds) {
+      if (GENUINE_REPEATS.test(s.displayName)) continue;
+      const words = s.displayName.toLowerCase().split(/[\s,]+/).filter(Boolean);
+      for (let i = 0; i < words.length - 1; i++) {
+        if (words[i]!.length > 3) {
+          assert.notEqual(words[i], words[i + 1], `"${s.displayName}" repeats "${words[i]}"`);
+        }
+      }
+    }
+  });
+
+  test('the inversion does not duplicate the head noun', () => {
+    assert.equal(consumerDisplayName('Sausage, breakfast sausage, beef'), 'Breakfast sausage, beef');
+    assert.equal(consumerDisplayName('Cheese, cheddar'), 'Cheddar cheese');
+  });
+
+  test('meaningful qualifiers always survive', () => {
+    for (const s of seeds) {
+      for (const q of ['raw', 'cooked', 'without salt', 'with skin', 'lean']) {
+        if (new RegExp(`\\b${q}\\b`, 'i').test(s.sourceDescription)) {
+          assert.match(s.displayName.toLowerCase(), new RegExp(q.split(' ')[0]!),
+            `"${s.sourceDescription}" lost "${q}"`);
+        }
+      }
+    }
+  });
+});

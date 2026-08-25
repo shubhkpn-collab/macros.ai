@@ -8,7 +8,7 @@
  * rules change and a food's factual state moves raw → cooked, that is a real
  * catalog change and must be traceable to the classifier that produced it.
  */
-export const PREPARATION_CLASSIFIER_VERSION = 'preparation-classifier@2.1.0';
+export const PREPARATION_CLASSIFIER_VERSION = 'preparation-classifier@2.2.0';
 
 /** Matches the existing `PreparationState` contract — no parallel field. */
 export type ClassifiedPreparation = 'raw' | 'cooked' | 'as_sold' | 'prepared' | 'unresolved';
@@ -63,7 +63,20 @@ const AMBIGUOUS_ALTERNATIVE = /\b(raw or cooked|cooked or raw|fresh or frozen|or
  * shelled nuts. `as_sold` states exactly what is on the scale without claiming
  * it was cooked, and without the false precision of calling it "raw".
  */
-const WHOLE_FOOD_CATEGORIES = /\b(vegetable|fruit|legume|nut|seed|cereal grain|pasta|spice|herb|dairy|egg|poultry|beef|pork|lamb|finfish|shellfish|sausage|luncheon|baked|snack|sweet|beverage|fats and oils|soup|sauce)\b/i;
+const WHOLE_FOOD_CATEGORIES = /\b(vegetable|fruit|legume|nut|seed|cereal grain|pasta|spice|herb|dairy|egg|baked|snack|sweet|beverage|fats and oils|soup|sauce)\b/i;
+
+/**
+ * Categories where raw and cooked differ MATERIALLY per 100 g and the source
+ * often leaves it unstated.
+ *
+ * Category membership alone must never resolve these: a bare "Beef, ground,
+ * 80% lean" is almost certainly raw, but `as_sold` would quietly assert that
+ * whatever is on the scale matches this record — and cooked beef is roughly a
+ * third denser in energy. These require an explicit preparation or form term,
+ * or they go to curation.
+ */
+const PREPARATION_CRITICAL_CATEGORIES =
+  /\b(beef|pork|poultry|lamb|veal|game|sausage|luncheon|finfish|shellfish)\b/i;
 
 export function classifyPreparation(
   description: string,
@@ -101,12 +114,23 @@ export function classifyPreparation(
   if (READY_TO_EAT.test(d)) {
     return { state: 'as_sold', classifierVersion: v, rule: 'ready_to_eat_term' };
   }
-  if (/\b(dry|dried|frozen|canned|fresh)\b/.test(d)) {
+  // Explicit FORM terms state how the food is sold. Evidence-derived from real
+  // records: pasteurized crab and sliced ham are ready to eat as purchased.
+  if (/\b(dry|dried|frozen|canned|fresh|pasteurized|cured|deli|sliced)\b/.test(d)) {
     return { state: 'as_sold', classifierVersion: v, rule: 'as_sold_form_term' };
   }
-  // Category evidence from the source, not a guess about the food itself.
-  if (category !== undefined && category !== null && WHOLE_FOOD_CATEGORIES.test(category)) {
-    return { state: 'as_sold', classifierVersion: v, rule: 'whole_food_category_no_preparation' };
+  if (category !== undefined && category !== null) {
+    // Preparation-critical categories are NEVER resolved by category alone.
+    if (PREPARATION_CRITICAL_CATEGORIES.test(category)) {
+      return {
+        state: 'unresolved', classifierVersion: v,
+        rule: 'preparation_critical_category_without_signal',
+      };
+    }
+    // Category evidence from the source, not a guess about the food itself.
+    if (WHOLE_FOOD_CATEGORIES.test(category)) {
+      return { state: 'as_sold', classifierVersion: v, rule: 'whole_food_category_no_preparation' };
+    }
   }
 
   return { state: 'unresolved', classifierVersion: v, rule: 'no_preparation_signal' };

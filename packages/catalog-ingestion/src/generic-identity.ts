@@ -135,10 +135,18 @@ export function consumerDisplayName(description: string): string {
   const modifier = rest[0]!;
   if (/^[a-z][a-z' -]{1,20}$/i.test(modifier) && !/\b(raw|cooked|with|without|and|or)\b/i.test(modifier)) {
     const tail = rest.slice(1);
-    const base = `${capitalize(modifier)} ${head.toLowerCase()}`;
+    const headLower = head.toLowerCase();
+    // Do NOT repeat the head word when the modifier already contains it.
+    // "Sausage, breakfast sausage, beef" inverted to "Breakfast sausage
+    // sausage, beef" — deterministic, and nonsense.
+    const base = new RegExp(`\\b${escapeRegex(headLower)}\\b`).test(modifier.toLowerCase())
+      ? capitalize(modifier)
+      : `${capitalize(modifier)} ${headLower}`;
     return tail.length > 0 ? `${base}, ${tail.join(', ')}` : base;
   }
   return description.trim();
 }
+
+const escapeRegex = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);

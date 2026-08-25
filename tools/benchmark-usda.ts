@@ -127,6 +127,23 @@ const QUERIES: readonly Query[] = [
   { q: 'breast chicken', expect: /chicken/i, ambiguous: true },
   { q: 'cheese cheddar', expect: /cheddar/i },
   { q: 'oil olive', expect: /olive/i, ambiguous: true },
+  // --- PREPARATION-SENSITIVE (Section 16) ---
+  // Wrong preparation is a HIGH-SEVERITY error: cooked beef is roughly a third
+  // denser in energy than raw, so a preparation mix-up silently corrupts a log.
+  // Every pair below was verified to exist in both states in the catalog.
+  { q: 'raw ground turkey', expect: /turkey/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked ground turkey', expect: /turkey/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw beef loin', expect: /loin/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked beef loin', expect: /loin/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw almonds', expect: /almond/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'roasted almonds', expect: /almond/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw sunflower seeds', expect: /seed/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'dry roasted sunflower seeds', expect: /seed/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw egg white', expect: /egg.*white|white.*egg/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked chicken breast', expect: /chicken/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw snap beans', expect: /snap bean|bean/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked kale', expect: /kale/i, ambiguous: true, expectPreparation: 'cooked' },
+
   // --- must return NOTHING ---
   { q: 'zzzqqq nonsense food', expect: null },
   { q: 'unicorn steak', expect: null },
@@ -137,7 +154,8 @@ const QUERIES: readonly Query[] = [
 let top1 = 0, top4 = 0, mrrSum = 0;
 let ambTop4 = 0, ambTotal = 0, unambTop1 = 0, unambTotal = 0;
 let zeroCorrect = 0, zeroTotal = 0, falsePositive = 0;
-let prepChecked = 0, prepCorrect = 0;
+let prepChecked = 0, prepTop1 = 0, prepTop4 = 0, prepOutranked = 0;
+const prepFailures: string[] = [];
 const misses: string[] = [];
 
 for (const query of QUERIES) {
@@ -159,9 +177,27 @@ for (const query of QUERIES) {
     unambTotal++;
     if (rank === 0) unambTop1++;
   }
-  if (query.expectPreparation !== undefined && rank >= 0) {
+  if (query.expectPreparation !== undefined) {
     prepChecked++;
-    if (results[rank]!.productVersion.preparationState === query.expectPreparation) prepCorrect++;
+    const top1Prep = results[0]?.productVersion.preparationState;
+    if (top1Prep === query.expectPreparation) prepTop1++;
+    const inTop4 = results.slice(0, 4).some(
+      (r) => query.expect!.test(r.productVersion.displayName) &&
+        r.productVersion.preparationState === query.expectPreparation,
+    );
+    if (inTop4) prepTop4++;
+    // A result of the WRONG preparation ranking above every correct one.
+    const firstCorrect = results.findIndex(
+      (r) => r.productVersion.preparationState === query.expectPreparation,
+    );
+    const firstWrong = results.findIndex(
+      (r) => query.expect!.test(r.productVersion.displayName) &&
+        r.productVersion.preparationState !== query.expectPreparation,
+    );
+    if (firstWrong >= 0 && (firstCorrect < 0 || firstWrong < firstCorrect)) {
+      prepOutranked++;
+      prepFailures.push(query.q);
+    }
   }
 }
 
@@ -200,10 +236,17 @@ const searchReport = {
   ambiguous: { total: ambTotal, top4: ambTop4, percent: ambTotal === 0 ? 0 : r1(ambTop4 / ambTotal) },
   zeroResult: { total: zeroTotal, correct: zeroCorrect },
   falsePositives: falsePositive,
-  preparationChecked: prepChecked, preparationCorrect: prepCorrect,
+  preparationSensitive: {
+    total: prepChecked, top1: prepTop1, top4: prepTop4,
+    top1Percent: prepChecked === 0 ? 0 : r1(prepTop1 / prepChecked),
+    top4Percent: prepChecked === 0 ? 0 : r1(prepTop4 / prepChecked),
+    wrongPreparationOutranked: prepOutranked,
+    wrongPreparationRate: prepChecked === 0 ? 0 : r1(prepOutranked / prepChecked),
+    failures: prepFailures,
+  },
   misses,
   conceptMatrix: { total: CONCEPTS.length, available: availableConcepts, entries: conceptMatrix },
-  preparationDistribution: prepDistribution,
+  publishedPreparationDistribution: prepDistribution,
 };
 
 // Merge into the canonical report so ONE artifact holds every metric.
@@ -226,4 +269,7 @@ console.log('\n=== COMMON FOOD COVERAGE ===');
 console.log(`available ${availableConcepts}/${CONCEPTS.length}`);
 const missing = conceptMatrix.filter((c) => !c.available).map((c) => c.concept);
 if (missing.length > 0) console.log('missing:', missing.join(', '));
-console.log('\npreparation distribution:', JSON.stringify(prepDistribution));
+console.log('\n=== PREPARATION-SENSITIVE SEARCH ===');
+console.log('queries', prepChecked, '| Top-1', prepTop1, '| Top-4', prepTop4, '| wrong-prep outranked', prepOutranked);
+if (prepFailures.length > 0) console.log('failures:', prepFailures.join(', '));
+console.log('\npublished preparation distribution:', JSON.stringify(prepDistribution));

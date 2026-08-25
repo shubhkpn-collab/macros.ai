@@ -58,7 +58,8 @@ const stats = {
   recordsRead: 0, nullRecords: 0, malformed: 0,
   missingCore: 0, unresolvedPrep: 0, accepted: 0,
   excludedCategory: 0, duplicateConcept: 0,
-  preparationCounts: {} as Record<string, number>,
+  /** Over ALL SOURCE RECORDS scanned — not the published catalog. */
+  sourcePreparationCounts: {} as Record<string, number>,
   categoryCounts: {} as Record<string, number>,
   byDataset: {} as Record<string, { read: number; accepted: number }>,
   unmapped: new Map<number, number>(),
@@ -66,6 +67,25 @@ const stats = {
 };
 
 const CORE = ['energy_kcal', 'protein', 'carbohydrate', 'fat'] as const;
+
+/**
+ * COLLISION INVARIANT.
+ *
+ * Ids are a 16-hex truncation of SHA-256. Collision is improbable, but
+ * improbable is not a guarantee — and a silent collision would attach one
+ * food's nutrition to another. The build fails loudly instead of relying on
+ * probability.
+ */
+const idToConceptKey = new Map<string, string>();
+function assertNoCollision(productId: string, conceptKey: string): void {
+  const existing = idToConceptKey.get(productId);
+  if (existing !== undefined && existing !== conceptKey) {
+    throw new Error(
+      `productId collision: ${productId} produced by two different concepts:\n  ${existing}\n  ${conceptKey}`,
+    );
+  }
+  idToConceptKey.set(productId, conceptKey);
+}
 const seeds: Seed[] = [];
 const seenFdc = new Set<number>();
 const seenConcepts = new Set<string>();
@@ -91,7 +111,7 @@ for (const [dataset, path] of FILES) {
     for (const i of e.issues) stats.issues[i.kind]++;
 
     const prep = classifyPreparation(e.description, e.category);
-    stats.preparationCounts[prep.state] = (stats.preparationCounts[prep.state] ?? 0) + 1;
+    stats.sourcePreparationCounts[prep.state] = (stats.sourcePreparationCounts[prep.state] ?? 0) + 1;
     if (!isPublishableState(prep.state)) { stats.unresolvedPrep++; continue; }
 
     const eligibility = categoryEligibility(e.category);
@@ -115,6 +135,7 @@ for (const [dataset, path] of FILES) {
     // near-identical catalog entries.
     const conceptKey = conceptKeyFor(e.description, prep.state);
     const productId = genericProductId(conceptKey);
+    assertNoCollision(productId, conceptKey);
     if (seenConcepts.has(productId)) { stats.duplicateConcept++; continue; }
     seenConcepts.add(productId);
     const per100g: Seed['per100g'] = {};
@@ -197,6 +218,12 @@ const coverageAllAccepted = coverageOver(seeds);
  * Metric names are explicit: a mapping ROW is not a canonical NUTRIENT, and
  * conflating them was how the reported mapping count drifted.
  */
+const publishedPreparationCounts = (): Record<string, number> => {
+  const out: Record<string, number> = {};
+  for (const s2 of curated) out[s2.preparationState] = (out[s2.preparationState] ?? 0) + 1;
+  return out;
+};
+
 const report = {
   adapterVersion: 'usda-fdc-adapter@1.0.0',
   classifierVersion: PREPARATION_CLASSIFIER_VERSION,
@@ -215,7 +242,11 @@ const report = {
     rejectedUnresolvedPreparation: stats.unresolvedPrep,
     rejectedExcludedCategory: stats.excludedCategory,
     duplicateConceptsCollapsed: stats.duplicateConcept,
-    preparationCounts: stats.preparationCounts,
+    // SCOPED NAMES. An unscoped `preparationCounts` left the denominator
+    // ambiguous and was mis-cited in a closure report; both populations are now
+    // reported explicitly and can never be confused.
+    sourcePreparationCounts: stats.sourcePreparationCounts,
+    publishedPreparationCounts: publishedPreparationCounts(),
     categoryCounts: stats.categoryCounts,
     recommendableCount: curated.filter((s2) => s2.recommendable).length,
     acceptedCandidates: stats.accepted,
@@ -239,7 +270,8 @@ console.log('rejected: missing core', stats.missingCore, '| unresolved prep', st
 console.log('accepted candidates', stats.accepted, '| PUBLISHED SEED', curated.length);
 console.log('by dataset:', JSON.stringify(stats.byDataset));
 if (MISSING_ARCHIVES.length > 0) console.log('MISSING ARCHIVES:', MISSING_ARCHIVES.join(', '));
-console.log('preparation:', JSON.stringify(stats.preparationCounts));
+console.log('source preparation:', JSON.stringify(stats.sourcePreparationCounts));
+console.log('published preparation:', JSON.stringify(publishedPreparationCounts()));
 console.log('excluded by category', stats.excludedCategory, '| duplicate concepts collapsed', stats.duplicateConcept);
 console.log('recommendable', curated.filter((s2) => s2.recommendable).length, 'of', curated.length);
 console.log('nutrient issues:', JSON.stringify(stats.issues));

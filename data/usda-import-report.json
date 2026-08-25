@@ -1,6 +1,6 @@
 {
  "adapterVersion": "usda-fdc-adapter@1.0.0",
- "classifierVersion": "preparation-classifier@2.1.0",
+ "classifierVersion": "preparation-classifier@2.2.0",
  "identityVersion": "generic-identity@1.0.0",
  "catalogPolicyVersion": "catalog-policy@1.0.0",
  "aliasPolicyVersion": "consumer-aliases@1.0.0",
@@ -24,11 +24,16 @@
   "rejectedUnresolvedPreparation": 5,
   "rejectedExcludedCategory": 0,
   "duplicateConceptsCollapsed": 0,
-  "preparationCounts": {
+  "sourcePreparationCounts": {
    "as_sold": 182,
    "raw": 162,
    "cooked": 14,
    "unresolved": 5
+  },
+  "publishedPreparationCounts": {
+   "as_sold": 150,
+   "cooked": 14,
+   "raw": 143
   },
   "categoryCounts": {
    "Legumes and Legume Products": 37,
@@ -490,33 +495,42 @@
  ],
  "search": {
   "corpusSize": 307,
-  "totalQueries": 84,
-  "scoredQueries": 80,
-  "top1": 78,
-  "top1Percent": 97.5,
-  "top4": 78,
-  "top4Percent": 97.5,
-  "mrr": 0.975,
+  "totalQueries": 96,
+  "scoredQueries": 92,
+  "top1": 89,
+  "top1Percent": 96.7,
+  "top4": 89,
+  "top4Percent": 96.7,
+  "mrr": 0.967,
   "unambiguous": {
    "total": 23,
    "top1": 23,
    "percent": 100
   },
   "ambiguous": {
-   "total": 57,
-   "top4": 55,
-   "percent": 96.5
+   "total": 69,
+   "top4": 66,
+   "percent": 95.7
   },
   "zeroResult": {
    "total": 4,
    "correct": 4
   },
   "falsePositives": 0,
-  "preparationChecked": 0,
-  "preparationCorrect": 0,
+  "preparationSensitive": {
+   "total": 12,
+   "top1": 11,
+   "top4": 11,
+   "top1Percent": 91.7,
+   "top4Percent": 91.7,
+   "wrongPreparationOutranked": 0,
+   "wrongPreparationRate": 0,
+   "failures": []
+  },
   "misses": [
    "whole wheat bread",
-   "tortilla"
+   "tortilla",
+   "cooked ground turkey"
   ],
   "conceptMatrix": {
    "total": 48,
@@ -918,7 +932,7 @@
     }
    ]
   },
-  "preparationDistribution": {
+  "publishedPreparationDistribution": {
    "as_sold": 150,
    "cooked": 14,
    "raw": 143
