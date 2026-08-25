@@ -133,10 +133,16 @@ export class DeterministicVoiceParser implements VoiceParser {
       return { status: 'invalid', reason: 'unsupported_unit', transcript };
     }
 
+    // Spoken negation. STT writes "minus fifty" as words, not as a '-' glyph,
+    // so a sign check on punctuation alone would read it as POSITIVE fifty.
+    const spokenNegation = new RegExp(
+      `\\b(?:minus|negative)\\s+\\d+(?:\\.\\d+)?\\s*(?:${GRAM_UNITS.join('|')})\\b`,
+    ).test(text);
+
     const match = new RegExp(`(-?\\b\\d+(?:\\.\\d+)?)\\s*(${GRAM_UNITS.join('|')})\\b`).exec(text);
     if (match?.[1] === undefined) return null;
 
-    const grams = Number(match[1]);
+    const grams = spokenNegation ? -Math.abs(Number(match[1])) : Number(match[1]);
     if (!Number.isFinite(grams)) return { status: 'invalid', reason: 'weight_not_finite', transcript };
     if (grams <= 0) return { status: 'invalid', reason: 'weight_not_positive', transcript };
     if (grams > SCALE_RANGE_G.max) {

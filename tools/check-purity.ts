@@ -36,6 +36,9 @@ const PURE_DOMAIN = [
   // Voice intent parsing is pure: a transcript in, a parse result out. No
   // clock, no randomness, no repository, and above all no LLM.
   'packages/domain-voice',
+  // Assistant proposal contracts, tool registry, validation and decision policy
+  // are pure: no LLM SDK, no network, no database, no clock, no randomness.
+  'packages/assistant-core',
 ];
 const PRODUCTION = [
   ...PURE_DOMAIN,

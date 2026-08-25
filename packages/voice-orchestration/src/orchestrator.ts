@@ -11,7 +11,9 @@ import {
   type VoiceResponse,
   type VoiceUtterance,
 } from '@macros/domain-voice';
+import type { AssistantInterpreter } from '@macros/assistant-core';
 import type { TabletAppController } from '@macros/tablet-app-core';
+import { AssistantRouter, type AssistantTrace } from './assistant-router.js';
 import {
   DELIVERY_REJECTION_SPEECH,
   VoiceDeliveryGuard,
@@ -39,10 +41,27 @@ export class VoiceOrchestrator {
   /** Transport safety. Owns no application state — see VoiceDeliveryGuard. */
   private readonly guard = new VoiceDeliveryGuard();
 
+  /**
+   * Optional. When absent, MACROS.AI runs fully offline on the deterministic
+   * parser alone — known commands must never depend on a cloud model.
+   */
+  private readonly router: AssistantRouter;
+
+  /** Diagnostics for the most recent turn. Non-authoritative, not persisted. */
+  private trace: AssistantTrace = { path: 'deterministic', parserVersion: 'unset' };
+
   constructor(
     private readonly app: TabletAppController,
     private readonly parser: VoiceParser = new DeterministicVoiceParser(),
-  ) {}
+    interpreter: AssistantInterpreter | null = null,
+  ) {
+    this.router = new AssistantRouter(app, interpreter);
+  }
+
+  /** The decision trail for the last turn — for tests and debugging only. */
+  lastTrace(): AssistantTrace {
+    return this.trace;
+  }
 
   get parserVersion(): string {
     return this.parser.version;
@@ -71,6 +90,28 @@ export class VoiceOrchestrator {
       return { kind: 'clarification', speech: CLARIFICATION_SPEECH[parsed.reason], reason: parsed.reason };
     }
     if (parsed.status === 'unsupported') {
+      // The grammar could not cover this phrasing. This is the ONLY point where
+      // a richer interpreter is consulted — and whatever it returns is still an
+      // untrusted proposal that must survive validation.
+      if (this.router.shouldConsult(parsed)) {
+        const proposed = await this.router.propose(utterance.transcript);
+        this.trace = proposed.trace;
+        if (proposed.kind === 'refused') return proposed.response;
+
+        const flowOk = this.guard.admitIntent(proposed.intent, utterance, context);
+        if (flowOk.kind === 'reject') {
+          return {
+            kind: 'error',
+            speech: DELIVERY_REJECTION_SPEECH[flowOk.reason],
+            reason: flowOk.reason,
+          };
+        }
+
+        const response = await this.dispatch(proposed.intent);
+        this.guard.record(utterance, response);
+        return response;
+      }
+
       return {
         kind: 'error',
         speech: "I can't do that yet. Try naming a food, choosing an option, or asking about today.",
@@ -79,6 +120,7 @@ export class VoiceOrchestrator {
     }
 
     const intent = parsed.intent;
+    this.trace = { path: 'deterministic', parserVersion: this.parser.version };
 
     // Phase 2: the intent is known, so flow-scoped commands can be checked
     // against the flow they were actually spoken into.

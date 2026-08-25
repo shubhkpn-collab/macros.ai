@@ -30,6 +30,7 @@
       "@macros/tablet-app-core": ["packages/tablet-app-core/src/index.ts"],
       "@macros/domain-catalog": ["packages/domain-catalog/src/index.ts"],
       "@macros/catalog-ingestion": ["packages/catalog-ingestion/src/index.ts"],
+      "@macros/assistant-core": ["packages/assistant-core/src/index.ts"],
       "@macros/domain-voice": ["packages/domain-voice/src/index.ts"],
       "@macros/voice-orchestration": ["packages/voice-orchestration/src/index.ts"],
       "@macros/testkit": ["packages/testkit/src/index.ts"]

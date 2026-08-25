@@ -103,6 +103,19 @@ to implement these.** Each is revisited when its own milestone arrives.
 **VO-3 is RESOLVED** — declared label facts now participate in ProductVersion
 version identity.
 
+## From ASSISTANT BRAIN + TRUSTED TOOL ROUTER CLOSURE (2026-08-21)
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| AS-1 | **Real provider adapter** (OpenAI/Anthropic/Gemini). The `AssistantInterpreter` seam is complete; no SDK, network or key exists. | Out of scope by instruction; needs a provider decision, timeout and cost policy. | Provider integration gate |
+| AS-2 | **Adapter-layer timeout/cancellation.** The router handles throws and malformed output; a wall-clock timeout belongs to the IO adapter, which does not exist yet. | Nothing to time out without a provider. | With AS-1 |
+| AS-3 | **AI phrasing seam.** Deterministic phrasing is retained. If AI phrasing is ever added, numbers must be injected from trusted structured results, never regenerated. | Not required for MVP-1. | Post-provider |
+| AS-4 | **Correlation fields are optional in the contract.** `sessionGeneration`, `turnSequence` and `flowIdAtCapture` are strictly enforced WHEN SUPPLIED; a pipeline that omits them loses the corresponding protection. Should become mandatory once a real STT adapter owns them. | Making them required now would break every non-STT caller for no safety gain. | STT integration |
+| AS-5 | **Household voice user switching.** Locked rule recorded: switching must require visible/spoken confirmation and never happen silently. Not built. | No household domain exists. | Household milestone |
+
+**VO-3 is RESOLVED** — declared label facts participate in ProductVersion
+version identity.
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
