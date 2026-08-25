@@ -29,21 +29,62 @@ export type NutrientQuery = 'calories' | 'protein' | 'carbohydrate' | 'fat';
  */
 export interface VoiceUtterance {
   readonly transcript: string;
-  readonly receivedAt: string;
-  readonly userId: string;
+
   /**
-   * Optional STT delivery identity.
+   * RULING (A6): RETAINED, with a real job and a hard limit.
    *
-   * A speech pipeline can deliver the SAME recognition result more than once —
-   * a retried callback, a duplicated event, a reconnect replay. When the
-   * pipeline supplies a stable id for one recognition, the orchestrator treats
-   * a repeat as a REPLAY of an already-handled utterance rather than a fresh
-   * command.
+   * Purpose: ordering evidence and bounded replay retention. It is validated as
+   * an Instant, and an unparseable value is REJECTED rather than coerced.
    *
-   * Absent when the pipeline cannot supply one, in which case the timestamp
-   * window applies instead.
+   * It is explicitly NOT a freshness test. Wall-clock recency can never stand in
+   * for `sessionGeneration`, `turnSequence` or `flowIdAtCapture`: a transcript
+   * can arrive milliseconds late and still belong to a dead session, and a clock
+   * that skews does not make a stale command safe. Correlation decides
+   * staleness; this field only orders and ages entries.
+   */
+  readonly receivedAt: string;
+
+  readonly userId: string;
+
+  /**
+   * STT delivery identity — idempotency key for one recognition.
+   *
+   * A speech pipeline can deliver the same recognition more than once: a retried
+   * callback, a duplicated event, a reconnect replay. A repeat replays the
+   * original response and executes nothing.
    */
   readonly utteranceId?: string;
+
+  /**
+   * The `TabletAppController` session this utterance was spoken into.
+   *
+   * A user switch increments the app's generation. A transcript captured before
+   * that switch belongs to a session that no longer exists and must never act on
+   * the new one.
+   */
+  readonly sessionGeneration?: number;
+
+  /**
+   * Monotonic turn counter within a session.
+   *
+   * Real STT completes out of order: a long utterance recognised slowly can land
+   * after a short one spoken later. Once a newer turn has been accepted, an
+   * older turn is stale — it was composed against a screen the user has already
+   * moved on from.
+   */
+  readonly turnSequence?: number;
+
+  /**
+   * The add-food flow this utterance was spoken into, for context-dependent
+   * commands only ("option B", "weigh it", "log it").
+   *
+   * "Option B" means *that* B — the one on screen when the user spoke. If the
+   * flow has since been cancelled or replaced, the words no longer refer to
+   * anything and must not be re-aimed at whatever is on screen now.
+   *
+   * Absent for commands that legitimately START a flow, such as search.
+   */
+  readonly flowIdAtCapture?: string;
 }
 
 /**

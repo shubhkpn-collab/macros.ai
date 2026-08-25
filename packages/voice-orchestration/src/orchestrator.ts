@@ -12,6 +12,11 @@ import {
   type VoiceUtterance,
 } from '@macros/domain-voice';
 import type { TabletAppController } from '@macros/tablet-app-core';
+import {
+  DELIVERY_REJECTION_SPEECH,
+  VoiceDeliveryGuard,
+  type DeliveryContext,
+} from './delivery-guard.js';
 
 export const VOICE_ORCHESTRATION_VERSION = 'voice-orchestration@1.0.0';
 
@@ -30,33 +35,9 @@ export const VOICE_ORCHESTRATION_VERSION = 'voice-orchestration@1.0.0';
  * "repeat the options" can work — and even that is re-derived from the
  * controller rather than cached independently.
  */
-/**
- * How long an identical delivery counts as a replay rather than a new command.
- *
- * Deliberately short. A real user saying "log it" twice a few seconds apart is
- * ALREADY safe — the application's single submissionId per logical submission
- * makes a duplicate log impossible — so this window exists only to stop a
- * transport-level redelivery from being spoken and acted on twice.
- */
-export const REPLAY_WINDOW_MS = 2000;
-
-interface HandledUtterance {
-  readonly key: string;
-  readonly atMs: number;
-  readonly response: VoiceResponse;
-}
-
-/** Bounded: this is a transport de-duplication guard, not an event store. */
-const MAX_TRACKED_UTTERANCES = 8;
-
 export class VoiceOrchestrator {
-  /**
-   * Recent deliveries, kept ONLY to recognise a replay. Voice still owns no
-   * application state: nothing here influences what the next command may do.
-   */
-  private handled: HandledUtterance[] = [];
-  /** Detects a subject change so replay memory can never cross users. */
-  private lastSubjectId: string | null = null;
+  /** Transport safety. Owns no application state — see VoiceDeliveryGuard. */
+  private readonly guard = new VoiceDeliveryGuard();
 
   constructor(
     private readonly app: TabletAppController,
@@ -68,25 +49,18 @@ export class VoiceOrchestrator {
   }
 
   async handle(utterance: VoiceUtterance): Promise<VoiceResponse> {
-    // The utterance must belong to the active user. A transcript addressed to
-    // another subject never drives this session.
-    if (utterance.userId !== this.app.getState().subject.userId) {
-      return { kind: 'error', speech: 'That request was for a different profile.', reason: 'subject_mismatch' };
-    }
+    const context = this.deliveryContext();
 
-    // Replay memory is per-session. A user switch discards it, so one user's
-    // delivery can never suppress or answer another user's command.
-    const subjectId = this.app.getState().subject.userId;
-    if (this.lastSubjectId !== null && this.lastSubjectId !== subjectId) {
-      this.resetDeliveryMemory();
+    // Phase 1: may this delivery act at all? Identity and ordering only.
+    const admitted = this.guard.admit(utterance, context);
+    if (admitted.kind === 'replay') return admitted.response;
+    if (admitted.kind === 'reject') {
+      return {
+        kind: 'error',
+        speech: DELIVERY_REJECTION_SPEECH[admitted.reason],
+        reason: admitted.reason,
+      };
     }
-    this.lastSubjectId = subjectId;
-
-    // A redelivered utterance replays its original response and executes
-    // NOTHING. The delivery identity is preferred; without one, an identical
-    // transcript inside a short window is treated the same way.
-    const replayed = this.findReplay(utterance);
-    if (replayed !== undefined) return replayed.response;
 
     const parsed = this.parser.parse(utterance);
 
@@ -105,42 +79,35 @@ export class VoiceOrchestrator {
     }
 
     const intent = parsed.intent;
+
+    // Phase 2: the intent is known, so flow-scoped commands can be checked
+    // against the flow they were actually spoken into.
+    const flowAdmitted = this.guard.admitIntent(intent, utterance, context);
+    if (flowAdmitted.kind === 'reject') {
+      return {
+        kind: 'error',
+        speech: DELIVERY_REJECTION_SPEECH[flowAdmitted.reason],
+        reason: flowAdmitted.reason,
+      };
+    }
+
     const response = await this.dispatch(intent);
-    this.remember(utterance, response);
+    this.guard.record(utterance, response);
     return response;
   }
 
-  private replayKey(utterance: VoiceUtterance): string {
-    return utterance.utteranceId !== undefined
-      ? `id:${utterance.utteranceId}`
-      : `text:${utterance.userId}:${utterance.transcript.trim().toLowerCase()}`;
+  private deliveryContext(): DeliveryContext {
+    const state = this.app.getState();
+    return {
+      userId: state.subject.userId,
+      sessionGeneration: state.sessionGeneration,
+      flowId: state.addFood.flowId,
+    };
   }
 
-  private findReplay(utterance: VoiceUtterance): HandledUtterance | undefined {
-    const key = this.replayKey(utterance);
-    const atMs = Date.parse(utterance.receivedAt);
-    return this.handled.find((h) => {
-      if (h.key !== key) return false;
-      // A stable delivery id is authoritative regardless of timing.
-      if (utterance.utteranceId !== undefined) return true;
-      if (!Number.isFinite(atMs) || !Number.isFinite(h.atMs)) return false;
-      const delta = atMs - h.atMs;
-      return delta >= 0 && delta <= REPLAY_WINDOW_MS;
-    });
-  }
 
-  private remember(utterance: VoiceUtterance, response: VoiceResponse): void {
-    const atMs = Date.parse(utterance.receivedAt);
-    this.handled = [
-      { key: this.replayKey(utterance), atMs: Number.isFinite(atMs) ? atMs : 0, response },
-      ...this.handled.filter((h) => h.key !== this.replayKey(utterance)),
-    ].slice(0, MAX_TRACKED_UTTERANCES);
-  }
 
-  /** Clears replay memory. Called when the session subject changes. */
-  resetDeliveryMemory(): void {
-    this.handled = [];
-  }
+
 
   private async dispatch(intent: VoiceIntent): Promise<VoiceResponse> {
     switch (intent.kind) {

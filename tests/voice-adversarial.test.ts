@@ -275,7 +275,7 @@ describe('USER ISOLATION', () => {
     const h = await harness();
     const r = await say(h, 'add chicken breast', USER_B);
     assert.equal(r.kind, 'error');
-    if (r.kind === 'error') assert.equal(r.reason, 'subject_mismatch');
+    if (r.kind === 'error') assert.equal(r.reason, 'wrong_user');
     assert.equal(h.app.getState().addFood.results.length, 0, 'zero side effects');
   });
 
