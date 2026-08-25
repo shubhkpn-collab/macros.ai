@@ -30,6 +30,13 @@ export const TOOL_REGISTRY: Readonly<Record<ProposalKind, ToolSpec>> = {
   ask_macros: { kind: 'ask_macros', stateChanging: false, allowedArguments: [] },
   repeat_options: { kind: 'repeat_options', stateChanging: false, allowedArguments: [] },
   help: { kind: 'help', stateChanging: false, allowedArguments: [] },
+  /**
+   * READ-ONLY. The model may recognise that the user is asking for a
+   * recommendation; it supplies NO arguments, so it cannot name candidate
+   * foods, scores, nutrition or quantities. The deterministic engine decides
+   * everything.
+   */
+  recommend_food: { kind: 'recommend_food', stateChanging: false, allowedArguments: [] },
 };
 
 export const isKnownTool = (name: string): name is ProposalKind =>

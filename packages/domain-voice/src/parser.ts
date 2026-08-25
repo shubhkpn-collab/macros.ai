@@ -44,6 +44,15 @@ const CANCEL = ['cancel', 'never mind', 'nevermind', 'start over', 'forget it', 
 const CONFIRM = ['log it', 'add it', 'confirm', 'save it', 'log that', 'yes log it'];
 const WEIGH = ['weigh it', 'use the scale', 'capture the weight', 'take the weight', 'weigh this', 'read the scale'];
 const HELP = ['what can i say', 'help', 'what are my options'];
+/**
+ * Recommendation requests. Matched BEFORE the generic question handler, since
+ * "what should I eat" is a question but not a dashboard query.
+ */
+const RECOMMEND = [
+  'what should i eat', 'what can i eat', 'what should i have',
+  'what do you recommend', 'recommend something', 'give me a suggestion',
+  'suggest something', 'what to eat',
+];
 const REPEAT = ['repeat the options', 'repeat options', 'say the options', 'what were the options'];
 
 const SEARCH_PREFIXES = [
@@ -98,6 +107,7 @@ export class DeterministicVoiceParser implements VoiceParser {
 
     if (containsAny(text, CANCEL)) return understood({ kind: 'cancel' }, transcript);
     if (containsAny(text, REPEAT)) return understood({ kind: 'repeat_options' }, transcript);
+    if (containsAny(text, RECOMMEND)) return understood({ kind: 'recommend_food' }, transcript);
     if (containsAny(text, HELP)) return understood({ kind: 'help' }, transcript);
     if (containsAny(text, CONFIRM)) return understood({ kind: 'confirm_log' }, transcript);
     if (containsAny(text, WEIGH)) return understood({ kind: 'request_stable_weight' }, transcript);

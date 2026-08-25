@@ -129,6 +129,17 @@ version identity.
 
 **AS-4 is RESOLVED** — correlation is mandatory at the executable voice boundary.
 
+## From GOAL-AWARE RECOMMENDATION CLOSURE (2026-08-23)
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| RC-1 | **Authoritative allergen data.** No allergy-safe capability exists and allergen absence is never inferred. Required before any restriction-aware recommendation. | No source-backed allergen metadata is ingested. | Allergen data domain |
+| RC-2 | **Preference persistence.** `PreferenceSnapshot` is a contract; no repository, migration or UI stores it. | Needs a settings surface. | Preferences milestone |
+| RC-3 | **User-saved portion presets.** Listed as a valid portion basis in policy; not implemented. | No UI to create one. | Preferences milestone |
+| RC-4 | **Recipes, multi-food meals, meal plans.** Out of scope by instruction; each needs its own data and domain. | Different problem shape entirely. | Post-catalog |
+| RC-5 | **Real-catalog ranking quality.** Scoring is validated for correctness and determinism, not for real-world usefulness — that needs hundreds of real foods. | 0 real records ingested. | After catalog population |
+| RC-6 | **AI phrasing of rationale codes.** Codes are deterministic; phrasing is deterministic too. Optional AI phrasing must inject trusted numbers, never regenerate them. | Not required. | Post-provider |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**

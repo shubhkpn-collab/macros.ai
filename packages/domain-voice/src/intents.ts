@@ -17,7 +17,12 @@ export type VoiceIntent =
   | { readonly kind: 'ask_remaining'; readonly nutrient: NutrientQuery }
   | { readonly kind: 'ask_macros' }
   | { readonly kind: 'repeat_options' }
-  | { readonly kind: 'help' };
+  | { readonly kind: 'help' }
+  /**
+   * "What should I eat?" — a READ-ONLY request. It returns candidates for the
+   * user to choose from and never selects, weighs or logs anything.
+   */
+  | { readonly kind: 'recommend_food' };
 
 export type NutrientQuery = 'calories' | 'protein' | 'carbohydrate' | 'fat';
 

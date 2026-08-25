@@ -1,0 +1,402 @@
+import { SCALE_RANGE_G, grams as toGrams, type Grams, type ProductVersion } from '@macros/contracts';
+import { calculateNutrition } from '@macros/domain-nutrition';
+import type {
+  HistoryObservation, PortionProposal, RationaleCode, Recommendation,
+  RecommendationCandidate, RecommendationInput, RecommendationSet, ScoreComponents,
+} from './contracts.js';
+import type { RecommendationPolicy } from './policy.js';
+
+/**
+ * THE RECOMMENDATION ENGINE.
+ *
+ * PURE: no clock, no repository, no network, no LLM, no randomness. Same inputs
+ * always produce the same ranking, with deterministic tie-breaking.
+ *
+ * It performs NO nutrition arithmetic of its own: portion nutrition comes from
+ * `calculateNutrition`, and every energy and macro figure is read from state
+ * the energy and macro engines already produced.
+ */
+
+const MACROS = ['protein', 'carbohydrate', 'fat'] as const;
+type MacroName = (typeof MACROS)[number];
+
+/** Energy contributed per gram, used only to express a candidate's PROFILE. */
+const KCAL_PER_G: Readonly<Record<MacroName, number>> = {
+  protein: 4, carbohydrate: 4, fat: 9,
+};
+
+const macroGrams = (v: ProductVersion, m: MacroName): number =>
+  m === 'protein' ? v.basis.proteinG : m === 'carbohydrate' ? v.basis.carbohydrateG : v.basis.fatG;
+
+/**
+ * ELIGIBILITY — hard filters. A candidate failing any of these is removed, not
+ * ranked lower.
+ */
+export function isEligible(
+  candidate: RecommendationCandidate,
+  input: RecommendationInput,
+): boolean {
+  const { productVersion: v, head } = candidate;
+
+  if (!head.isActive) return false;
+  // Only the CURRENT head version may be recommended. A superseded version is
+  // history, and recommending it would present outdated nutrition as current.
+  if (head.currentProductVersionId !== v.productVersionId) return false;
+  if (head.productId !== v.productId) return false;
+
+  // Core nutrition must be complete. Missing is never treated as zero.
+  const n = v.basis;
+  for (const value of [n.kcal, n.proteinG, n.carbohydrateG, n.fatG]) {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return false;
+  }
+  if (v.preparationState === undefined || String(v.preparationState).length === 0) return false;
+
+  // Synthetic fixtures must never be presented as real food in production.
+  if (
+    (input.environment === 'production' || input.environment === 'staging') &&
+    v.source.verificationStatus === 'synthetic_test'
+  ) {
+    return false;
+  }
+
+  // An avoid is a HARD filter; a preference is only a nudge.
+  if (input.preferences?.avoidedProductIds.includes(v.productId) === true) return false;
+
+  return true;
+}
+
+/**
+ * MACRO DEFICIT WEIGHTS — dimensionless.
+ *
+ * Raw grams cannot be compared across macros: 100 g of carbohydrate remaining
+ * is not "more needed" than 30 g of protein remaining. Each gap is normalized
+ * against that macro's own configured target, giving a remaining FRACTION, and
+ * the fractions are then normalized to sum to 1.
+ */
+export function macroDeficitWeights(
+  remaining: Readonly<Record<MacroName, number>>,
+  targets: Readonly<Record<MacroName, number>>,
+): Record<MacroName, number> {
+  const fractions: Record<MacroName, number> = { protein: 0, carbohydrate: 0, fat: 0 };
+  for (const m of MACROS) {
+    const target = targets[m];
+    if (!Number.isFinite(target) || target <= 0) { fractions[m] = 0; continue; }
+    fractions[m] = Math.max(0, Math.min(1, remaining[m] / target));
+  }
+  const total = MACROS.reduce((s, m) => s + fractions[m], 0);
+  if (total <= 0) return { protein: 0, carbohydrate: 0, fat: 0 };
+  return {
+    protein: fractions.protein / total,
+    carbohydrate: fractions.carbohydrate / total,
+    fat: fractions.fat / total,
+  };
+}
+
+/**
+ * A candidate's macro PROFILE — the share of its energy from each macro.
+ * Dimensionless and portion-independent, so it works for foods with no
+ * defensible serving size.
+ */
+export function macroEnergyShares(v: ProductVersion): Record<MacroName, number> {
+  const energy: Record<MacroName, number> = {
+    protein: macroGrams(v, 'protein') * KCAL_PER_G.protein,
+    carbohydrate: macroGrams(v, 'carbohydrate') * KCAL_PER_G.carbohydrate,
+    fat: macroGrams(v, 'fat') * KCAL_PER_G.fat,
+  };
+  const total = MACROS.reduce((s, m) => s + energy[m], 0);
+  if (total <= 0) return { protein: 0, carbohydrate: 0, fat: 0 };
+  return {
+    protein: energy.protein / total,
+    carbohydrate: energy.carbohydrate / total,
+    fat: energy.fat / total,
+  };
+}
+
+const daysBetween = (aIso: string, bIso: string): number =>
+  Math.abs(Date.parse(aIso) - Date.parse(bIso)) / 86_400_000;
+
+const median = (values: readonly number[]): number => {
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[mid - 1]! + sorted[mid]!) / 2 : sorted[mid]!;
+};
+
+/**
+ * PORTION AUTHORITY.
+ *
+ * Only two grounded bases are permitted, in this order:
+ *   1. the CURRENT version's source-backed serving mass;
+ *   2. a robust median of this user's own recent observed portions.
+ *
+ * There is deliberately no third option. Dividing remaining calories by energy
+ * density would produce arithmetically valid nonsense — 650 g of almonds, 14 g
+ * of chicken — so no quantity is proposed at all when neither basis exists.
+ *
+ * Reformulation safety: the serving mass is read from the CURRENT version, so a
+ * V1 serving is never reused for a reformulated V2.
+ */
+export function proposePortion(
+  candidate: RecommendationCandidate,
+  input: RecommendationInput,
+  remainingKcal: number | null,
+): PortionProposal | null {
+  const policy = input.policy;
+  const v = candidate.productVersion;
+
+  const servingGrams = v.labelFacts?.servingGrams;
+  if (typeof servingGrams === 'number' && Number.isFinite(servingGrams) && servingGrams > 0) {
+    const options = policy.servingMultiples
+      .map((multiple) => ({ multiple, grams: servingGrams * multiple }))
+      .filter((o) => withinBounds(o.grams, policy));
+
+    if (options.length > 0) {
+      // Prefer the largest multiple that still fits the remaining budget; if
+      // none fits, fall back to the smallest grounded option.
+      const chosen =
+        remainingKcal === null
+          ? options.find((o) => o.multiple === 1) ?? options[0]!
+          : [...options]
+              .sort((a, b) => b.grams - a.grams)
+              .find((o) => kcalFor(v, o.grams) <= remainingKcal) ?? options[0]!;
+
+      return { grams: toGrams(round1(chosen.grams)), basis: 'source_serving', servingMultiple: chosen.multiple };
+    }
+  }
+
+  // The user's own behaviour with THIS product, keyed by stable productId so a
+  // reformulation does not discard their history.
+  const samples = input.history
+    .filter((h) => h.productId === v.productId)
+    .filter((h) => daysBetween(h.loggedAt, input.nowIso) <= policy.history.windowDays)
+    .map((h) => h.grams)
+    .filter((g) => Number.isFinite(g) && g > 0 && withinBounds(g, policy));
+
+  if (samples.length >= policy.history.minPortionSamples) {
+    const value = round1(median(samples));
+    if (withinBounds(value, policy)) {
+      return { grams: toGrams(value), basis: 'user_history', sampleCount: samples.length };
+    }
+  }
+
+  return null;
+}
+
+const withinBounds = (g: number, policy: RecommendationPolicy): boolean =>
+  g >= policy.bounds.minPortionGrams &&
+  g <= policy.bounds.maxPortionGrams &&
+  g > SCALE_RANGE_G.min &&
+  g <= SCALE_RANGE_G.max;
+
+const round1 = (n: number): number => Math.round(n * 10) / 10;
+
+/** Uses the nutrition engine, never local arithmetic. */
+const kcalFor = (v: ProductVersion, g: number): number =>
+  calculateNutrition(v.basis, toGrams(g)).totals.kcal;
+
+// ---------------------------------------------------------------------------
+
+export function recommendFoods(input: RecommendationInput): RecommendationSet {
+  const { policy } = input;
+  const base = {
+    policyVersion: policy.version,
+    generatedAt: input.nowIso,
+    recommendations: [] as readonly Recommendation[],
+  };
+
+  // Missing state is never filled in. A recommendation built on assumed
+  // expenditure would be a confident wrong answer.
+  if (input.macros === null) {
+    return { ...base, status: 'insufficient_state', reason: 'macro_target_unavailable' };
+  }
+
+  const energy = input.energy;
+  const remainingKcal = energy === null ? null : energy.remainingIntakeKcal;
+
+  // With the day's energy budget spent, the engine does not push more food
+  // merely because one macro remains.
+  if (remainingKcal !== null && remainingKcal <= 0) {
+    return { ...base, status: 'energy_budget_exhausted', reason: 'remaining_intake_not_positive' };
+  }
+
+  const eligible = input.candidates.filter((c) => isEligible(c, input));
+  if (eligible.length === 0) {
+    return { ...base, status: 'no_eligible_candidates', reason: 'no_candidate_passed_eligibility' };
+  }
+
+  const m = input.macros;
+  const remaining = {
+    protein: m.remainingProteinG as number,
+    carbohydrate: m.remainingCarbohydrateG as number,
+    fat: m.remainingFatG as number,
+  };
+  const targets = {
+    protein: m.targets.proteinG as number,
+    carbohydrate: m.targets.carbohydrateG as number,
+    fat: m.targets.fatG as number,
+  };
+  const weights = macroDeficitWeights(remaining, targets);
+
+  const scored = eligible
+    .map((c) => scoreCandidate(c, input, weights, remaining, remainingKcal))
+    .filter((r): r is Recommendation => r !== null);
+
+  if (scored.length === 0) {
+    return { ...base, status: 'no_eligible_candidates', reason: 'all_candidates_filtered' };
+  }
+
+  // Deterministic ordering: score, then productVersionId. Never input order.
+  const ranked = [...scored].sort(
+    (a, b) => b.score - a.score || a.productVersionId.localeCompare(b.productVersionId),
+  );
+
+  return {
+    ...base,
+    status: energy === null
+      ? 'available_with_limited_energy_confidence'
+      : 'available',
+    recommendations: ranked.slice(0, policy.maxResults),
+  };
+}
+
+function scoreCandidate(
+  candidate: RecommendationCandidate,
+  input: RecommendationInput,
+  weights: Record<MacroName, number>,
+  remaining: Record<MacroName, number>,
+  remainingKcal: number | null,
+): Recommendation | null {
+  const { policy } = input;
+  const v = candidate.productVersion;
+  const shares = macroEnergyShares(v);
+  const rationale: RationaleCode[] = [];
+
+  // Dimensionless: Σ(deficit weight × candidate's energy share) ∈ [0, 1].
+  const macroFit = MACROS.reduce((s, m) => s + weights[m] * shares[m], 0);
+
+  for (const m of MACROS) {
+    if (weights[m] >= 0.4 && shares[m] >= 0.4) {
+      rationale.push(
+        m === 'protein' ? 'strong_protein_fit' : m === 'carbohydrate' ? 'strong_carb_fit' : 'strong_fat_fit',
+      );
+    }
+  }
+
+  const portion = proposePortion(candidate, input, remainingKcal);
+  let energyFit = 0;
+  let energyOvershootPenalty = 0;
+  let macroOvershootPenalty = 0;
+  let nutrition;
+
+  if (portion !== null) {
+    nutrition = calculateNutrition(v.basis, portion.grams).totals;
+    rationale.push(
+      portion.basis === 'source_serving' ? 'portion_from_source_serving' : 'portion_from_your_history',
+    );
+
+    if (remainingKcal !== null && remainingKcal > 0) {
+      const ratio = nutrition.kcal / remainingKcal;
+      if (ratio > policy.bounds.maxEnergyOvershootRatio) {
+        // HARD bound: this portion cannot sensibly be suggested today.
+        return null;
+      }
+      if (ratio > 1) {
+        energyOvershootPenalty = policy.penalties.energyOvershoot * (ratio - 1);
+        rationale.push('would_overshoot_energy');
+      } else {
+        energyFit = 1 - ratio;
+        rationale.push('fits_remaining_energy');
+      }
+    }
+
+    let macroOver = 0;
+    for (const m of MACROS) {
+      const contributed =
+        m === 'protein' ? nutrition.proteinG
+        : m === 'carbohydrate' ? nutrition.carbohydrateG
+        : nutrition.fatG;
+      if (remaining[m] > 0 && contributed > remaining[m]) {
+        macroOver += (contributed - remaining[m]) / remaining[m];
+      }
+    }
+    if (macroOver > 0) {
+      macroOvershootPenalty = policy.penalties.macroOvershoot * Math.min(1, macroOver);
+      rationale.push('would_overshoot_macro');
+    }
+  } else {
+    rationale.push('portion_unavailable');
+  }
+
+  // History and preference are RANKING nudges only — never nutrition authority
+  // and never able to override a materially better nutritional fit on their own.
+  const recent = input.history.filter(
+    (h) => h.productId === v.productId &&
+      daysBetween(h.loggedAt, input.nowIso) <= policy.history.recencyWindowDays,
+  );
+  const historyNudge = recent.length > 0 ? policy.weights.historyNudge : 0;
+  if (recent.length > 0) rationale.push('recently_used');
+
+  const preferred = input.preferences?.preferredProductIds.includes(v.productId) === true;
+  const preferenceNudge = preferred ? policy.weights.preferenceNudge : 0;
+  if (preferred) rationale.push('preferred');
+
+  // Discourage suggesting what the user has already eaten repeatedly today.
+  const todayCount = input.history.filter(
+    (h) => h.productId === v.productId && h.localDate === todayOf(input),
+  ).length;
+  const repetitionPenalty = todayCount >= 2 ? policy.penalties.repetition : 0;
+
+  const components: ScoreComponents = {
+    macroFit: macroFit * policy.weights.macroFit,
+    energyFit: energyFit * policy.weights.energyFit,
+    historyNudge,
+    preferenceNudge,
+    energyOvershootPenalty,
+    macroOvershootPenalty,
+    repetitionPenalty,
+  };
+
+  const score =
+    components.macroFit + components.energyFit + components.historyNudge + components.preferenceNudge
+    - components.energyOvershootPenalty - components.macroOvershootPenalty - components.repetitionPenalty;
+
+  return {
+    productId: v.productId,
+    productVersionId: v.productVersionId,
+    displayName: v.displayName,
+    ...(v.brandName !== undefined ? { brandName: v.brandName } : {}),
+    preparationState: String(v.preparationState),
+    score: Math.round(score * 1e6) / 1e6,
+    scoreComponents: components,
+    rationaleCodes: rationale,
+    ...(portion !== null ? { portionProposal: portion } : {}),
+    ...(nutrition !== undefined ? { nutritionAtProposedPortion: nutrition } : {}),
+  };
+}
+
+const todayOf = (input: RecommendationInput): string => input.nowIso.slice(0, 10);
+
+/**
+ * Project effective food-log entries into history observations.
+ *
+ * The caller must pass ALREADY-FOLDED entries, so voided and superseded logs
+ * never reach ranking or portion statistics.
+ */
+export function observationsFromLogs(
+  userId: string,
+  logs: readonly {
+    userId: string; productId: string; productVersionId: string;
+    grams: number; loggedAt: string; localDate: string;
+  }[],
+): readonly HistoryObservation[] {
+  return logs
+    .filter((l) => l.userId === userId)
+    .map((l) => ({
+      productId: l.productId,
+      productVersionId: l.productVersionId,
+      grams: l.grams,
+      loggedAt: l.loggedAt,
+      localDate: l.localDate,
+    }));
+}
+
+export type { Grams };

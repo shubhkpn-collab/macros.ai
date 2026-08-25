@@ -13,6 +13,16 @@ import {
 } from '@macros/domain-voice';
 import type { AssistantInterpreter } from '@macros/assistant-core';
 import type { CorrelatedVoiceDelivery } from '@macros/domain-voice';
+import type { RecommendationSet, RecommendationStatus } from '@macros/domain-recommendation';
+
+/** Deterministic phrasing for a recommendation that produced no options. */
+const RECOMMENDATION_STATUS_SPEECH: Readonly<Record<RecommendationStatus, string>> = {
+  available: '',
+  available_with_limited_energy_confidence: '',
+  insufficient_state: "I don't have enough of today's numbers to suggest anything yet.",
+  no_eligible_candidates: "I don't have a suitable food to suggest right now.",
+  energy_budget_exhausted: "You've reached your calorie target for today, so I'm not suggesting more food.",
+};
 import type { TabletAppController } from '@macros/tablet-app-core';
 import { AssistantRouter, type AssistantTrace } from './assistant-router.js';
 import {
@@ -55,6 +65,8 @@ export class VoiceOrchestrator {
     private readonly app: TabletAppController,
     private readonly parser: VoiceParser = new DeterministicVoiceParser(),
     interpreter: AssistantInterpreter | null = null,
+    /** Supplies trusted recommendations. Absent means the feature is off. */
+    private readonly recommendations: (() => RecommendationSet) | null = null,
   ) {
     this.router = new AssistantRouter(app, interpreter);
   }
@@ -197,6 +209,7 @@ export class VoiceOrchestrator {
       case 'ask_macros': return this.askMacros();
       case 'repeat_options': return this.repeatOptions();
       case 'help': return this.help();
+      case 'recommend_food': return this.recommendFood();
     }
   }
 
@@ -447,6 +460,56 @@ export class VoiceOrchestrator {
       kind: 'options',
       speech: `${options.map((o) => this.describeOption(o)).join('. ')}.`,
       options,
+    };
+  }
+
+  /**
+   * "What should I eat?"
+   *
+   * Returns candidates only. Nothing is selected, weighed or logged — the user
+   * still chooses, still weighs and still confirms explicitly.
+   */
+  private recommendFood(): VoiceResponse {
+    const provider = this.recommendations;
+    if (provider === null) {
+      return {
+        kind: 'error',
+        speech: "I can't suggest foods yet.",
+        reason: 'recommendations_unavailable',
+      };
+    }
+
+    const set = provider();
+    if (set.status !== 'available' && set.status !== 'available_with_limited_energy_confidence') {
+      return {
+        kind: 'informational',
+        speech: RECOMMENDATION_STATUS_SPEECH[set.status],
+        data: { status: set.status },
+      };
+    }
+
+    const lines = set.recommendations.map((r, i) => {
+      const label = String.fromCharCode(65 + i);
+      const brand = r.brandName === undefined ? '' : `${r.brandName} `;
+      const portion =
+        r.portionProposal === undefined
+          ? ''
+          // A grounded quantity only. Never an invented one.
+          : ` — about ${Math.round(r.portionProposal.grams as number)} grams`;
+      return `Option ${label}: ${brand}${r.displayName}${portion}`;
+    });
+
+    return {
+      kind: 'options',
+      speech: `${lines.join('. ')}. Say the option you want, or ask for something else.`,
+      // Identity comes from the canonical product, exactly as in search.
+      options: set.recommendations.map((r, i) => ({
+        optionLabel: String.fromCharCode(65 + i),
+        productVersionId: r.productVersionId,
+        displayName: r.displayName,
+        ...(r.brandName !== undefined ? { brandName: r.brandName } : {}),
+        preparationState: r.preparationState,
+      })),
     };
   }
 

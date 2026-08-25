@@ -67,7 +67,11 @@ export class AssistantRouter {
   /** Legal actions derived from application state — never from the model. */
   allowedActions(): readonly ProposalKind[] {
     const flow = this.app.getState().addFood;
-    const readOnly: ProposalKind[] = ['ask_consumed', 'ask_remaining', 'ask_macros', 'help'];
+    const readOnly: ProposalKind[] = [
+      'ask_consumed', 'ask_remaining', 'ask_macros', 'help',
+      // Read-only: it returns candidates the user must still choose from.
+      'recommend_food',
+    ];
     const actions: ProposalKind[] = ['search_food', 'cancel', ...readOnly];
 
     if (flow.results.length > 0) {
