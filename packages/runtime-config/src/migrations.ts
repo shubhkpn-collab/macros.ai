@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { appError, type AppError } from './errors.js';
 
 /**
@@ -32,18 +33,19 @@ export interface MigrationDriver {
 }
 
 /**
- * Deterministic content checksum (FNV-1a, hex).
+ * Deterministic content checksum — SHA-256, full 64-char hex.
  *
- * Detects an already-applied migration file being edited after the fact — a
- * silent schema drift that is otherwise invisible until data is wrong.
+ * Detects an already-applied migration file being edited after the fact: a
+ * silent schema drift otherwise invisible until data is wrong.
+ *
+ * A 32-bit checksum was rejected here. Migration integrity is long-lived
+ * production state, and at 32 bits a collision is merely improbable rather
+ * than negligible — the wrong tradeoff for the one record proving the deployed
+ * schema is the schema this build expects. `node:crypto` is built in, so this
+ * costs no dependency.
  */
 export function checksumOf(sql: string): string {
-  let h = 2166136261;
-  for (let i = 0; i < sql.length; i++) {
-    h ^= sql.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0).toString(16).padStart(8, '0');
+  return createHash('sha256').update(sql, 'utf8').digest('hex');
 }
 
 /** Migration order is lexicographic by numeric prefix, never directory order. */

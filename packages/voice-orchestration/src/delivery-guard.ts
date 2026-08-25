@@ -34,6 +34,8 @@ export type DeliveryRejection =
   | 'stale_turn'
   | 'delivery_conflict'
   | 'duplicate_in_flight'
+  | 'too_many_in_flight'
+  | 'superseded_by_newer_turn'
   | 'stale_flow'
   | 'missing_flow_context';
 
@@ -49,11 +51,19 @@ export interface DeliveryContext {
   readonly flowId: string;
 }
 
-interface TrackedDelivery {
+interface InFlightDelivery {
   readonly utteranceId: string;
   readonly transcriptKey: string;
-  status: 'in_flight' | 'completed';
-  response?: VoiceResponse;
+  /** Turn number, so a newer state-changing turn can supersede this one. */
+  readonly turnSequence: number;
+  /** Set when a newer state-changing turn has superseded this reservation. */
+  superseded: boolean;
+}
+
+interface CompletedDelivery {
+  readonly utteranceId: string;
+  readonly transcriptKey: string;
+  readonly response: VoiceResponse;
 }
 
 /**
@@ -72,14 +82,38 @@ const FLOW_SCOPED_INTENTS: ReadonlySet<VoiceIntent['kind']> = new Set([
 export const isFlowScopedIntent = (kind: VoiceIntent['kind']): boolean =>
   FLOW_SCOPED_INTENTS.has(kind);
 
-const MAX_TRACKED_DELIVERIES = 16;
+/**
+ * Completed responses are a bounded REPLAY CACHE — safe to forget, because
+ * forgetting one only costs a re-execution of an idempotent replay.
+ */
+const MAX_COMPLETED_CACHE = 16;
+
+/**
+ * In-flight reservations are NEVER evicted. Forgetting one would let a
+ * duplicate execute a second time, so overload is refused instead.
+ */
+export const MAX_CONCURRENT_IN_FLIGHT = 32;
 
 const normalize = (transcript: string): string =>
   transcript.trim().toLowerCase().replace(/\s+/g, ' ');
 
 export class VoiceDeliveryGuard {
-  private tracked: TrackedDelivery[] = [];
+  /**
+   * Reservations for deliveries currently executing. UNBOUNDED BY EVICTION:
+   * entries leave only when their execution completes. A capacity limit exists,
+   * but it refuses NEW work rather than forgetting work already accepted.
+   */
+  private inFlight: InFlightDelivery[] = [];
+
+  /** Completed responses, bounded. Losing one costs at most a re-execution. */
+  private completed: CompletedDelivery[] = [];
+
   private highestAcceptedTurn: number | null = null;
+  /**
+   * Turn number of the most recent STATE-CHANGING intent that has been
+   * dispatched. Read-only questions never advance it.
+   */
+  private highestStateChangingTurn: number | null = null;
   private sessionKey: string | null = null;
 
   /**
@@ -103,8 +137,10 @@ export class VoiceDeliveryGuard {
     const sessionKey = `${context.userId}#${context.sessionGeneration}`;
     if (this.sessionKey !== sessionKey) {
       this.sessionKey = sessionKey;
-      this.tracked = [];
+      this.inFlight = [];
+      this.completed = [];
       this.highestAcceptedTurn = null;
+      this.highestStateChangingTurn = null;
     }
 
     if (delivery.userId !== context.userId) {
@@ -115,18 +151,24 @@ export class VoiceDeliveryGuard {
     }
 
     const transcriptKey = normalize(delivery.transcript);
-    const prior = this.tracked.find((t) => t.utteranceId === delivery.utteranceId);
-    if (prior !== undefined) {
-      // Same id, different words: the pipeline contradicted itself. Neither
-      // reading executes — this is an idempotency conflict, not a retry.
-      if (prior.transcriptKey !== transcriptKey) {
+
+    // In-flight is checked FIRST and can never have been evicted.
+    const running = this.inFlight.find((t) => t.utteranceId === delivery.utteranceId);
+    if (running !== undefined) {
+      if (running.transcriptKey !== transcriptKey) {
         return { kind: 'reject', reason: 'delivery_conflict' };
       }
-      if (prior.status === 'in_flight') {
-        // The original is still running. The duplicate must not race it.
-        return { kind: 'reject', reason: 'duplicate_in_flight' };
+      return { kind: 'reject', reason: 'duplicate_in_flight' };
+    }
+
+    const done = this.completed.find((t) => t.utteranceId === delivery.utteranceId);
+    if (done !== undefined) {
+      // Same id, different words: the pipeline contradicted itself. Neither
+      // reading executes — this is an idempotency conflict, not a retry.
+      if (done.transcriptKey !== transcriptKey) {
+        return { kind: 'reject', reason: 'delivery_conflict' };
       }
-      return { kind: 'replay', response: prior.response! };
+      return { kind: 'replay', response: done.response };
     }
 
     if (
@@ -136,11 +178,18 @@ export class VoiceDeliveryGuard {
       return { kind: 'reject', reason: 'stale_turn' };
     }
 
+    // Overload is refused, never resolved by discarding a live reservation.
+    if (this.inFlight.length >= MAX_CONCURRENT_IN_FLIGHT) {
+      return { kind: 'reject', reason: 'too_many_in_flight' };
+    }
+
     // RESERVE — synchronously, before the caller may await anything.
-    this.tracked = [
-      { utteranceId: delivery.utteranceId, transcriptKey, status: 'in_flight' as const },
-      ...this.tracked,
-    ].slice(0, MAX_TRACKED_DELIVERIES);
+    this.inFlight.push({
+      utteranceId: delivery.utteranceId,
+      transcriptKey,
+      turnSequence: delivery.turnSequence,
+      superseded: false,
+    });
 
     // The high-water mark advances at ADMISSION and never rolls back — an
     // admitted turn stays logically newer even if it later clarifies, fails or
@@ -184,17 +233,62 @@ export class VoiceDeliveryGuard {
     return { kind: 'accept' };
   }
 
+  /**
+   * Record that a state-changing intent is about to execute.
+   *
+   * This SUPERSEDES every older in-flight reservation, so a slow interpretation
+   * from an earlier turn cannot later undo or resurrect what a newer command
+   * just did. Read-only questions deliberately do not call this: asking "how
+   * much protein is left" must never invalidate work already under way.
+   */
+  markStateChanging(delivery: CorrelatedVoiceDelivery): void {
+    this.highestStateChangingTurn =
+      this.highestStateChangingTurn === null
+        ? delivery.turnSequence
+        : Math.max(this.highestStateChangingTurn, delivery.turnSequence);
+
+    for (const entry of this.inFlight) {
+      if (entry.turnSequence < delivery.turnSequence) entry.superseded = true;
+    }
+  }
+
+  /**
+   * Whether an older state-changing intent may still execute.
+   *
+   * A proposal that was still being interpreted when a newer state-changing
+   * command ran is stale: acting on it now would apply a decision the user made
+   * about a screen that has since moved on.
+   */
+  isSupersededStateChange(delivery: CorrelatedVoiceDelivery): boolean {
+    const entry = this.inFlight.find((t) => t.utteranceId === delivery.utteranceId);
+    if (entry !== undefined && entry.superseded) return true;
+    return (
+      this.highestStateChangingTurn !== null &&
+      delivery.turnSequence < this.highestStateChangingTurn
+    );
+  }
+
   /** Settle a reservation with its canonical response, so duplicates replay it. */
   complete(delivery: CorrelatedVoiceDelivery, response: VoiceResponse): void {
-    const entry = this.tracked.find((t) => t.utteranceId === delivery.utteranceId);
-    if (entry === undefined) return;
-    entry.status = 'completed';
-    entry.response = response;
+    const idx = this.inFlight.findIndex((t) => t.utteranceId === delivery.utteranceId);
+    if (idx === -1) return;
+    const entry = this.inFlight[idx]!;
+    this.inFlight.splice(idx, 1);
+    this.completed = [
+      { utteranceId: entry.utteranceId, transcriptKey: entry.transcriptKey, response },
+      ...this.completed,
+    ].slice(0, MAX_COMPLETED_CACHE);
+  }
+
+  inFlightCount(): number {
+    return this.inFlight.length;
   }
 
   reset(): void {
-    this.tracked = [];
+    this.inFlight = [];
+    this.completed = [];
     this.highestAcceptedTurn = null;
+    this.highestStateChangingTurn = null;
     this.sessionKey = null;
   }
 }
@@ -206,6 +300,8 @@ export const DELIVERY_REJECTION_SPEECH: Readonly<Record<DeliveryRejection, strin
   stale_turn: "That arrived out of order, so I didn't act on it.",
   delivery_conflict: "I got two different versions of that, so I didn't act on either.",
   duplicate_in_flight: "I'm already working on that one.",
+  too_many_in_flight: "I've got too much in progress right now — say that again in a moment.",
+  superseded_by_newer_turn: "You asked for something else after that, so I skipped it.",
   stale_flow: "That referred to something that's no longer on screen.",
   missing_flow_context: "I couldn't tell which item that referred to.",
 };

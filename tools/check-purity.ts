@@ -39,9 +39,6 @@ const PURE_DOMAIN = [
   // Assistant proposal contracts, tool registry, validation and decision policy
   // are pure: no LLM SDK, no network, no database, no clock, no randomness.
   'packages/assistant-core',
-  // Runtime CONFIG logic is pure: it validates a supplied record and decides
-  // what should be built. Actual construction and IO live in runtime-api.
-  'packages/runtime-config',
 ];
 const PRODUCTION = [
   ...PURE_DOMAIN,
@@ -61,6 +58,10 @@ const PRODUCTION = [
   // Voice orchestration invokes application intents, so it is not pure — but
   // MVP-1 is deterministic, so no LLM/ASR/TTS SDK may enter it either.
   'packages/voice-orchestration',
+  // Runtime config/composition validates supplied records and decides what may
+  // be built. It reads node:crypto for migration checksums, so it is not pure —
+  // but it still may not reach an LLM SDK, a transport library or the test kit.
+  'packages/runtime-config',
 ];
 
 /** Transport and hardware libraries must not reach the pure capture logic. */

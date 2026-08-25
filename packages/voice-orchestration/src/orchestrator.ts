@@ -153,6 +153,21 @@ export class VoiceOrchestrator {
         reason: revalidated.reason,
       };
     }
+
+    // ORDERING OF STATE CHANGES. A read-only question never invalidates work in
+    // progress, but an older state-changing proposal that was still being
+    // interpreted when a newer one executed must not now undo or resurrect it.
+    if (AssistantRouter.isStateChanging(intent.kind)) {
+      if (this.guard.isSupersededStateChange(delivery)) {
+        return {
+          kind: 'error',
+          speech: DELIVERY_REJECTION_SPEECH['superseded_by_newer_turn'],
+          reason: 'superseded_by_newer_turn',
+        };
+      }
+      this.guard.markStateChanging(delivery);
+    }
+
     return this.dispatch(intent);
   }
 

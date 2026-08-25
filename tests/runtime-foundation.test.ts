@@ -7,7 +7,8 @@ import {
   CAPABILITY_MATRIX, FakeAuthSessionProvider, MemoryLogSink, MemoryTimingRecorder,
   PERFORMANCE_BUDGETS, StructuredLogger, allowsSyntheticProviders,
   appError, assertImplementationAllowed, checksumOf, computeHealth, fromUnknown,
-  loadRuntimeConfig, orderMigrations, planComposition, redactConfig, runMigrations,
+  loadRuntimeConfig, loadRoleConfig, orderMigrations, planComposition, redactConfig, runMigrations,
+  privilegedDatabaseAuthority, createPrivilegedDatabaseFactory,
   subjectFromSession, subjectRef, toWireError,
   type AppliedMigration, type MigrationDriver, type MigrationFile, type RuntimeConfig,
   type VersionManifest,
@@ -279,7 +280,7 @@ describe('B9 — migration runner', () => {
       .map((name) => ({ name, sql: readFileSync(join(dir, name), 'utf8') }));
     assert.ok(real.length >= 4);
     assert.deepEqual(orderMigrations(real).map((f) => f.name), [...real.map((f) => f.name)].sort());
-    for (const f of real) assert.match(checksumOf(f.sql), /^[0-9a-f]{8}$/);
+    for (const f of real) assert.match(checksumOf(f.sql), /^[0-9a-f]{64}$/);
   });
 });
 
@@ -576,5 +577,106 @@ describe('B25/B26/B31 — declared contracts', () => {
     const rec = new MemoryTimingRecorder();
     rec.record('food_search', 42, 'ok');
     assert.equal(rec.samples.length, 1);
+  });
+});
+
+describe('A4/A5 — runtime role separates tablet from server', () => {
+  const tabletRaw = {
+    environment: 'production',
+    appVersion: '1.0.0', apiVersion: 'macros-api@1.0.0', expectedSchemaVersion: '0004',
+    auth: 'real', assistant: 'real', scale: 'real', activity: 'real', catalog: 'real',
+    logLevel: 'info', maxRequestBytes: 65536,
+    apiBaseUrl: 'https://api.macros.example',
+  };
+
+  test('a valid tablet config has no database field at all', () => {
+    const r = loadRoleConfig('tablet', tabletRaw);
+    assert.equal(r.ok, true);
+    if (!r.ok) return;
+    assert.equal(r.config.role, 'tablet');
+    assert.equal('database' in r.config, false, 'unrepresentable, not merely null');
+    assert.ok(!JSON.stringify(r.config).includes('postgres'));
+  });
+
+  for (const field of ['databaseAppUrl', 'databasePrivilegedUrl', 'serviceRoleKey', 'providerApiKey', 'catalogPublishKey']) {
+    test(`a tablet supplied with ${field} FAILS startup`, () => {
+      const r = loadRoleConfig('tablet', {
+        ...tabletRaw,
+        [field]: 'postgres://app:hunter2@db/macros',
+      });
+      assert.equal(r.ok, false);
+      if (r.ok) return;
+      assert.ok(r.violations.some((v) => v.field === field));
+      // The diagnostic names the field, never the credential.
+      assert.ok(!JSON.stringify(r.violations).includes('hunter2'));
+      assert.ok(!JSON.stringify(r.violations).includes('postgres://'));
+    });
+  }
+
+  test('a tablet requires an https API base URL', () => {
+    const r = loadRoleConfig('tablet', { ...tabletRaw, apiBaseUrl: 'http://api.macros.example' });
+    assert.equal(r.ok, false);
+  });
+
+  test('a server config carries database connectivity', () => {
+    const r = loadRoleConfig('server', { ...baseRaw, databasePrivilegedUrl: 'postgres://root:x@db/macros' });
+    assert.equal(r.ok, true);
+    if (!r.ok || r.config.role !== 'server') return;
+    assert.equal(r.config.database.appUrl, baseRaw.databaseAppUrl);
+  });
+
+  test('a server without a database URL fails startup', () => {
+    const r = loadRoleConfig('server', { ...baseRaw, databaseAppUrl: '' });
+    assert.equal(r.ok, false);
+  });
+
+  test('privileged authority requires BOTH server role and configuration', () => {
+    const server = loadRoleConfig('server', { ...baseRaw, databasePrivilegedUrl: 'postgres://root:x@db/macros' });
+    assert.equal(server.ok, true);
+    if (!server.ok) return;
+    const granted = privilegedDatabaseAuthority(server.config);
+    assert.equal(granted.granted, true);
+
+    const noPriv = loadRoleConfig('server', baseRaw);
+    assert.equal(noPriv.ok, true);
+    if (!noPriv.ok) return;
+    const denied = privilegedDatabaseAuthority(noPriv.config);
+    assert.equal(denied.granted, false);
+    if (!denied.granted) assert.equal(denied.reason, 'not_configured');
+  });
+
+  test('a tablet can NEVER construct a privileged database factory', () => {
+    const tablet = loadRoleConfig('tablet', tabletRaw);
+    assert.equal(tablet.ok, true);
+    if (!tablet.ok) return;
+
+    const authority = privilegedDatabaseAuthority(tablet.config);
+    assert.equal(authority.granted, false);
+    if (!authority.granted) assert.equal(authority.reason, 'not_server_role');
+
+    let constructed = false;
+    const factory = createPrivilegedDatabaseFactory(tablet.config, () => { constructed = true; return {}; });
+    assert.equal(factory, null, 'no client is ever returned to a tablet');
+    assert.equal(constructed, false, 'the constructor never even ran');
+  });
+});
+
+describe('A6 — migration checksums are SHA-256', () => {
+  test('a checksum is a full 64-character hex digest', () => {
+    assert.match(checksumOf('CREATE TABLE a();'), /^[0-9a-f]{64}$/);
+  });
+
+  test('checksums are deterministic and content-sensitive', () => {
+    assert.equal(checksumOf('SELECT 1;'), checksumOf('SELECT 1;'));
+    assert.notEqual(checksumOf('SELECT 1;'), checksumOf('SELECT 2;'));
+    // A single-character edit must change the digest.
+    assert.notEqual(checksumOf('CREATE TABLE a();'), checksumOf('CREATE TABLE b();'));
+  });
+
+  test('every real migration hashes to 64 hex characters', () => {
+    const dir = join(ROOT, 'db/migrations');
+    for (const name of readdirSync(dir).filter((f) => f.endsWith('.sql'))) {
+      assert.match(checksumOf(readFileSync(join(dir, name), 'utf8')), /^[0-9a-f]{64}$/, name);
+    }
   });
 });

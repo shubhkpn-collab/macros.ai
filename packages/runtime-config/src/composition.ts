@@ -1,4 +1,7 @@
-import { allowsSyntheticProviders, type RuntimeConfig } from './config.js';
+import {
+  allowsSyntheticProviders, isServerConfig,
+  type AnyRuntimeConfig, type RuntimeConfig,
+} from './config.js';
 import { appError, type AppError } from './errors.js';
 
 /**
@@ -73,7 +76,7 @@ export function planComposition(config: RuntimeConfig): CompositionPlan | AppErr
   return {
     environment: config.environment,
     components,
-    // A tablet build never holds privileged credentials; only a server may.
+    // Presence of a URL is NOT authority. See privilegedDatabaseAuthority.
     privilegedDatabaseAllowed: config.database.privilegedUrl !== null,
   };
 }
@@ -97,4 +100,37 @@ export function assertImplementationAllowed(
     'Runtime refused to start.',
     `${implementationName} is not permitted in ${environment}`,
   );
+}
+
+/**
+ * PRIVILEGED DATABASE AUTHORITY.
+ *
+ * Authority requires a SERVER role AND an explicitly configured privileged
+ * connection. A connection string alone never confers it: possession of a
+ * credential is not the same as being permitted to use it, and a tablet must
+ * not be able to construct a privileged factory even if one is somehow present.
+ */
+export type PrivilegedAuthority =
+  | { readonly granted: true; readonly connection: string }
+  | { readonly granted: false; readonly reason: 'not_server_role' | 'not_configured' };
+
+export function privilegedDatabaseAuthority(config: AnyRuntimeConfig): PrivilegedAuthority {
+  if (!isServerConfig(config)) return { granted: false, reason: 'not_server_role' };
+  const url = config.database.privilegedUrl;
+  if (url === null || url.length === 0) return { granted: false, reason: 'not_configured' };
+  return { granted: true, connection: url };
+}
+
+/**
+ * The only way to obtain a privileged database client.
+ *
+ * Returns null rather than throwing, so a tablet code path that asks for one
+ * simply cannot have it — there is no branch in which it receives a client.
+ */
+export function createPrivilegedDatabaseFactory<T>(
+  config: AnyRuntimeConfig,
+  construct: (connection: string) => T,
+): T | null {
+  const authority = privilegedDatabaseAuthority(config);
+  return authority.granted ? construct(authority.connection) : null;
 }
