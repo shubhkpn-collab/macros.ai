@@ -1,7 +1,7 @@
 {
  "adapterVersion": "usda-fdc-adapter@1.0.0",
- "classifierVersion": "preparation-classifier@2.2.0",
- "identityVersion": "generic-identity@1.0.0",
+ "classifierVersion": "preparation-classifier@2.3.0",
+ "identityVersion": "generic-identity@1.1.0",
  "catalogPolicyVersion": "catalog-policy@1.0.0",
  "aliasPolicyVersion": "consumer-aliases@1.0.0",
  "archives": [
@@ -9,59 +9,77 @@
    "dataset": "Foundation",
    "path": "/mnt/user-data/uploads/FoodData_Central_foundation_food_json_2026-04-30.json",
    "sha256": "27d1fe3fd89edfbe528ed915da5619320e1d004d4594603a1b19bdb1511590cc"
+  },
+  {
+   "dataset": "SR Legacy",
+   "path": "/mnt/user-data/uploads/FoodData_Central_sr_legacy_food_json_2018-04.json",
+   "sha256": "70d4235ae3a2bdf48a7b9eaa1286a83fa67b6f3270436c9ce8b008213f500129"
   }
  ],
- "missingArchives": [
-  "SR Legacy"
- ],
+ "missingArchives": [],
  "sourceMappingRows": 35,
  "canonicalNutrientsMapped": 32,
  "stats": {
-  "recordsRead": 395,
+  "recordsRead": 8188,
   "nullRecords": 32,
   "malformed": 0,
-  "rejectedMissingCore": 51,
-  "rejectedUnresolvedPreparation": 5,
-  "rejectedExcludedCategory": 0,
-  "duplicateConceptsCollapsed": 0,
+  "rejectedMissingCore": 49,
+  "rejectedUnresolvedPreparation": 955,
+  "rejectedExcludedCategory": 183,
+  "duplicateConceptsCollapsed": 93,
   "sourcePreparationCounts": {
-   "as_sold": 182,
-   "raw": 162,
-   "cooked": 14,
-   "unresolved": 5
+   "as_sold": 3446,
+   "raw": 1548,
+   "cooked": 2207,
+   "unresolved": 955
   },
   "publishedPreparationCounts": {
-   "as_sold": 150,
-   "cooked": 14,
-   "raw": 143
+   "cooked": 2194,
+   "raw": 1480,
+   "as_sold": 3202
   },
   "categoryCounts": {
-   "Legumes and Legume Products": 37,
-   "Vegetables and Vegetable Products": 88,
-   "Sausages and Luncheon Meats": 6,
-   "Nut and Seed Products": 19,
-   "Dairy and Egg Products": 42,
-   "Fruits and Fruit Juices": 50,
-   "Spices and Herbs": 1,
-   "Fats and Oils": 9,
-   "Poultry Products": 11,
-   "Soups, Sauces, and Gravies": 2,
-   "Baked Products": 1,
-   "Finfish and Shellfish Products": 23,
-   "Restaurant Foods": 1,
-   "Beef Products": 15,
-   "Pork Products": 7,
-   "Cereal Grains and Pasta": 41,
-   "Beverages": 3,
-   "Lamb, Veal, and Game Products": 2
+   "Legumes and Legume Products": 327,
+   "Vegetables and Vegetable Products": 902,
+   "Sausages and Luncheon Meats": 88,
+   "Nut and Seed Products": 156,
+   "Dairy and Egg Products": 333,
+   "Fruits and Fruit Juices": 405,
+   "Spices and Herbs": 32,
+   "Fats and Oils": 225,
+   "Poultry Products": 379,
+   "Soups, Sauces, and Gravies": 216,
+   "Baked Products": 518,
+   "Finfish and Shellfish Products": 260,
+   "Restaurant Foods": 42,
+   "Beef Products": 969,
+   "Pork Products": 333,
+   "Cereal Grains and Pasta": 222,
+   "Beverages": 252,
+   "Lamb, Veal, and Game Products": 466,
+   "Snacks": 126,
+   "Sweets": 227,
+   "American Indian/Alaska Native Foods": 106,
+   "Baby Foods": 183,
+   "Breakfast Cereals": 188,
+   "Meals, Entrees, and Side Dishes": 68,
+   "Fast Foods": 178
   },
-  "recommendableCount": 305,
-  "acceptedCandidates": 307,
-  "publishedSeed": 307,
+  "recommendableCount": 6629,
+  "searchableNotRecommendedCount": 247,
+  "crossSourceDuplicatesCollapsed": 0,
+  "duplicateConceptsCollapsedCrossSource": 92,
+  "duplicateConceptsCollapsedSameSource": 1,
+  "acceptedCandidates": 6876,
+  "publishedSeed": 6876,
   "byDataset": {
    "Foundation": {
     "read": 395,
-    "accepted": 307
+    "accepted": 297
+   },
+   "SR Legacy": {
+    "read": 7793,
+    "accepted": 6579
    }
   },
   "nutrientIssues": {
@@ -73,444 +91,3377 @@
  },
  "unmappedUsdaNutrients": [
   {
-   "usdaId": 1002,
-   "occurrences": 326
-  },
-  {
-   "usdaId": 2048,
-   "occurrences": 199
-  },
-  {
-   "usdaId": 1012,
-   "occurrences": 139
-  },
-  {
-   "usdaId": 1013,
-   "occurrences": 139
-  },
-  {
-   "usdaId": 1010,
-   "occurrences": 139
-  },
-  {
-   "usdaId": 1011,
-   "occurrences": 139
-  },
-  {
-   "usdaId": 1014,
-   "occurrences": 139
-  },
-  {
-   "usdaId": 1176,
-   "occurrences": 110
-  },
-  {
    "usdaId": 1292,
-   "occurrences": 105
+   "occurrences": 7382
   },
   {
    "usdaId": 1293,
-   "occurrences": 90
-  },
-  {
-   "usdaId": 1009,
-   "occurrences": 89
+   "occurrences": 7369
   },
   {
    "usdaId": 1265,
-   "occurrences": 87
+   "occurrences": 7086
   },
   {
    "usdaId": 1266,
-   "occurrences": 87
+   "occurrences": 7076
+  },
+  {
+   "usdaId": 1269,
+   "occurrences": 7040
+  },
+  {
+   "usdaId": 1268,
+   "occurrences": 7018
+  },
+  {
+   "usdaId": 1270,
+   "occurrences": 6943
   },
   {
    "usdaId": 1264,
-   "occurrences": 83
+   "occurrences": 6876
+  },
+  {
+   "usdaId": 1275,
+   "occurrences": 6782
   },
   {
    "usdaId": 1263,
-   "occurrences": 78
+   "occurrences": 6528
   },
   {
-   "usdaId": 1316,
-   "occurrences": 78
+   "usdaId": 1186,
+   "occurrences": 6500
   },
   {
-   "usdaId": 1075,
-   "occurrences": 78
+   "usdaId": 1271,
+   "occurrences": 6362
   },
   {
-   "usdaId": 1315,
-   "occurrences": 76
+   "usdaId": 1262,
+   "occurrences": 6333
   },
   {
-   "usdaId": 1102,
-   "occurrences": 68
+   "usdaId": 1277,
+   "occurrences": 6332
   },
   {
-   "usdaId": 1257,
-   "occurrences": 67
+   "usdaId": 1261,
+   "occurrences": 5977
+  },
+  {
+   "usdaId": 1278,
+   "occurrences": 5862
+  },
+  {
+   "usdaId": 1272,
+   "occurrences": 5834
+  },
+  {
+   "usdaId": 1280,
+   "occurrences": 5817
+  },
+  {
+   "usdaId": 1260,
+   "occurrences": 5787
+  },
+  {
+   "usdaId": 1279,
+   "occurrences": 5781
   }
  ],
  "coverage": [
   {
    "nutrientId": "fiber",
-   "known": 172,
-   "total": 307,
-   "percent": 56
+   "known": 6295,
+   "total": 6876,
+   "percent": 91.6
   },
   {
    "nutrientId": "total_sugars",
-   "known": 117,
-   "total": 307,
-   "percent": 38.1
+   "known": 5073,
+   "total": 6876,
+   "percent": 73.8
   },
   {
    "nutrientId": "added_sugars",
    "known": 0,
-   "total": 307,
+   "total": 6876,
    "percent": 0
   },
   {
    "nutrientId": "saturated_fat",
-   "known": 93,
-   "total": 307,
-   "percent": 30.3
+   "known": 6401,
+   "total": 6876,
+   "percent": 93.1
   },
   {
    "nutrientId": "cholesterol",
-   "known": 76,
-   "total": 307,
-   "percent": 24.8
+   "known": 6354,
+   "total": 6876,
+   "percent": 92.4
   },
   {
    "nutrientId": "sodium",
-   "known": 302,
-   "total": 307,
-   "percent": 98.4
+   "known": 6811,
+   "total": 6876,
+   "percent": 99.1
   },
   {
    "nutrientId": "potassium",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6657,
+   "total": 6876,
+   "percent": 96.8
   },
   {
    "nutrientId": "calcium",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6800,
+   "total": 6876,
+   "percent": 98.9
   },
   {
    "nutrientId": "iron",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6802,
+   "total": 6876,
+   "percent": 98.9
   },
   {
    "nutrientId": "magnesium",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6574,
+   "total": 6876,
+   "percent": 95.6
   },
   {
    "nutrientId": "phosphorus",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6606,
+   "total": 6876,
+   "percent": 96.1
   },
   {
    "nutrientId": "zinc",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6563,
+   "total": 6876,
+   "percent": 95.4
   },
   {
    "nutrientId": "selenium",
-   "known": 146,
-   "total": 307,
-   "percent": 47.6
+   "known": 5962,
+   "total": 6876,
+   "percent": 86.7
   },
   {
    "nutrientId": "copper",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6451,
+   "total": 6876,
+   "percent": 93.8
   },
   {
    "nutrientId": "manganese",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 5917,
+   "total": 6876,
+   "percent": 86.1
   },
   {
    "nutrientId": "vitamin_a",
-   "known": 48,
-   "total": 307,
-   "percent": 15.6
+   "known": 5945,
+   "total": 6876,
+   "percent": 86.5
   },
   {
    "nutrientId": "vitamin_c",
-   "known": 101,
-   "total": 307,
-   "percent": 32.9
+   "known": 6323,
+   "total": 6876,
+   "percent": 92
   },
   {
    "nutrientId": "vitamin_d",
-   "known": 51,
-   "total": 307,
-   "percent": 16.6
+   "known": 4441,
+   "total": 6876,
+   "percent": 64.6
   },
   {
    "nutrientId": "vitamin_e",
-   "known": 52,
-   "total": 307,
-   "percent": 16.9
+   "known": 4693,
+   "total": 6876,
+   "percent": 68.3
   },
   {
    "nutrientId": "vitamin_k",
-   "known": 68,
-   "total": 307,
-   "percent": 22.1
+   "known": 4239,
+   "total": 6876,
+   "percent": 61.6
   },
   {
    "nutrientId": "thiamin",
-   "known": 166,
-   "total": 307,
-   "percent": 54.1
+   "known": 6436,
+   "total": 6876,
+   "percent": 93.6
   },
   {
    "nutrientId": "riboflavin",
-   "known": 129,
-   "total": 307,
-   "percent": 42
+   "known": 6420,
+   "total": 6876,
+   "percent": 93.4
   },
   {
    "nutrientId": "niacin",
-   "known": 172,
-   "total": 307,
-   "percent": 56
+   "known": 6439,
+   "total": 6876,
+   "percent": 93.6
   },
   {
    "nutrientId": "pantothenic_acid",
-   "known": 49,
-   "total": 307,
-   "percent": 16
+   "known": 5557,
+   "total": 6876,
+   "percent": 80.8
   },
   {
    "nutrientId": "vitamin_b6",
-   "known": 187,
-   "total": 307,
-   "percent": 60.9
+   "known": 6353,
+   "total": 6876,
+   "percent": 92.4
   },
   {
    "nutrientId": "folate",
-   "known": 114,
-   "total": 307,
-   "percent": 37.1
+   "known": 5942,
+   "total": 6876,
+   "percent": 86.4
   },
   {
    "nutrientId": "vitamin_b12",
-   "known": 59,
-   "total": 307,
-   "percent": 19.2
+   "known": 6112,
+   "total": 6876,
+   "percent": 88.9
   },
   {
    "nutrientId": "choline",
-   "known": 25,
-   "total": 307,
-   "percent": 8.1
+   "known": 3849,
+   "total": 6876,
+   "percent": 56
   }
  ],
  "coverageAllAccepted": [
   {
    "nutrientId": "fiber",
-   "known": 172,
-   "total": 307,
-   "percent": 56
+   "known": 6295,
+   "total": 6876,
+   "percent": 91.6
   },
   {
    "nutrientId": "total_sugars",
-   "known": 117,
-   "total": 307,
-   "percent": 38.1
+   "known": 5073,
+   "total": 6876,
+   "percent": 73.8
   },
   {
    "nutrientId": "added_sugars",
    "known": 0,
-   "total": 307,
+   "total": 6876,
    "percent": 0
   },
   {
    "nutrientId": "saturated_fat",
-   "known": 93,
-   "total": 307,
-   "percent": 30.3
+   "known": 6401,
+   "total": 6876,
+   "percent": 93.1
   },
   {
    "nutrientId": "cholesterol",
-   "known": 76,
-   "total": 307,
-   "percent": 24.8
+   "known": 6354,
+   "total": 6876,
+   "percent": 92.4
   },
   {
    "nutrientId": "sodium",
-   "known": 302,
-   "total": 307,
-   "percent": 98.4
+   "known": 6811,
+   "total": 6876,
+   "percent": 99.1
   },
   {
    "nutrientId": "potassium",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6657,
+   "total": 6876,
+   "percent": 96.8
   },
   {
    "nutrientId": "calcium",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6800,
+   "total": 6876,
+   "percent": 98.9
   },
   {
    "nutrientId": "iron",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6802,
+   "total": 6876,
+   "percent": 98.9
   },
   {
    "nutrientId": "magnesium",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6574,
+   "total": 6876,
+   "percent": 95.6
   },
   {
    "nutrientId": "phosphorus",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6606,
+   "total": 6876,
+   "percent": 96.1
   },
   {
    "nutrientId": "zinc",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6563,
+   "total": 6876,
+   "percent": 95.4
   },
   {
    "nutrientId": "selenium",
-   "known": 146,
-   "total": 307,
-   "percent": 47.6
+   "known": 5962,
+   "total": 6876,
+   "percent": 86.7
   },
   {
    "nutrientId": "copper",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 6451,
+   "total": 6876,
+   "percent": 93.8
   },
   {
    "nutrientId": "manganese",
-   "known": 303,
-   "total": 307,
-   "percent": 98.7
+   "known": 5917,
+   "total": 6876,
+   "percent": 86.1
   },
   {
    "nutrientId": "vitamin_a",
-   "known": 48,
-   "total": 307,
-   "percent": 15.6
+   "known": 5945,
+   "total": 6876,
+   "percent": 86.5
   },
   {
    "nutrientId": "vitamin_c",
-   "known": 101,
-   "total": 307,
-   "percent": 32.9
+   "known": 6323,
+   "total": 6876,
+   "percent": 92
   },
   {
    "nutrientId": "vitamin_d",
-   "known": 51,
-   "total": 307,
-   "percent": 16.6
+   "known": 4441,
+   "total": 6876,
+   "percent": 64.6
   },
   {
    "nutrientId": "vitamin_e",
-   "known": 52,
-   "total": 307,
-   "percent": 16.9
+   "known": 4693,
+   "total": 6876,
+   "percent": 68.3
   },
   {
    "nutrientId": "vitamin_k",
-   "known": 68,
-   "total": 307,
-   "percent": 22.1
+   "known": 4239,
+   "total": 6876,
+   "percent": 61.6
   },
   {
    "nutrientId": "thiamin",
-   "known": 166,
-   "total": 307,
-   "percent": 54.1
+   "known": 6436,
+   "total": 6876,
+   "percent": 93.6
   },
   {
    "nutrientId": "riboflavin",
-   "known": 129,
-   "total": 307,
-   "percent": 42
+   "known": 6420,
+   "total": 6876,
+   "percent": 93.4
   },
   {
    "nutrientId": "niacin",
-   "known": 172,
-   "total": 307,
-   "percent": 56
+   "known": 6439,
+   "total": 6876,
+   "percent": 93.6
   },
   {
    "nutrientId": "pantothenic_acid",
-   "known": 49,
-   "total": 307,
-   "percent": 16
+   "known": 5557,
+   "total": 6876,
+   "percent": 80.8
   },
   {
    "nutrientId": "vitamin_b6",
-   "known": 187,
-   "total": 307,
-   "percent": 60.9
+   "known": 6353,
+   "total": 6876,
+   "percent": 92.4
   },
   {
    "nutrientId": "folate",
-   "known": 114,
-   "total": 307,
-   "percent": 37.1
+   "known": 5942,
+   "total": 6876,
+   "percent": 86.4
   },
   {
    "nutrientId": "vitamin_b12",
-   "known": 59,
-   "total": 307,
-   "percent": 19.2
+   "known": 6112,
+   "total": 6876,
+   "percent": 88.9
   },
   {
    "nutrientId": "choline",
-   "known": 25,
-   "total": 307,
-   "percent": 8.1
+   "known": 3849,
+   "total": 6876,
+   "percent": 56
   }
  ],
+ "crossSource": {
+  "definiteSame": 0,
+  "possibleDuplicate": 170,
+  "pairsCompared": 10749,
+  "overlapMs": 63,
+  "pairs": [
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1104705",
+     "description": "Flour, soy, defatted"
+    },
+    "sr": {
+     "sourceRecordId": "174275",
+     "description": "Soy flour, defatted"
+    },
+    "preparation": "as_sold",
+    "category": "Legumes and Legume Products",
+    "foundationConceptKey": "defatted|flour|soy#as_sold",
+    "srConceptKey": "defatted|soy flour#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1104812",
+     "description": "Flour, rice, brown"
+    },
+    "sr": {
+     "sourceRecordId": "168898",
+     "description": "Rice flour, brown"
+    },
+    "preparation": "as_sold",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "brown|flour|rice#as_sold",
+    "srConceptKey": "brown|rice flour#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1104962",
+     "description": "Onions, white, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170000",
+     "description": "Onions, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "onions|raw|white#raw",
+    "srConceptKey": "onions|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1105073",
+     "description": "Bananas, overripe, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173944",
+     "description": "Bananas, raw"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "bananas|overripe|raw#raw",
+    "srConceptKey": "bananas|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1105314",
+     "description": "Bananas, ripe and slightly ripe, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173944",
+     "description": "Bananas, raw"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "bananas|raw|ripe and slightly ripe#raw",
+    "srConceptKey": "bananas|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1750339",
+     "description": "Apples, red delicious, with skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171688",
+     "description": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "apples|raw|red delicious|with skin#raw",
+    "srConceptKey": "apples|raw|with skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1750340",
+     "description": "Apples, fuji, with skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171688",
+     "description": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "apples|fuji|raw|with skin#raw",
+    "srConceptKey": "apples|raw|with skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1750341",
+     "description": "Apples, gala, with skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171688",
+     "description": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "apples|gala|raw|with skin#raw",
+    "srConceptKey": "apples|raw|with skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1750342",
+     "description": "Apples, granny smith, with skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171688",
+     "description": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "apples|granny smith|raw|with skin#raw",
+    "srConceptKey": "apples|raw|with skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "1750343",
+     "description": "Apples, honeycrisp, with skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171688",
+     "description": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "apples|honeycrisp|raw|with skin#raw",
+    "srConceptKey": "apples|raw|with skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2258586",
+     "description": "Carrots, mature, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170393",
+     "description": "Carrots, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "carrots|mature|raw#raw",
+    "srConceptKey": "carrots|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2259796",
+     "description": "Cheese, feta, whole milk, crumbled"
+    },
+    "sr": {
+     "sourceRecordId": "173420",
+     "description": "Cheese, feta"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|crumbled|feta|whole milk#as_sold",
+    "srConceptKey": "cheese|feta#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2262072",
+     "description": "Peanut butter, creamy"
+    },
+    "sr": {
+     "sourceRecordId": "172471",
+     "description": "Peanut butter with omega-3, creamy"
+    },
+    "preparation": "as_sold",
+    "category": "Legumes and Legume Products",
+    "foundationConceptKey": "creamy|peanut butter#as_sold",
+    "srConceptKey": "creamy|peanut butter with omega 3#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346386",
+     "description": "Cream, heavy"
+    },
+    "sr": {
+     "sourceRecordId": "170859",
+     "description": "Cream, fluid, heavy whipping"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cream|heavy#as_sold",
+    "srConceptKey": "cream|fluid|heavy whipping#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346388",
+     "description": "Lettuce, iceberg, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169248",
+     "description": "Lettuce, iceberg (includes crisphead types), raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "iceberg|lettuce|raw#raw",
+    "srConceptKey": "iceberg includes crisphead types|lettuce|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346391",
+     "description": "Lettuce, leaf, green, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169249",
+     "description": "Lettuce, green leaf, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "green|leaf|lettuce|raw#raw",
+    "srConceptKey": "green leaf|lettuce|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346398",
+     "description": "Pineapple, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168193",
+     "description": "Pineapple, raw, traditional varieties"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "pineapple|raw#raw",
+    "srConceptKey": "pineapple|raw|traditional varieties#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346399",
+     "description": "Cherries, sweet, dark red, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171719",
+     "description": "Cherries, sweet, raw"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "cherries|dark red|raw|sweet#raw",
+    "srConceptKey": "cherries|raw|sweet#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346401",
+     "description": "Potatoes, russet, without skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170032",
+     "description": "Potatoes, raw, skin"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "potatoes|raw|russet|without skin#raw",
+    "srConceptKey": "potatoes|raw|skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346402",
+     "description": "Potatoes, red, without skin, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170032",
+     "description": "Potatoes, raw, skin"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "potatoes|raw|red|without skin#raw",
+    "srConceptKey": "potatoes|raw|skin#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346407",
+     "description": "Cabbage, green, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169975",
+     "description": "Cabbage, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "cabbage|green|raw#raw",
+    "srConceptKey": "cabbage|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346408",
+     "description": "Cabbage, red, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169975",
+     "description": "Cabbage, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "cabbage|raw|red#raw",
+    "srConceptKey": "cabbage|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346412",
+     "description": "Grapes, red, seedless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174683",
+     "description": "Grapes, red or green (European type, such as Thompson seedless), raw"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "grapes|raw|red|seedless#raw",
+    "srConceptKey": "grapes|raw|red or green european type|such as thompson seedless#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2346413",
+     "description": "Grapes, green, seedless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174683",
+     "description": "Grapes, red or green (European type, such as Thompson seedless), raw"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "grapes|green|raw|seedless#raw",
+    "srConceptKey": "grapes|raw|red or green european type|such as thompson seedless#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2512374",
+     "description": "Flour, buckwheat"
+    },
+    "sr": {
+     "sourceRecordId": "170687",
+     "description": "Buckwheat flour, whole-groat"
+    },
+    "preparation": "as_sold",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "buckwheat|flour#as_sold",
+    "srConceptKey": "buckwheat flour|whole groat#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2512376",
+     "description": "Flour, barley"
+    },
+    "sr": {
+     "sourceRecordId": "169739",
+     "description": "Barley flour or meal"
+    },
+    "preparation": "as_sold",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "barley|flour#as_sold",
+    "srConceptKey": "barley flour or meal#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2512376",
+     "description": "Flour, barley"
+    },
+    "sr": {
+     "sourceRecordId": "169740",
+     "description": "Barley malt flour"
+    },
+    "preparation": "as_sold",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "barley|flour#as_sold",
+    "srConceptKey": "barley malt flour#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2512380",
+     "description": "Rice, brown, long grain, unenriched, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169703",
+     "description": "Rice, brown, long-grain, raw (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "raw",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "brown|long grain|raw|rice|unenriched#raw",
+    "srConceptKey": "brown|long grain|raw|rice#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2512381",
+     "description": "Rice, white, long grain, unenriched, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169756",
+     "description": "Rice, white, long-grain, regular, raw, unenriched"
+    },
+    "preparation": "raw",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "long grain|raw|rice|unenriched|white#raw",
+    "srConceptKey": "long grain|raw|regular|rice|unenriched|white#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2514746",
+     "description": "Chicken, ground, with additives, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171116",
+     "description": "Chicken, ground, raw"
+    },
+    "preparation": "raw",
+    "category": "Poultry Products",
+    "foundationConceptKey": "chicken|ground|raw|with additives#raw",
+    "srConceptKey": "chicken|ground|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2515376",
+     "description": "Peanuts, raw"
+    },
+    "sr": {
+     "sourceRecordId": "172432",
+     "description": "Peanuts, valencia, raw"
+    },
+    "preparation": "raw",
+    "category": "Legumes and Legume Products",
+    "foundationConceptKey": "peanuts|raw#raw",
+    "srConceptKey": "peanuts|raw|valencia#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2515376",
+     "description": "Peanuts, raw"
+    },
+    "sr": {
+     "sourceRecordId": "172434",
+     "description": "Peanuts, virginia, raw"
+    },
+    "preparation": "raw",
+    "category": "Legumes and Legume Products",
+    "foundationConceptKey": "peanuts|raw#raw",
+    "srConceptKey": "peanuts|raw|virginia#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2515376",
+     "description": "Peanuts, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174263",
+     "description": "Peanuts, spanish, raw"
+    },
+    "preparation": "raw",
+    "category": "Legumes and Legume Products",
+    "foundationConceptKey": "peanuts|raw#raw",
+    "srConceptKey": "peanuts|raw|spanish#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "167839",
+     "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean and fat, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean and fat|top loin chops#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "167889",
+     "description": "Pork, fresh, loin, center rib (chops or roasts), boneless, separable lean and fat, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|center rib chops or roasts|fresh|loin|pork|raw|separable lean and fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "167901",
+     "description": "Pork, fresh, loin, sirloin (chops or roasts), boneless, separable lean only, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean only|sirloin chops or roasts#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168251",
+     "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean only, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean only|top loin chops#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168263",
+     "description": "Pork, fresh, loin, center loin (chops), boneless, separable lean only, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|center loin chops|fresh|loin|pork|raw|separable lean only#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168286",
+     "description": "Pork, fresh, loin, center loin (chops), boneless, separable lean and fat, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|center loin chops|fresh|loin|pork|raw|separable lean and fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168302",
+     "description": "Pork, fresh, loin, center rib (chops or roasts), boneless, separable lean only, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|center rib chops or roasts|fresh|loin|pork|raw|separable lean only#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168308",
+     "description": "Pork, fresh, loin, sirloin (chops or roasts), boneless, separable lean and fat, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean and fat|sirloin chops or roasts#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168314",
+     "description": "Pork, fresh, loin, top loin (roasts), boneless, separable lean and fat, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean and fat|top loin roasts#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168315",
+     "description": "Pork, fresh, loin, top loin (roasts), boneless, separable lean only, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean only|top loin roasts#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169181",
+     "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean only, with added solution, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean only|top loin chops|with added solution#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646168",
+     "description": "Pork, loin, boneless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169182",
+     "description": "Pork, fresh, loin, top loin (chops), boneless, separable lean and fat, with added solution, raw"
+    },
+    "preparation": "raw",
+    "category": "Pork Products",
+    "foundationConceptKey": "boneless|loin|pork|raw#raw",
+    "srConceptKey": "boneless|fresh|loin|pork|raw|separable lean and fat|top loin chops|with added solution#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646170",
+     "description": "Chicken, breast, boneless, skinless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171077",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw"
+    },
+    "preparation": "raw",
+    "category": "Poultry Products",
+    "foundationConceptKey": "boneless|breast|chicken|raw|skinless#raw",
+    "srConceptKey": "boneless|breast|broiler or fryers|chicken|meat only|raw|skinless#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646170",
+     "description": "Chicken, breast, boneless, skinless, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171509",
+     "description": "Chicken, broilers or fryers, breast, skinless, boneless, meat only, with added solution, raw"
+    },
+    "preparation": "raw",
+    "category": "Poultry Products",
+    "foundationConceptKey": "boneless|breast|chicken|raw|skinless#raw",
+    "srConceptKey": "boneless|breast|broilers or fryers|chicken|meat only|raw|skinless|with added solution#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646172",
+     "description": "Beef, ribeye, steak, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174699",
+     "description": "Beef, ribeye cap steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|raw|ribeye|steak#raw",
+    "srConceptKey": "beef|boneless|choice|raw|ribeye cap steak|separable lean only|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646173",
+     "description": "Beef, round, top round, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171758",
+     "description": "Beef, round, top round steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|raw|round|top round#raw",
+    "srConceptKey": "beef|boneless|choice|raw|round|separable lean only|top round steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646173",
+     "description": "Beef, round, top round, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173980",
+     "description": "Beef, round, top round steak, boneless, separable lean and fat, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|raw|round|top round#raw",
+    "srConceptKey": "beef|boneless|choice|raw|round|separable lean and fat|top round steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646173",
+     "description": "Beef, round, top round, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173983",
+     "description": "Beef, round, top round roast, boneless, separable lean and fat, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|raw|round|top round#raw",
+    "srConceptKey": "beef|boneless|choice|raw|round|separable lean and fat|top round roast|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646173",
+     "description": "Beef, round, top round, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173996",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|raw|round|top round#raw",
+    "srConceptKey": "beef|boneless|choice|raw|round|separable lean only|top round roast|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646174",
+     "description": "Beef, chuck, roast, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169446",
+     "description": "Beef, chuck, under blade pot roast or steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|chuck|raw|roast#raw",
+    "srConceptKey": "beef|boneless|choice|chuck|raw|separable lean only|trimmed to 0 fat|under blade pot roast or steak#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2646174",
+     "description": "Beef, chuck, roast, boneless, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170814",
+     "description": "Beef, chuck, under blade pot roast or steak, boneless, separable lean and fat, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|chuck|raw|roast#raw",
+    "srConceptKey": "beef|boneless|choice|chuck|raw|separable lean and fat|trimmed to 0 fat|under blade pot roast or steak#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2647438",
+     "description": "Cheese, monterey jack, solid"
+    },
+    "sr": {
+     "sourceRecordId": "170844",
+     "description": "Cheese, monterey"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|monterey jack|solid#as_sold",
+    "srConceptKey": "cheese|monterey#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2647440",
+     "description": "Cheese, provolone, sliced"
+    },
+    "sr": {
+     "sourceRecordId": "170850",
+     "description": "Cheese, provolone"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|provolone|sliced#as_sold",
+    "srConceptKey": "cheese|provolone#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2684440",
+     "description": "Fish, salmon, sockeye, wild caught, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173691",
+     "description": "Fish, salmon, sockeye, raw"
+    },
+    "preparation": "raw",
+    "category": "Finfish and Shellfish Products",
+    "foundationConceptKey": "fish|raw|salmon|sockeye|wild caught#raw",
+    "srConceptKey": "fish|raw|salmon|sockeye#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2684443",
+     "description": "Crustaceans, shrimp, farm raised, raw"
+    },
+    "sr": {
+     "sourceRecordId": "175179",
+     "description": "Crustaceans, shrimp, raw"
+    },
+    "preparation": "raw",
+    "category": "Finfish and Shellfish Products",
+    "foundationConceptKey": "crustaceans|farm raised|raw|shrimp#raw",
+    "srConceptKey": "crustaceans|raw|shrimp#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2684444",
+     "description": "Fish, cod, Atlantic, wild caught, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171955",
+     "description": "Fish, cod, Atlantic, raw"
+    },
+    "preparation": "raw",
+    "category": "Finfish and Shellfish Products",
+    "foundationConceptKey": "atlantic|cod|fish|raw|wild caught#raw",
+    "srConceptKey": "atlantic|cod|fish|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2685573",
+     "description": "Cauliflower, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169389",
+     "description": "Cauliflower, green, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "cauliflower|raw#raw",
+    "srConceptKey": "cauliflower|green|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2685580",
+     "description": "Tomato, paste, canned, without salt added"
+    },
+    "sr": {
+     "sourceRecordId": "170459",
+     "description": "Tomato products, canned, paste, without salt added (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "as_sold",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "canned|paste|tomato|without salt added#as_sold",
+    "srConceptKey": "canned|paste|tomato products|without salt added#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2685582",
+     "description": "Tomato, puree, canned"
+    },
+    "sr": {
+     "sourceRecordId": "170460",
+     "description": "Tomato products, canned, puree, without salt added"
+    },
+    "preparation": "as_sold",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "canned|puree|tomato#as_sold",
+    "srConceptKey": "canned|puree|tomato products|without salt added#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2685582",
+     "description": "Tomato, puree, canned"
+    },
+    "sr": {
+     "sourceRecordId": "170546",
+     "description": "Tomato products, canned, puree, with salt added"
+    },
+    "preparation": "as_sold",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "canned|puree|tomato#as_sold",
+    "srConceptKey": "canned|puree|tomato products|with salt added#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2710822",
+     "description": "Arugula, baby, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169387",
+     "description": "Arugula, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "arugula|baby|raw#raw",
+    "srConceptKey": "arugula|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2710823",
+     "description": "Asparagus, green, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168389",
+     "description": "Asparagus, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "asparagus|green|raw#raw",
+    "srConceptKey": "asparagus|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2710826",
+     "description": "Corn, sweet, yellow and white kernels,  fresh, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168538",
+     "description": "Corn, sweet, white, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "corn|fresh|raw|sweet|yellow and white kernels#raw",
+    "srConceptKey": "corn|raw|sweet|white#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2710826",
+     "description": "Corn, sweet, yellow and white kernels,  fresh, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169998",
+     "description": "Corn, sweet, yellow, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "corn|fresh|raw|sweet|yellow and white kernels#raw",
+    "srConceptKey": "corn|raw|sweet|yellow#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168724",
+     "description": "Beef, tenderloin, steak, separable lean and fat, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|raw|select|separable lean and fat|steak|tenderloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169545",
+     "description": "Beef, tenderloin, steak, separable lean and fat, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|choice|raw|separable lean and fat|steak|tenderloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171768",
+     "description": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|boneless|choice|loin|raw|separable lean only|tenderloin steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171769",
+     "description": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|boneless|loin|raw|select|separable lean only|tenderloin steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171803",
+     "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|raw|select|separable lean only|steak|tenderloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173989",
+     "description": "Beef, loin, tenderloin steak, boneless, separable lean and fat, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|boneless|choice|loin|raw|separable lean and fat|tenderloin steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173990",
+     "description": "Beef, loin, tenderloin steak, boneless, separable lean and fat, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|boneless|loin|raw|select|separable lean and fat|tenderloin steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727573",
+     "description": "Beef, tenderloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174762",
+     "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|tenderloin steak#raw",
+    "srConceptKey": "beef|choice|raw|separable lean only|steak|tenderloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168728",
+     "description": "Beef, top sirloin, steak, separable lean and fat, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|choice|raw|separable lean and fat|steak|top sirloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169551",
+     "description": "Beef, top sirloin, steak, separable lean and fat, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|raw|select|separable lean and fat|steak|top sirloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171804",
+     "description": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|raw|select|separable lean only|steak|top sirloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "172174",
+     "description": "Beef, loin, top sirloin cap steak, boneless, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|boneless|choice|loin|raw|separable lean only|top sirloin cap steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173062",
+     "description": "Beef, loin, top sirloin cap steak, boneless, separable lean and fat, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|boneless|loin|raw|select|separable lean and fat|top sirloin cap steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173409",
+     "description": "Beef, loin, top sirloin cap steak, boneless, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|boneless|loin|raw|select|separable lean only|top sirloin cap steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174707",
+     "description": "Beef, loin, top sirloin cap steak, boneless, separable lean and fat, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|boneless|choice|loin|raw|separable lean and fat|top sirloin cap steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2727574",
+     "description": "Beef, top sirloin steak, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174763",
+     "description": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|raw|top sirloin steak#raw",
+    "srConceptKey": "beef|choice|raw|separable lean only|steak|top sirloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2747661",
+     "description": "Peppers, jalapeno, seeded, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168576",
+     "description": "Peppers, jalapeno, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "jalapeno|peppers|raw|seeded#raw",
+    "srConceptKey": "jalapeno|peppers|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2747663",
+     "description": "Peppers, serrano, seeded, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169395",
+     "description": "Peppers, serrano, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "peppers|raw|seeded|serrano#raw",
+    "srConceptKey": "peppers|raw|serrano#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2747665",
+     "description": "Radishes, red, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169276",
+     "description": "Radishes, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "radishes|raw|red#raw",
+    "srConceptKey": "radishes|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "2747676",
+     "description": "Watermelon, seedless, rind only, raw"
+    },
+    "sr": {
+     "sourceRecordId": "167765",
+     "description": "Watermelon, raw"
+    },
+    "preparation": "raw",
+    "category": "Fruits and Fruit Juices",
+    "foundationConceptKey": "raw|rind only|seedless|watermelon#raw",
+    "srConceptKey": "raw|watermelon#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "323604",
+     "description": "Egg, whole, raw, frozen, pasteurized"
+    },
+    "sr": {
+     "sourceRecordId": "170893",
+     "description": "Egg, whole, raw, frozen, salted, pasteurized"
+    },
+    "preparation": "raw",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "egg|frozen|pasteurized|raw|whole#raw",
+    "srConceptKey": "egg|frozen|pasteurized|raw|salted|whole#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "323793",
+     "description": "Egg, white, dried"
+    },
+    "sr": {
+     "sourceRecordId": "170895",
+     "description": "Egg, white, dried, stabilized, glucose reduced"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "dried|egg|white#as_sold",
+    "srConceptKey": "dried|egg|glucose reduced|stabilized|white#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "323793",
+     "description": "Egg, white, dried"
+    },
+    "sr": {
+     "sourceRecordId": "173426",
+     "description": "Egg, white, dried, flakes, stabilized, glucose reduced"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "dried|egg|white#as_sold",
+    "srConceptKey": "dried|egg|flakes|glucose reduced|stabilized|white#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "323793",
+     "description": "Egg, white, dried"
+    },
+    "sr": {
+     "sourceRecordId": "173427",
+     "description": "Egg, white, dried, powder, stabilized, glucose reduced"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "dried|egg|white#as_sold",
+    "srConceptKey": "dried|egg|glucose reduced|powder|stabilized|white#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "325036",
+     "description": "Cheese, parmesan, grated"
+    },
+    "sr": {
+     "sourceRecordId": "173452",
+     "description": "Cheese, parmesan, dry grated, reduced fat"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|grated|parmesan#as_sold",
+    "srConceptKey": "cheese|dry grated|parmesan|reduced fat#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "325198",
+     "description": "Cheese, pasteurized process, American, vitamin D fortified"
+    },
+    "sr": {
+     "sourceRecordId": "170853",
+     "description": "Cheese, pasteurized process, American, fortified with vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "american|cheese|pasteurized process|vitamin d fortified#as_sold",
+    "srConceptKey": "american|cheese|fortified with vitamin d|pasteurized process#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "325198",
+     "description": "Cheese, pasteurized process, American, vitamin D fortified"
+    },
+    "sr": {
+     "sourceRecordId": "171252",
+     "description": "Cheese food, pasteurized process, American, vitamin D fortified"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "american|cheese|pasteurized process|vitamin d fortified#as_sold",
+    "srConceptKey": "american|cheese food|pasteurized process|vitamin d fortified#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "325198",
+     "description": "Cheese, pasteurized process, American, vitamin D fortified"
+    },
+    "sr": {
+     "sourceRecordId": "171289",
+     "description": "Cheese product, pasteurized process, American, vitamin D fortified"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "american|cheese|pasteurized process|vitamin d fortified#as_sold",
+    "srConceptKey": "american|cheese product|pasteurized process|vitamin d fortified#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "325198",
+     "description": "Cheese, pasteurized process, American, vitamin D fortified"
+    },
+    "sr": {
+     "sourceRecordId": "173455",
+     "description": "Cheese product, pasteurized process, American, reduced fat, fortified with vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "american|cheese|pasteurized process|vitamin d fortified#as_sold",
+    "srConceptKey": "american|cheese product|fortified with vitamin d|pasteurized process|reduced fat#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "325524",
+     "description": "Seeds, sunflower seed kernels, dry roasted, with salt added"
+    },
+    "sr": {
+     "sourceRecordId": "169417",
+     "description": "Seeds, sunflower seed kernels from shell, dry roasted, with salt added"
+    },
+    "preparation": "cooked",
+    "category": "Nut and Seed Products",
+    "foundationConceptKey": "dry roasted|seeds|sunflower seed kernels|with salt added#cooked",
+    "srConceptKey": "dry roasted|seeds|sunflower seed kernels from shell|with salt added#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "326196",
+     "description": "Kale, frozen, cooked, boiled, drained, without salt"
+    },
+    "sr": {
+     "sourceRecordId": "169238",
+     "description": "Kale, cooked, boiled, drained, without salt"
+    },
+    "preparation": "cooked",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "boiled|cooked|drained|frozen|kale|without salt#cooked",
+    "srConceptKey": "boiled|cooked|drained|kale|without salt#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "328637",
+     "description": "Cheese, cheddar"
+    },
+    "sr": {
+     "sourceRecordId": "168121",
+     "description": "Cheese, pasteurized process, cheddar or American, low sodium"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheddar|cheese#as_sold",
+    "srConceptKey": "cheddar or american|cheese|low sodium|pasteurized process#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "328637",
+     "description": "Cheese, cheddar"
+    },
+    "sr": {
+     "sourceRecordId": "170899",
+     "description": "Cheese, cheddar, sharp, sliced"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheddar|cheese#as_sold",
+    "srConceptKey": "cheddar|cheese|sharp|sliced#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "328637",
+     "description": "Cheese, cheddar"
+    },
+    "sr": {
+     "sourceRecordId": "171292",
+     "description": "Cheese, cheddar, reduced fat (Includes foods for USDA's Food Distribution Program)"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheddar|cheese#as_sold",
+    "srConceptKey": "cheddar|cheese|reduced fat#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "328637",
+     "description": "Cheese, cheddar"
+    },
+    "sr": {
+     "sourceRecordId": "171295",
+     "description": "Cheese, cheddar, nonfat or fat free"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheddar|cheese#as_sold",
+    "srConceptKey": "cheddar|cheese|nonfat or fat free#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "328637",
+     "description": "Cheese, cheddar"
+    },
+    "sr": {
+     "sourceRecordId": "173439",
+     "description": "Cheese, low fat, cheddar or colby"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheddar|cheese#as_sold",
+    "srConceptKey": "cheddar or colby|cheese|low fat#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "328637",
+     "description": "Cheese, cheddar"
+    },
+    "sr": {
+     "sourceRecordId": "173440",
+     "description": "Cheese, low-sodium, cheddar or colby"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheddar|cheese#as_sold",
+    "srConceptKey": "cheddar or colby|cheese|low sodium#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "329370",
+     "description": "Cheese, mozzarella, low moisture, part-skim"
+    },
+    "sr": {
+     "sourceRecordId": "170900",
+     "description": "Cheese, mozzarella, low moisture, part-skim, shredded"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|low moisture|mozzarella|part skim#as_sold",
+    "srConceptKey": "cheese|low moisture|mozzarella|part skim|shredded#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "329490",
+     "description": "Egg, whole, dried"
+    },
+    "sr": {
+     "sourceRecordId": "173425",
+     "description": "Egg, whole, dried, stabilized, glucose reduced"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "dried|egg|whole#as_sold",
+    "srConceptKey": "dried|egg|glucose reduced|stabilized|whole#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "329596",
+     "description": "Egg, yolk, raw, frozen, pasteurized"
+    },
+    "sr": {
+     "sourceRecordId": "173422",
+     "description": "Egg, yolk, raw, frozen, sugared, pasteurized"
+    },
+    "preparation": "raw",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "egg|frozen|pasteurized|raw|yolk#raw",
+    "srConceptKey": "egg|frozen|pasteurized|raw|sugared|yolk#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "329596",
+     "description": "Egg, yolk, raw, frozen, pasteurized"
+    },
+    "sr": {
+     "sourceRecordId": "173436",
+     "description": "Egg, yolk, raw, frozen, salted, pasteurized"
+    },
+    "preparation": "raw",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "egg|frozen|pasteurized|raw|yolk#raw",
+    "srConceptKey": "egg|frozen|pasteurized|raw|salted|yolk#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "330458",
+     "description": "Oil, coconut"
+    },
+    "sr": {
+     "sourceRecordId": "172365",
+     "description": "Oil, industrial, coconut, confection fat, typical basis for ice cream coatings"
+    },
+    "preparation": "as_sold",
+    "category": "Fats and Oils",
+    "foundationConceptKey": "coconut|oil#as_sold",
+    "srConceptKey": "coconut|confection fat|industrial|oil|typical basis for ice cream coatings#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "330458",
+     "description": "Oil, coconut"
+    },
+    "sr": {
+     "sourceRecordId": "172367",
+     "description": "Oil, industrial, coconut (hydrogenated), used for whipped toppings and coffee whiteners"
+    },
+    "preparation": "as_sold",
+    "category": "Fats and Oils",
+    "foundationConceptKey": "coconut|oil#as_sold",
+    "srConceptKey": "coconut hydrogenated|industrial|oil|used for whipped toppings and coffee whiteners#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "330458",
+     "description": "Oil, coconut"
+    },
+    "sr": {
+     "sourceRecordId": "173595",
+     "description": "Oil, industrial, coconut, principal uses candy coatings, oil sprays, roasting nuts"
+    },
+    "preparation": "as_sold",
+    "category": "Fats and Oils",
+    "foundationConceptKey": "coconut|oil#as_sold",
+    "srConceptKey": "coconut|industrial|oil|oil sprays|principal uses candy coatings|roasting nuts#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "331897",
+     "description": "Chicken, broilers or fryers, drumstick, meat only, cooked, braised"
+    },
+    "sr": {
+     "sourceRecordId": "172852",
+     "description": "Chicken, broilers or fryers, dark meat, drumstick, meat only, cooked, braised"
+    },
+    "preparation": "cooked",
+    "category": "Poultry Products",
+    "foundationConceptKey": "braised|broilers or fryers|chicken|cooked|drumstick|meat only#cooked",
+    "srConceptKey": "braised|broilers or fryers|chicken|cooked|dark meat|drumstick|meat only#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "331960",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised"
+    },
+    "sr": {
+     "sourceRecordId": "171534",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, grilled"
+    },
+    "preparation": "cooked",
+    "category": "Poultry Products",
+    "foundationConceptKey": "boneless|braised|breast|broiler or fryers|chicken|cooked|meat only|skinless#cooked",
+    "srConceptKey": "boneless|breast|broiler or fryers|chicken|cooked|grilled|meat only|skinless#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "331960",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised"
+    },
+    "sr": {
+     "sourceRecordId": "171535",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, with added solution, cooked, braised"
+    },
+    "preparation": "cooked",
+    "category": "Poultry Products",
+    "foundationConceptKey": "boneless|braised|breast|broiler or fryers|chicken|cooked|meat only|skinless#cooked",
+    "srConceptKey": "boneless|braised|breast|broiler or fryers|chicken|cooked|meat only|skinless|with added solution#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "331960",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised"
+    },
+    "sr": {
+     "sourceRecordId": "171536",
+     "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, with added solution, cooked, grilled"
+    },
+    "preparation": "cooked",
+    "category": "Poultry Products",
+    "foundationConceptKey": "boneless|braised|breast|broiler or fryers|chicken|cooked|meat only|skinless#cooked",
+    "srConceptKey": "boneless|breast|broiler or fryers|chicken|cooked|grilled|meat only|skinless|with added solution#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "333008",
+     "description": "Cookies, oatmeal, soft, with raisins"
+    },
+    "sr": {
+     "sourceRecordId": "174963",
+     "description": "Cookies, oatmeal, with raisins"
+    },
+    "preparation": "as_sold",
+    "category": "Baked Products",
+    "foundationConceptKey": "cookies|oatmeal|soft|with raisins#as_sold",
+    "srConceptKey": "cookies|oatmeal|with raisins#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "334194",
+     "description": "Fish, tuna, light, canned in water, drained solids"
+    },
+    "sr": {
+     "sourceRecordId": "171986",
+     "description": "Fish, tuna, light, canned in water, without salt, drained solids"
+    },
+    "preparation": "as_sold",
+    "category": "Finfish and Shellfish Products",
+    "foundationConceptKey": "canned in water|drained solids|fish|light|tuna#as_sold",
+    "srConceptKey": "canned in water|drained solids|fish|light|tuna|without salt#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746758",
+     "description": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted"
+    },
+    "sr": {
+     "sourceRecordId": "171754",
+     "description": "Beef, loin, tenderloin roast, boneless, separable lean and fat, trimmed to 0\" fat, select, cooked, roasted"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|cooked|loin|roasted|select|separable lean only|tenderloin roast|trimmed to 0 fat#cooked",
+    "srConceptKey": "beef|boneless|cooked|loin|roasted|select|separable lean and fat|tenderloin roast|trimmed to 0 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746758",
+     "description": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted"
+    },
+    "sr": {
+     "sourceRecordId": "173052",
+     "description": "Beef, loin, top sirloin petite roast, boneless, separable lean only, trimmed to 0\" fat, select, cooked, roasted"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|cooked|loin|roasted|select|separable lean only|tenderloin roast|trimmed to 0 fat#cooked",
+    "srConceptKey": "beef|boneless|cooked|loin|roasted|select|separable lean only|top sirloin petite roast|trimmed to 0 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746758",
+     "description": "Beef, loin, tenderloin roast, separable lean only, boneless, trimmed to 0\" fat, select, cooked, roasted"
+    },
+    "sr": {
+     "sourceRecordId": "174005",
+     "description": "Beef, loin, tenderloin roast, boneless, separable lean only, trimmed to 0\" fat, choice, cooked, roasted"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|cooked|loin|roasted|select|separable lean only|tenderloin roast|trimmed to 0 fat#cooked",
+    "srConceptKey": "beef|boneless|choice|cooked|loin|roasted|separable lean only|tenderloin roast|trimmed to 0 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169540",
+     "description": "Beef, loin, top loin, separable lean and fat, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|choice|loin|raw|separable lean and fat|top loin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171820",
+     "description": "Beef, round, top round, steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|choice|raw|round|separable lean only|steak|top round|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173072",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean and fat, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean and fat|top loin steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173116",
+     "description": "Beef, short loin, top loin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|choice|raw|separable lean only|short loin|steak|top loin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174009",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|boneless|lip on|loin|raw|select|separable lean only|top loin steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174762",
+     "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|choice|raw|separable lean only|steak|tenderloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746759",
+     "description": "Beef, loin, top loin steak, boneless, lip-on, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174763",
+     "description": "Beef, top sirloin, steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|choice|lip on|loin|raw|separable lean only|top loin steak|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|choice|raw|separable lean only|steak|top sirloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746760",
+     "description": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171747",
+     "description": "Beef, round, eye of round roast, boneless, separable lean and fat, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|eye of round roast|raw|round|select|separable lean only|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|eye of round roast|raw|round|select|separable lean and fat|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746760",
+     "description": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171764",
+     "description": "Beef, round, eye of round steak, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|eye of round roast|raw|round|select|separable lean only|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|eye of round steak|raw|round|select|separable lean only|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746760",
+     "description": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173127",
+     "description": "Beef, round, tip round, roast, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|eye of round roast|raw|round|select|separable lean only|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|raw|roast|round|select|separable lean only|tip round|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746760",
+     "description": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173999",
+     "description": "Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|eye of round roast|raw|round|select|separable lean only|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|choice|eye of round roast|raw|round|separable lean only|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746761",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171744",
+     "description": "Beef, round, top round roast, boneless, separable lean and fat, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|raw|round|select|separable lean only|top round roast|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|raw|round|select|separable lean and fat|top round roast|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746761",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171759",
+     "description": "Beef, round, top round steak, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|raw|round|select|separable lean only|top round roast|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|raw|round|select|separable lean only|top round steak|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746761",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173127",
+     "description": "Beef, round, tip round, roast, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|raw|round|select|separable lean only|top round roast|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|raw|roast|round|select|separable lean only|tip round|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746761",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "173996",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|raw|round|select|separable lean only|top round roast|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|choice|raw|round|separable lean only|top round roast|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746761",
+     "description": "Beef, round, top round roast, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174695",
+     "description": "Beef, loin, top sirloin petite roast/filet, boneless, separable lean only, trimmed to 0\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|boneless|raw|round|select|separable lean only|top round roast|trimmed to 0 fat#raw",
+    "srConceptKey": "beef|boneless|loin|raw|select|separable lean only|top sirloin petite roast filet|trimmed to 0 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746762",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "168645",
+     "description": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|porterhouse steak|raw|select|separable lean only|short loin|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|bone in|raw|select|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746762",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169443",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, choice, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|porterhouse steak|raw|select|separable lean only|short loin|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|choice|porterhouse steak|raw|separable lean only|short loin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746762",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "171803",
+     "description": "Beef, tenderloin, steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|porterhouse steak|raw|select|separable lean only|short loin|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|raw|select|separable lean only|steak|tenderloin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746762",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "172116",
+     "description": "Beef, short loin, porterhouse steak, separable lean and fat, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|porterhouse steak|raw|select|separable lean only|short loin|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|porterhouse steak|raw|select|separable lean and fat|short loin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746762",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "sr": {
+     "sourceRecordId": "174041",
+     "description": "Beef, short loin, top loin, steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    "preparation": "raw",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|porterhouse steak|raw|select|separable lean only|short loin|trimmed to 1 8 fat#raw",
+    "srConceptKey": "beef|raw|select|separable lean only|short loin|steak|top loin|trimmed to 1 8 fat#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746763",
+     "description": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    "sr": {
+     "sourceRecordId": "168618",
+     "description": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|bone in|choice|cooked|grilled|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#cooked",
+    "srConceptKey": "beef|choice|cooked|grilled|porterhouse steak|separable lean only|short loin|trimmed to 1 8 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746763",
+     "description": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    "sr": {
+     "sourceRecordId": "169467",
+     "description": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, select, cooked, grilled"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|bone in|choice|cooked|grilled|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#cooked",
+    "srConceptKey": "beef|bone in|cooked|grilled|select|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746763",
+     "description": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    "sr": {
+     "sourceRecordId": "169537",
+     "description": "Beef, short loin, t-bone steak, separable lean and fat, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|bone in|choice|cooked|grilled|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#cooked",
+    "srConceptKey": "beef|choice|cooked|grilled|separable lean and fat|short loin|t bone steak|trimmed to 1 8 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746763",
+     "description": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    "sr": {
+     "sourceRecordId": "174013",
+     "description": "Beef composite, separable lean only, trimmed to 1/8\" fat, choice, cooked"
+    },
+    "preparation": "cooked",
+    "category": "Beef Products",
+    "foundationConceptKey": "beef|bone in|choice|cooked|grilled|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#cooked",
+    "srConceptKey": "beef composite|choice|cooked|separable lean only|trimmed to 1 8 fat#cooked"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746767",
+     "description": "Cheese, swiss"
+    },
+    "sr": {
+     "sourceRecordId": "168124",
+     "description": "Cheese, swiss, low sodium"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|swiss#as_sold",
+    "srConceptKey": "cheese|low sodium|swiss#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746767",
+     "description": "Cheese, swiss"
+    },
+    "sr": {
+     "sourceRecordId": "168141",
+     "description": "Cheese, swiss, low fat"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|swiss#as_sold",
+    "srConceptKey": "cheese|low fat|swiss#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746767",
+     "description": "Cheese, swiss"
+    },
+    "sr": {
+     "sourceRecordId": "170855",
+     "description": "Cheese, pasteurized process, swiss"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|swiss#as_sold",
+    "srConceptKey": "cheese|pasteurized process|swiss#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746767",
+     "description": "Cheese, swiss"
+    },
+    "sr": {
+     "sourceRecordId": "170897",
+     "description": "Cheese, Swiss, nonfat or fat free"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|swiss#as_sold",
+    "srConceptKey": "cheese|nonfat or fat free|swiss#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746767",
+     "description": "Cheese, swiss"
+    },
+    "sr": {
+     "sourceRecordId": "171253",
+     "description": "Cheese food, pasteurized process, swiss"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "cheese|swiss#as_sold",
+    "srConceptKey": "cheese food|pasteurized process|swiss#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746772",
+     "description": "Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "170873",
+     "description": "Milk, lowfat, fluid, 1% milkfat, with added nonfat milk solids, vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "1 milkfat|fluid|lowfat|milk|with added vitamin a and vitamin d#as_sold",
+    "srConceptKey": "1 milkfat|fluid|lowfat|milk|vitamin a and vitamin d|with added nonfat milk solids#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746772",
+     "description": "Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "171268",
+     "description": "Milk, lowfat, fluid, 1% milkfat, protein fortified, with added vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "1 milkfat|fluid|lowfat|milk|with added vitamin a and vitamin d#as_sold",
+    "srConceptKey": "1 milkfat|fluid|lowfat|milk|protein fortified|with added vitamin a and vitamin d#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746776",
+     "description": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)"
+    },
+    "sr": {
+     "sourceRecordId": "171270",
+     "description": "Milk, nonfat, fluid, with added nonfat milk solids, vitamin A and vitamin D (fat free or skim)"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "fluid|milk|nonfat|with added vitamin a and vitamin d fat free or skim#as_sold",
+    "srConceptKey": "fluid|milk|nonfat|vitamin a and vitamin d fat free or skim|with added nonfat milk solids#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746776",
+     "description": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)"
+    },
+    "sr": {
+     "sourceRecordId": "171271",
+     "description": "Milk, nonfat, fluid, protein fortified, with added vitamin A and vitamin D (fat free and skim)"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "fluid|milk|nonfat|with added vitamin a and vitamin d fat free or skim#as_sold",
+    "srConceptKey": "fluid|milk|nonfat|protein fortified|with added vitamin a and vitamin d fat free and skim#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746776",
+     "description": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)"
+    },
+    "sr": {
+     "sourceRecordId": "173432",
+     "description": "Milk, nonfat, fluid, without added vitamin A and vitamin D (fat free or skim)"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "fluid|milk|nonfat|with added vitamin a and vitamin d fat free or skim#as_sold",
+    "srConceptKey": "fluid|milk|nonfat|without added vitamin a and vitamin d fat free or skim#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746777",
+     "description": "Sauce, salsa, ready-to-serve"
+    },
+    "sr": {
+     "sourceRecordId": "171824",
+     "description": "Sauce, salsa, verde, ready-to-serve"
+    },
+    "preparation": "as_sold",
+    "category": "Soups, Sauces, and Gravies",
+    "foundationConceptKey": "ready to serve|salsa|sauce#as_sold",
+    "srConceptKey": "ready to serve|salsa|sauce|verde#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746778",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "170870",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, with added nonfat milk solids and vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "2 milkfat|fluid|milk|reduced fat|with added vitamin a and vitamin d#as_sold",
+    "srConceptKey": "2 milkfat|fluid|milk|reduced fat|with added nonfat milk solids and vitamin a and vitamin d#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746778",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "170871",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, protein fortified, with added vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "2 milkfat|fluid|milk|reduced fat|with added vitamin a and vitamin d#as_sold",
+    "srConceptKey": "2 milkfat|fluid|milk|protein fortified|reduced fat|with added vitamin a and vitamin d#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746778",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "171302",
+     "description": "Milk, evaporated, 2% fat, with added vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "2 milkfat|fluid|milk|reduced fat|with added vitamin a and vitamin d#as_sold",
+    "srConceptKey": "2 fat|evaporated|milk|with added vitamin a and vitamin d#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746778",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "172205",
+     "description": "Milk, reduced fat, fluid, 2% milkfat, without added vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "2 milkfat|fluid|milk|reduced fat|with added vitamin a and vitamin d#as_sold",
+    "srConceptKey": "2 milkfat|fluid|milk|reduced fat|without added vitamin a and vitamin d#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "746782",
+     "description": "Milk, whole, 3.25% milkfat, with added vitamin D"
+    },
+    "sr": {
+     "sourceRecordId": "172217",
+     "description": "Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D"
+    },
+    "preparation": "as_sold",
+    "category": "Dairy and Egg Products",
+    "foundationConceptKey": "3 25 milkfat|milk|whole|with added vitamin d#as_sold",
+    "srConceptKey": "3 25 milkfat|milk|whole|without added vitamin a and vitamin d#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "747447",
+     "description": "Broccoli, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169329",
+     "description": "Broccoli, leaves, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "broccoli|raw#raw",
+    "srConceptKey": "broccoli|leaves|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "747447",
+     "description": "Broccoli, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169330",
+     "description": "Broccoli, flower clusters, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "broccoli|raw#raw",
+    "srConceptKey": "broccoli|flower clusters|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "747447",
+     "description": "Broccoli, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169331",
+     "description": "Broccoli, stalks, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "broccoli|raw#raw",
+    "srConceptKey": "broccoli|raw|stalks#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "747447",
+     "description": "Broccoli, raw"
+    },
+    "sr": {
+     "sourceRecordId": "169404",
+     "description": "Broccoli, chinese, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "broccoli|raw#raw",
+    "srConceptKey": "broccoli|chinese|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "747447",
+     "description": "Broccoli, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170381",
+     "description": "Broccoli raab, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "broccoli|raw#raw",
+    "srConceptKey": "broccoli raab|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "789890",
+     "description": "Flour, wheat, all-purpose, enriched, bleached"
+    },
+    "sr": {
+     "sourceRecordId": "168894",
+     "description": "Wheat flour, white, all-purpose, enriched, bleached"
+    },
+    "preparation": "as_sold",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "all purpose|bleached|enriched|flour|wheat#as_sold",
+    "srConceptKey": "all purpose|bleached|enriched|wheat flour|white#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "789951",
+     "description": "Flour, wheat, all-purpose, enriched, unbleached"
+    },
+    "sr": {
+     "sourceRecordId": "168936",
+     "description": "Wheat flour, white, all-purpose, enriched, unbleached"
+    },
+    "preparation": "as_sold",
+    "category": "Cereal Grains and Pasta",
+    "foundationConceptKey": "all purpose|enriched|flour|unbleached|wheat#as_sold",
+    "srConceptKey": "all purpose|enriched|unbleached|wheat flour|white#as_sold"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "790577",
+     "description": "Onions, red, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170000",
+     "description": "Onions, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "onions|raw|red#raw",
+    "srConceptKey": "onions|raw#raw"
+   },
+   {
+    "verdict": "possible_duplicate",
+    "reason": "near_identical_terms_same_category",
+    "foundation": {
+     "sourceRecordId": "790646",
+     "description": "Onions, yellow, raw"
+    },
+    "sr": {
+     "sourceRecordId": "170000",
+     "description": "Onions, raw"
+    },
+    "preparation": "raw",
+    "category": "Vegetables and Vegetable Products",
+    "foundationConceptKey": "onions|raw|yellow#raw",
+    "srConceptKey": "onions|raw#raw"
+   }
+  ],
+  "conceptConvergence": {
+   "count": 92,
+   "examples": [
+    {
+     "productId": "food_a9fcab2d20a1a0c8",
+     "conceptKey": "chinese|fried rice|restaurant|without meat#cooked",
+     "keptDataset": "Foundation",
+     "keptDescription": "Restaurant, Chinese, fried rice, without meat",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Restaurant, Chinese, fried rice, without meat"
+    },
+    {
+     "productId": "food_2964424b77df37b0",
+     "conceptKey": "raspberries|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Raspberries, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Raspberries, raw"
+    },
+    {
+     "productId": "food_0163287256b25aae",
+     "conceptKey": "raw|strawberries#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Strawberries, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Strawberries, raw"
+    },
+    {
+     "productId": "food_885380cbd573109e",
+     "conceptKey": "bartlett|pears|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Pears, raw, bartlett",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Pears, raw, bartlett (Includes foods for USDA's Food Distribution Program)"
+    },
+    {
+     "productId": "food_eb0545cee0f6b3e7",
+     "conceptKey": "apples|fuji|raw|with skin#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Apples, fuji, with skin, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Apples, raw, fuji, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    {
+     "productId": "food_9693c0e1531f575c",
+     "conceptKey": "green|kiwifruit|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Kiwifruit, green, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Kiwifruit, green, raw"
+    },
+    {
+     "productId": "food_7f01922ffa91ab61",
+     "conceptKey": "apples|raw|red delicious|with skin#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Apples, red delicious, with skin, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Apples, raw, red delicious, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    {
+     "productId": "food_0378965e76caccd0",
+     "conceptKey": "apples|granny smith|raw|with skin#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Apples, granny smith, with skin, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Apples, raw, granny smith, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    {
+     "productId": "food_69f4e695399d62d7",
+     "conceptKey": "apples|gala|raw|with skin#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Apples, gala, with skin, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Apples, raw, gala, with skin (Includes foods for USDA's Food Distribution Program)"
+    },
+    {
+     "productId": "food_5381a06004d80505",
+     "conceptKey": "cucumber|raw|with peel#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Cucumber, with peel, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Cucumber, with peel, raw"
+    },
+    {
+     "productId": "food_881997594ae57c1e",
+     "conceptKey": "kale|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Kale, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Kale, raw"
+    },
+    {
+     "productId": "food_36690b067b6c7647",
+     "conceptKey": "acorn|raw|squash|winter#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Squash, winter, acorn, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Squash, winter, acorn, raw"
+    },
+    {
+     "productId": "food_f02c292dfae19fd4",
+     "conceptKey": "cucumber|dill or kosher dill|pickles#as_sold",
+     "keptDataset": "Foundation",
+     "keptDescription": "Pickles, cucumber, dill or kosher dill",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Pickles, cucumber, dill or kosher dill"
+    },
+    {
+     "productId": "food_d9b99f0528117d66",
+     "conceptKey": "radicchio|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Radicchio, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Radicchio, raw"
+    },
+    {
+     "productId": "food_5e0aa46db99ca249",
+     "conceptKey": "baby|carrots|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Carrots, baby, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Carrots, baby, raw"
+    },
+    {
+     "productId": "food_4ecbe34b0ac6c631",
+     "conceptKey": "almonds|dry roasted|nuts|with salt added#cooked",
+     "keptDataset": "Foundation",
+     "keptDescription": "Nuts, almonds, dry roasted, with salt added",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Nuts, almonds, dry roasted, with salt added"
+    },
+    {
+     "productId": "food_a1b6b7afbe344a33",
+     "conceptKey": "beef|bone in|choice|cooked|grilled|separable lean only|short loin|t bone steak|trimmed to 1 8 fat#cooked",
+     "keptDataset": "Foundation",
+     "keptDescription": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Beef, short loin, t-bone steak, bone-in, separable lean only, trimmed to 1/8\" fat, choice, cooked, grilled"
+    },
+    {
+     "productId": "food_333e681970b63c89",
+     "conceptKey": "beef|porterhouse steak|raw|select|separable lean only|short loin|trimmed to 1 8 fat#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Beef, short loin, porterhouse steak, separable lean only, trimmed to 1/8\" fat, select, raw"
+    },
+    {
+     "productId": "food_647b868c8f462609",
+     "conceptKey": "cantaloupe|melons|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Melons, cantaloupe, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Melons, cantaloupe, raw"
+    },
+    {
+     "productId": "food_fa4c28861316aba8",
+     "conceptKey": "beans|canned|drained solids|green|regular pack|snap#as_sold",
+     "keptDataset": "Foundation",
+     "keptDescription": "Beans, snap, green, canned, regular pack, drained solids",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Beans, snap, green, canned, regular pack, drained solids"
+    },
+    {
+     "productId": "food_8a57fa754d63ce7c",
+     "conceptKey": "beets|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Beets, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Beets, raw"
+    },
+    {
+     "productId": "food_27d556fd3ae74001",
+     "conceptKey": "eggplant|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Eggplant, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Eggplant, raw"
+    },
+    {
+     "productId": "food_eedc5cb0969a41eb",
+     "conceptKey": "garlic|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Garlic, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Garlic, raw"
+    },
+    {
+     "productId": "food_048430c329101753",
+     "conceptKey": "boiled|cooked|drained|frozen|kale|without salt#cooked",
+     "keptDataset": "Foundation",
+     "keptDescription": "Kale, frozen, cooked, boiled, drained, without salt",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Kale, frozen, cooked, boiled, drained, without salt"
+    },
+    {
+     "productId": "food_b70a53f41cb0f654",
+     "conceptKey": "cos or romaine|lettuce|raw#raw",
+     "keptDataset": "Foundation",
+     "keptDescription": "Lettuce, cos or romaine, raw",
+     "droppedDataset": "SR Legacy",
+     "droppedDescription": "Lettuce, cos or romaine, raw"
+    }
+   ]
+  }
+ },
  "search": {
-  "corpusSize": 307,
-  "totalQueries": 96,
-  "scoredQueries": 92,
-  "top1": 89,
-  "top1Percent": 96.7,
-  "top4": 89,
-  "top4Percent": 96.7,
-  "mrr": 0.967,
+  "corpusSize": 6876,
+  "totalQueries": 164,
+  "scoredQueries": 160,
+  "top1": 158,
+  "top1Percent": 98.8,
+  "top4": 159,
+  "top4Percent": 99.4,
+  "mrr": 0.991,
   "unambiguous": {
    "total": 23,
    "top1": 23,
    "percent": 100
   },
   "ambiguous": {
-   "total": 69,
-   "top4": 66,
-   "percent": 95.7
+   "total": 137,
+   "top4": 136,
+   "percent": 99.3
   },
   "zeroResult": {
    "total": 4,
@@ -518,46 +3469,49 @@
   },
   "falsePositives": 0,
   "preparationSensitive": {
-   "total": 12,
-   "top1": 11,
-   "top4": 11,
-   "top1Percent": 91.7,
-   "top4Percent": 91.7,
+   "total": 30,
+   "top1": 30,
+   "top4": 30,
+   "top1Percent": 100,
+   "top4Percent": 100,
    "wrongPreparationOutranked": 0,
    "wrongPreparationRate": 0,
-   "failures": []
+   "noCorrectPreparationCandidate": 0,
+   "correctCandidateOutsideTop4": 0,
+   "wrongPreparationOutrankedQueries": [],
+   "noCorrectPreparationCandidateQueries": [],
+   "correctCandidateOutsideTop4Queries": []
   },
   "misses": [
-   "whole wheat bread",
-   "tortilla",
-   "cooked ground turkey"
+   "green beans"
   ],
   "conceptMatrix": {
    "total": 48,
-   "available": 47,
+   "available": 48,
    "entries": [
     {
      "concept": "chicken breast",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
-      "cooked",
-      "raw"
+      "as_sold",
+      "cooked"
      ]
     },
     {
      "concept": "chicken thigh",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
-      "raw"
+      "cooked"
      ]
     },
     {
      "concept": "ground beef",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
+      "as_sold",
       "raw"
      ]
     },
@@ -572,8 +3526,9 @@
     {
      "concept": "turkey",
      "available": true,
-     "matches": 3,
+     "matches": 4,
      "preparations": [
+      "as_sold",
       "cooked",
       "raw"
      ]
@@ -581,25 +3536,30 @@
     {
      "concept": "salmon",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
+      "as_sold",
+      "cooked",
       "raw"
      ]
     },
     {
      "concept": "tuna",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
-      "as_sold"
+      "as_sold",
+      "cooked",
+      "raw"
      ]
     },
     {
      "concept": "shrimp",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
-      "raw"
+      "as_sold",
+      "cooked"
      ]
     },
     {
@@ -613,10 +3573,9 @@
     {
      "concept": "egg whites",
      "available": true,
-     "matches": 3,
+     "matches": 4,
      "preparations": [
-      "as_sold",
-      "raw"
+      "as_sold"
      ]
     },
     {
@@ -630,7 +3589,7 @@
     {
      "concept": "2% milk",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
@@ -638,7 +3597,7 @@
     {
      "concept": "skim milk",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
@@ -646,7 +3605,7 @@
     {
      "concept": "greek yogurt",
      "available": true,
-     "matches": 3,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
@@ -662,7 +3621,7 @@
     {
      "concept": "cottage cheese",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
@@ -670,35 +3629,36 @@
     {
      "concept": "cheddar",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
-      "as_sold"
+      "as_sold",
+      "cooked"
      ]
     },
     {
      "concept": "mozzarella",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
-      "as_sold"
+      "as_sold",
+      "cooked"
      ]
     },
     {
      "concept": "white rice",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
-      "as_sold",
-      "raw"
+      "as_sold"
      ]
     },
     {
      "concept": "brown rice",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
       "as_sold",
-      "raw"
+      "cooked"
      ]
     },
     {
@@ -712,16 +3672,15 @@
     {
      "concept": "bread",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
-      "as_sold",
-      "cooked"
+      "as_sold"
      ]
     },
     {
      "concept": "pasta",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
@@ -729,13 +3688,64 @@
     {
      "concept": "quinoa",
      "available": true,
-     "matches": 1,
+     "matches": 4,
+     "preparations": [
+      "as_sold",
+      "cooked"
+     ]
+    },
+    {
+     "concept": "potato",
+     "available": true,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
     },
     {
-     "concept": "potato",
+     "concept": "sweet potato",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold"
+     ]
+    },
+    {
+     "concept": "tortilla",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold",
+      "cooked"
+     ]
+    },
+    {
+     "concept": "black beans",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold"
+     ]
+    },
+    {
+     "concept": "kidney beans",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold",
+      "cooked"
+     ]
+    },
+    {
+     "concept": "chickpeas",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold"
+     ]
+    },
+    {
+     "concept": "lentils",
      "available": true,
      "matches": 4,
      "preparations": [
@@ -744,57 +3754,11 @@
      ]
     },
     {
-     "concept": "sweet potato",
-     "available": true,
-     "matches": 1,
-     "preparations": [
-      "raw"
-     ]
-    },
-    {
-     "concept": "tortilla",
-     "available": false,
-     "matches": 0,
-     "preparations": []
-    },
-    {
-     "concept": "black beans",
-     "available": true,
-     "matches": 1,
-     "preparations": [
-      "as_sold"
-     ]
-    },
-    {
-     "concept": "kidney beans",
-     "available": true,
-     "matches": 2,
-     "preparations": [
-      "as_sold"
-     ]
-    },
-    {
-     "concept": "chickpeas",
-     "available": true,
-     "matches": 2,
-     "preparations": [
-      "as_sold"
-     ]
-    },
-    {
-     "concept": "lentils",
-     "available": true,
-     "matches": 1,
-     "preparations": [
-      "as_sold"
-     ]
-    },
-    {
      "concept": "banana",
      "available": true,
-     "matches": 3,
+     "matches": 4,
      "preparations": [
-      "raw"
+      "as_sold"
      ]
     },
     {
@@ -802,6 +3766,7 @@
      "available": true,
      "matches": 4,
      "preparations": [
+      "as_sold",
       "raw"
      ]
     },
@@ -817,46 +3782,13 @@
     {
      "concept": "blueberries",
      "available": true,
-     "matches": 1,
-     "preparations": [
-      "raw"
-     ]
-    },
-    {
-     "concept": "strawberries",
-     "available": true,
-     "matches": 2,
-     "preparations": [
-      "as_sold",
-      "raw"
-     ]
-    },
-    {
-     "concept": "avocado",
-     "available": true,
-     "matches": 1,
-     "preparations": [
-      "raw"
-     ]
-    },
-    {
-     "concept": "broccoli",
-     "available": true,
-     "matches": 1,
-     "preparations": [
-      "raw"
-     ]
-    },
-    {
-     "concept": "spinach",
-     "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
     },
     {
-     "concept": "tomato",
+     "concept": "strawberries",
      "available": true,
      "matches": 4,
      "preparations": [
@@ -864,9 +3796,45 @@
      ]
     },
     {
+     "concept": "avocado",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "raw"
+     ]
+    },
+    {
+     "concept": "broccoli",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold",
+      "cooked",
+      "raw"
+     ]
+    },
+    {
+     "concept": "spinach",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold",
+      "cooked"
+     ]
+    },
+    {
+     "concept": "tomato",
+     "available": true,
+     "matches": 4,
+     "preparations": [
+      "as_sold",
+      "cooked"
+     ]
+    },
+    {
      "concept": "cucumber",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
       "as_sold",
       "raw"
@@ -875,10 +3843,9 @@
     {
      "concept": "carrot",
      "available": true,
-     "matches": 3,
+     "matches": 4,
      "preparations": [
-      "as_sold",
-      "raw"
+      "as_sold"
      ]
     },
     {
@@ -892,7 +3859,7 @@
     {
      "concept": "olive oil",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
       "as_sold"
      ]
@@ -908,10 +3875,9 @@
     {
      "concept": "peanut butter",
      "available": true,
-     "matches": 2,
+     "matches": 4,
      "preparations": [
-      "as_sold",
-      "raw"
+      "as_sold"
      ]
     },
     {
@@ -925,17 +3891,17 @@
     {
      "concept": "walnuts",
      "available": true,
-     "matches": 1,
+     "matches": 4,
      "preparations": [
-      "raw"
+      "as_sold"
      ]
     }
    ]
   },
   "publishedPreparationDistribution": {
-   "as_sold": 150,
-   "cooked": 14,
-   "raw": 143
+   "cooked": 2194,
+   "raw": 1480,
+   "as_sold": 3202
   }
  }
 }

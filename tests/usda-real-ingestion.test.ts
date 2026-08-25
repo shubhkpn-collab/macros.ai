@@ -213,7 +213,9 @@ describe('C7/C8/C12 — the published real seed', () => {
     for (const s of seeds) {
       const kcal = s.per100g['energy_kcal']!.amount;
       const protein = s.per100g['protein']!.amount;
-      assert.ok(kcal >= 0 && kcal <= 900, `${s.sourceDescription} kcal ${kcal}`);
+      // Pure fats (lard, tallow, fish oils) are genuinely ~902 kcal/100 g;
+      // 9 kcal/g is the physical ceiling for a fat.
+      assert.ok(kcal >= 0 && kcal <= 910, `${s.sourceDescription} kcal ${kcal}`);
       assert.ok(protein >= 0 && protein <= 100, `${s.sourceDescription} protein ${protein}`);
     }
   });

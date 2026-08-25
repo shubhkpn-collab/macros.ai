@@ -13,7 +13,34 @@ import type { ClassifiedPreparation } from './preparation-classifier.js';
  * USDA's numbering effectively became our identity. A second source describing
  * the same food could never attach without inventing a competing id.
  */
-export const GENERIC_IDENTITY_VERSION = 'generic-identity@1.0.0';
+export const GENERIC_IDENTITY_VERSION = 'generic-identity@1.1.0';
+
+/**
+ * ADMINISTRATIVE SOURCE TEXT (CA-15).
+ *
+ * SR Legacy appends programme annotations to 57 real descriptions, e.g.
+ * "Apples, raw, fuji, with skin (Includes foods for USDA's Food Distribution
+ * Program)". That phrase records a USDA distribution programme — it says
+ * nothing about the food — yet it would otherwise make an SR record a different
+ * MACROS.AI concept from the identical Foundation food.
+ *
+ * Stripped from the SEMANTIC projection ONLY. The original description is
+ * always retained verbatim in provenance.
+ *
+ * Deliberately NOT a general parenthesis strip: 871 SR descriptions contain
+ * parentheses, and most carry real identity — "(garbanzo beans, bengal gram)"
+ * names the food. Only these explicit administrative patterns are removed.
+ */
+export const ADMINISTRATIVE_TEXT_PATTERNS: readonly RegExp[] = [
+  /\(includes foods for usda'?s? food distribution program\)/gi,
+  /\(commodity\)/gi,
+];
+
+export function stripAdministrativeText(description: string): string {
+  let out = description;
+  for (const pattern of ADMINISTRATIVE_TEXT_PATTERNS) out = out.replace(pattern, ' ');
+  return out.replace(/\s+/g, ' ').trim();
+}
 
 export interface ExternalSourceIdentity {
   readonly provider: 'usda_fdc';
@@ -42,7 +69,7 @@ export function conceptKeyFor(
   description: string,
   preparation: ClassifiedPreparation,
 ): string {
-  const normalized = description
+  const normalized = stripAdministrativeText(description)
     .toLowerCase()
     .replace(/[^a-z0-9, ]+/g, ' ')
     .split(',')

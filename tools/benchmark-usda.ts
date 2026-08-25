@@ -144,6 +144,78 @@ const QUERIES: readonly Query[] = [
   { q: 'raw snap beans', expect: /snap bean|bean/i, ambiguous: true, expectPreparation: 'raw' },
   { q: 'cooked kale', expect: /kale/i, ambiguous: true, expectPreparation: 'cooked' },
 
+  // --- deeper catalog: SR now supplies these ---
+  { q: 'tortilla', expect: /tortilla/i, ambiguous: true },
+  { q: 'whole wheat bread', expect: /bread/i, ambiguous: true },
+  { q: 'white bread', expect: /bread/i, ambiguous: true },
+  { q: 'bagel', expect: /bagel/i, ambiguous: true },
+  { q: 'ground turkey', expect: /turkey/i, ambiguous: true },
+  { q: 'cottage cheese', expect: /cottage/i, ambiguous: true },
+  { q: 'ricotta', expect: /ricotta/i, ambiguous: true },
+  { q: 'feta cheese', expect: /feta/i, ambiguous: true },
+  { q: 'sour cream', expect: /sour cream/i, ambiguous: true },
+  { q: 'cream cheese', expect: /cream cheese/i, ambiguous: true },
+  { q: 'maple syrup', expect: /syrup/i, ambiguous: true },
+  { q: 'honey', expect: /honey/i, ambiguous: true },
+  { q: 'soy sauce', expect: /soy sauce/i, ambiguous: true },
+  { q: 'ketchup', expect: /ketchup|catsup/i, ambiguous: true },
+  { q: 'mayonnaise', expect: /mayonnaise/i, ambiguous: true },
+  { q: 'mustard', expect: /mustard/i, ambiguous: true },
+  { q: 'coconut oil', expect: /coconut oil|oil.*coconut/i, ambiguous: true },
+  { q: 'canola oil', expect: /canola/i, ambiguous: true },
+  { q: 'cashews', expect: /cashew/i, ambiguous: true },
+  { q: 'pistachios', expect: /pistachio/i, ambiguous: true },
+  { q: 'pecans', expect: /pecan/i, ambiguous: true },
+  { q: 'sunflower seeds', expect: /sunflower/i, ambiguous: true },
+  { q: 'chia seeds', expect: /chia/i, ambiguous: true },
+  { q: 'couscous', expect: /couscous/i, ambiguous: true },
+  { q: 'barley', expect: /barley/i, ambiguous: true },
+  { q: 'bulgur', expect: /bulgur/i, ambiguous: true },
+  { q: 'edamame', expect: /edamame|soybean/i, ambiguous: true },
+  { q: 'tofu', expect: /tofu/i, ambiguous: true },
+  { q: 'pinto beans', expect: /pinto/i, ambiguous: true },
+  { q: 'navy beans', expect: /navy bean/i, ambiguous: true },
+  { q: 'asparagus', expect: /asparagus/i, ambiguous: true },
+  { q: 'zucchini', expect: /zucchini|squash/i, ambiguous: true },
+  { q: 'cauliflower', expect: /cauliflower/i, ambiguous: true },
+  { q: 'brussels sprouts', expect: /brussels/i, ambiguous: true },
+  { q: 'sweet corn', expect: /corn/i, ambiguous: true },
+  { q: 'green beans', expect: /bean.*snap|green bean/i, ambiguous: true },
+  { q: 'watermelon', expect: /watermelon/i, ambiguous: true },
+  { q: 'pineapple', expect: /pineapple/i, ambiguous: true },
+  { q: 'mango', expect: /mango/i, ambiguous: true },
+  { q: 'peaches', expect: /peach/i, ambiguous: true },
+  { q: 'grapefruit', expect: /grapefruit/i, ambiguous: true },
+  { q: 'raspberries', expect: /raspberr/i, ambiguous: true },
+  { q: 'cod fish', expect: /cod/i, ambiguous: true },
+  { q: 'tilapia', expect: /tilapia/i, ambiguous: true },
+  { q: 'sardines', expect: /sardine/i, ambiguous: true },
+  { q: 'pork chop', expect: /pork/i, ambiguous: true },
+  { q: 'bacon', expect: /bacon/i, ambiguous: true },
+  { q: 'ham', expect: /ham/i, ambiguous: true },
+  { q: 'lamb', expect: /lamb/i, ambiguous: true },
+  { q: 'duck', expect: /duck/i, ambiguous: true },
+
+  // --- PREPARATION-SENSITIVE, deeper catalog ---
+  { q: 'cooked ground turkey', expect: /turkey/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw ground beef', expect: /beef/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked ground beef', expect: /beef/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw chicken breast', expect: /chicken/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked white rice', expect: /rice/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'cooked brown rice', expect: /rice/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'cooked pasta', expect: /pasta|spaghetti|macaroni/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'boiled potato', expect: /potato/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw potato', expect: /potato/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'raw salmon', expect: /salmon/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked salmon', expect: /salmon/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'cooked lentils', expect: /lentil/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'cooked broccoli', expect: /broccoli/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw broccoli', expect: /broccoli/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked spinach', expect: /spinach/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'raw carrots', expect: /carrot/i, ambiguous: true, expectPreparation: 'raw' },
+  { q: 'cooked eggs', expect: /egg/i, ambiguous: true, expectPreparation: 'cooked' },
+  { q: 'cooked oats', expect: /oat/i, ambiguous: true, expectPreparation: 'cooked' },
+
   // --- must return NOTHING ---
   { q: 'zzzqqq nonsense food', expect: null },
   { q: 'unicorn steak', expect: null },
@@ -155,7 +227,10 @@ let top1 = 0, top4 = 0, mrrSum = 0;
 let ambTop4 = 0, ambTotal = 0, unambTop1 = 0, unambTotal = 0;
 let zeroCorrect = 0, zeroTotal = 0, falsePositive = 0;
 let prepChecked = 0, prepTop1 = 0, prepTop4 = 0, prepOutranked = 0;
-const prepFailures: string[] = [];
+let prepNoCandidate = 0, prepOutsideTop4 = 0;
+const prepOutrankedQueries: string[] = [];
+const prepNoCandidateQueries: string[] = [];
+const prepOutsideTop4Queries: string[] = [];
 const misses: string[] = [];
 
 for (const query of QUERIES) {
@@ -186,7 +261,10 @@ for (const query of QUERIES) {
         r.productVersion.preparationState === query.expectPreparation,
     );
     if (inTop4) prepTop4++;
-    // A result of the WRONG preparation ranking above every correct one.
+    // EXPLICIT failure taxonomy. A preparation-sensitive query can fail
+    // WITHOUT a wrong-state result outranking it — the correct candidate may
+    // simply be absent, or present but below the fold. Collapsing those into
+    // one `failures` array hid exactly that distinction.
     const firstCorrect = results.findIndex(
       (r) => r.productVersion.preparationState === query.expectPreparation,
     );
@@ -194,9 +272,16 @@ for (const query of QUERIES) {
       (r) => query.expect!.test(r.productVersion.displayName) &&
         r.productVersion.preparationState !== query.expectPreparation,
     );
+    if (firstCorrect < 0) {
+      prepNoCandidate++;
+      prepNoCandidateQueries.push(query.q);
+    } else if (firstCorrect >= 4) {
+      prepOutsideTop4++;
+      prepOutsideTop4Queries.push(query.q);
+    }
     if (firstWrong >= 0 && (firstCorrect < 0 || firstWrong < firstCorrect)) {
       prepOutranked++;
-      prepFailures.push(query.q);
+      prepOutrankedQueries.push(query.q);
     }
   }
 }
@@ -242,7 +327,11 @@ const searchReport = {
     top4Percent: prepChecked === 0 ? 0 : r1(prepTop4 / prepChecked),
     wrongPreparationOutranked: prepOutranked,
     wrongPreparationRate: prepChecked === 0 ? 0 : r1(prepOutranked / prepChecked),
-    failures: prepFailures,
+    noCorrectPreparationCandidate: prepNoCandidate,
+    correctCandidateOutsideTop4: prepOutsideTop4,
+    wrongPreparationOutrankedQueries: prepOutrankedQueries,
+    noCorrectPreparationCandidateQueries: prepNoCandidateQueries,
+    correctCandidateOutsideTop4Queries: prepOutsideTop4Queries,
   },
   misses,
   conceptMatrix: { total: CONCEPTS.length, available: availableConcepts, entries: conceptMatrix },
@@ -271,5 +360,7 @@ const missing = conceptMatrix.filter((c) => !c.available).map((c) => c.concept);
 if (missing.length > 0) console.log('missing:', missing.join(', '));
 console.log('\n=== PREPARATION-SENSITIVE SEARCH ===');
 console.log('queries', prepChecked, '| Top-1', prepTop1, '| Top-4', prepTop4, '| wrong-prep outranked', prepOutranked);
-if (prepFailures.length > 0) console.log('failures:', prepFailures.join(', '));
+console.log('  no-correct-candidate', prepNoCandidate, '| outside-top4', prepOutsideTop4, '| wrong-state outranking', prepOutranked);
+if (prepOutrankedQueries.length > 0) console.log('  OUTRANKED:', prepOutrankedQueries.join(', '));
+if (prepNoCandidateQueries.length > 0) console.log('  NO CANDIDATE:', prepNoCandidateQueries.join(', '));
 console.log('\npublished preparation distribution:', JSON.stringify(prepDistribution));

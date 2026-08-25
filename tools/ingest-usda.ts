@@ -15,7 +15,8 @@ import {
   CATALOG_POLICY_VERSION, GENERIC_IDENTITY_VERSION, PREPARATION_CLASSIFIER_VERSION,
   categoryEligibility, classifyPreparation, conceptKeyFor, consumerDisplayName,
   eligibleForRecommendation, extractUsdaRecord, genericProductId, isPublishableState,
-  publishesToConsumerCatalog, aliasesFor, ALIAS_POLICY_VERSION, USDA_NUTRIENT_MAP,
+  publishesToConsumerCatalog, aliasesFor, assessOverlap, preferredSource,
+  ALIAS_POLICY_VERSION, USDA_NUTRIENT_MAP,
 } from '@macros/catalog-ingestion';
 
 /**
@@ -57,7 +58,7 @@ interface Seed {
 const stats = {
   recordsRead: 0, nullRecords: 0, malformed: 0,
   missingCore: 0, unresolvedPrep: 0, accepted: 0,
-  excludedCategory: 0, duplicateConcept: 0,
+  excludedCategory: 0, duplicateConcept: 0, crossSourceConvergence: 0,
   /** Over ALL SOURCE RECORDS scanned — not the published catalog. */
   sourcePreparationCounts: {} as Record<string, number>,
   categoryCounts: {} as Record<string, number>,
@@ -89,6 +90,13 @@ function assertNoCollision(productId: string, conceptKey: string): void {
 const seeds: Seed[] = [];
 const seenFdc = new Set<number>();
 const seenConcepts = new Set<string>();
+/** Which source first claimed each concept — used to measure convergence. */
+const conceptOrigin = new Map<string, { dataset: string; description: string }>();
+const convergenceExamples: {
+  productId: string; conceptKey: string;
+  keptDataset: string; keptDescription: string;
+  droppedDataset: string; droppedDescription: string;
+}[] = [];
 const archiveHashes: Record<string, string> = {};
 
 for (const [dataset, path] of FILES) {
@@ -136,8 +144,26 @@ for (const [dataset, path] of FILES) {
     const conceptKey = conceptKeyFor(e.description, prep.state);
     const productId = genericProductId(conceptKey);
     assertNoCollision(productId, conceptKey);
-    if (seenConcepts.has(productId)) { stats.duplicateConcept++; continue; }
+    if (seenConcepts.has(productId)) {
+      stats.duplicateConcept++;
+      // THE CORE GATE, measured rather than assumed: when the SAME food concept
+      // arrives from a DIFFERENT source, does it converge onto one identity?
+      const first = conceptOrigin.get(productId);
+      if (first !== undefined && first.dataset !== dataset) {
+        stats.crossSourceConvergence++;
+        convergenceExamples.push({
+          productId,
+          conceptKey,
+          keptDataset: first.dataset,
+          keptDescription: first.description,
+          droppedDataset: dataset,
+          droppedDescription: e.description,
+        });
+      }
+      continue;
+    }
     seenConcepts.add(productId);
+    conceptOrigin.set(productId, { dataset, description: e.description });
     const per100g: Seed['per100g'] = {};
     for (const [k, v] of Object.entries(map)) {
       if (v !== undefined) per100g[k] = { nutrientId: v.nutrientId, amount: v.amount, unit: v.unit };
@@ -187,7 +213,25 @@ const PRIORITY = /\b(chicken|beef|pork|turkey|salmon|tuna|cod|shrimp|egg|milk|yo
  * policy already decide what belongs, and an artificial cap previously
  * truncated the catalog alphabetically and hid whole food groups.
  */
-const curated = [...seeds].sort(
+const overlapT0 = performance.now();
+const overlap = assessCrossSource(seeds);
+const overlapMs = Math.round(performance.now() - overlapT0);
+
+/**
+ * Collapse only DEFINITE same concepts, by source priority. Values are never
+ * averaged and no field is filled across sources: the losing record's fact set
+ * is dropped whole, and its provenance is retained on the pair report.
+ */
+const droppedByPriority = new Set<string>();
+for (const pair of overlap.pairs) {
+  if (pair.verdict !== 'definite_same') continue;
+  const winner = preferredSource('Foundation', 'SR Legacy');
+  const loserId = winner === 'Foundation' ? pair.sr.sourceRecordId : pair.foundation.sourceRecordId;
+  droppedByPriority.add(loserId);
+}
+const deduped = seeds.filter((s2) => !droppedByPriority.has(s2.externalIdentity.sourceRecordId));
+
+const curated = [...deduped].sort(
   (a, b) => a.displayName.localeCompare(b.displayName) || a.productId.localeCompare(b.productId),
 );
 
@@ -218,6 +262,64 @@ const coverageAllAccepted = coverageOver(seeds);
  * Metric names are explicit: a mapping ROW is not a canonical NUTRIENT, and
  * conflating them was how the reported mapping count drifted.
  */
+/**
+ * CROSS-SOURCE OVERLAP.
+ *
+ * BLOCKED, not all-pairs: comparing every Foundation record against every SR
+ * record would be ~395 x 7,793 comparisons and would grow quadratically with
+ * the catalog. Records can only be the same concept if they share preparation
+ * AND a leading significant term, so blocking on that pair is safe — it can
+ * never merge across a block, and identity accuracy is unchanged.
+ */
+interface OverlapPair {
+  readonly verdict: string; readonly reason: string;
+  readonly foundation: { sourceRecordId: string; description: string };
+  readonly sr: { sourceRecordId: string; description: string };
+  readonly preparation: string; readonly category: string | null;
+  readonly foundationConceptKey: string; readonly srConceptKey: string;
+}
+
+function assessCrossSource(all: readonly Seed[]): {
+  definiteSame: number; possibleDuplicate: number; distinctPairsCompared: number;
+  pairs: OverlapPair[];
+} {
+  const blocks = new Map<string, Seed[]>();
+  for (const s of all) {
+    const lead = s.conceptKey.split('|')[0]!.split(' ')[0] ?? '';
+    const key = `${s.preparationState}#${lead}`;
+    blocks.set(key, [...(blocks.get(key) ?? []), s]);
+  }
+
+  const pairs: OverlapPair[] = [];
+  let definiteSame = 0, possibleDuplicate = 0, compared = 0;
+
+  for (const group of blocks.values()) {
+    const foundation = group.filter((g) => g.externalIdentity.dataset === 'Foundation');
+    const sr = group.filter((g) => g.externalIdentity.dataset === 'SR Legacy');
+    for (const f of foundation) {
+      for (const s2 of sr) {
+        compared++;
+        const verdict = assessOverlap(
+          { conceptKey: f.conceptKey, category: f.category, preparation: f.preparationState as never },
+          { conceptKey: s2.conceptKey, category: s2.category, preparation: s2.preparationState as never },
+        );
+        if (verdict.verdict === 'distinct') continue;
+        if (verdict.verdict === 'definite_same') definiteSame++; else possibleDuplicate++;
+        pairs.push({
+          verdict: verdict.verdict, reason: verdict.reason,
+          foundation: { sourceRecordId: f.externalIdentity.sourceRecordId, description: f.sourceDescription },
+          sr: { sourceRecordId: s2.externalIdentity.sourceRecordId, description: s2.sourceDescription },
+          preparation: f.preparationState, category: f.category,
+          foundationConceptKey: f.conceptKey, srConceptKey: s2.conceptKey,
+        });
+      }
+    }
+  }
+  pairs.sort((a, b) => a.foundation.sourceRecordId.localeCompare(b.foundation.sourceRecordId)
+    || a.sr.sourceRecordId.localeCompare(b.sr.sourceRecordId));
+  return { definiteSame, possibleDuplicate, distinctPairsCompared: compared, pairs };
+}
+
 const publishedPreparationCounts = (): Record<string, number> => {
   const out: Record<string, number> = {};
   for (const s2 of curated) out[s2.preparationState] = (out[s2.preparationState] ?? 0) + 1;
@@ -249,6 +351,10 @@ const report = {
     publishedPreparationCounts: publishedPreparationCounts(),
     categoryCounts: stats.categoryCounts,
     recommendableCount: curated.filter((s2) => s2.recommendable).length,
+    searchableNotRecommendedCount: curated.filter((s2) => !s2.recommendable).length,
+    crossSourceDuplicatesCollapsed: droppedByPriority.size,
+    duplicateConceptsCollapsedCrossSource: stats.crossSourceConvergence,
+    duplicateConceptsCollapsedSameSource: stats.duplicateConcept - stats.crossSourceConvergence,
     acceptedCandidates: stats.accepted,
     publishedSeed: curated.length,
     byDataset: stats.byDataset,
@@ -259,6 +365,24 @@ const report = {
     .map(([id, count]) => ({ usdaId: id, occurrences: count })),
   coverage,
   coverageAllAccepted,
+  crossSource: {
+    definiteSame: overlap.definiteSame,
+    possibleDuplicate: overlap.possibleDuplicate,
+    pairsCompared: overlap.distinctPairsCompared,
+    overlapMs,
+    // Steward queue: possible duplicates are NEVER auto-merged.
+    pairs: overlap.pairs.slice(0, 200),
+    /**
+     * Identical-concept convergence: the same food from two sources resolving
+     * to ONE MACROS.AI identity. This is the proof that identity is
+     * source-independent, and it happens at the concept key — before overlap
+     * assessment ever runs, which is why definiteSame there can be 0.
+     */
+    conceptConvergence: {
+      count: stats.crossSourceConvergence,
+      examples: convergenceExamples.slice(0, 25),
+    },
+  },
 };
 
 writeFileSync('data/usda-seed.json', JSON.stringify(curated, null, 1));
@@ -272,6 +396,9 @@ console.log('by dataset:', JSON.stringify(stats.byDataset));
 if (MISSING_ARCHIVES.length > 0) console.log('MISSING ARCHIVES:', MISSING_ARCHIVES.join(', '));
 console.log('source preparation:', JSON.stringify(stats.sourcePreparationCounts));
 console.log('published preparation:', JSON.stringify(publishedPreparationCounts()));
+console.log('cross-source: definiteSame', overlap.definiteSame, '| possibleDuplicate', overlap.possibleDuplicate, '| pairs compared', overlap.distinctPairsCompared, 'in', overlapMs, 'ms');
+console.log('CROSS-SOURCE CONCEPT CONVERGENCE:', stats.crossSourceConvergence, '| same-source dupes', stats.duplicateConcept - stats.crossSourceConvergence);
+console.log('collapsed by source priority', droppedByPriority.size);
 console.log('excluded by category', stats.excludedCategory, '| duplicate concepts collapsed', stats.duplicateConcept);
 console.log('recommendable', curated.filter((s2) => s2.recommendable).length, 'of', curated.length);
 console.log('nutrient issues:', JSON.stringify(stats.issues));

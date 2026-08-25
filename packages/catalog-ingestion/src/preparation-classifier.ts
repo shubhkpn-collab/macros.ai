@@ -8,7 +8,7 @@
  * rules change and a food's factual state moves raw → cooked, that is a real
  * catalog change and must be traceable to the classifier that produced it.
  */
-export const PREPARATION_CLASSIFIER_VERSION = 'preparation-classifier@2.2.0';
+export const PREPARATION_CLASSIFIER_VERSION = 'preparation-classifier@2.3.0';
 
 /** Matches the existing `PreparationState` contract — no parallel field. */
 export type ClassifiedPreparation = 'raw' | 'cooked' | 'as_sold' | 'prepared' | 'unresolved';
@@ -37,8 +37,33 @@ const RAW_TERMS = /\braw\b/i;
  * weighed exactly as purchased, so forcing them into raw/cooked would state
  * something false about what is on the scale.
  */
-const READY_TO_EAT =
-  /\b(cheese|yogurt|yoghurt|hummus|butter|margarine|oil|juice|milk|cream|pickles?|mustard|ketchup|mayonnaise|jam|jelly|honey|syrup|sauce|dressing|vinegar|bread|tortilla|cracker|cereal|granola|chips?|cookie|candy|chocolate|frankfurter|sausage|deli|luncheon meat|nuts?|peanut butter|almond butter|dried|powder|flour|beverage|soda|water|infant formula)\b/i;
+/**
+ * FOOD-TYPE terms for products that are inherently ready to eat.
+ *
+ * Meat nouns are deliberately ABSENT. "sausage", "frankfurter" and "luncheon
+ * meat" name a food TYPE, not a state — a raw breakfast sausage and a
+ * fully-cooked frankfurter are both "sausage", and letting the noun imply
+ * readiness let a raw product publish as `as_sold`.
+ */
+const READY_TO_EAT_FOOD_TYPE =
+  /\b(cheese|yogurt|yoghurt|hummus|butter|margarine|oil|juice|milk|cream|pickles?|mustard|ketchup|mayonnaise|jam|jelly|honey|syrup|sauce|dressing|vinegar|bread|tortilla|cracker|cereal|granola|chips?|cookie|candy|chocolate|nuts?|peanut butter|almond butter|powder|flour|beverage|soda|water|infant formula)\b/i;
+
+/**
+ * STATE / FORM evidence — the food's actual condition, from source wording.
+ *
+ * These are strong enough to resolve even a preparation-critical category,
+ * because each states how the item is sold rather than merely what it is.
+ *
+ * `frozen` and `fresh` are deliberately EXCLUDED: frozen salmon may be raw or
+ * cooked, and calling it `as_sold` would assert that this record matches
+ * whatever is on the scale.
+ */
+const STATE_FORM_EVIDENCE =
+  /\b(fully cooked|pre-?cooked|ready[- ]to[- ]eat|pasteuri[sz]ed|cured|deli|luncheon|sliced|unheated|uncooked|canned|jerky|smoked)\b/i;
+
+/** Non-critical form terms: fine for produce and grains, not for meat/fish. */
+const NON_CRITICAL_FORM =
+  /\b(dry|dried|frozen|canned|fresh)\b/i;
 
 /** Wording that states the food was NOT cooked, without meaning "raw". */
 const EXPLICIT_UNHEATED = /\b(unheated|uncooked|not heated)\b/i;
@@ -109,28 +134,34 @@ export function classifyPreparation(
     return { state: 'as_sold', classifierVersion: v, rule: 'explicitly_unheated' };
   }
 
-  // No preparation wording at all. A ready-to-eat food is weighed as sold;
-  // anything else is genuinely unknown and goes to curation.
-  if (READY_TO_EAT.test(d)) {
+  // 2. STATE/FORM evidence — strong enough for ANY category, including
+  //    preparation-critical ones, because it describes the actual condition.
+  if (STATE_FORM_EVIDENCE.test(d)) {
+    return { state: 'as_sold', classifierVersion: v, rule: 'state_form_evidence' };
+  }
+
+  const critical =
+    category !== undefined && category !== null && PREPARATION_CRITICAL_CATEGORIES.test(category);
+
+  // 3. Preparation-critical safety, evaluated BEFORE any food-type or category
+  //    inference. A generic food noun ("sausage", "chicken") is not evidence of
+  //    readiness, and neither is "frozen".
+  if (critical) {
+    return {
+      state: 'unresolved', classifierVersion: v,
+      rule: 'preparation_critical_category_without_signal',
+    };
+  }
+
+  // 4. Non-critical inference: inherently ready-to-eat foods and forms.
+  if (READY_TO_EAT_FOOD_TYPE.test(d)) {
     return { state: 'as_sold', classifierVersion: v, rule: 'ready_to_eat_term' };
   }
-  // Explicit FORM terms state how the food is sold. Evidence-derived from real
-  // records: pasteurized crab and sliced ham are ready to eat as purchased.
-  if (/\b(dry|dried|frozen|canned|fresh|pasteurized|cured|deli|sliced)\b/.test(d)) {
+  if (NON_CRITICAL_FORM.test(d)) {
     return { state: 'as_sold', classifierVersion: v, rule: 'as_sold_form_term' };
   }
-  if (category !== undefined && category !== null) {
-    // Preparation-critical categories are NEVER resolved by category alone.
-    if (PREPARATION_CRITICAL_CATEGORIES.test(category)) {
-      return {
-        state: 'unresolved', classifierVersion: v,
-        rule: 'preparation_critical_category_without_signal',
-      };
-    }
-    // Category evidence from the source, not a guess about the food itself.
-    if (WHOLE_FOOD_CATEGORIES.test(category)) {
-      return { state: 'as_sold', classifierVersion: v, rule: 'whole_food_category_no_preparation' };
-    }
+  if (category !== undefined && category !== null && WHOLE_FOOD_CATEGORIES.test(category)) {
+    return { state: 'as_sold', classifierVersion: v, rule: 'whole_food_category_no_preparation' };
   }
 
   return { state: 'unresolved', classifierVersion: v, rule: 'no_preparation_signal' };

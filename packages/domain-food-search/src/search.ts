@@ -91,6 +91,12 @@ const SCORE = {
   brand: 300,
   /** Recency is a nudge, never enough to outrank a better textual match. */
   recentMax: 90,
+  /** CA-14: canonical preparation state matching the user's stated intent. */
+  preparationMatch: 120,
+  /** The record's text also names the specific method the user asked for. */
+  preparationMethodMatch: 60,
+  /** A stated-raw query matching a cooked record, or vice versa. */
+  preparationConflict: 400,
 } as const;
 
 interface Scored {
@@ -166,6 +172,34 @@ const OPTION_LABELS = 'ABCDEFGH';
  * ordering. Ties are broken explicitly by displayName then productVersionId —
  * never by map or object iteration order.
  */
+/**
+ * PREPARATION INTENT (CA-14).
+ *
+ * A user saying "cooked ground turkey" means the canonical cooked state — but
+ * the matching record reads "pan-broiled crumbles", so display text alone
+ * misses it. Intent is matched against `preparationState`, not wording.
+ *
+ * Method words stay meaningful: "boiled potato" still prefers a record whose
+ * text says boiled over a generically cooked one.
+ */
+const COOKED_INTENT = /\b(cooked|boiled|roasted|grilled|fried|baked|broiled|steamed|braised|poached|toasted|sauteed)\b/i;
+const RAW_INTENT = /\b(raw|uncooked|fresh)\b/i;
+
+export interface PreparationIntent {
+  readonly state: 'raw' | 'cooked' | null;
+  readonly method: string | null;
+}
+
+export function preparationIntentOf(query: string): PreparationIntent {
+  const cooked = COOKED_INTENT.exec(query);
+  if (cooked !== null) {
+    const word = cooked[0].toLowerCase();
+    return { state: 'cooked', method: word === 'cooked' ? null : word };
+  }
+  if (RAW_INTENT.test(query)) return { state: 'raw', method: null };
+  return { state: null, method: null };
+}
+
 export function searchFood(
   catalog: readonly SearchableFood[],
   query: FoodSearchQuery,
@@ -174,6 +208,7 @@ export function searchFood(
   if (queryText.length === 0) return [];
 
   const queryTokens = tokenize(query.text).map(stemToken);
+  const intent = preparationIntentOf(query.text);
   const recent = query.recentProductVersionIds ?? [];
 
   const scored: Scored[] = [];
@@ -185,7 +220,26 @@ export function searchFood(
     const recencyBoost =
       recentIndex === -1 ? 0 : Math.max(1, SCORE.recentMax - recentIndex * 10);
 
-    scored.push({ ...base, score: base.score + recencyBoost });
+    // CA-14 / B15: preparation intent applied to CANONICAL state.
+    let preparationAdjustment = 0;
+    if (intent.state !== null) {
+      const state = product.preparationState;
+      if (state === intent.state) {
+        preparationAdjustment += SCORE.preparationMatch;
+        // A method word still discriminates: "boiled potato" prefers a record
+        // that actually says boiled over a generically cooked one.
+        if (intent.method !== null && new RegExp(`\\b${intent.method}`, 'i').test(product.displayName)) {
+          preparationAdjustment += SCORE.preparationMethodMatch;
+        }
+      } else if (state === 'raw' || state === 'cooked') {
+        // A DIRECT conflict. Wrong preparation is high-severity — cooked beef
+        // is roughly a third denser than raw — so it is pushed below every
+        // correctly-stated candidate rather than merely nudged.
+        preparationAdjustment -= SCORE.preparationConflict;
+      }
+    }
+
+    scored.push({ ...base, score: base.score + recencyBoost + preparationAdjustment });
   }
 
   scored.sort(
