@@ -65,8 +65,21 @@ async function harness() {
 type H = Awaited<ReturnType<typeof harness>>;
 
 let n = 0;
-const say = (h: H, transcript: string, userId = USER_A) =>
-  h.voice.handle({ transcript, receivedAt: instant(`2026-08-19T17:0${n++ % 10}:00.000Z`), userId } as VoiceUtterance);
+const say = (h: H, transcript: string, userId = USER_A) => {
+  n += 1;
+  return h.voice.handle(correlate(h, transcript, userId, n));
+};
+
+/** Full correlation, as a real STT adapter must now supply. */
+const correlate = (h: H, transcript: string, userId: string, turn: number) => ({
+  transcript,
+  receivedAt: instant(new Date(Date.parse('2026-08-19T17:00:00.000Z') + turn * 1000).toISOString()),
+  userId,
+  utteranceId: `u-${turn}`,
+  sessionGeneration: h.app.getState().sessionGeneration,
+  turnSequence: turn,
+  flowIdAtCapture: h.app.getState().addFood.flowId,
+});
 
 /** Narrow a response to its options, failing loudly if it was not an options reply. */
 const optionsOf = (r: VoiceResponse): readonly VoiceOption[] => {

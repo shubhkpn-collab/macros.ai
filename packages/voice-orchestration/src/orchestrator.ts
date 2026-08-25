@@ -12,6 +12,7 @@ import {
   type VoiceUtterance,
 } from '@macros/domain-voice';
 import type { AssistantInterpreter } from '@macros/assistant-core';
+import type { CorrelatedVoiceDelivery } from '@macros/domain-voice';
 import type { TabletAppController } from '@macros/tablet-app-core';
 import { AssistantRouter, type AssistantTrace } from './assistant-router.js';
 import {
@@ -67,11 +68,12 @@ export class VoiceOrchestrator {
     return this.parser.version;
   }
 
-  async handle(utterance: VoiceUtterance): Promise<VoiceResponse> {
+  async handle(delivery: CorrelatedVoiceDelivery): Promise<VoiceResponse> {
     const context = this.deliveryContext();
 
-    // Phase 1: may this delivery act at all? Identity and ordering only.
-    const admitted = this.guard.admit(utterance, context);
+    // Admit AND reserve synchronously — no await may occur before the identity
+    // and the turn number are claimed.
+    const admitted = this.guard.admitAndReserve(delivery, context);
     if (admitted.kind === 'replay') return admitted.response;
     if (admitted.kind === 'reject') {
       return {
@@ -81,7 +83,27 @@ export class VoiceOrchestrator {
       };
     }
 
-    const parsed = this.parser.parse(utterance);
+    // From here the reservation exists, so it must always be settled.
+    let response: VoiceResponse;
+    try {
+      response = await this.execute(delivery);
+    } catch {
+      response = {
+        kind: 'error',
+        speech: "Something went wrong handling that.",
+        reason: 'internal',
+      };
+    }
+    this.guard.complete(delivery, response);
+    return response;
+  }
+
+  private async execute(delivery: CorrelatedVoiceDelivery): Promise<VoiceResponse> {
+    const parsed = this.parser.parse({
+      transcript: delivery.transcript,
+      receivedAt: delivery.receivedAt,
+      userId: delivery.userId,
+    });
 
     if (parsed.status === 'invalid') {
       return { kind: 'error', speech: INVALID_SPEECH[parsed.reason], reason: parsed.reason };
@@ -89,27 +111,16 @@ export class VoiceOrchestrator {
     if (parsed.status === 'needs_clarification') {
       return { kind: 'clarification', speech: CLARIFICATION_SPEECH[parsed.reason], reason: parsed.reason };
     }
+
     if (parsed.status === 'unsupported') {
       // The grammar could not cover this phrasing. This is the ONLY point where
       // a richer interpreter is consulted — and whatever it returns is still an
       // untrusted proposal that must survive validation.
       if (this.router.shouldConsult(parsed)) {
-        const proposed = await this.router.propose(utterance.transcript);
+        const proposed = await this.router.propose(delivery.transcript);
         this.trace = proposed.trace;
         if (proposed.kind === 'refused') return proposed.response;
-
-        const flowOk = this.guard.admitIntent(proposed.intent, utterance, context);
-        if (flowOk.kind === 'reject') {
-          return {
-            kind: 'error',
-            speech: DELIVERY_REJECTION_SPEECH[flowOk.reason],
-            reason: flowOk.reason,
-          };
-        }
-
-        const response = await this.dispatch(proposed.intent);
-        this.guard.record(utterance, response);
-        return response;
+        return this.executeIntent(proposed.intent, delivery);
       }
 
       return {
@@ -119,23 +130,30 @@ export class VoiceOrchestrator {
       };
     }
 
-    const intent = parsed.intent;
     this.trace = { path: 'deterministic', parserVersion: this.parser.version };
+    return this.executeIntent(parsed.intent, delivery);
+  }
 
-    // Phase 2: the intent is known, so flow-scoped commands can be checked
-    // against the flow they were actually spoken into.
-    const flowAdmitted = this.guard.admitIntent(intent, utterance, context);
-    if (flowAdmitted.kind === 'reject') {
+  /**
+   * Revalidate against CURRENT state, then dispatch.
+   *
+   * The context is re-read here rather than reused from admission: an
+   * interpreter call may have outlived the session or the flow it began in.
+   */
+  private async executeIntent(
+    intent: VoiceIntent,
+    delivery: CorrelatedVoiceDelivery,
+  ): Promise<VoiceResponse> {
+    const current = this.deliveryContext();
+    const revalidated = this.guard.revalidateForExecution(intent, delivery, current);
+    if (revalidated.kind === 'reject') {
       return {
         kind: 'error',
-        speech: DELIVERY_REJECTION_SPEECH[flowAdmitted.reason],
-        reason: flowAdmitted.reason,
+        speech: DELIVERY_REJECTION_SPEECH[revalidated.reason],
+        reason: revalidated.reason,
       };
     }
-
-    const response = await this.dispatch(intent);
-    this.guard.record(utterance, response);
-    return response;
+    return this.dispatch(intent);
   }
 
   private deliveryContext(): DeliveryContext {

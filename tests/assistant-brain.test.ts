@@ -78,7 +78,8 @@ const speak = (h: H, transcript: string, userId = USER_A) => {
     utteranceId: `a-${seq}`,
     sessionGeneration: h.app.getState().sessionGeneration,
     turnSequence: seq,
-  } as VoiceUtterance);
+    flowIdAtCapture: h.app.getState().addFood.flowId,
+  });
 };
 const logsOf = async (h: H, userId = USER_A) =>
   h.repos.foodLogs.listByLocalDate(userId, h.app.getState().dashboard!.localDate);

@@ -109,3 +109,66 @@ export type InvalidReason =
   | 'weight_not_finite'
   | 'weight_out_of_range'
   | 'unsupported_unit';
+
+/**
+ * AN EXECUTABLE VOICE DELIVERY.
+ *
+ * `VoiceUtterance` above is the PARSE input — the minimum a pure parser needs.
+ * This is the EXECUTION input, and correlation is MANDATORY here.
+ *
+ * The distinction matters: omitting a correlation field must never silently
+ * disable a safety check. A pipeline that cannot supply these values is not
+ * permitted to drive state changes at all, rather than being quietly granted a
+ * weaker guarantee.
+ */
+export interface CorrelatedVoiceDelivery {
+  readonly transcript: string;
+  readonly receivedAt: string;
+  readonly userId: string;
+  readonly utteranceId: string;
+  readonly sessionGeneration: number;
+  readonly turnSequence: number;
+  /**
+   * The add-food flow this was spoken into.
+   *
+   * REQUIRED for flow-scoped commands and explicitly `null` for
+   * flow-independent ones — null is a stated fact ("this did not belong to a
+   * flow"), not an omission.
+   */
+  readonly flowIdAtCapture: string | null;
+}
+
+export type DeliveryContractViolation =
+  | 'transcript_missing'
+  | 'received_at_invalid'
+  | 'user_missing'
+  | 'utterance_id_missing'
+  | 'session_generation_invalid'
+  | 'turn_sequence_invalid'
+  | 'flow_context_field_missing';
+
+/**
+ * Runtime validation of a delivery from an adapter. TypeScript types are not
+ * evidence at a transport boundary — STT output crosses a process edge.
+ */
+export function validateDelivery(
+  candidate: Partial<CorrelatedVoiceDelivery> | null | undefined,
+): DeliveryContractViolation | null {
+  if (candidate === null || candidate === undefined) return 'transcript_missing';
+  if (typeof candidate.transcript !== 'string') return 'transcript_missing';
+  if (typeof candidate.userId !== 'string' || candidate.userId.length === 0) return 'user_missing';
+  if (typeof candidate.utteranceId !== 'string' || candidate.utteranceId.length === 0) {
+    return 'utterance_id_missing';
+  }
+  if (typeof candidate.receivedAt !== 'string' || !Number.isFinite(Date.parse(candidate.receivedAt))) {
+    return 'received_at_invalid';
+  }
+  if (!Number.isInteger(candidate.sessionGeneration)) return 'session_generation_invalid';
+  if (!Number.isInteger(candidate.turnSequence)) return 'turn_sequence_invalid';
+  // Absent is a contract violation; explicit null is a valid statement.
+  if (!('flowIdAtCapture' in candidate)) return 'flow_context_field_missing';
+  if (candidate.flowIdAtCapture !== null && typeof candidate.flowIdAtCapture !== 'string') {
+    return 'flow_context_field_missing';
+  }
+  return null;
+}

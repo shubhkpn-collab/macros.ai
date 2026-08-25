@@ -1,6 +1,10 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { DeterministicVoiceParser, type VoiceUtterance } from '@macros/domain-voice';
+import {
+  DeterministicVoiceParser,
+  type CorrelatedVoiceDelivery,
+  type VoiceUtterance,
+} from '@macros/domain-voice';
 import { VoiceOrchestrator } from '@macros/voice-orchestration';
 import { TabletAppController, DevScaleAdapter, type AppEnvironment, type AppSubject } from '@macros/tablet-app-core';
 import {
@@ -65,18 +69,19 @@ let seq = 0;
 const speak = (
   h: H,
   transcript: string,
-  opts: Partial<VoiceUtterance> & { turn?: number } = {},
+  opts: Partial<CorrelatedVoiceDelivery> & { turn?: number } = {},
 ) => {
   const state = h.app.getState();
   seq += 1;
-  const u: VoiceUtterance = {
+  const u: CorrelatedVoiceDelivery = {
     transcript,
     receivedAt: instant(new Date(Date.parse(START) + seq * 1000).toISOString()),
     userId: opts.userId ?? state.subject.userId,
     utteranceId: opts.utteranceId ?? `stt-${seq}`,
     sessionGeneration: opts.sessionGeneration ?? state.sessionGeneration,
     turnSequence: opts.turnSequence ?? opts.turn ?? seq,
-    ...(opts.flowIdAtCapture !== undefined ? { flowIdAtCapture: opts.flowIdAtCapture } : {}),
+    // Flow-scoped commands must state their flow; default to the current one.
+    flowIdAtCapture: opts.flowIdAtCapture ?? state.addFood.flowId,
     ...(opts.receivedAt !== undefined ? { receivedAt: opts.receivedAt } : {}),
   };
   return h.voice.handle(u);
@@ -176,6 +181,7 @@ describe('A3 — utterance idempotency', () => {
         utteranceId: 'dup-1',
         sessionGeneration: h.app.getState().sessionGeneration,
         turnSequence: 1,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
       });
       assert.deepEqual(again, first, 'the original response is replayed verbatim');
     });
@@ -196,6 +202,7 @@ describe('A3 — utterance idempotency', () => {
       utteranceId: 'log-once',
       sessionGeneration: h.app.getState().sessionGeneration,
       turnSequence: 4,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
     });
 
     assert.equal(first.kind, 'success');
@@ -216,6 +223,7 @@ describe('A3 — utterance idempotency', () => {
       utteranceId: 'w-1',
       sessionGeneration: h.app.getState().sessionGeneration,
       turnSequence: 3,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
     });
     assert.deepEqual(replay, first);
     assert.equal(h.app.getState().addFood.weightCapture!.grams, 150);
@@ -238,6 +246,7 @@ describe('A4 — same id, different transcript is a conflict', () => {
       utteranceId: 'ambig',
       sessionGeneration: h.app.getState().sessionGeneration,
       turnSequence: 3,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
     });
 
     assert.equal(conflict.kind, 'error');
@@ -259,6 +268,7 @@ describe('A4 — same id, different transcript is a conflict', () => {
       utteranceId: 'same',
       sessionGeneration: h.app.getState().sessionGeneration,
       turnSequence: 1,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
     });
     assert.deepEqual(again, first, 'a replay, not a conflict');
   });
@@ -337,9 +347,10 @@ describe('A6 — receivedAt is validated, not ceremonial', () => {
       utteranceId: 'bad-ts',
       sessionGeneration: h.app.getState().sessionGeneration,
       turnSequence: 1,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
     });
     assert.equal(r.kind, 'error');
-    if (r.kind === 'error') assert.equal(r.reason, 'invalid_received_at');
+    if (r.kind === 'error') assert.equal(r.reason, 'invalid_delivery');
     assert.equal(h.app.getState().addFood.results.length, 0);
   });
 
@@ -353,6 +364,7 @@ describe('A6 — receivedAt is validated, not ceremonial', () => {
       utteranceId: 'ancient',
       sessionGeneration: h.app.getState().sessionGeneration,
       turnSequence: 1,
+      flowIdAtCapture: h.app.getState().addFood.flowId,
     });
     assert.equal(r.kind, 'options', 'correlation decides staleness, not the clock');
   });
