@@ -63,6 +63,10 @@ export interface FoodLogRow {
   event_utc_offset_minutes: number;
   local_date: string;
   meal_id: string | null;
+  /** Correction lineage. Absent on legacy rows written before migration 0004. */
+  entry_kind?: string | null;
+  supersedes_log_id?: string | null;
+  correction_reason?: string | null;
   nutrition_calc_version: string;
   weight_capture: unknown;
   nutrition_snapshot: unknown;
@@ -107,6 +111,11 @@ export function foodLogToRow(item: FoodLogItem): FoodLogRow {
     event_utc_offset_minutes: item.eventUtcOffsetMinutes,
     local_date: item.localDate,
     meal_id: item.mealId ?? null,
+    // Correction lineage MUST round-trip. Dropping it would make a correction
+    // read back as a second original and double-count the day.
+    entry_kind: item.entryKind ?? 'original',
+    supersedes_log_id: item.supersedesLogId ?? null,
+    correction_reason: item.correctionReason ?? null,
     nutrition_calc_version: item.nutritionCalcVersion,
     weight_capture: item.weightCapture,
     nutrition_snapshot: item.nutritionSnapshot,
@@ -143,6 +152,11 @@ export function rowToFoodLog(row: FoodLogRow): FoodLogItem {
     nutritionCalcVersion: row.nutrition_calc_version,
     status: 'active' as const,
     ...(row.meal_id !== null ? { mealId: row.meal_id } : {}),
+    ...(row.entry_kind === 'correction' ? { entryKind: 'correction' as const } : {}),
+    ...(row.supersedes_log_id !== null && row.supersedes_log_id !== undefined
+      ? { supersedesLogId: row.supersedes_log_id } : {}),
+    ...(row.correction_reason !== null && row.correction_reason !== undefined
+      ? { correctionReason: row.correction_reason } : {}),
   } as FoodLogItem;
 
   // The stored columns and the stored snapshot must still agree years later.

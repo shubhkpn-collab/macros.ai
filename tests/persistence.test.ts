@@ -517,6 +517,7 @@ describe('MIGRATIONS — static assertions (RLS runtime verification PENDING)', 
       '0001_core_schema.sql',
       '0002_rls.sql',
       '0003_catalog_identifiers.sql',
+      '0004_food_log_corrections.sql',
     ]);
   });
 

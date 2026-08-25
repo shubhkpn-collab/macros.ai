@@ -91,6 +91,18 @@ to implement these.** Each is revisited when its own milestone arrives.
 | VO-3 | **V-1: label macros outside version identity.** Declared per-serving protein/carb/fat and the serving description can change without producing a new ProductVersion, so a label-only correction is silently dropped. Documented with a falsifiable test; **A7 not changed unilaterally.** | A7 is a closed classification; widening the fingerprint is an owner decision. | Owner ruling |
 | VO-4 | **Reverse quantity targets** ("200 calories of oats"). Currently refused. | Requires an explicit, deterministic reverse-calculation feature. | If the product wants it |
 
+## From FOOD LOG CORRECTION CLOSURE (2026-08-20)
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| FC-1 | **Void persistence adapters.** Migration 0004 creates `food_log_voids`, but no repository method writes or reads it yet, so voids currently exist only in the pure fold. | The correction path is the one the tablet needs first; void UX is undesigned. | Correction UX milestone |
+| FC-2 | **Application/voice correction intents.** No `correctFoodLog` / `voidFoodLog` controller intent yet — the domain and schema are ready, the UI affordance is not designed. | Designing the affordance before the interaction is known would guess. | Correction UX milestone |
+| FC-3 | **Migration 0004 runtime validation.** Authored and statically tested; never executed. | No PostgreSQL in this environment. | Runtime DB gate |
+| FC-4 | **Cross-day correction.** Refused today. Moving a meal to another local day needs an explicit operation that recomputes both days. | Not needed for MVP-1. | If the product wants it |
+
+**VO-3 is RESOLVED** — declared label facts now participate in ProductVersion
+version identity.
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**

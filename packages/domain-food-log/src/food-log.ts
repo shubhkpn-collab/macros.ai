@@ -5,6 +5,7 @@ import {
   validateProductVersion,
   validateWeightCapture,
   validateFoodLogItem,
+  type FoodLogEntry,
   type FoodLogItem,
   type Instant,
   type IntakeTotals,
@@ -13,6 +14,7 @@ import {
   type ProductVersion,
   type WeightCapture,
 } from '@macros/contracts';
+import { foldFoodLogEntries } from './corrections.js';
 import { calculateNutrition, NUTRITION_CALC_VERSION, sumNutrition } from '@macros/domain-nutrition';
 import { localDayOf } from './local-day.js';
 
@@ -151,19 +153,22 @@ export interface DailyIntakeQuery {
 }
 
 /**
- * FoodLogItem[] → IntakeTotals for ONE user and ONE local calendar day.
+ * FoodLogEntry[] → IntakeTotals for ONE user and ONE local calendar day.
  *
  * Totals are summed from the STORED snapshots, never recomputed from current
  * product data — so correcting a product tomorrow leaves yesterday's logged
  * nutrition historically intact.
+ *
+ * The stream is FOLDED first, so a corrected entry contributes once (its
+ * corrected value) and a voided entry contributes nothing. Superseded entries
+ * are retained in storage but never counted twice.
  */
 export function aggregateDailyIntake(
-  logs: readonly FoodLogItem[],
+  logs: readonly FoodLogEntry[],
   query: DailyIntakeQuery,
 ): IntakeTotals {
-  const matching = logs.filter(
-    (l) => l.userId === query.userId && l.localDate === query.localDate && l.status === 'active',
-  );
+  const fold = foldFoodLogEntries(query.userId, logs);
+  const matching = fold.effective.filter((l) => l.localDate === query.localDate);
   const totals: NutritionTotals = sumNutrition(matching.map((l) => l.nutritionSnapshot.totals));
   return { ...totals, itemCount: matching.length };
 }
