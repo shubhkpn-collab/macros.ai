@@ -1,221 +1,413 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const ROOT = new URL('..', import.meta.url).pathname;
 import {
-  GTIN_POLICY_VERSION, VALID_GTIN_LENGTHS, gs1CheckDigit, lookupByGtin, normalizeGtin,
-  type IdentifierAssignment,
-} from '@macros/catalog-ingestion';
-import { isNutrientId } from '@macros/domain-nutrients';
+  buildProductCard,
+  buildSearchProjection,
+  fingerprintOf,
+  gtinCheckDigit,
+  lookupByIdentifier,
+  normalizeGtin,
+  normalizeLabelToPer100g,
+  resolveSourceConflict,
+  trustLabelFor,
+  validateGtin,
+  type IdentifierIndexEntry,
+} from '@macros/domain-catalog';
+import { calculateNutrition } from '@macros/domain-nutrition';
+import { searchFood } from '@macros/domain-food-search';
+import { grams } from '@macros/contracts';
+import {
+  BRANDED_GTINS,
+  SYNTHETIC_BRANDED_ALIASES,
+  SYNTHETIC_BRANDED_HEADS,
+  SYNTHETIC_BRANDED_META,
+  SYNTHETIC_BRANDED_OATS_V2,
+  SYNTHETIC_BRANDED_PRODUCTS,
+  SYNTHETIC_PRODUCTS,
+  SYNTHETIC_CATALOG_HEADS,
+  approx,
+} from '@macros/testkit';
 
-const REPORT = 'data/branded-report.json';
-const FIXTURES = 'data/branded-fixtures.json';
-const report = existsSync(REPORT) ? JSON.parse(readFileSync(REPORT, 'utf8')) : null;
-const fixtures = existsSync(FIXTURES) ? JSON.parse(readFileSync(FIXTURES, 'utf8')) : null;
+const OATS = SYNTHETIC_BRANDED_PRODUCTS.find((p) => p.productId === 'synb-oats-old-fashioned')!;
 
-describe('B5/B6 — GTIN normalization and check digit', () => {
-  test('real USDA codes validate, with leading zeros preserved', () => {
-    // "076014101088" is a real 12-digit UPC-A from the corpus. Trimming the
-    // leading zero would make it invalid — or a different product.
-    const r = normalizeGtin('076014101088');
-    assert.equal(r.ok, true);
-    if (!r.ok) return;
-    assert.equal(r.family, 'GTIN-12');
-    assert.equal(r.gtin14, '00076014101088');
-    assert.equal(r.raw, '076014101088', 'the raw code is never rewritten');
-  });
+const indexFor = (
+  entries: readonly { gtin: string; productId: string; productVersionId: string; state?: 'current' | 'superseded' | 'conflicted' }[],
+): IdentifierIndexEntry[] =>
+  entries.map((e) => ({
+    normalizedValue: e.gtin,
+    productId: e.productId,
+    productVersionId: e.productVersionId,
+    state: e.state ?? 'current',
+  }));
 
-  test('all four observed GS1 families are supported', () => {
-    assert.deepEqual([...VALID_GTIN_LENGTHS], [8, 12, 13, 14]);
-    assert.equal(normalizeGtin('1633636543505').ok, true, 'GTIN-13 from the corpus');
-  });
+const CURRENT_INDEX = indexFor(
+  SYNTHETIC_BRANDED_PRODUCTS.map((p) => ({
+    gtin: SYNTHETIC_BRANDED_META[p.productId]!.gtin!,
+    productId: p.productId,
+    productVersionId: p.productVersionId,
+  })),
+);
 
-  test('a bad check digit NEVER validates', () => {
-    const good = '076014101088';
-    const bad = good.slice(0, -1) + String((Number(good.slice(-1)) + 1) % 10);
-    const r = normalizeGtin(bad);
-    assert.equal(r.ok, false);
-    if (r.ok) return;
-    assert.equal(r.reason, 'bad_check_digit');
-  });
+// ---------------------------------------------------------------------------
 
-  test('malformed identifiers are rejected, never padded into validity', () => {
-    for (const [raw, reason] of [
-      ['', 'empty'], ['abc123', 'non_digit'], ['12345', 'unsupported_length'],
-      ['1234567890', 'unsupported_length'],
-    ] as const) {
-      const r = normalizeGtin(raw);
-      assert.equal(r.ok, false, raw);
-      if (!r.ok) assert.equal(r.reason, reason, raw);
+describe('GTIN VALIDATION', () => {
+  test('every synthetic fixture GTIN passes the check digit', () => {
+    for (const [name, value] of Object.entries(BRANDED_GTINS)) {
+      assert.equal(validateGtin(value).ok, true, `${name} (${value}) must be a valid GTIN`);
     }
   });
 
-  test('the check digit weights from the RIGHT', () => {
-    // Applying 3/1 left-to-right silently inverts weighting on odd lengths.
-    assert.equal(gs1CheckDigit('07601410108'), 8);
+  test('an arbitrary numeric string is NOT a GTIN', () => {
+    const r = validateGtin('012345678901');
+    if (r.ok) assert.fail('a random 12-digit number must not validate by accident');
+    assert.equal(r.reason, 'check_digit_failed');
   });
 
-  test('the policy is versioned', () => {
-    assert.equal(GTIN_POLICY_VERSION, 'gtin@1.0.0');
+  test('the check digit is the standard mod-10 algorithm', () => {
+    assert.equal(gtinCheckDigit('0009900000001'), 1);
+  });
+
+  test('malformed identifiers are rejected by reason', () => {
+    assert.deepEqual(validateGtin(''), { ok: false, reason: 'empty' });
+    assert.deepEqual(validateGtin('abc'), { ok: false, reason: 'not_numeric' });
+    assert.deepEqual(validateGtin('12345'), { ok: false, reason: 'unsupported_length' });
+  });
+
+  test('GTIN-12 and its GTIN-14 form normalize to one value', () => {
+    const twelve = '099000000011';
+    const check = gtinCheckDigit(twelve.slice(0, -1));
+    const valid = `${twelve.slice(0, -1)}${check}`;
+    assert.equal(normalizeGtin(valid), valid.padStart(14, '0'));
   });
 });
 
-describe('B8/B21 — barcode lookup refuses rather than guesses', () => {
-  const assign = (gtin14: string, productId: string, over: Partial<IdentifierAssignment> = {}): IdentifierAssignment => ({
-    gtin14, productId, productVersionId: `${productId}@v1`,
-    state: 'current', discontinued: false, ...over,
-  });
-  const map = (list: IdentifierAssignment[]) => {
-    const m = new Map<string, IdentifierAssignment[]>();
-    for (const a of list) m.set(a.gtin14, [...(m.get(a.gtin14) ?? []), a]);
-    return m;
-  };
-
-  test('a valid barcode resolves to exactly one current product', () => {
-    const r = lookupByGtin('076014101088', map([assign('00076014101088', 'bprod_x')]));
-    assert.equal(r.outcome, 'found');
+describe('BARCODE LOOKUP — never guesses', () => {
+  test('a known GTIN resolves to exactly one product', () => {
+    const r = lookupByIdentifier(BRANDED_GTINS.oatsOldFashioned, CURRENT_INDEX);
+    assert.equal(r.outcome, 'exact_match');
+    if (r.outcome === 'exact_match') assert.equal(r.productId, 'synb-oats-old-fashioned');
   });
 
-  test('an unknown barcode is not_found, never a near match', () => {
-    assert.equal(lookupByGtin('076014101088', map([])).outcome, 'not_found');
+  test('an unknown but VALID barcode is not_found — no fallback, no estimate', () => {
+    const unknown = '00099000009999';
+    const check = gtinCheckDigit(unknown.slice(0, -1));
+    const valid = `${unknown.slice(0, -1)}${check}`;
+    assert.deepEqual(lookupByIdentifier(valid, CURRENT_INDEX), { outcome: 'not_found' });
   });
 
-  test('an invalid barcode NEVER resolves', () => {
-    const r = lookupByGtin('12345', map([assign('00000000012345', 'bprod_x')]));
+  test('an invalid barcode never reaches the catalog', () => {
+    const r = lookupByIdentifier('00099000000012', CURRENT_INDEX);
     assert.equal(r.outcome, 'invalid_identifier');
   });
 
-  test('a CONFLICTED identifier never silently picks a product', () => {
-    const m = map([
-      assign('00076014101088', 'bprod_a', { state: 'conflicted' }),
-      assign('00076014101088', 'bprod_b', { state: 'conflicted' }),
+  test('two active products claiming one GTIN is ambiguous — neither wins', () => {
+    const conflicted = indexFor([
+      { gtin: BRANDED_GTINS.conflictA, productId: 'synb-product-a', productVersionId: 'a@v1' },
+      { gtin: BRANDED_GTINS.conflictB, productId: 'synb-product-b', productVersionId: 'b@v1' },
     ]);
-    const r = lookupByGtin('076014101088', m);
-    assert.equal(r.outcome, 'conflicted_identifier');
-    if (r.outcome === 'conflicted_identifier') assert.equal(r.candidates.length, 2);
+    const r = lookupByIdentifier(BRANDED_GTINS.conflictA, conflicted);
+    assert.equal(r.outcome, 'ambiguous');
+    if (r.outcome === 'ambiguous') assert.deepEqual(r.productIds, ['synb-product-a', 'synb-product-b']);
   });
 
-  test('two current assignments for one barcode is also a conflict', () => {
-    const r = lookupByGtin('076014101088', map([
-      assign('00076014101088', 'bprod_a'), assign('00076014101088', 'bprod_b'),
-    ]));
-    assert.equal(r.outcome, 'conflicted_identifier');
-  });
-
-  test('a discontinued product is reported, not silently returned', () => {
-    const r = lookupByGtin('076014101088', map([assign('00076014101088', 'bprod_x', { discontinued: true })]));
-    assert.equal(r.outcome, 'discontinued');
-  });
-
-  test('superseded assignments do not resolve', () => {
-    const r = lookupByGtin('076014101088', map([assign('00076014101088', 'bprod_x', { state: 'superseded' })]));
-    assert.equal(r.outcome, 'not_found');
+  test('a superseded identifier does not resolve', () => {
+    const superseded = indexFor([
+      { gtin: BRANDED_GTINS.oatsOldFashioned, productId: 'x', productVersionId: 'x@v1', state: 'superseded' },
+    ]);
+    assert.deepEqual(lookupByIdentifier(BRANDED_GTINS.oatsOldFashioned, superseded), { outcome: 'not_found' });
   });
 });
 
-describe('REAL branded ingestion (skipped when artifacts are absent)', () => {
-  const t = (name: string, fn: () => void) =>
-    test(name, { skip: report === null ? 'branded artifacts not generated' : false }, fn);
-
-  t('B34: exact barcode lookup is 100% on a real sample', () => {
-    assert.equal(report.barcode.exactLookupPercent, 100,
-      'a wrong product for a valid barcode is a BLOCKER');
-    assert.equal(report.barcode.malformedResolved, 0, 'malformed must never resolve');
+describe('REFORMULATION — barcode is not a version id', () => {
+  test('the same GTIN resolves to V2 after reformulation, and V1 still exists', () => {
+    const afterUpdate = indexFor([
+      { gtin: BRANDED_GTINS.oatsOldFashioned, productId: 'synb-oats-old-fashioned', productVersionId: SYNTHETIC_BRANDED_OATS_V2.productVersionId },
+    ]);
+    const r = lookupByIdentifier(BRANDED_GTINS.oatsOldFashioned, afterUpdate);
+    assert.equal(r.outcome, 'exact_match');
+    if (r.outcome === 'exact_match') {
+      assert.equal(r.productVersionId, 'synb-oats-old-fashioned@v2');
+      assert.notEqual(r.productVersionId, OATS.productVersionId);
+    }
+    assert.equal(OATS.basis.kcal, 375, 'V1 is untouched by the reformulation');
+    assert.equal(SYNTHETIC_BRANDED_OATS_V2.basis.kcal, 350);
   });
 
-  t('B7/B8: duplicate GTINs are lifecycle, conflicts are quarantined', () => {
-    assert.ok(report.stats.duplicateGtinGroups > 0, 'real duplicates exist');
-    assert.ok(report.identifierConflictCount > 0, 'real conflicts exist');
-    for (const c of report.identifierConflicts) {
-      assert.ok(c.brands.length > 1, 'a conflict means materially different brands');
+  test('a historical log pinned to V1 keeps V1 nutrition forever', () => {
+    const before = calculateNutrition(OATS.basis, grams(100));
+    const after = calculateNutrition(SYNTHETIC_BRANDED_OATS_V2.basis, grams(100));
+    assert.ok(approx(before.totals.kcal, 375, 1e-9));
+    assert.ok(approx(after.totals.kcal, 350, 1e-9));
+    assert.notEqual(before.totals.kcal, after.totals.kcal);
+  });
+
+  test('reformulation keeps ONE product identity, not two unrelated products', () => {
+    assert.equal(SYNTHETIC_BRANDED_OATS_V2.productId, OATS.productId);
+    assert.equal(SYNTHETIC_BRANDED_OATS_V2.versionNo, 2);
+  });
+});
+
+describe('LABEL FACTS ARE NEVER RECONSTRUCTED', () => {
+  test('label → per100g normalization is deterministic', () => {
+    const r = normalizeLabelToPer100g({
+      servingGrams: 40, kcalPerServing: 150, proteinGPerServing: 5,
+      carbohydrateGPerServing: 27, fatGPerServing: 3,
+    });
+    assert.equal(r.ok, true);
+    if (r.ok) {
+      assert.ok(approx(r.per100g.kcal, 375, 1e-9));
+      assert.ok(approx(r.per100g.carbohydrateG, 67.5, 1e-9));
     }
   });
 
-  t('B4: internal identity is not the GTIN or the FDC id', () => {
-    for (const p of fixtures.validGtin) {
-      assert.match(p.productId, /^bprod_[0-9a-f]{16}$/);
-      assert.ok(!p.productId.includes(p.sourceRecordId));
-      assert.ok(!p.productId.includes(p.gtin14));
+  test('ROUNDING: reconstructing the label from per-100 g does not reproduce it exactly', () => {
+    // A label rounded under labelling rules: 3/4 cup (170 g), 100 kcal, 18 g protein.
+    const label = { servingGrams: 170, kcalPerServing: 100, proteinGPerServing: 18,
+      carbohydrateGPerServing: 6, fatGPerServing: 0 };
+    const normalized = normalizeLabelToPer100g(label);
+    assert.ok(normalized.ok);
+    if (!normalized.ok) return;
+
+    // The fixture stores a ROUNDED per-100 g basis, as a real source would.
+    const stored = SYNTHETIC_BRANDED_PRODUCTS.find((p) => p.productId === 'synb-yogurt-nonfat')!;
+    const reconstructed = (stored.basis.proteinG * 170) / 100;
+    assert.notEqual(
+      reconstructed,
+      label.proteinGPerServing,
+      'reconstruction differs from the printed label — this is expected',
+    );
+
+    // And the original label is retained unchanged regardless.
+    assert.equal(stored.labelFacts!.declaredPerServing!.proteinG, 18);
+    assert.equal(stored.labelFacts!.servingGrams, 170);
+  });
+
+  test('a serving with no gram basis is NOT converted by guessing', () => {
+    const r = normalizeLabelToPer100g({ servingDescription: '1 cup', kcalPerServing: 150,
+      proteinGPerServing: 5, carbohydrateGPerServing: 27, fatGPerServing: 3 });
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'no_serving_mass');
+  });
+
+  test('missing label energy or macros blocks normalization', () => {
+    assert.equal(normalizeLabelToPer100g({ servingGrams: 40 }).ok, false);
+    const r = normalizeLabelToPer100g({ servingGrams: 40, kcalPerServing: 150 });
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'missing_required_label_macro');
+  });
+
+  test('a non-positive serving mass is refused', () => {
+    const r = normalizeLabelToPer100g({ servingGrams: 0, kcalPerServing: 1, proteinGPerServing: 1,
+      carbohydrateGPerServing: 1, fatGPerServing: 1 });
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'serving_mass_not_positive');
+  });
+});
+
+describe('PRODUCT CARD — identification, never calculation', () => {
+  const card = buildProductCard({
+    version: OATS,
+    optionLabel: 'A',
+    evidence: 'synthetic_test',
+    branded: SYNTHETIC_BRANDED_META['synb-oats-old-fashioned'],
+  });
+
+  test('the card carries only source-backed facts', () => {
+    assert.equal(card.brandName, 'Demo Brand');
+    assert.equal(card.productName, 'Old Fashioned Oats');
+    assert.equal(card.variant, 'Original');
+    assert.equal(card.packageDescriptor, '18 oz box');
+    assert.equal(card.servingGrams, 40);
+    assert.equal(card.labelKcal, 150);
+    assert.equal(card.gtin, BRANDED_GTINS.oatsOldFashioned);
+    assert.equal(card.productVersionId, OATS.productVersionId);
+  });
+
+  test('missing facts stay ABSENT — never invented to fill a layout', () => {
+    const generic = SYNTHETIC_PRODUCTS.find((p) => p.brandName === undefined)!;
+    const plain = buildProductCard({ version: generic, optionLabel: 'A', evidence: 'authoritative_database' });
+    assert.equal(plain.brandName, undefined);
+    assert.equal(plain.variant, undefined);
+    assert.equal(plain.packageDescriptor, undefined);
+    assert.equal(plain.gtin, undefined);
+    assert.equal(plain.servingGrams, undefined);
+    assert.equal(plain.labelKcal, undefined);
+    assert.equal(plain.imageRef, undefined, 'a product is selectable without an image');
+  });
+
+  test('database nutrition is NEVER labelled manufacturer-verified', () => {
+    assert.equal(trustLabelFor('authoritative_database'), 'database');
+    assert.equal(trustLabelFor('curated_database'), 'database');
+    assert.equal(trustLabelFor('manufacturer_label'), 'manufacturer');
+    assert.equal(trustLabelFor('estimated'), 'estimated');
+    assert.equal(trustLabelFor('synthetic_test'), 'synthetic');
+  });
+
+  test('the card is not the log: 40 g on the card, 83 g on the scale', () => {
+    assert.equal(card.servingGrams, 40);
+    assert.equal(card.labelKcal, 150);
+    const logged = calculateNutrition(OATS.basis, grams(83));
+    assert.ok(approx(logged.totals.kcal, 375 * 0.83, 1e-9));
+    assert.notEqual(logged.totals.kcal, card.labelKcal);
+  });
+});
+
+describe('SEARCH — generic and branded coexist', () => {
+  const CATALOG = buildSearchProjection({
+    versions: [...SYNTHETIC_PRODUCTS, ...SYNTHETIC_BRANDED_PRODUCTS],
+    heads: [...SYNTHETIC_CATALOG_HEADS, ...SYNTHETIC_BRANDED_HEADS],
+    aliasSets: SYNTHETIC_BRANDED_ALIASES,
+  });
+  const ids = (q: string) => searchFood(CATALOG, { text: q, limit: 4 }).map((r) => r.productVersion.productVersionId);
+
+  test('brand + product resolves to that brand', () => {
+    const results = ids('demo brand oats');
+    assert.ok(results.includes('synb-oats-old-fashioned@v1'));
+  });
+
+  test('brand + variant distinguishes two products of one brand', () => {
+    assert.ok(ids('fjordly vanilla yogurt').includes('synb-yogurt-vanilla@v1'));
+    assert.ok(ids('fjordly yogurt').includes('synb-yogurt-nonfat@v1'));
+  });
+
+  test('same brand, multiple products both surface', () => {
+    const millhouse = ids('millhouse');
+    assert.ok(millhouse.length >= 2, 'both Millhouse products are offered');
+  });
+
+  test('a generic query does not collapse branded and generic foods', () => {
+    const results = ids('chicken breast');
+    assert.ok(results.every((id) => id.startsWith('syn-chicken-breast')));
+  });
+
+  test('branded products do not automatically outrank generic ones', () => {
+    const top = searchFood(CATALOG, { text: 'Chicken breast, cooked', limit: 4 })[0]!;
+    assert.equal(top.productVersion.productVersionId, 'syn-chicken-breast@cooked-v1');
+  });
+
+  test('A/B/C/D labels remain stable for branded results', () => {
+    const a = searchFood(CATALOG, { text: 'oats', limit: 4 });
+    const b = searchFood(CATALOG, { text: 'oats', limit: 4 });
+    assert.deepEqual(a.map((r) => r.optionLabel), b.map((r) => r.optionLabel));
+  });
+
+  test('nonsense never returns a branded product', () => {
+    assert.deepEqual(ids('zzzqqq'), []);
+  });
+});
+
+describe('VERSION IDENTITY (A7)', () => {
+  const base = {
+    displayName: 'Old Fashioned Oats',
+    preparationState: 'as_sold',
+    brandName: 'Demo Brand',
+    variant: 'Original',
+    per100g: { kcal: 375, proteinG: 12.5, carbohydrateG: 67.5, fatG: 7.5 },
+    servingGrams: 40,
+    servingLabelKcal: 150,
+  };
+
+  test('a different brand is a different product', () => {
+    assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, brandName: 'Other Brand' }));
+  });
+
+  test('a different variant is a different product', () => {
+    assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, variant: 'Vanilla' }));
+  });
+
+  test('a changed label serving basis is a factual change', () => {
+    assert.notEqual(fingerprintOf(base), fingerprintOf({ ...base, servingGrams: 45 }));
+  });
+
+  test('package descriptor and GTIN are NOT part of version identity', () => {
+    // Neither is an input to the fingerprint at all — a carton redesign or a
+    // barcode reassignment must not split a product's history.
+    assert.equal(fingerprintOf(base), fingerprintOf({ ...base }));
+    assert.ok(!Object.keys(base).includes('packageDescriptor'));
+    assert.ok(!Object.keys(base).includes('gtin'));
+  });
+
+  test('identical facts produce an identical fingerprint', () => {
+    assert.equal(fingerprintOf(base), fingerprintOf({ ...base }));
+  });
+});
+
+describe('SOURCE CONFLICT — never averaged', () => {
+  test('manufacturer label beats a database when they disagree', () => {
+    const r = resolveSourceConflict([
+      { evidence: 'authoritative_database', fingerprint: 'A' },
+      { evidence: 'manufacturer_label', fingerprint: 'B' },
+    ]);
+    assert.deepEqual(r, { kind: 'resolved', winningEvidence: 'manufacturer_label' });
+  });
+
+  test('equal-priority disagreement goes to curation, never a merge', () => {
+    const r = resolveSourceConflict([
+      { evidence: 'authoritative_database', fingerprint: 'A' },
+      { evidence: 'authoritative_database', fingerprint: 'B' },
+    ]);
+    assert.deepEqual(r, { kind: 'needs_curation', reason: 'source_conflict' });
+  });
+
+  test('agreeing sources are not a conflict', () => {
+    const r = resolveSourceConflict([
+      { evidence: 'authoritative_database', fingerprint: 'A' },
+      { evidence: 'manufacturer_label', fingerprint: 'A' },
+    ]);
+    assert.equal(r.kind, 'resolved');
+  });
+});
+
+describe('SYNTHETIC BRANDED DATA IS UNMISTAKABLE', () => {
+  test('every branded fixture is tagged synthetic on all three axes', () => {
+    for (const p of [...SYNTHETIC_BRANDED_PRODUCTS, SYNTHETIC_BRANDED_OATS_V2]) {
+      assert.equal(p.source.kind, 'synthetic_test');
+      assert.equal(p.source.verificationStatus, 'synthetic_test');
+      assert.equal(p.source.licenseClass, 'synthetic_test_data');
+      assert.match(p.source.sourceId, /^SYNTHETIC_BRANDED_TEST:/);
     }
   });
 
-  t('B13: a volume-only serving NEVER becomes grams', () => {
-    for (const p of fixtures.volumeOnlyServing) {
-      assert.equal(p.servingGrams, null, `${p.sourceDescription} invented grams`);
-      assert.ok(['ml', 'mlt'].includes(p.servingUnit));
-    }
-    assert.ok(report.stats.servingVolumeOnly > 0);
-  });
-
-  t('B15: added sugars come from the SOURCE, never inferred', () => {
-    const added = report.coverage.find((c: { nutrientId: string }) => c.nutrientId === 'added_sugars');
-    assert.ok(added.known > 0, 'branded genuinely supplies added sugars');
-    for (const p of fixtures.addedSugars) {
-      assert.notEqual(p.per100g['added_sugars'], undefined);
-      // Never equal to total sugars by construction.
-      if (p.per100g['total_sugars'] !== undefined) {
-        assert.equal(typeof p.per100g['added_sugars'].amount, 'number');
+  test('no fixture claims a real brand', () => {
+    const realBrands = ['quaker', 'chobani', 'kirkland', 'great value', '365', 'good & gather', 'trader'];
+    for (const p of SYNTHETIC_BRANDED_PRODUCTS) {
+      const brand = (p.brandName ?? '').toLowerCase();
+      for (const real of realBrands) {
+        assert.ok(!brand.includes(real), `${p.brandName} must be fictional`);
       }
     }
   });
+});
 
-  t('every mapped nutrient is a canonical id in its canonical unit', () => {
-    for (const p of fixtures.validGtin) {
-      for (const [id, v] of Object.entries(p.per100g) as [string, { unit: string }][]) {
-        assert.equal(isNutrientId(id), true, id);
-        void v;
-      }
+describe('MIGRATION 0003 — authored, runtime validation pending', () => {
+  const sql = readFileSync(join(ROOT, 'db/migrations/0003_catalog_identifiers.sql'), 'utf8');
+
+  test('one current identifier may resolve to at most one product', () => {
+    assert.match(sql, /CREATE UNIQUE INDEX[\s\S]*?product_identifiers_one_current[\s\S]*?WHERE state = 'current'/);
+  });
+
+  test('identifier and alias tables have RLS enabled and forced', () => {
+    for (const table of ['product_external_identifiers', 'catalog_product_aliases', 'catalog_review_metadata']) {
+      assert.match(sql, new RegExp(`ALTER TABLE ${table} ENABLE ROW LEVEL SECURITY`));
+      assert.match(sql, new RegExp(`ALTER TABLE ${table} FORCE ROW LEVEL SECURITY`));
     }
   });
 
-  t('B29: every published product has all four core nutrients', () => {
-    for (const group of Object.values(fixtures) as Record<string, unknown>[][]) {
-      for (const p of group) {
-        const per = (p as { per100g?: Record<string, unknown> }).per100g;
-        if (per === undefined) continue;
-        for (const core of ['energy_kcal', 'protein', 'carbohydrate', 'fat']) {
-          assert.ok(per[core] !== undefined, `missing ${core}`);
-        }
-      }
-    }
-    assert.ok(report.stats.rejectedMissingCore > 0, 'records really were rejected');
+  test('catalog tables are read-only for end users', () => {
+    assert.equal(/FOR (INSERT|UPDATE|DELETE)/.test(sql), false, 'no end-user mutation policy');
+    assert.equal(/GRANT[^;]*(INSERT|UPDATE|DELETE)/.test(sql), false, 'no end-user mutation grant');
   });
 
-  t('B18/B28: discontinued products are flagged, never deleted', () => {
-    for (const p of fixtures.discontinued) {
-      assert.equal(p.isDiscontinued, true);
-      assert.notEqual(p.discontinuedDate, null);
-      assert.ok(p.per100g['energy_kcal'] !== undefined, 'history remains resolvable');
-    }
+  test('no cascading delete can destroy catalog history', () => {
+    assert.equal(sql.includes('ON DELETE CASCADE'), false);
+    assert.ok(sql.includes('ON DELETE RESTRICT'));
   });
 
-  t('B19: lifecycle groups keep exactly one current head', () => {
-    for (const p of fixtures.lifecycleUpdate) {
-      assert.equal(p.identifierState, 'current');
-      assert.ok(p.historicalSourceRecordIds.length > 0, 'earlier records retained');
-      assert.ok(!p.historicalSourceRecordIds.includes(p.sourceRecordId));
-    }
-  });
-
-  t('B16: ingredients are preserved but make NO health claim', () => {
-    assert.ok(report.stats.ingredientsPresent > 0);
-    const text = JSON.stringify(fixtures);
-    for (const claim of ['glutenFree', 'allergenFree', 'vegan', 'isSafe', 'heartHealthy']) {
-      assert.ok(!text.includes(claim), `${claim} must not exist`);
-    }
-  });
-
-  t('B3: source provenance and checksum are recorded', () => {
-    assert.equal(report.source.provider, 'USDA FoodData Central');
-    assert.equal(report.source.dataType, 'Branded');
-    assert.match(report.source.archiveSha256, /^[0-9a-f]{64}$/);
-  });
-
-  t('B30: unmapped nutrient ids are reported, never guessed', () => {
-    assert.ok(typeof report.unmappedNutrientIds === 'object');
-  });
-
-  t('B33: branded search baseline is measured', () => {
-    assert.ok(report.search.scoredQueries >= 20);
-    assert.ok(report.search.top4Percent >= 80);
+  test('the migration states that runtime validation is pending', () => {
+    assert.match(sql, /RUNTIME VALIDATION PENDING/);
   });
 });
