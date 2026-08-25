@@ -110,11 +110,24 @@ version identity.
 | AS-1 | **Real provider adapter** (OpenAI/Anthropic/Gemini). The `AssistantInterpreter` seam is complete; no SDK, network or key exists. | Out of scope by instruction; needs a provider decision, timeout and cost policy. | Provider integration gate |
 | AS-2 | **Adapter-layer timeout/cancellation.** The router handles throws and malformed output; a wall-clock timeout belongs to the IO adapter, which does not exist yet. | Nothing to time out without a provider. | With AS-1 |
 | AS-3 | **AI phrasing seam.** Deterministic phrasing is retained. If AI phrasing is ever added, numbers must be injected from trusted structured results, never regenerated. | Not required for MVP-1. | Post-provider |
-| AS-4 | **Correlation fields are optional in the contract.** `sessionGeneration`, `turnSequence` and `flowIdAtCapture` are strictly enforced WHEN SUPPLIED; a pipeline that omits them loses the corresponding protection. Should become mandatory once a real STT adapter owns them. | Making them required now would break every non-STT caller for no safety gain. | STT integration |
+| ~~AS-4~~ **RESOLVED** | **Correlation fields are optional in the contract.** `sessionGeneration`, `turnSequence` and `flowIdAtCapture` are strictly enforced WHEN SUPPLIED; a pipeline that omits them loses the corresponding protection. Should become mandatory once a real STT adapter owns them. | Making them required now would break every non-STT caller for no safety gain. | STT integration |
 | AS-5 | **Household voice user switching.** Locked rule recorded: switching must require visible/spoken confirmation and never happen silently. Not built. | No household domain exists. | Household milestone |
 
 **VO-3 is RESOLVED** — declared label facts participate in ProductVersion
 version identity.
+
+## From PRODUCTION RUNTIME FOUNDATION CLOSURE (2026-08-22)
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| RT-1 | **PostgreSQL runtime validation** — migrations, RLS matrix, DB concurrency, privileged/app connection split. Runner logic is tested against a driver interface; no DDL has executed. | No PostgreSQL, Docker or Supabase CLI in this environment. | Owner unblock |
+| RT-2 | **React Native tablet renderer.** Architecture and screen inventory defined; no code. | react-native/expo not installable — registry returns 403. | Owner unblock |
+| RT-3 | **Local pending food-log capture** during backend loss. Declared `offline_unavailable` rather than half-built. | Sync must retain submissionId, version, snapshot, capture and timezone, and merge idempotently — a domain of its own. | Offline resilience milestone |
+| RT-4 | **Offline catalog cache** for food search. | Needs a real catalog first. | After catalog population |
+| RT-5 | **Real auth provider.** Contract and binding complete; only a fake provider exists. | No provider chosen or reachable. | Provider integration |
+| RT-6 | **Postgres driver adapter.** `MigrationDriver` and repository interfaces exist; no `pg` client. | `pg` not installable. | With RT-1 |
+
+**AS-4 is RESOLVED** — correlation is mandatory at the executable voice boundary.
 
 ## ROADMAP GATE — persistence runtime validation
 

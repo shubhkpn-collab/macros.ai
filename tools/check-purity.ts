@@ -39,6 +39,9 @@ const PURE_DOMAIN = [
   // Assistant proposal contracts, tool registry, validation and decision policy
   // are pure: no LLM SDK, no network, no database, no clock, no randomness.
   'packages/assistant-core',
+  // Runtime CONFIG logic is pure: it validates a supplied record and decides
+  // what should be built. Actual construction and IO live in runtime-api.
+  'packages/runtime-config',
 ];
 const PRODUCTION = [
   ...PURE_DOMAIN,
