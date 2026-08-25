@@ -21,9 +21,18 @@ p(`Ingested: ${r.archives.map((a: any) => `${a.dataset} (\`${a.sha256.slice(0, 1
 p('');
 p(`**Missing this session: ${r.missingArchives.length > 0 ? r.missingArchives.join(', ') : 'none'}**`);
 p('');
-p('SR Legacy (211 MB) was supplied in the previous session but is **not present');
-p('now**, so depth is bounded by Foundation Foods alone. Reported rather than');
-p('compensated for with remembered data.');
+// CONDITIONAL. Prose about archive availability is derived from the report,
+// never written unconditionally — a fixed sentence claiming SR was missing
+// survived alongside a table showing it present, and the document contradicted
+// itself.
+if (r.missingArchives.length > 0) {
+  p(`Depth is bounded: ${r.missingArchives.join(', ')} ${r.missingArchives.length === 1 ? 'was' : 'were'} not`);
+  p('available for this run. Reported rather than compensated for with');
+  p('remembered data.');
+} else {
+  p('All expected archives were present for this run, so catalog depth reflects');
+  p('the full supplied source population.');
+}
 p('');
 p('## 2. The preparation bug');
 p('');
@@ -155,7 +164,11 @@ p('saying "with added sugar" never produces a numeric added-sugar amount.');
 p('');
 p('## 10. Known limitations');
 p('');
-p('- Depth is bounded by Foundation alone; SR Legacy would multiply it.');
+if (r.missingArchives.length > 0) {
+  p(`- Depth is bounded — missing: ${r.missingArchives.join(', ')}.`);
+} else {
+  p(`- Depth reflects all supplied archives (${r.archives.map((a: any) => a.dataset).join(' + ')}).`);
+}
 p(`- ${q.misses.length} search misses are catalog gaps, not ranking failures.`);
 p('- Overlap assessment is implemented and tested but had no cross-source pairs.');
 p('- Search metrics come from a human-authored regression corpus, not real users.');

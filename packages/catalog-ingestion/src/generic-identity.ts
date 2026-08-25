@@ -13,7 +13,26 @@ import type { ClassifiedPreparation } from './preparation-classifier.js';
  * USDA's numbering effectively became our identity. A second source describing
  * the same food could never attach without inventing a competing id.
  */
-export const GENERIC_IDENTITY_VERSION = 'generic-identity@1.1.0';
+export const GENERIC_IDENTITY_VERSION = 'generic-identity@1.2.0';
+
+/**
+ * SAME-SOURCE RECORDS ARE NEVER THE SAME CONCEPT.
+ *
+ * A source does not publish one food twice. Two SR records differing only by a
+ * hyphen — "Pancakes, whole wheat, dry mix" and "Pancakes, whole-wheat, dry
+ * mix" — carry different NDB numbers and materially different nutrition
+ * (350 vs 344 kcal, 10.5 vs 12.8 g protein, fiber present vs absent). Text
+ * normalization made their concept keys identical and silently discarded one.
+ *
+ * Cross-source convergence is the intended behaviour and is unaffected: it is
+ * exactly the case where two DIFFERENT sources describe one food.
+ */
+export function disambiguateSameSource(
+  conceptKey: string,
+  sourceRecordId: string,
+): string {
+  return `${conceptKey}@src:${sourceRecordId}`;
+}
 
 /**
  * ADMINISTRATIVE SOURCE TEXT (CA-15).

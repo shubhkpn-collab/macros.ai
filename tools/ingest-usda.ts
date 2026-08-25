@@ -15,7 +15,7 @@ import {
   CATALOG_POLICY_VERSION, GENERIC_IDENTITY_VERSION, PREPARATION_CLASSIFIER_VERSION,
   categoryEligibility, classifyPreparation, conceptKeyFor, consumerDisplayName,
   eligibleForRecommendation, extractUsdaRecord, genericProductId, isPublishableState,
-  publishesToConsumerCatalog, aliasesFor, assessOverlap, preferredSource,
+  publishesToConsumerCatalog, aliasesFor, assessOverlap, disambiguateSameSource, preferredSource,
   ALIAS_POLICY_VERSION, USDA_NUTRIENT_MAP,
 } from '@macros/catalog-ingestion';
 
@@ -91,7 +91,13 @@ const seeds: Seed[] = [];
 const seenFdc = new Set<number>();
 const seenConcepts = new Set<string>();
 /** Which source first claimed each concept — used to measure convergence. */
-const conceptOrigin = new Map<string, { dataset: string; description: string }>();
+const conceptOrigin = new Map<string, { dataset: string; description: string; sourceRecordId: string }>();
+const sourcePriorityAudit = { foundationKept: 0, unexpectedPriority: [] as string[] };
+const sameSourceCollisions: {
+  conceptKey: string; dataset: string;
+  keptSourceRecordId: string; keptDescription: string;
+  disambiguatedSourceRecordId: string; disambiguatedDescription: string;
+}[] = [];
 const convergenceExamples: {
   productId: string; conceptKey: string;
   keptDataset: string; keptDescription: string;
@@ -141,16 +147,22 @@ for (const [dataset, path] of FILES) {
     // Internal identity from FOOD SEMANTICS. Two source records describing the
     // same food and preparation collapse to one concept rather than two
     // near-identical catalog entries.
-    const conceptKey = conceptKeyFor(e.description, prep.state);
-    const productId = genericProductId(conceptKey);
+    let conceptKey = conceptKeyFor(e.description, prep.state);
+    let productId = genericProductId(conceptKey);
     assertNoCollision(productId, conceptKey);
     if (seenConcepts.has(productId)) {
-      stats.duplicateConcept++;
       // THE CORE GATE, measured rather than assumed: when the SAME food concept
       // arrives from a DIFFERENT source, does it converge onto one identity?
       const first = conceptOrigin.get(productId);
       if (first !== undefined && first.dataset !== dataset) {
         stats.crossSourceConvergence++;
+        stats.duplicateConcept++;
+        // A4: source priority audited over EVERY convergence, not a sample.
+        const expected = preferredSource(first.dataset, dataset);
+        if (first.dataset === expected) sourcePriorityAudit.foundationKept++;
+        else sourcePriorityAudit.unexpectedPriority.push(
+          `${productId}: kept ${first.dataset} over ${dataset}`,
+        );
         convergenceExamples.push({
           productId,
           conceptKey,
@@ -159,11 +171,27 @@ for (const [dataset, path] of FILES) {
           droppedDataset: dataset,
           droppedDescription: e.description,
         });
+        // The lower-priority source's fact set is dropped WHOLE.
+        continue;
+      } else if (first !== undefined) {
+        // A3 FIX: a same-source key collision is NOT a duplicate. Both records
+        // are published under distinct identities and the collision is reported
+        // for curation rather than one record being silently discarded.
+        sameSourceCollisions.push({
+          conceptKey, dataset,
+          keptSourceRecordId: first.sourceRecordId,
+          keptDescription: first.description,
+          disambiguatedSourceRecordId: String(e.fdcId),
+          disambiguatedDescription: e.description,
+        });
+        // Fall THROUGH to normal publication under the disambiguated identity.
+        conceptKey = disambiguateSameSource(conceptKey, String(e.fdcId));
+        productId = genericProductId(conceptKey);
+        assertNoCollision(productId, conceptKey);
       }
-      continue;
     }
     seenConcepts.add(productId);
-    conceptOrigin.set(productId, { dataset, description: e.description });
+    conceptOrigin.set(productId, { dataset, description: e.description, sourceRecordId: String(e.fdcId) });
     const per100g: Seed['per100g'] = {};
     for (const [k, v] of Object.entries(map)) {
       if (v !== undefined) per100g[k] = { nutrientId: v.nutrientId, amount: v.amount, unit: v.unit };
@@ -382,6 +410,14 @@ const report = {
       count: stats.crossSourceConvergence,
       examples: convergenceExamples.slice(0, 25),
     },
+    /** A4: audited over EVERY convergence. unexpectedPriority must be empty. */
+    sourcePriorityAudit: {
+      convergencesAudited: stats.crossSourceConvergence,
+      preferredSourceKept: sourcePriorityAudit.foundationKept,
+      unexpectedPriority: sourcePriorityAudit.unexpectedPriority,
+    },
+    /** A3: every same-source collapse, in full, for audit. */
+    sameSourceCollisions,
   },
 };
 
@@ -397,6 +433,8 @@ if (MISSING_ARCHIVES.length > 0) console.log('MISSING ARCHIVES:', MISSING_ARCHIV
 console.log('source preparation:', JSON.stringify(stats.sourcePreparationCounts));
 console.log('published preparation:', JSON.stringify(publishedPreparationCounts()));
 console.log('cross-source: definiteSame', overlap.definiteSame, '| possibleDuplicate', overlap.possibleDuplicate, '| pairs compared', overlap.distinctPairsCompared, 'in', overlapMs, 'ms');
+console.log('source-priority audit: preferredKept', sourcePriorityAudit.foundationKept, '| unexpected', sourcePriorityAudit.unexpectedPriority.length);
+console.log('same-source key collisions (both published):', sameSourceCollisions.length);
 console.log('CROSS-SOURCE CONCEPT CONVERGENCE:', stats.crossSourceConvergence, '| same-source dupes', stats.duplicateConcept - stats.crossSourceConvergence);
 console.log('collapsed by source priority', droppedByPriority.size);
 console.log('excluded by category', stats.excludedCategory, '| duplicate concepts collapsed', stats.duplicateConcept);

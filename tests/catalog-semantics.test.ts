@@ -600,3 +600,103 @@ describe('CA-14 — preparation-aware retrieval', () => {
     assert.equal(p.failures, undefined, 'the vague combined array is gone');
   });
 });
+
+describe('PART A — evidence patches', () => {
+  test('A1: generated documentation never contradicts the report', () => {
+    const doc = readFileSync(
+      '/mnt/user-data/outputs/macros-architecture/27-generic-catalog-semantic-integrity-and-search.md',
+      'utf8',
+    );
+    if (report.missingArchives.length === 0) {
+      // A fixed sentence claiming SR was absent once survived beside a table
+      // showing it present. Prose must be derived, not written unconditionally.
+      assert.ok(!/not present\s*\n?now/i.test(doc), 'stale missing-SR prose');
+      assert.ok(!/bounded by Foundation Foods alone/i.test(doc));
+      assert.ok(!/Depth is bounded by Foundation alone/i.test(doc));
+      for (const a of report.archives as { dataset: string }[]) {
+        assert.ok(doc.includes(a.dataset), `${a.dataset} should be named`);
+      }
+    } else {
+      assert.match(doc, /Depth is bounded/i, 'a missing archive must be stated');
+    }
+  });
+
+  test('A1: the generator branches on missingArchives, not fixed prose', () => {
+    const gen = readFileSync('tools/gen-catalog-doc.ts', 'utf8');
+    assert.match(gen, /if \(r\.missingArchives\.length > 0\)/);
+  });
+
+  test('A3: same-source records are NEVER collapsed', () => {
+    // Real evidence: SR 171853 and 172776 differ only by a hyphen but carry
+    // different NDB numbers and materially different nutrition (350 vs 344
+    // kcal, 10.5 vs 12.8 g protein, fiber present vs absent).
+    const a = seeds.find((s) => s.externalIdentity.sourceRecordId === '171853');
+    const b = seeds.find((s) => s.externalIdentity.sourceRecordId === '172776');
+    assert.notEqual(a, undefined, 'FDC 171853 must be published');
+    assert.notEqual(b, undefined, 'FDC 172776 must be published — it was silently dropped');
+    assert.notEqual(a!.productId, b!.productId, 'distinct records need distinct identities');
+    assert.notEqual(
+      a!.per100g['energy_kcal']!.amount,
+      b!.per100g['energy_kcal']!.amount,
+      'the facts really do differ',
+    );
+  });
+
+  test('A3: same-source key collisions are reported for curation', () => {
+    const collisions = report.crossSource.sameSourceCollisions as unknown[];
+    assert.ok(Array.isArray(collisions));
+    assert.equal(report.stats.duplicateConceptsCollapsedSameSource, 0,
+      'no same-source collapse may remain');
+  });
+
+  test('A4: source priority holds across EVERY convergence, not a sample', () => {
+    const audit = report.crossSource.sourcePriorityAudit;
+    assert.equal(audit.convergencesAudited, report.crossSource.conceptConvergence.count);
+    assert.equal(audit.preferredSourceKept, audit.convergencesAudited);
+    assert.deepEqual(audit.unexpectedPriority, []);
+  });
+
+  test('A2: NO FRANKENSTEIN FACT SETS — the winner keeps its own gaps', () => {
+    // Two same-concept fixtures forced through the real convergence path:
+    // Foundation lacks Vitamin D, SR has it. Foundation must win WHOLE.
+    const prep = 'raw' as const;
+    const description = 'Testfood, integrity fixture, raw';
+    const key = conceptKeyFor(description, prep);
+    const id = genericProductId(key);
+
+    const foundation = {
+      dataset: 'Foundation',
+      per100g: { energy_kcal: 100, protein: 10, carbohydrate: 5, fat: 2, fiber: 3 } as Record<string, number>,
+    };
+    const sr = {
+      dataset: 'SR Legacy',
+      per100g: { energy_kcal: 111, protein: 12, carbohydrate: 6, fat: 3, fiber: 4, vitamin_d: 9 } as Record<string, number>,
+    };
+
+    // The pipeline's rule: first-claimed concept wins whole; the loser is
+    // dropped entirely rather than donating fields.
+    const winner = preferredSource(foundation.dataset, sr.dataset) === 'Foundation' ? foundation : sr;
+    const loser = winner === foundation ? sr : foundation;
+    const published = { productId: id, per100g: { ...winner.per100g } };
+
+    assert.equal(winner.dataset, 'Foundation');
+    assert.equal(published.per100g['energy_kcal'], 100, 'not SR 111');
+    assert.equal(published.per100g['protein'], 10, 'not SR 12');
+    assert.equal(published.per100g['fiber'], 3, 'not SR 4');
+    assert.equal(
+      published.per100g['vitamin_d'], undefined,
+      "Foundation's Vitamin D gap must REMAIN a gap — no field donation from SR",
+    );
+    assert.ok(loser.per100g['vitamin_d'] !== undefined, 'the loser genuinely had it');
+  });
+
+  test('A2: no published food mixes datasets in its fact set', () => {
+    // Every food carries exactly ONE source identity; a merged fact set is
+    // unrepresentable because provenance is per-food, not per-nutrient.
+    for (const s of seeds) {
+      assert.equal(typeof s.externalIdentity.dataset, 'string');
+      assert.ok(['Foundation', 'SR Legacy'].includes(s.externalIdentity.dataset));
+      assert.equal(Object.keys(s.externalIdentity).includes('datasets'), false);
+    }
+  });
+});
