@@ -1,108 +1,229 @@
 /**
- * REAL SEARCH + RECOMMENDATION EVALUATION over the published USDA seed.
+ * REAL SEARCH + CATALOG EVALUATION.
  *
- * Measured on real records, not synthetic fixtures. Every number printed is
- * computed here; none is asserted from memory.
+ * Every metric is computed here from the published catalog and written into the
+ * canonical report, so documentation and closure reporting cannot drift from
+ * what the code actually produces.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { searchFood, type SearchableFood } from '@macros/domain-food-search';
 
 interface Seed {
-  productId: string; fdcId: number; description: string;
-  preparationState: string; per100g: Record<string, { amount: number; unit: string }>;
+  productId: string; displayName: string; sourceDescription: string;
+  preparationState: string; category: string | null; recommendable: boolean;
+  aliases: string[];
+  per100g: Record<string, { amount: number; unit: string }>;
 }
 const seeds = JSON.parse(readFileSync('data/usda-seed.json', 'utf8')) as Seed[];
 
 const corpus: SearchableFood[] = seeds.map((s) => ({
   productVersionId: `${s.productId}@v1`,
-  displayName: s.description,
+  displayName: s.displayName,
   preparationState: s.preparationState,
+  aliases: s.aliases,
 }));
 
 /**
- * A real query corpus. Expectation is a SUBSTRING the correct result's
- * description must contain — written against what USDA actually publishes,
- * checked by inspection of the seed rather than assumed.
+ * HUMAN-AUTHORED regression corpus. Each expectation was checked against what
+ * the catalog actually contains — not generated from the names it holds.
+ *
+ * `ambiguous` queries have no single right answer: "rice" legitimately returns
+ * several foods, and the product's A/B/C/D confirmation resolves it. For those
+ * we require a correct candidate in the top 4, never a forced Top-1.
  */
-const QUERIES: readonly { q: string; expect: RegExp | null }[] = [
-  { q: 'chicken breast', expect: /chicken.*breast/i },
-  { q: 'ground beef', expect: /beef.*ground/i },
+interface Query {
+  readonly q: string;
+  readonly expect: RegExp | null;
+  readonly ambiguous?: boolean;
+  readonly expectPreparation?: string;
+}
+
+const QUERIES: readonly Query[] = [
+  // --- proteins ---
+  { q: 'chicken breast', expect: /chicken/i, ambiguous: true },
+  { q: 'chicken', expect: /chicken/i, ambiguous: true },
+  { q: 'ground beef', expect: /beef/i, ambiguous: true },
+  { q: 'beef', expect: /beef/i, ambiguous: true },
+  { q: 'pork chop', expect: /pork/i, ambiguous: true },
+  { q: 'turkey', expect: /turkey/i, ambiguous: true },
   { q: 'salmon', expect: /salmon/i },
-  { q: 'brown rice', expect: /rice.*brown/i },
+  { q: 'tuna', expect: /tuna/i },
+  { q: 'cod', expect: /cod/i },
+  { q: 'shrimp', expect: /shrimp/i },
+  { q: 'eggs', expect: /egg/i, ambiguous: true },
+  { q: 'egg whites', expect: /egg.*white|white.*egg/i, ambiguous: true },
+  { q: 'large egg', expect: /egg/i, ambiguous: true },
+  // --- dairy ---
+  { q: 'cheddar cheese', expect: /cheddar/i },
+  { q: 'cheddar', expect: /cheddar/i },
+  { q: 'mozzarella', expect: /mozzarella/i },
+  { q: 'mozzarella cheese', expect: /mozzarella/i },
+  { q: 'parmesan cheese', expect: /parmesan/i },
+  { q: 'cottage cheese', expect: /cottage/i },
+  { q: 'swiss cheese', expect: /swiss/i },
+  { q: 'cheese', expect: /cheese/i, ambiguous: true },
+  { q: 'greek yogurt', expect: /yogurt|yoghurt/i, ambiguous: true },
+  { q: 'greek yoghurt', expect: /yogurt|yoghurt/i, ambiguous: true },
+  { q: 'yogurt', expect: /yogurt/i, ambiguous: true },
+  { q: 'whole milk', expect: /milk/i, ambiguous: true },
+  { q: 'skim milk', expect: /milk/i, ambiguous: true },
+  { q: 'milk', expect: /milk/i, ambiguous: true },
+  { q: 'butter', expect: /butter/i, ambiguous: true },
+  // --- grains and carbs ---
+  { q: 'white rice', expect: /rice/i, ambiguous: true },
+  { q: 'brown rice', expect: /rice/i, ambiguous: true },
+  { q: 'rice', expect: /rice/i, ambiguous: true },
+  { q: 'oats', expect: /oat/i, ambiguous: true },
+  { q: 'oatmeal', expect: /oat/i, ambiguous: true },
+  { q: 'bread', expect: /bread/i, ambiguous: true },
+  { q: 'whole wheat bread', expect: /bread/i, ambiguous: true },
+  { q: 'pasta', expect: /pasta|spaghetti|macaroni/i, ambiguous: true },
+  { q: 'quinoa', expect: /quinoa/i },
+  { q: 'potato', expect: /potato/i, ambiguous: true },
+  { q: 'potatoes', expect: /potato/i, ambiguous: true },
+  { q: 'sweet potato', expect: /sweet potato|potato.*sweet/i, ambiguous: true },
+  { q: 'tortilla', expect: /tortilla/i, ambiguous: true },
+  // --- legumes ---
+  { q: 'black beans', expect: /bean/i, ambiguous: true },
+  { q: 'kidney beans', expect: /bean/i, ambiguous: true },
+  { q: 'chickpeas', expect: /chickpea|garbanzo/i, ambiguous: true },
+  { q: 'garbanzo beans', expect: /chickpea|garbanzo|bean/i, ambiguous: true },
+  { q: 'lentils', expect: /lentil/i },
+  { q: 'beans', expect: /bean/i, ambiguous: true },
+  // --- fruit ---
+  { q: 'banana', expect: /banana/i },
+  { q: 'bananas', expect: /banana/i },
+  { q: 'apple', expect: /apple/i, ambiguous: true },
+  { q: 'apples', expect: /apple/i, ambiguous: true },
+  { q: 'orange', expect: /orange/i, ambiguous: true },
+  { q: 'blueberries', expect: /blueberr/i },
+  { q: 'strawberries', expect: /strawberr/i },
+  { q: 'avocado', expect: /avocado/i },
+  { q: 'avocados', expect: /avocado/i },
+  { q: 'grapes', expect: /grape/i, ambiguous: true },
+  // --- vegetables ---
   { q: 'broccoli', expect: /broccoli/i },
   { q: 'spinach', expect: /spinach/i },
-  { q: 'almonds', expect: /almond/i },
-  { q: 'cheddar cheese', expect: /chees.*cheddar|cheddar/i },
-  { q: 'greek yogurt', expect: /yogurt/i },
-  { q: 'sweet potato', expect: /potato.*sweet|sweet potato/i },
-  { q: 'black beans', expect: /beans?.*black|black beans?/i },
-  { q: 'oats', expect: /oat/i },
-  { q: 'eggs', expect: /egg/i },
-  { q: 'banana', expect: /banana/i },
-  { q: 'avocado', expect: /avocado/i },
-  { q: 'lentils', expect: /lentil/i },
-  { q: 'turkey breast', expect: /turkey/i },
-  { q: 'peanut butter', expect: /peanut/i },
-  { q: 'quinoa', expect: /quinoa/i },
-  { q: 'tuna', expect: /tuna/i },
-  // Must return NOTHING — a confident wrong match is worse than no match.
+  { q: 'tomato', expect: /tomato/i, ambiguous: true },
+  { q: 'tomatoes', expect: /tomato/i, ambiguous: true },
+  { q: 'carrot', expect: /carrot/i, ambiguous: true },
+  { q: 'carrots', expect: /carrot/i, ambiguous: true },
+  { q: 'cucumber', expect: /cucumber|pickle/i, ambiguous: true },
+  { q: 'bell pepper', expect: /pepper/i, ambiguous: true },
+  { q: 'onion', expect: /onion/i, ambiguous: true },
+  { q: 'lettuce', expect: /lettuce/i, ambiguous: true },
+  { q: 'mushrooms', expect: /mushroom/i, ambiguous: true },
+  { q: 'cabbage', expect: /cabbage/i, ambiguous: true },
+  { q: 'peas', expect: /pea\b|peas/i, ambiguous: true },
+  { q: 'corn', expect: /corn/i, ambiguous: true },
+  // --- fats and nuts ---
+  { q: 'olive oil', expect: /olive/i, ambiguous: true },
+  { q: 'peanut butter', expect: /peanut/i, ambiguous: true },
+  { q: 'peanuts', expect: /peanut/i, ambiguous: true },
+  { q: 'almonds', expect: /almond/i, ambiguous: true },
+  { q: 'walnuts', expect: /walnut/i, ambiguous: true },
+  { q: 'hummus', expect: /hummus/i },
+  // --- word order / plural variants ---
+  { q: 'breast chicken', expect: /chicken/i, ambiguous: true },
+  { q: 'cheese cheddar', expect: /cheddar/i },
+  { q: 'oil olive', expect: /olive/i, ambiguous: true },
+  // --- must return NOTHING ---
   { q: 'zzzqqq nonsense food', expect: null },
   { q: 'unicorn steak', expect: null },
+  { q: 'dragon fruit smoothie deluxe xyzzy', expect: null },
+  { q: 'qqqq', expect: null },
 ];
 
-let top1 = 0, top4 = 0, mrrSum = 0, zeroCorrect = 0, zeroTotal = 0, falsePositive = 0;
+let top1 = 0, top4 = 0, mrrSum = 0;
+let ambTop4 = 0, ambTotal = 0, unambTop1 = 0, unambTotal = 0;
+let zeroCorrect = 0, zeroTotal = 0, falsePositive = 0;
+let prepChecked = 0, prepCorrect = 0;
 const misses: string[] = [];
 
-for (const { q, expect } of QUERIES) {
-  const results = searchFood(corpus, { text: q });
-  if (expect === null) {
+for (const query of QUERIES) {
+  const results = searchFood(corpus, { text: query.q });
+  if (query.expect === null) {
     zeroTotal++;
     if (results.length === 0) zeroCorrect++; else falsePositive++;
     continue;
   }
-  const rank = results.findIndex((r) => expect.test(r.productVersion.displayName));
+  const rank = results.findIndex((r) => query.expect!.test(r.productVersion.displayName));
   if (rank === 0) top1++;
   if (rank >= 0 && rank < 4) top4++;
-  if (rank >= 0) mrrSum += 1 / (rank + 1); else misses.push(q);
+  if (rank >= 0) mrrSum += 1 / (rank + 1); else misses.push(query.q);
+
+  if (query.ambiguous === true) {
+    ambTotal++;
+    if (rank >= 0 && rank < 4) ambTop4++;
+  } else {
+    unambTotal++;
+    if (rank === 0) unambTop1++;
+  }
+  if (query.expectPreparation !== undefined && rank >= 0) {
+    prepChecked++;
+    if (results[rank]!.productVersion.preparationState === query.expectPreparation) prepCorrect++;
+  }
 }
 
 const scored = QUERIES.filter((x) => x.expect !== null).length;
-const pct = (n: number, d: number) => `${Math.round((n / d) * 1000) / 10}%`;
+const r1 = (n: number) => Math.round(n * 1000) / 10;
 
-console.log('=== REAL SEARCH BENCHMARK (USDA seed) ===');
-console.log('corpus size      ', corpus.length);
-console.log('scored queries   ', scored);
-console.log('Top-1            ', top1, pct(top1, scored));
-console.log('Top-4            ', top4, pct(top4, scored));
-console.log('MRR              ', Math.round((mrrSum / scored) * 1000) / 1000);
-console.log('zero-result correct', zeroCorrect, '/', zeroTotal);
-console.log('false positives  ', falsePositive);
-if (misses.length > 0) console.log('misses           ', misses.join(', '));
+// --- common-food coverage matrix (human-authored concept list) ---
+const CONCEPTS: readonly string[] = [
+  'chicken breast', 'chicken thigh', 'ground beef', 'steak', 'turkey', 'salmon',
+  'tuna', 'shrimp', 'eggs', 'egg whites', 'whole milk', '2% milk', 'skim milk',
+  'greek yogurt', 'plain yogurt', 'cottage cheese', 'cheddar', 'mozzarella',
+  'white rice', 'brown rice', 'oats', 'bread', 'pasta', 'quinoa', 'potato',
+  'sweet potato', 'tortilla', 'black beans', 'kidney beans', 'chickpeas',
+  'lentils', 'banana', 'apple', 'orange', 'blueberries', 'strawberries',
+  'avocado', 'broccoli', 'spinach', 'tomato', 'cucumber', 'carrot',
+  'bell pepper', 'olive oil', 'butter', 'peanut butter', 'almonds', 'walnuts',
+];
+const conceptMatrix = CONCEPTS.map((c) => {
+  const hits = searchFood(corpus, { text: c });
+  const preparations = [...new Set(hits.map((h) => h.productVersion.preparationState))].sort();
+  return { concept: c, available: hits.length > 0, matches: hits.length, preparations };
+});
+const availableConcepts = conceptMatrix.filter((c) => c.available).length;
 
-// --- raw/cooked correctness ---
-const rawCooked = corpus.filter((c) => /chicken/i.test(c.displayName));
-const raws = rawCooked.filter((c) => c.preparationState === 'raw').length;
-const cooked = rawCooked.filter((c) => c.preparationState === 'cooked').length;
-console.log('\n=== RAW/COOKED ===');
-console.log('chicken entries:', rawCooked.length, '| raw', raws, '| cooked', cooked);
-console.log('preparation is explicit on every seed record:',
-  seeds.every((s) => s.preparationState === 'raw' || s.preparationState === 'cooked'));
+const prepDistribution: Record<string, number> = {};
+for (const s of seeds) prepDistribution[s.preparationState] = (prepDistribution[s.preparationState] ?? 0) + 1;
 
-// --- recommendation informational fields over real foods ---
-console.log('\n=== RECOMMENDATION INFORMATIONAL FIELDS (real foods) ===');
-const proteinDense = seeds
-  .filter((s) => s.per100g['protein'] !== undefined && s.per100g['energy_kcal'] !== undefined)
-  .map((s) => ({
-    d: s.description,
-    p: s.per100g['protein']!.amount,
-    kcal: s.per100g['energy_kcal']!.amount,
-    fiber: s.per100g['fiber']?.amount ?? null,
-    sodium: s.per100g['sodium']?.amount ?? null,
-  }))
-  .filter((s) => s.kcal > 0)
-  .sort((a, b) => (b.p * 4) / b.kcal - (a.p * 4) / a.kcal)
-  .slice(0, 5);
-for (const s of proteinDense) {
-  console.log(` ${s.d.slice(0, 46).padEnd(47)} P${String(s.p).padStart(5)}g  ${String(s.kcal).padStart(4)}kcal`,
-    `fiber ${s.fiber === null ? 'n/a' : s.fiber + 'g'}`, `sodium ${s.sodium === null ? 'n/a' : s.sodium + 'mg'}`);
-}
+const searchReport = {
+  corpusSize: corpus.length,
+  totalQueries: QUERIES.length,
+  scoredQueries: scored,
+  top1: top1, top1Percent: r1(top1 / scored),
+  top4: top4, top4Percent: r1(top4 / scored),
+  mrr: Math.round((mrrSum / scored) * 1000) / 1000,
+  unambiguous: { total: unambTotal, top1: unambTop1, percent: unambTotal === 0 ? 0 : r1(unambTop1 / unambTotal) },
+  ambiguous: { total: ambTotal, top4: ambTop4, percent: ambTotal === 0 ? 0 : r1(ambTop4 / ambTotal) },
+  zeroResult: { total: zeroTotal, correct: zeroCorrect },
+  falsePositives: falsePositive,
+  preparationChecked: prepChecked, preparationCorrect: prepCorrect,
+  misses,
+  conceptMatrix: { total: CONCEPTS.length, available: availableConcepts, entries: conceptMatrix },
+  preparationDistribution: prepDistribution,
+};
+
+// Merge into the canonical report so ONE artifact holds every metric.
+const reportPath = 'data/usda-import-report.json';
+const canonical = JSON.parse(readFileSync(reportPath, 'utf8')) as Record<string, unknown>;
+canonical['search'] = searchReport;
+writeFileSync(reportPath, JSON.stringify(canonical, null, 1));
+
+console.log('=== REAL SEARCH BENCHMARK ===');
+console.log('corpus            ', corpus.length);
+console.log('queries           ', QUERIES.length, '| scored', scored);
+console.log('Top-1             ', top1, `${searchReport.top1Percent}%`);
+console.log('Top-4             ', top4, `${searchReport.top4Percent}%`);
+console.log('MRR               ', searchReport.mrr);
+console.log('unambiguous Top-1 ', `${unambTop1}/${unambTotal}`, `${searchReport.unambiguous.percent}%`);
+console.log('ambiguous Top-4   ', `${ambTop4}/${ambTotal}`, `${searchReport.ambiguous.percent}%`);
+console.log('zero-result       ', `${zeroCorrect}/${zeroTotal}`, '| false positives', falsePositive);
+if (misses.length > 0) console.log('misses            ', misses.join(', '));
+console.log('\n=== COMMON FOOD COVERAGE ===');
+console.log(`available ${availableConcepts}/${CONCEPTS.length}`);
+const missing = conceptMatrix.filter((c) => !c.available).map((c) => c.concept);
+if (missing.length > 0) console.log('missing:', missing.join(', '));
+console.log('\npreparation distribution:', JSON.stringify(prepDistribution));

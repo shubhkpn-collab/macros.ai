@@ -153,6 +153,20 @@ version identity.
 | CA-9 | **Unresolved-preparation curation.** 4,490 records rejected for not stating raw/cooked. Many are usable with human curation. | Never guessed. | Catalog expansion |
 | CA-10 | **203 unmapped USDA nutrients** (fatty acids, amino acids, carotenoid fractions). Reported, never guessed. | Needs canonical registry entries first. | If product needs them |
 
+## From GENERIC CATALOG SEMANTIC INTEGRITY CLOSURE (2026-08-25)
+
+**CA-7 (aliases) RESOLVED** — curated consumer vocabulary shipped; Top-1 97.5%.
+**CA-9 (preparation curation) RESOLVED** — taxonomy extended to `as_sold`;
+unresolved fell from 4,459-equivalent to 5 of 395.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| CA-8 | **Catalog depth.** SR Legacy archive is absent this session, so depth is bounded by Foundation (307 published). | Needs the archive re-supplied. | Owner re-upload |
+| CA-11 | **Cross-source overlap resolution.** Assessment logic and source priority are implemented and tested, but no Foundation/SR pairs existed to resolve. | Requires both archives. | With CA-8 |
+| CA-12 | **Remaining search misses** ("tortilla", "whole wheat bread") are catalog gaps, not ranking failures. | Source does not contain them. | With CA-8 |
+| CA-13 | **Typo tolerance / embeddings.** Not added — the expanded benchmark shows no failure class lexical matching cannot handle. | Measurement first. | If a benchmark demands it |
+| RC-5 | **Recommendation quality on real foods** — 7 scenarios reviewed, all sensible (protein gap → lean fish, fat gap → cream/nuts). Not user-validated. | Needs real users. | Post-pilot |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**

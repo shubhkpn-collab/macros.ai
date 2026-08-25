@@ -4,7 +4,7 @@ import {
   CORE_NUTRIENTS, DEFAULT_VISIBLE_NUTRIENTS, MAX_VISIBLE_NUTRIENTS, NUTRIENTS,
   aggregateDailyNutrients, buildNutrientMap, convertAmount, defaultViewPreferences,
   hasNutrient, isNutrientId, normalizeUnit, nutrientDefinition, nutrientDetails,
-  nutrientValue, scaleNutrientMap, setVisibleNutrients, visibleFor,
+  nutrientValue, scaleNutrientMap, setVisibleNutrients, visibleFor, isMeasured,
   type NutrientMap, type RawNutrientReading,
 } from '@macros/domain-nutrients';
 import { fingerprintOf } from '@macros/domain-catalog';
@@ -202,7 +202,8 @@ describe('B14/B15 — details and target separation', () => {
 
   test('with NO target, an amount is shown and no percentage is manufactured', () => {
     const [fiber] = nutrientDetails(daily, ['fiber']);
-    assert.ok(approx(fiber!.knownAmount, 12, 1e-9));
+    assert.equal(fiber!.value.status, 'partial');
+    if (isMeasured(fiber!.value)) assert.ok(approx(fiber!.value.amount, 12, 1e-9));
     assert.equal(fiber!.target, undefined);
     assert.equal(fiber!.progressPercent, undefined, 'no invented percentage');
   });
@@ -215,11 +216,42 @@ describe('B14/B15 — details and target separation', () => {
     assert.equal(fiber!.progressPercent, 40);
   });
 
-  test('a nutrient with no data reports incomplete, not a confident zero', () => {
+  test('A3: an unreported nutrient is UNAVAILABLE, never a numeric zero', () => {
     const [vitD] = nutrientDetails(daily, ['vitamin_d']);
-    assert.equal(vitD!.complete, false);
+    assert.equal(vitD!.value.status, 'unavailable');
+    assert.equal('amount' in vitD!.value, false, 'there is no amount to misread as 0');
     assert.equal(vitD!.itemsWithData, 0);
     assert.equal(vitD!.target, undefined);
+  });
+
+  test('A3: a MEASURED zero is distinguishable from unreported', () => {
+    // Every food reported Vitamin D, and every one reported 0.
+    const measuredZero = aggregateDailyNutrients('2026-08-25', [
+      buildNutrientMap([reading('vitamin_d', 0, 'ug')]).map,
+      buildNutrientMap([reading('vitamin_d', 0, 'ug')]).map,
+    ]);
+    const [vitD] = nutrientDetails(measuredZero, ['vitamin_d']);
+    assert.equal(vitD!.value.status, 'known', 'measured, complete');
+    if (isMeasured(vitD!.value)) assert.equal(vitD!.value.amount, 0);
+    assert.equal(vitD!.itemsWithData, 2);
+  });
+
+  test('A3: partial coverage is its own status, not silently complete', () => {
+    const partial = aggregateDailyNutrients('2026-08-25', [
+      buildNutrientMap([reading('vitamin_d', 2, 'ug')]).map,
+      buildNutrientMap([reading('protein', 20, 'g')]).map,
+    ]);
+    const [vitD] = nutrientDetails(partial, ['vitamin_d']);
+    assert.equal(vitD!.value.status, 'partial');
+    assert.equal(vitD!.itemsWithData, 1);
+    assert.equal(vitD!.itemsTotal, 2);
+  });
+
+  test('A3: an unavailable nutrient never receives a progress percentage', () => {
+    const [vitD] = nutrientDetails(daily, ['vitamin_d'], {
+      targets: { vitamin_d: 20 }, policyVersion: 'explicit@1',
+    });
+    assert.equal(vitD!.progressPercent, undefined, 'no percentage without a value');
   });
 });
 

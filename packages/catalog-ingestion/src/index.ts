@@ -4,3 +4,7 @@ export * from './quality-report.js';
 export * from './fdc-adapter.js';
 export * from './synthetic-adapter.js';
 export * from './usda-fdc-adapter.js';
+export * from './preparation-classifier.js';
+export * from './catalog-policy.js';
+export * from './generic-identity.js';
+export * from './consumer-aliases.js';

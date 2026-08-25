@@ -7,33 +7,59 @@
  * the source never reported stays absent.
  */
 import { createHash } from 'node:crypto';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import {
   buildNutrientMap, type NutrientId,
 } from '@macros/domain-nutrients';
 import {
-  extractUsdaRecord, inferPreparationState, USDA_NUTRIENT_MAP,
+  CATALOG_POLICY_VERSION, GENERIC_IDENTITY_VERSION, PREPARATION_CLASSIFIER_VERSION,
+  categoryEligibility, classifyPreparation, conceptKeyFor, consumerDisplayName,
+  eligibleForRecommendation, extractUsdaRecord, genericProductId, isPublishableState,
+  publishesToConsumerCatalog, aliasesFor, ALIAS_POLICY_VERSION, USDA_NUTRIENT_MAP,
 } from '@macros/catalog-ingestion';
 
-const FILES = [
+/**
+ * Source archives, discovered rather than assumed.
+ *
+ * The owner supplies these; whichever are present are ingested, and the report
+ * records exactly which were used. A missing archive is reported honestly, not
+ * substituted with remembered data.
+ */
+const CANDIDATE_FILES = [
   ['Foundation', '/mnt/user-data/uploads/FoodData_Central_foundation_food_json_2026-04-30.json'],
   ['SR Legacy', '/mnt/user-data/uploads/FoodData_Central_sr_legacy_food_json_2018-04.json'],
 ] as const;
+const FILES = CANDIDATE_FILES.filter(([, p]) => existsSync(p));
+const MISSING_ARCHIVES = CANDIDATE_FILES.filter(([, p]) => !existsSync(p)).map(([d]) => d);
 
 interface Seed {
+  /** Internal identity, derived from food semantics — never from a source id. */
   readonly productId: string;
-  readonly fdcId: number;
-  readonly dataset: string;
-  readonly description: string;
-  readonly category: string | null;
+  readonly conceptKey: string;
+  /** Consumer-facing label. The original description is retained separately. */
+  readonly displayName: string;
+  readonly sourceDescription: string;
   readonly preparationState: string;
+  readonly preparationRule: string;
+  readonly category: string | null;
+  readonly categoryEligibility: string;
+  readonly recommendable: boolean;
+  readonly aliases: readonly string[];
   readonly per100g: Record<string, { nutrientId: string; amount: number; unit: string }>;
-  readonly publicationDate: string | null;
+  /** External source identity lives HERE, as provenance. */
+  readonly externalIdentity: {
+    readonly provider: string; readonly dataset: string;
+    readonly sourceRecordId: string; readonly release: string | null;
+    readonly archiveSha256: string;
+  };
 }
 
 const stats = {
   recordsRead: 0, nullRecords: 0, malformed: 0,
   missingCore: 0, unresolvedPrep: 0, accepted: 0,
+  excludedCategory: 0, duplicateConcept: 0,
+  preparationCounts: {} as Record<string, number>,
+  categoryCounts: {} as Record<string, number>,
   byDataset: {} as Record<string, { read: number; accepted: number }>,
   unmapped: new Map<number, number>(),
   issues: { unit_conflict: 0, duplicate_conflict: 0, invalid_amount: 0, unknown_nutrient: 0 },
@@ -42,6 +68,7 @@ const stats = {
 const CORE = ['energy_kcal', 'protein', 'carbohydrate', 'fat'] as const;
 const seeds: Seed[] = [];
 const seenFdc = new Set<number>();
+const seenConcepts = new Set<string>();
 const archiveHashes: Record<string, string> = {};
 
 for (const [dataset, path] of FILES) {
@@ -63,10 +90,14 @@ for (const [dataset, path] of FILES) {
     for (const id of e.unmappedUsdaIds) stats.unmapped.set(id, (stats.unmapped.get(id) ?? 0) + 1);
     for (const i of e.issues) stats.issues[i.kind]++;
 
-    const prep = inferPreparationState(e.description);
-    if (prep === 'unresolved') { stats.unresolvedPrep++; continue; }
+    const prep = classifyPreparation(e.description, e.category);
+    stats.preparationCounts[prep.state] = (stats.preparationCounts[prep.state] ?? 0) + 1;
+    if (!isPublishableState(prep.state)) { stats.unresolvedPrep++; continue; }
 
-    // Same FDC id twice across archives: keep the first (Foundation wins).
+    const eligibility = categoryEligibility(e.category);
+    stats.categoryCounts[e.category ?? '(none)'] = (stats.categoryCounts[e.category ?? '(none)'] ?? 0) + 1;
+    if (!publishesToConsumerCatalog(eligibility)) { stats.excludedCategory++; continue; }
+
     if (seenFdc.has(e.fdcId)) continue;
 
     const { map } = buildNutrientMap(e.readings);
@@ -78,20 +109,38 @@ for (const [dataset, path] of FILES) {
     // with no carbohydrate at all.
     if (!CORE.every((c) => map[c] !== undefined)) { stats.missingCore++; continue; }
     seenFdc.add(e.fdcId);
+
+    // Internal identity from FOOD SEMANTICS. Two source records describing the
+    // same food and preparation collapse to one concept rather than two
+    // near-identical catalog entries.
+    const conceptKey = conceptKeyFor(e.description, prep.state);
+    const productId = genericProductId(conceptKey);
+    if (seenConcepts.has(productId)) { stats.duplicateConcept++; continue; }
+    seenConcepts.add(productId);
     const per100g: Seed['per100g'] = {};
     for (const [k, v] of Object.entries(map)) {
       if (v !== undefined) per100g[k] = { nutrientId: v.nutrientId, amount: v.amount, unit: v.unit };
     }
 
     seeds.push({
-      productId: `usda-fdc-${e.fdcId}`,
-      fdcId: e.fdcId,
-      dataset,
-      description: e.description,
+      productId,
+      conceptKey,
+      displayName: consumerDisplayName(e.description),
+      sourceDescription: e.description,
+      aliases: aliasesFor(e.description),
+      preparationState: prep.state,
+      preparationRule: prep.rule,
       category: e.category,
-      preparationState: prep,
+      categoryEligibility: eligibility,
+      recommendable: eligibleForRecommendation(eligibility),
       per100g,
-      publicationDate: e.publicationDate,
+      externalIdentity: {
+        provider: 'usda_fdc',
+        dataset,
+        sourceRecordId: String(e.fdcId),
+        release: e.publicationDate,
+        archiveSha256: archiveHashes[dataset]!,
+      },
     });
     stats.accepted++;
     stats.byDataset[dataset]!.accepted++;
@@ -110,47 +159,16 @@ const PRIORITY = /\b(chicken|beef|pork|turkey|salmon|tuna|cod|shrimp|egg|milk|yo
  * so the seed is reproducible.
  */
 /**
- * STRATIFIED curation, round-robin across food terms.
+ * PUBLICATION.
  *
- * A plain alphabetical sort with a 500 cap silently truncated the seed at the
- * letter B — the catalog contained no chicken at all, and the search benchmark
- * scored 10% as a result. Taking a bounded slice PER TERM keeps every common
- * food represented, and ordering stays deterministic within each term.
+ * Every defensible consumer-relevant food is published. There is no numeric
+ * target and no stratified sampling: identity de-duplication and category
+ * policy already decide what belongs, and an artificial cap previously
+ * truncated the catalog alphabetically and hid whole food groups.
  */
-const TERMS = [
-  'chicken', 'beef', 'pork', 'turkey', 'salmon', 'tuna', 'cod', 'shrimp', 'egg',
-  'milk', 'yogurt', 'cheese', 'rice', 'oat', 'bread', 'pasta', 'potato', 'bean',
-  'lentil', 'chickpea', 'broccoli', 'spinach', 'carrot', 'tomato', 'apple',
-  'banana', 'orange', 'berry', 'almond', 'walnut', 'peanut', 'avocado', 'butter',
-  'oil', 'quinoa', 'corn', 'pea', 'onion', 'pepper', 'lettuce', 'cabbage',
-  'squash', 'mushroom',
-];
-const TARGET_SEED = 500;
-const buckets = new Map<string, Seed[]>();
-for (const term of TERMS) {
-  const re = new RegExp(`\\b${term}`, 'i');
-  buckets.set(term, seeds
-    .filter((s) => re.test(s.description))
-    .sort((a, b) => a.description.localeCompare(b.description) || a.fdcId - b.fdcId));
-}
-const curated: Seed[] = [];
-const taken = new Set<number>();
-let round = 0;
-while (curated.length < TARGET_SEED) {
-  let addedThisRound = 0;
-  for (const term of TERMS) {
-    if (curated.length >= TARGET_SEED) break;
-    const bucket = buckets.get(term)!;
-    const pick = bucket[round];
-    if (pick === undefined || taken.has(pick.fdcId)) continue;
-    taken.add(pick.fdcId);
-    curated.push(pick);
-    addedThisRound++;
-  }
-  if (addedThisRound === 0) break;
-  round++;
-}
-curated.sort((a, b) => a.description.localeCompare(b.description) || a.fdcId - b.fdcId);
+const curated = [...seeds].sort(
+  (a, b) => a.displayName.localeCompare(b.displayName) || a.productId.localeCompare(b.productId),
+);
 
 // --- micronutrient coverage over the PUBLISHED seed ---
 const REPORTED: NutrientId[] = [
@@ -172,16 +190,34 @@ const coverage = coverageOver(curated);
 // checked against the wider population rather than taken on trust.
 const coverageAllAccepted = coverageOver(seeds);
 
+/**
+ * THE CANONICAL MACHINE REPORT — single source of truth.
+ *
+ * Documentation and closure reporting derive their metrics from this file.
+ * Metric names are explicit: a mapping ROW is not a canonical NUTRIENT, and
+ * conflating them was how the reported mapping count drifted.
+ */
 const report = {
   adapterVersion: 'usda-fdc-adapter@1.0.0',
+  classifierVersion: PREPARATION_CLASSIFIER_VERSION,
+  identityVersion: GENERIC_IDENTITY_VERSION,
+  catalogPolicyVersion: CATALOG_POLICY_VERSION,
+  aliasPolicyVersion: ALIAS_POLICY_VERSION,
   archives: FILES.map(([d, p]) => ({ dataset: d, path: p, sha256: archiveHashes[d] })),
-  mappedNutrients: USDA_NUTRIENT_MAP.length,
+  missingArchives: MISSING_ARCHIVES,
+  sourceMappingRows: USDA_NUTRIENT_MAP.length,
+  canonicalNutrientsMapped: new Set(USDA_NUTRIENT_MAP.map((m) => m.canonical)).size,
   stats: {
     recordsRead: stats.recordsRead,
     nullRecords: stats.nullRecords,
     malformed: stats.malformed,
     rejectedMissingCore: stats.missingCore,
     rejectedUnresolvedPreparation: stats.unresolvedPrep,
+    rejectedExcludedCategory: stats.excludedCategory,
+    duplicateConceptsCollapsed: stats.duplicateConcept,
+    preparationCounts: stats.preparationCounts,
+    categoryCounts: stats.categoryCounts,
+    recommendableCount: curated.filter((s2) => s2.recommendable).length,
     acceptedCandidates: stats.accepted,
     publishedSeed: curated.length,
     byDataset: stats.byDataset,
@@ -202,6 +238,10 @@ console.log('records read      ', stats.recordsRead, '| null', stats.nullRecords
 console.log('rejected: missing core', stats.missingCore, '| unresolved prep', stats.unresolvedPrep);
 console.log('accepted candidates', stats.accepted, '| PUBLISHED SEED', curated.length);
 console.log('by dataset:', JSON.stringify(stats.byDataset));
+if (MISSING_ARCHIVES.length > 0) console.log('MISSING ARCHIVES:', MISSING_ARCHIVES.join(', '));
+console.log('preparation:', JSON.stringify(stats.preparationCounts));
+console.log('excluded by category', stats.excludedCategory, '| duplicate concepts collapsed', stats.duplicateConcept);
+console.log('recommendable', curated.filter((s2) => s2.recommendable).length, 'of', curated.length);
 console.log('nutrient issues:', JSON.stringify(stats.issues));
 console.log('distinct unmapped USDA ids:', stats.unmapped.size);
 console.log('\n=== MICRONUTRIENT COVERAGE ===');

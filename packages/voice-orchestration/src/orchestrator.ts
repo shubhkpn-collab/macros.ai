@@ -534,11 +534,12 @@ export class VoiceOrchestrator {
     const total = daily.totals[nutrientId as keyof typeof daily.totals];
 
     if (total === undefined) {
-      // No food today reported it. That is NOT zero.
+      // No food today reported it. Saying "zero" here would state a fact the
+      // data does not support.
       return {
         kind: 'informational',
-        speech: "I don't have data for that from today's foods.",
-        data: { nutrientId, coverage: 'none' },
+        speech: `That data isn't available for the foods you've logged.`,
+        data: { nutrientId, coverage: 'unavailable' },
       };
     }
 

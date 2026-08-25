@@ -1,0 +1,127 @@
+/**
+ * PREPARATION CLASSIFIER.
+ *
+ * Classifies the state of the FOOD BEING WEIGHED — not the processing history
+ * of its ingredients. Cheddar is not "raw milk"; bread is not "cooked flour".
+ *
+ * Versioned because classification materially affects catalog identity: if the
+ * rules change and a food's factual state moves raw → cooked, that is a real
+ * catalog change and must be traceable to the classifier that produced it.
+ */
+export const PREPARATION_CLASSIFIER_VERSION = 'preparation-classifier@2.1.0';
+
+/** Matches the existing `PreparationState` contract — no parallel field. */
+export type ClassifiedPreparation = 'raw' | 'cooked' | 'as_sold' | 'prepared' | 'unresolved';
+
+export interface PreparationClassification {
+  readonly state: ClassifiedPreparation;
+  readonly classifierVersion: string;
+  /** Why this state was chosen — auditable, not a black box. */
+  readonly rule: string;
+}
+
+/**
+ * Terms describing a FINAL cooked state.
+ *
+ * "microwave" and "toasted" are included: USDA writes "cooked, microwave" and
+ * "toasted" as terminal preparations, and omitting them was part of why
+ * cooked apples published as raw.
+ */
+const COOKED_TERMS =
+  /\b(cooked|boiled|roasted|grilled|baked|braised|steamed|broiled|fried|stewed|microwaved?|toasted|poached|simmered|blanched|sauteed|sautéed|barbecued|smoked)\b/i;
+
+const RAW_TERMS = /\braw\b/i;
+
+/**
+ * Foods sold ready to eat with no further preparation by the user. These are
+ * weighed exactly as purchased, so forcing them into raw/cooked would state
+ * something false about what is on the scale.
+ */
+const READY_TO_EAT =
+  /\b(cheese|yogurt|yoghurt|hummus|butter|margarine|oil|juice|milk|cream|pickles?|mustard|ketchup|mayonnaise|jam|jelly|honey|syrup|sauce|dressing|vinegar|bread|tortilla|cracker|cereal|granola|chips?|cookie|candy|chocolate|frankfurter|sausage|deli|luncheon meat|nuts?|peanut butter|almond butter|dried|powder|flour|beverage|soda|water|infant formula)\b/i;
+
+/** Wording that states the food was NOT cooked, without meaning "raw". */
+const EXPLICIT_UNHEATED = /\b(unheated|uncooked|not heated)\b/i;
+
+/**
+ * Genuinely ambiguous constructions: the description offers alternatives rather
+ * than stating one final state. These go to curation rather than a guess.
+ */
+const AMBIGUOUS_ALTERNATIVE = /\b(raw or cooked|cooked or raw|fresh or frozen|or raw|or cooked)\b/i;
+
+/**
+ * Classify a USDA description.
+ *
+ * PRECEDENCE IS BY FINAL STATE, not by which word appears first. USDA writes
+ * "Apples, raw, without skin, cooked, boiled" — the leading "raw" describes the
+ * INPUT and the trailing "cooked, boiled" is the final state. Checking `raw`
+ * first published cooked apples as raw, with the wrong nutrition attached.
+ */
+/**
+ * Categories of whole/unprocessed foods. A record in one of these with no
+ * preparation wording describes the food AS SOLD — fresh spinach, dry lentils,
+ * shelled nuts. `as_sold` states exactly what is on the scale without claiming
+ * it was cooked, and without the false precision of calling it "raw".
+ */
+const WHOLE_FOOD_CATEGORIES = /\b(vegetable|fruit|legume|nut|seed|cereal grain|pasta|spice|herb|dairy|egg|poultry|beef|pork|lamb|finfish|shellfish|sausage|luncheon|baked|snack|sweet|beverage|fats and oils|soup|sauce)\b/i;
+
+export function classifyPreparation(
+  description: string,
+  category?: string | null,
+): PreparationClassification {
+  const d = description.toLowerCase();
+  const v = PREPARATION_CLASSIFIER_VERSION;
+
+  // Explicit alternatives are never resolved by picking one.
+  if (AMBIGUOUS_ALTERNATIVE.test(d)) {
+    return { state: 'unresolved', classifierVersion: v, rule: 'ambiguous_alternative' };
+  }
+
+  const hasRaw = RAW_TERMS.test(d);
+  const hasCooked = COOKED_TERMS.test(d);
+
+  if (hasRaw && hasCooked) {
+    // Both present: the LAST preparation term states the final state.
+    const lastRaw = lastIndexOfMatch(d, RAW_TERMS);
+    const lastCooked = lastIndexOfMatch(d, COOKED_TERMS);
+    return lastCooked > lastRaw
+      ? { state: 'cooked', classifierVersion: v, rule: 'mixed_final_state_cooked' }
+      : { state: 'raw', classifierVersion: v, rule: 'mixed_final_state_raw' };
+  }
+
+  if (hasCooked) return { state: 'cooked', classifierVersion: v, rule: 'cooked_term' };
+  if (hasRaw) return { state: 'raw', classifierVersion: v, rule: 'raw_term' };
+
+  if (EXPLICIT_UNHEATED.test(d)) {
+    return { state: 'as_sold', classifierVersion: v, rule: 'explicitly_unheated' };
+  }
+
+  // No preparation wording at all. A ready-to-eat food is weighed as sold;
+  // anything else is genuinely unknown and goes to curation.
+  if (READY_TO_EAT.test(d)) {
+    return { state: 'as_sold', classifierVersion: v, rule: 'ready_to_eat_term' };
+  }
+  if (/\b(dry|dried|frozen|canned|fresh)\b/.test(d)) {
+    return { state: 'as_sold', classifierVersion: v, rule: 'as_sold_form_term' };
+  }
+  // Category evidence from the source, not a guess about the food itself.
+  if (category !== undefined && category !== null && WHOLE_FOOD_CATEGORIES.test(category)) {
+    return { state: 'as_sold', classifierVersion: v, rule: 'whole_food_category_no_preparation' };
+  }
+
+  return { state: 'unresolved', classifierVersion: v, rule: 'no_preparation_signal' };
+}
+
+function lastIndexOfMatch(text: string, pattern: RegExp): number {
+  const global = new RegExp(pattern.source, 'gi');
+  let last = -1;
+  for (const m of text.matchAll(global)) last = m.index ?? last;
+  return last;
+}
+
+/** States eligible for consumer publication. `unresolved` never publishes. */
+export const PUBLISHABLE_STATES: readonly ClassifiedPreparation[] =
+  ['raw', 'cooked', 'as_sold', 'prepared'];
+
+export const isPublishableState = (s: ClassifiedPreparation): boolean =>
+  PUBLISHABLE_STATES.includes(s);
