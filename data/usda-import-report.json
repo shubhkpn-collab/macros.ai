@@ -515,7 +515,6 @@
   "definiteSame": 0,
   "possibleDuplicate": 170,
   "pairsCompared": 10750,
-  "overlapMs": 83,
   "pairs": [
    {
     "verdict": "possible_duplicate",

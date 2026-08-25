@@ -397,7 +397,9 @@ const report = {
     definiteSame: overlap.definiteSame,
     possibleDuplicate: overlap.possibleDuplicate,
     pairsCompared: overlap.distinctPairsCompared,
-    overlapMs,
+    // NOTE: overlapMs is deliberately NOT stored here. A wall-clock measurement
+    // inside a deterministic artifact makes byte-identical re-import
+    // impossible. Timings are printed for development instead.
     // Steward queue: possible duplicates are NEVER auto-merged.
     pairs: overlap.pairs.slice(0, 200),
     /**
@@ -432,6 +434,7 @@ console.log('by dataset:', JSON.stringify(stats.byDataset));
 if (MISSING_ARCHIVES.length > 0) console.log('MISSING ARCHIVES:', MISSING_ARCHIVES.join(', '));
 console.log('source preparation:', JSON.stringify(stats.sourcePreparationCounts));
 console.log('published preparation:', JSON.stringify(publishedPreparationCounts()));
+console.log('overlap assessment took', overlapMs, 'ms (operational timing, not in the artifact)');
 console.log('cross-source: definiteSame', overlap.definiteSame, '| possibleDuplicate', overlap.possibleDuplicate, '| pairs compared', overlap.distinctPairsCompared, 'in', overlapMs, 'ms');
 console.log('source-priority audit: preferredKept', sourcePriorityAudit.foundationKept, '| unexpected', sourcePriorityAudit.unexpectedPriority.length);
 console.log('same-source key collisions (both published):', sameSourceCollisions.length);
