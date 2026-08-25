@@ -1,0 +1,463 @@
+{
+ "adapterVersion": "usda-fdc-adapter@1.0.0",
+ "archives": [
+  {
+   "dataset": "Foundation",
+   "path": "/mnt/user-data/uploads/FoodData_Central_foundation_food_json_2026-04-30.json",
+   "sha256": "27d1fe3fd89edfbe528ed915da5619320e1d004d4594603a1b19bdb1511590cc"
+  },
+  {
+   "dataset": "SR Legacy",
+   "path": "/mnt/user-data/uploads/FoodData_Central_sr_legacy_food_json_2018-04.json",
+   "sha256": "70d4235ae3a2bdf48a7b9eaa1286a83fa67b6f3270436c9ce8b008213f500129"
+  }
+ ],
+ "mappedNutrients": 35,
+ "stats": {
+  "recordsRead": 8188,
+  "nullRecords": 32,
+  "malformed": 0,
+  "rejectedMissingCore": 19,
+  "rejectedUnresolvedPreparation": 4490,
+  "acceptedCandidates": 3647,
+  "publishedSeed": 500,
+  "byDataset": {
+   "Foundation": {
+    "read": 395,
+    "accepted": 157
+   },
+   "SR Legacy": {
+    "read": 7793,
+    "accepted": 3490
+   }
+  },
+  "nutrientIssues": {
+   "unit_conflict": 0,
+   "duplicate_conflict": 18,
+   "invalid_amount": 10,
+   "unknown_nutrient": 0
+  }
+ },
+ "unmappedUsdaNutrients": [
+  {
+   "usdaId": 1292,
+   "occurrences": 7382
+  },
+  {
+   "usdaId": 1293,
+   "occurrences": 7369
+  },
+  {
+   "usdaId": 1265,
+   "occurrences": 7086
+  },
+  {
+   "usdaId": 1266,
+   "occurrences": 7076
+  },
+  {
+   "usdaId": 1269,
+   "occurrences": 7040
+  },
+  {
+   "usdaId": 1268,
+   "occurrences": 7018
+  },
+  {
+   "usdaId": 1270,
+   "occurrences": 6943
+  },
+  {
+   "usdaId": 1264,
+   "occurrences": 6876
+  },
+  {
+   "usdaId": 1275,
+   "occurrences": 6782
+  },
+  {
+   "usdaId": 1263,
+   "occurrences": 6528
+  },
+  {
+   "usdaId": 1186,
+   "occurrences": 6500
+  },
+  {
+   "usdaId": 1271,
+   "occurrences": 6362
+  },
+  {
+   "usdaId": 1262,
+   "occurrences": 6333
+  },
+  {
+   "usdaId": 1277,
+   "occurrences": 6332
+  },
+  {
+   "usdaId": 1261,
+   "occurrences": 5977
+  },
+  {
+   "usdaId": 1278,
+   "occurrences": 5862
+  },
+  {
+   "usdaId": 1272,
+   "occurrences": 5834
+  },
+  {
+   "usdaId": 1280,
+   "occurrences": 5817
+  },
+  {
+   "usdaId": 1260,
+   "occurrences": 5787
+  },
+  {
+   "usdaId": 1279,
+   "occurrences": 5781
+  }
+ ],
+ "coverage": [
+  {
+   "nutrientId": "fiber",
+   "known": 457,
+   "total": 500,
+   "percent": 91.4
+  },
+  {
+   "nutrientId": "total_sugars",
+   "known": 378,
+   "total": 500,
+   "percent": 75.6
+  },
+  {
+   "nutrientId": "added_sugars",
+   "known": 0,
+   "total": 500,
+   "percent": 0
+  },
+  {
+   "nutrientId": "saturated_fat",
+   "known": 432,
+   "total": 500,
+   "percent": 86.4
+  },
+  {
+   "nutrientId": "cholesterol",
+   "known": 435,
+   "total": 500,
+   "percent": 87
+  },
+  {
+   "nutrientId": "sodium",
+   "known": 497,
+   "total": 500,
+   "percent": 99.4
+  },
+  {
+   "nutrientId": "potassium",
+   "known": 482,
+   "total": 500,
+   "percent": 96.4
+  },
+  {
+   "nutrientId": "calcium",
+   "known": 498,
+   "total": 500,
+   "percent": 99.6
+  },
+  {
+   "nutrientId": "iron",
+   "known": 498,
+   "total": 500,
+   "percent": 99.6
+  },
+  {
+   "nutrientId": "magnesium",
+   "known": 481,
+   "total": 500,
+   "percent": 96.2
+  },
+  {
+   "nutrientId": "phosphorus",
+   "known": 481,
+   "total": 500,
+   "percent": 96.2
+  },
+  {
+   "nutrientId": "zinc",
+   "known": 480,
+   "total": 500,
+   "percent": 96
+  },
+  {
+   "nutrientId": "selenium",
+   "known": 424,
+   "total": 500,
+   "percent": 84.8
+  },
+  {
+   "nutrientId": "copper",
+   "known": 479,
+   "total": 500,
+   "percent": 95.8
+  },
+  {
+   "nutrientId": "manganese",
+   "known": 466,
+   "total": 500,
+   "percent": 93.2
+  },
+  {
+   "nutrientId": "vitamin_a",
+   "known": 422,
+   "total": 500,
+   "percent": 84.4
+  },
+  {
+   "nutrientId": "vitamin_c",
+   "known": 447,
+   "total": 500,
+   "percent": 89.4
+  },
+  {
+   "nutrientId": "vitamin_d",
+   "known": 344,
+   "total": 500,
+   "percent": 68.8
+  },
+  {
+   "nutrientId": "vitamin_e",
+   "known": 341,
+   "total": 500,
+   "percent": 68.2
+  },
+  {
+   "nutrientId": "vitamin_k",
+   "known": 339,
+   "total": 500,
+   "percent": 67.8
+  },
+  {
+   "nutrientId": "thiamin",
+   "known": 459,
+   "total": 500,
+   "percent": 91.8
+  },
+  {
+   "nutrientId": "riboflavin",
+   "known": 447,
+   "total": 500,
+   "percent": 89.4
+  },
+  {
+   "nutrientId": "niacin",
+   "known": 459,
+   "total": 500,
+   "percent": 91.8
+  },
+  {
+   "nutrientId": "pantothenic_acid",
+   "known": 415,
+   "total": 500,
+   "percent": 83
+  },
+  {
+   "nutrientId": "vitamin_b6",
+   "known": 461,
+   "total": 500,
+   "percent": 92.2
+  },
+  {
+   "nutrientId": "folate",
+   "known": 433,
+   "total": 500,
+   "percent": 86.6
+  },
+  {
+   "nutrientId": "vitamin_b12",
+   "known": 409,
+   "total": 500,
+   "percent": 81.8
+  },
+  {
+   "nutrientId": "choline",
+   "known": 290,
+   "total": 500,
+   "percent": 58
+  }
+ ],
+ "coverageAllAccepted": [
+  {
+   "nutrientId": "fiber",
+   "known": 3324,
+   "total": 3647,
+   "percent": 91.1
+  },
+  {
+   "nutrientId": "total_sugars",
+   "known": 2598,
+   "total": 3647,
+   "percent": 71.2
+  },
+  {
+   "nutrientId": "added_sugars",
+   "known": 0,
+   "total": 3647,
+   "percent": 0
+  },
+  {
+   "nutrientId": "saturated_fat",
+   "known": 3390,
+   "total": 3647,
+   "percent": 93
+  },
+  {
+   "nutrientId": "cholesterol",
+   "known": 3440,
+   "total": 3647,
+   "percent": 94.3
+  },
+  {
+   "nutrientId": "sodium",
+   "known": 3622,
+   "total": 3647,
+   "percent": 99.3
+  },
+  {
+   "nutrientId": "potassium",
+   "known": 3578,
+   "total": 3647,
+   "percent": 98.1
+  },
+  {
+   "nutrientId": "calcium",
+   "known": 3637,
+   "total": 3647,
+   "percent": 99.7
+  },
+  {
+   "nutrientId": "iron",
+   "known": 3638,
+   "total": 3647,
+   "percent": 99.8
+  },
+  {
+   "nutrientId": "magnesium",
+   "known": 3562,
+   "total": 3647,
+   "percent": 97.7
+  },
+  {
+   "nutrientId": "phosphorus",
+   "known": 3584,
+   "total": 3647,
+   "percent": 98.3
+  },
+  {
+   "nutrientId": "zinc",
+   "known": 3548,
+   "total": 3647,
+   "percent": 97.3
+  },
+  {
+   "nutrientId": "selenium",
+   "known": 3358,
+   "total": 3647,
+   "percent": 92.1
+  },
+  {
+   "nutrientId": "copper",
+   "known": 3546,
+   "total": 3647,
+   "percent": 97.2
+  },
+  {
+   "nutrientId": "manganese",
+   "known": 3391,
+   "total": 3647,
+   "percent": 93
+  },
+  {
+   "nutrientId": "vitamin_a",
+   "known": 3281,
+   "total": 3647,
+   "percent": 90
+  },
+  {
+   "nutrientId": "vitamin_c",
+   "known": 3413,
+   "total": 3647,
+   "percent": 93.6
+  },
+  {
+   "nutrientId": "vitamin_d",
+   "known": 2315,
+   "total": 3647,
+   "percent": 63.5
+  },
+  {
+   "nutrientId": "vitamin_e",
+   "known": 2473,
+   "total": 3647,
+   "percent": 67.8
+  },
+  {
+   "nutrientId": "vitamin_k",
+   "known": 2168,
+   "total": 3647,
+   "percent": 59.4
+  },
+  {
+   "nutrientId": "thiamin",
+   "known": 3484,
+   "total": 3647,
+   "percent": 95.5
+  },
+  {
+   "nutrientId": "riboflavin",
+   "known": 3464,
+   "total": 3647,
+   "percent": 95
+  },
+  {
+   "nutrientId": "niacin",
+   "known": 3490,
+   "total": 3647,
+   "percent": 95.7
+  },
+  {
+   "nutrientId": "pantothenic_acid",
+   "known": 3184,
+   "total": 3647,
+   "percent": 87.3
+  },
+  {
+   "nutrientId": "vitamin_b6",
+   "known": 3457,
+   "total": 3647,
+   "percent": 94.8
+  },
+  {
+   "nutrientId": "folate",
+   "known": 3124,
+   "total": 3647,
+   "percent": 85.7
+  },
+  {
+   "nutrientId": "vitamin_b12",
+   "known": 3352,
+   "total": 3647,
+   "percent": 91.9
+  },
+  {
+   "nutrientId": "choline",
+   "known": 2004,
+   "total": 3647,
+   "percent": 54.9
+  }
+ ]
+}

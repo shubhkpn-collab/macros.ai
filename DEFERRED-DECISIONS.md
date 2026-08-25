@@ -140,6 +140,19 @@ version identity.
 | RC-5 | **Real-catalog ranking quality.** Scoring is validated for correctness and determinism, not for real-world usefulness — that needs hundreds of real foods. | 0 real records ingested. | After catalog population |
 | RC-6 | **AI phrasing of rationale codes.** Codes are deterministic; phrasing is deterministic too. Optional AI phrasing must inject trusted numbers, never regenerate them. | Not required. | Post-provider |
 
+## From NUTRIENT TRACKING + REAL USDA CLOSURE (2026-08-25)
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| NU-1 | **Reviewed micronutrient target policies.** Tracking and targets are separate concerns; no default vitamin/mineral targets exist and none are invented. | Requires dietitian review. | Target policy milestone |
+| NU-2 | **Micronutrient-aware recommendations.** Ranking stays goal-aware on energy and the macro four; micronutrients are informational only, with no hidden weights. | Needs an explicit reviewed policy. | Post target policy |
+| NU-3 | **Nutrient insights.** Contracts allow arithmetic statements ("averaged 18 g fiber over 7 days"); no interpretation, and no deficiency claims. | Medical interpretation is out of scope. | Insights milestone |
+| NU-4 | **IU→µg conversion.** Refused because the factor is substance-specific. Would need per-substance, per-source rules. | Not defensible generically. | If a source forces it |
+| CA-7 | **Search aliases for real vocabulary.** "cheddar cheese" and "greek yogurt" miss because USDA writes "Cheese, cheddar". | Alias curation is its own pass. | Catalog expansion |
+| CA-8 | **Seed expansion beyond 500.** 3,647 defensible candidates exist; publishing more needs category curation, not more source data. | Quality over count. | Catalog expansion |
+| CA-9 | **Unresolved-preparation curation.** 4,490 records rejected for not stating raw/cooked. Many are usable with human curation. | Never guessed. | Catalog expansion |
+| CA-10 | **203 unmapped USDA nutrients** (fatty acids, amino acids, carotenoid fractions). Reported, never guessed. | Needs canonical registry entries first. | If product needs them |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
