@@ -36,3 +36,9 @@ Thumbs.db
 
 # NOTE: db/migrations, data/golden, docs and all source are TRACKED on purpose.
 # They are part of the verified state, not build artifacts.
+
+# Owner-supplied USDA source archives and the large derived branded catalog.
+# The catalog is 428 MB of public product data, deterministically regenerable
+# from the archive by tools/ingest-branded.py — the checksum manifest and the
+# machine report are committed instead.
+data/branded-catalog.json

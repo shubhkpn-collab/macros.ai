@@ -201,6 +201,23 @@ concepts covered.
 | CA-13 | Typo/fuzzy matching — still no demonstrated need at 98.8% Top-1. | Measurement first. | If a benchmark demands it |
 | RC-5 | Recommendation quality — engineering evaluation only. | Needs real users. | Post-pilot |
 
+## From BRANDED CATALOG CLOSURE (2026-08-25)
+
+**B-1 RESOLVED** — real USDA Branded adapter populated 243,004 products.
+**B-3 RESOLVED** — GTIN lifecycle validated on real duplicate groups and 82 real
+identifier conflicts, with barcode lookup 500/500 exact.
+**B-6 RESOLVED** — real branded search baseline established.
+**B-2 REMAINS DEFERRED** — 31,508 volume-only servings still lack a defensible
+gram basis; no density conversion was invented.
+**B-4 REMAINS PENDING** — no package images; nothing scraped.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| BR-1 | **Full-release ingestion.** A 250,000-record window was processed at ~1,600 rec/s; the full release is larger. | Bounded by run time, not by design — the streaming path is unchanged. | Full import run |
+| BR-2 | **82 identifier conflicts** quarantined for curation. | Needs human adjudication. | Curation tooling |
+| BR-3 | **Retailer brandOwner ambiguity** — bare "Wal-Mart" matches thousands of products. | Needs brand-vs-retailer modelling. | Branded search polish |
+| BR-4 | **labelNutrients per-serving facts** captured in source but not yet surfaced as label facts on the card. | Card work, not ingestion. | Branded UX |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
