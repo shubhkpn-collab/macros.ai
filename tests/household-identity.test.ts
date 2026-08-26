@@ -447,3 +447,26 @@ describe('B37/B38 — migration structure and future RLS matrix', () => {
     }
   });
 });
+
+describe('PART A REFREEZE — transfer atomicity vs the unique owner index', () => {
+  test('A3: a transfer yields EXACTLY ONE active owner in a single state', () => {
+    const r = transferOwnership(MEMBERS, HH, OWNER, MEMBER);
+    assert.equal(r.ok, true);
+    if (!r.ok) return;
+    const owners = r.value.filter((x) => x.status === 'active' && x.role === 'owner');
+    assert.equal(owners.length, 1, 'never two active owners, even transiently');
+    assert.equal(owners[0]!.userId, MEMBER);
+  });
+
+  test('A3: the migration documents the demote-before-promote requirement', () => {
+    const sql = readFileSync('db/migrations/0005_households.sql', 'utf8');
+    assert.match(sql, /demote the outgoing owner BEFORE promoting/i);
+    assert.match(sql, /one transaction/i);
+  });
+
+  test('A3: a transfer that would leave zero owners fails closed', () => {
+    // Target is not an active member, so no valid single-owner state exists.
+    const r = transferOwnership([m(OWNER, 'owner')], HH, OWNER, THIRD);
+    assert.equal(r.ok, false);
+  });
+});

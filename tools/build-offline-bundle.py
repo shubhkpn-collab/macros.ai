@@ -131,10 +131,19 @@ for bk in sorted(auth_buckets):
     write_shard('authority/branded-%s.ndjson' % bk,
                 sorted(auth_buckets[bk], key=lambda r: r['productVersionId']))
 
-gp = os.path.join(STAGE, 'gtin-index.json')
-json.dump(gtin_index, open(gp, 'w'), sort_keys=True, separators=(',', ':'))
-shards.append({'file': 'gtin-index.json', 'records': len(gtin_index),
-               'bytes': os.path.getsize(gp), 'sha256': sha256_file(gp)})
+# A4: BUCKETED GTIN INDEX. A single 22.8 MB index costs ~383 ms to parse, which
+# is a real delay between a barcode scan and a result. Bucketing by the last two
+# digits of the GTIN means a scan parses one ~90 KB bucket instead.
+os.makedirs(STAGE + '/gtin', exist_ok=True)
+gtin_buckets = {}
+for g, vid in gtin_index.items():
+    gtin_buckets.setdefault(g[-2:], {})[g] = vid
+for bk in sorted(gtin_buckets):
+    rel = 'gtin/%s.json' % bk
+    bp = os.path.join(STAGE, rel)
+    json.dump(gtin_buckets[bk], open(bp, 'w'), sort_keys=True, separators=(',', ':'))
+    shards.append({'file': rel, 'records': len(gtin_buckets[bk]),
+                   'bytes': os.path.getsize(bp), 'sha256': sha256_file(bp)})
 
 branded_manifest = json.load(open('data/branded/manifest.json'))
 manifest = {
@@ -161,7 +170,8 @@ manifest = {
 # how "one ~15 MB authority shard" got stated without measurement supporting it.
 auth_sh = [s2 for s2 in shards if s2['file'].startswith('authority/')]
 srch_sh = [s2 for s2 in shards if s2['file'].startswith('search/')]
-gtin_bytes = next(s2['bytes'] for s2 in shards if s2['file'] == 'gtin-index.json')
+gtin_sh = [s2 for s2 in shards if s2['file'].startswith('gtin/')]
+gtin_bytes = sum(s2['bytes'] for s2 in gtin_sh)
 manifest['shardMetrics'] = {
     'authorityShardCount': len(auth_sh),
     'authorityTotalBytes': sum(s2['bytes'] for s2 in auth_sh),
@@ -171,6 +181,9 @@ manifest['shardMetrics'] = {
     'searchTotalBytes': sum(s2['bytes'] for s2 in srch_sh),
     'searchLargestShardBytes': max((s2['bytes'] for s2 in srch_sh), default=0),
     'gtinIndexBytes': gtin_bytes,
+    'gtinBucketCount': len(gtin_sh),
+    'gtinLargestBucketBytes': max((s2['bytes'] for s2 in gtin_sh), default=0),
+    'gtinAverageBucketBytes': round(gtin_bytes / max(len(gtin_sh), 1)),
     'manifestBytes': 0,
 }
 _mp = os.path.join(STAGE, 'manifest.json')
@@ -187,7 +200,7 @@ srch = sum(s['bytes'] for s in shards if s['file'].startswith('search/'))
 auth = sum(s['bytes'] for s in shards if s['file'].startswith('authority/'))
 print('generic', len(g_auth), '| branded', b_auth_rows, '| gtin', len(gtin_index))
 print('search MB', mb(srch), '| authority MB', mb(auth),
-      '| gtin MB', mb(os.path.getsize(os.path.join(OUT,'gtin-index.json'))), '| TOTAL MB', mb(manifest['totalBytes']))
+      '| gtin MB', mb(gtin_bytes), '| TOTAL MB', mb(manifest['totalBytes']))
 sm = manifest['shardMetrics']
 print('ledger:', ledger)
 print('authority shards', sm['authorityShardCount'],

@@ -99,10 +99,13 @@ export class FilesystemOutboxStore implements SecureLocalStore {
       try { files = readdirSync(full); } catch { continue; }
       for (const f of files) {
         if (!f.endsWith('.json')) continue;
-        const storageId = `${userDir}/${f}`;
+        // Opaque handle: a digest of the slot, never the path (which encodes a
+        // userId). Stable across reads so repair tooling can address it.
+        const storageRef = createHash('sha256')
+          .update(`${userDir}/${f}`, 'utf8').digest('hex').slice(0, 16);
         const quarantine = (reason: QuarantineReason, userId?: string): void => {
           quarantined.push({
-            storageId, reason, detectedAt,
+            storageRef, reason, detectedAt,
             ...(userId !== undefined ? { userId } : {}),
           });
         };
@@ -133,7 +136,7 @@ export class FilesystemOutboxStore implements SecureLocalStore {
       }
     }
     valid.sort((a, b) => a.sequence - b.sequence || a.logId.localeCompare(b.logId));
-    quarantined.sort((a, b) => a.storageId.localeCompare(b.storageId));
+    quarantined.sort((a, b) => a.storageRef.localeCompare(b.storageRef));
     return { validEntries: valid, quarantined };
   }
 

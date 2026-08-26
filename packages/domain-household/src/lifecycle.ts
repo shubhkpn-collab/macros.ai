@@ -94,7 +94,15 @@ export function removeMembership(
       : m));
 }
 
-/** Deterministic transfer — the only way a sole owner may step down. */
+/**
+ * Deterministic transfer — the only way a sole owner may step down.
+ *
+ * Returns ONE fully-formed membership set in which exactly one active owner
+ * exists. Persisted naively as promote-then-demote it would transiently create
+ * two active owners and violate `household_single_active_owner`, so the writer
+ * must apply this result atomically: demote first, or upsert both rows in a
+ * single transaction. The invariant below is asserted on the returned value.
+ */
 export function transferOwnership(
   memberships: readonly HouseholdMembership[],
   householdId: string,
@@ -106,12 +114,17 @@ export function transferOwnership(
   const to = membershipFor(memberships, householdId, toUserId);
   if (to === null || to.status !== 'active') return fail('no_such_membership');
 
-  return ok(memberships.map((m) => {
+  const next = memberships.map((m) => {
     if (m.householdId !== householdId) return m;
     if (m.userId === toUserId) return { ...m, role: 'owner' as const };
     if (m.userId === fromUserId) return { ...m, role: 'member' as const };
     return m;
-  }));
+  });
+  // Fail closed rather than emit a state the database would reject.
+  const activeOwners = next.filter(
+    (m) => m.householdId === householdId && m.status === 'active' && m.role === 'owner');
+  if (activeOwners.length !== 1) return fail('would_leave_household_ownerless');
+  return ok(next);
 }
 
 /**

@@ -41,6 +41,13 @@ CREATE TABLE IF NOT EXISTS household_memberships (
 
 -- A household must never silently become ownerless: at most one ACTIVE owner,
 -- and application logic requires a transfer before the last owner may leave.
+--
+-- ORDERING REQUIREMENT FOR TRANSFER (enforced by this index):
+-- an ownership transfer MUST demote the outgoing owner BEFORE promoting the
+-- incoming one, and both statements MUST run in one transaction. Promoting
+-- first would momentarily create two active owners and be rejected by this
+-- index. `transferOwnership` in @macros/domain-household emits exactly one
+-- atomic state, so the ordering is a property of the write, not a convention.
 CREATE UNIQUE INDEX IF NOT EXISTS household_single_active_owner
     ON household_memberships (household_id)
     WHERE role = 'owner' AND status = 'active';

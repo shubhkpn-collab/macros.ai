@@ -8,6 +8,27 @@
   "sampled": 1500,
   "wrongProductResolved": 0
  },
+ "claimScope": {
+  "barcodeLookup": {
+   "method": "random_sample",
+   "note": "sampled from the complete current GTIN index",
+   "population": 397737,
+   "sampleSize": 1500
+  },
+  "eligibilityLedger": {
+   "method": "exhaustive",
+   "note": "every current product is classified exactly once"
+  },
+  "integrityInvariants": {
+   "method": "exhaustive",
+   "note": "identity and fingerprint invariants are checked on EVERY product and version during the build, not sampled"
+  },
+  "searchCorpus": {
+   "method": "bounded_slice",
+   "note": "a full in-memory token index over the whole catalog exhausts RAM",
+   "population": 120000
+  }
+ },
  "coverage": [
   {
    "known": 366832,

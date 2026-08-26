@@ -31,6 +31,8 @@ export interface OutboxEntry {
   readonly sequence: number;
   readonly lastError?: SyncFailureKind;
   readonly nextEligibleAttemptAtMs?: number;
+  /** Opaque handle to the record's storage slot, when the store supplies one. */
+  readonly storageRef?: string;
 }
 
 export type SyncFailureKind =
@@ -141,13 +143,28 @@ export function applyResult(
 export const recoverInFlight = (entries: readonly OutboxEntry[]): readonly OutboxEntry[] =>
   entries.map((e) => (e.state === 'in_flight' ? { ...e, state: 'pending' as const } : e));
 
-/** Entries eligible to send now, in deterministic order. */
+/**
+ * Entries eligible to send now, in deterministic order.
+ *
+ * QUARANTINE IS ENFORCED HERE, not merely by callers passing the right list.
+ * A quarantined record has failed integrity verification, so its payload cannot
+ * be trusted to represent what the user confirmed — transmitting it could write
+ * corrupt nutrition to the server permanently.
+ */
 export function dueForSubmission(
   entries: readonly OutboxEntry[],
   nowMs: number,
+  quarantined: readonly QuarantinedEntry[] = [],
 ): readonly OutboxEntry[] {
+  const blocked = new Set(
+    quarantined.map((q) => `${q.userId ?? ''}#${q.storageRef}`),
+  );
+  const blockedRefs = new Set(quarantined.map((q) => q.storageRef));
   return entries
     .filter((e) => {
+      // A quarantined record is never transmitted, under any state.
+      if (e.storageRef !== undefined && blockedRefs.has(e.storageRef)) return false;
+      if (blocked.has(`${e.userId}#${e.storageRef ?? ''}`)) return false;
       if (e.state === 'pending') return true;
       if (e.state !== 'retryable_failure') return false;
       return (e.nextEligibleAttemptAtMs ?? 0) <= nowMs;
@@ -187,7 +204,13 @@ export type QuarantineReason =
  * or reconstructed — an unreadable log stays unreadable.
  */
 export interface QuarantinedEntry {
-  readonly storageId: string;
+  /**
+   * OPAQUE handle. Deliberately not a filesystem path: the path embedded an
+   * encoded userId, so a diagnostic list that was meant to carry safe metadata
+   * would have carried an identifier in the reference itself. `userId` below is
+   * the ONE place a subject appears, and it is what the isolation rules act on.
+   */
+  readonly storageRef: string;
   readonly reason: QuarantineReason;
   readonly detectedAt: string;
   /** Present only when the envelope was readable enough to identify an owner. */

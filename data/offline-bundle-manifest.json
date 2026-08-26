@@ -32,8 +32,11 @@
   "authorityLargestShardBytes": 15512557,
   "authorityShardCount": 257,
   "authorityTotalBytes": 645016689,
-  "gtinIndexBytes": 23864221,
-  "manifestBytes": 47612,
+  "gtinAverageBucketBytes": 238643,
+  "gtinBucketCount": 100,
+  "gtinIndexBytes": 23864320,
+  "gtinLargestBucketBytes": 316501,
+  "manifestBytes": 63147,
   "searchLargestShardBytes": 13330146,
   "searchShardCount": 12,
   "searchTotalBytes": 136797574
@@ -1582,10 +1585,604 @@
    "sha256": "9172b2dc40bb3a43a2cf52319c78ebbb9beb8b55dd97282ceb3941b3e4d371d0"
   },
   {
-   "bytes": 23864221,
-   "file": "gtin-index.json",
-   "records": 397737,
-   "sha256": "bba6e4a3d9664c2337503b860ca809b4b1aca32a551e638119d01a9df941b91f"
+   "bytes": 313681,
+   "file": "gtin/00.json",
+   "records": 5228,
+   "sha256": "109ae6dc770ae18de4a58e7062ca1b7ef58722f44c0a92cb5a2a84b750eb2826"
+  },
+  {
+   "bytes": 316501,
+   "file": "gtin/01.json",
+   "records": 5275,
+   "sha256": "bb269863127809ffc3b5a20ad279ae172f1fc32805e26171376baaecaad284ca"
+  },
+  {
+   "bytes": 311101,
+   "file": "gtin/02.json",
+   "records": 5185,
+   "sha256": "35bcae4b5803629ac8c4cd761ab61ea11581fc013ec2f94c25a5040380dcc6a4"
+  },
+  {
+   "bytes": 303901,
+   "file": "gtin/03.json",
+   "records": 5065,
+   "sha256": "8053ebe52b0faa157a2967be71631649f60de54c4d38c682754cc7b318ae022b"
+  },
+  {
+   "bytes": 312781,
+   "file": "gtin/04.json",
+   "records": 5213,
+   "sha256": "e2ec7826f2836b19d9c8ee31ed3c55ad061a1b768ece5d53feb8c9d8f2d33e6d"
+  },
+  {
+   "bytes": 311221,
+   "file": "gtin/05.json",
+   "records": 5187,
+   "sha256": "20da13454afed5f69a3b005744760a77c11a1509cd708de4a10858a9d971ffff"
+  },
+  {
+   "bytes": 312841,
+   "file": "gtin/06.json",
+   "records": 5214,
+   "sha256": "16c8e203215fe5d20527940bb6c6cd15205b1aab3d42865c098a67d0e1e0f116"
+  },
+  {
+   "bytes": 300241,
+   "file": "gtin/07.json",
+   "records": 5004,
+   "sha256": "7f5382e4bd9802279cb9d0015992707e8b88999c01935533e88e1955a9f81dbd"
+  },
+  {
+   "bytes": 311401,
+   "file": "gtin/08.json",
+   "records": 5190,
+   "sha256": "1d16d78da5ea3c80ecb78aa57e677410a9abc559bd4b98d5fde843aaab4eeb00"
+  },
+  {
+   "bytes": 310441,
+   "file": "gtin/09.json",
+   "records": 5174,
+   "sha256": "ca1e8628e0e5829f4ed57b26f6abe93c42aba56ddd95cdd195ee72e15fd7b76a"
+  },
+  {
+   "bytes": 266641,
+   "file": "gtin/10.json",
+   "records": 4444,
+   "sha256": "c71c0e739afbdb22fa4d413c13cf577805424dda1e3cf527c8073030441c8e26"
+  },
+  {
+   "bytes": 274501,
+   "file": "gtin/11.json",
+   "records": 4575,
+   "sha256": "30f0ae904bec1118253d76a4cd7ca2828c392deb55450f6526bc94e6213a6422"
+  },
+  {
+   "bytes": 272821,
+   "file": "gtin/12.json",
+   "records": 4547,
+   "sha256": "6ae2487eeb7af3320236563d7cf38e1b3b17907c1fab1e2ad6062071ef51293b"
+  },
+  {
+   "bytes": 268561,
+   "file": "gtin/13.json",
+   "records": 4476,
+   "sha256": "cf0b409eb0011d52bf118778ace88c668d5b84a6a8f4797cc6ea5b5282af9b61"
+  },
+  {
+   "bytes": 269821,
+   "file": "gtin/14.json",
+   "records": 4497,
+   "sha256": "6dbef0419267f3d5e4397bdebd7a71832e32a1334ccb4b506d78fdc8b6361ee1"
+  },
+  {
+   "bytes": 266041,
+   "file": "gtin/15.json",
+   "records": 4434,
+   "sha256": "8ed3cc3013bb7e2af09823b559307c4ac40414c02749470d0e68d4470aafebff"
+  },
+  {
+   "bytes": 268861,
+   "file": "gtin/16.json",
+   "records": 4481,
+   "sha256": "5d7c499227e2cbc83f3c3722443030fbe131f3c3807e365193410ea11d2c0f61"
+  },
+  {
+   "bytes": 270841,
+   "file": "gtin/17.json",
+   "records": 4514,
+   "sha256": "f039fec7f6be6306c03f67763a7390731469644e8f12db030be63a8830ddd7fe"
+  },
+  {
+   "bytes": 277861,
+   "file": "gtin/18.json",
+   "records": 4631,
+   "sha256": "58ad70785419e92a19a076b8db22dded120db12fbde9615f51095a4114d5a11b"
+  },
+  {
+   "bytes": 264241,
+   "file": "gtin/19.json",
+   "records": 4404,
+   "sha256": "d90e03e90d90cec662646581b8ecce549b8084f65342732c50b4e2f0f0496f92"
+  },
+  {
+   "bytes": 255061,
+   "file": "gtin/20.json",
+   "records": 4251,
+   "sha256": "1325e7eaf61041dcb58fa33778ad964d3db4eac7edacf3539f3101eb2bb060c0"
+  },
+  {
+   "bytes": 261001,
+   "file": "gtin/21.json",
+   "records": 4350,
+   "sha256": "879a297565f084aa30a1861522cc58b63842bcab0759fea6423f2aedfbd05c5f"
+  },
+  {
+   "bytes": 252421,
+   "file": "gtin/22.json",
+   "records": 4207,
+   "sha256": "beb05ec390dae414ccaed4c15e8beff1b3a6e5d188dd8caf64a9c9ae744f3133"
+  },
+  {
+   "bytes": 257281,
+   "file": "gtin/23.json",
+   "records": 4288,
+   "sha256": "aaa43053523177dfad59d1528ca5898fa272907be5423747e417275cb43fa023"
+  },
+  {
+   "bytes": 264601,
+   "file": "gtin/24.json",
+   "records": 4410,
+   "sha256": "3714a61c54490d7399ebeba4148b2b6b413162b77e3ad8c26c622cb6a1f702e0"
+  },
+  {
+   "bytes": 258541,
+   "file": "gtin/25.json",
+   "records": 4309,
+   "sha256": "ec8077f340b6fa1555014578ad5ee9f295468a0684b2d0b7f413a1972590ef69"
+  },
+  {
+   "bytes": 255961,
+   "file": "gtin/26.json",
+   "records": 4266,
+   "sha256": "064f3c98e0104ab0f8869dedd1a7515c031b23505f26416533876d0d7a472d6f"
+  },
+  {
+   "bytes": 249001,
+   "file": "gtin/27.json",
+   "records": 4150,
+   "sha256": "4fc4c0f73a34254c877919572981f1ebb676d1889b332420748a7680404ef6ff"
+  },
+  {
+   "bytes": 250261,
+   "file": "gtin/28.json",
+   "records": 4171,
+   "sha256": "aff946c6a113740c5a909193b440b9e7cf785f204911ff90b163c2f3dab8604f"
+  },
+  {
+   "bytes": 262801,
+   "file": "gtin/29.json",
+   "records": 4380,
+   "sha256": "cf9c33cd8b09a3730673f47ff23f580c71a0d4cbe32b3f5c4a118be4103dcdf2"
+  },
+  {
+   "bytes": 237961,
+   "file": "gtin/30.json",
+   "records": 3966,
+   "sha256": "ef60dd5a2731f787299fee30fb7da53327f0152fe8b6a8d769df0f3148b91162"
+  },
+  {
+   "bytes": 244021,
+   "file": "gtin/31.json",
+   "records": 4067,
+   "sha256": "a2976edebc10b82b433a1dce32a390d4cb414e054659d9a3cbb340e104eabf8d"
+  },
+  {
+   "bytes": 239401,
+   "file": "gtin/32.json",
+   "records": 3990,
+   "sha256": "0927da9a534cf774085a6c63ae411df6dc5fafb2c21a4e9a9ec430d4016d793a"
+  },
+  {
+   "bytes": 233521,
+   "file": "gtin/33.json",
+   "records": 3892,
+   "sha256": "66a840b0b05ef0df0069587c33ca6258eca89ed8435c936ac841fbb3e68d8add"
+  },
+  {
+   "bytes": 241561,
+   "file": "gtin/34.json",
+   "records": 4026,
+   "sha256": "329f4be7b22e0ec32b4a592e108023391b32dbeabf5bf05b4b53e392ef47aa64"
+  },
+  {
+   "bytes": 239701,
+   "file": "gtin/35.json",
+   "records": 3995,
+   "sha256": "981ac379b6bc1c289762692fe8b3ad9f53431ba5293d370ec2c9dec519718fc8"
+  },
+  {
+   "bytes": 237901,
+   "file": "gtin/36.json",
+   "records": 3965,
+   "sha256": "21102822cd84464a74699d8388761c66ad478783fc8d44905752c124f240098f"
+  },
+  {
+   "bytes": 242701,
+   "file": "gtin/37.json",
+   "records": 4045,
+   "sha256": "7cdb238ea9d7a64579825124aa4337bfbf24ebc0818fe129abac5f19f6796ef8"
+  },
+  {
+   "bytes": 237181,
+   "file": "gtin/38.json",
+   "records": 3953,
+   "sha256": "67186c8aa2568be95bb802ff404b47b5e2376f7d56f207a1de13db5b058023c9"
+  },
+  {
+   "bytes": 231241,
+   "file": "gtin/39.json",
+   "records": 3854,
+   "sha256": "7cfd75fa7a72025e1b89611a7babeb3bb4fb4adf8a1765ce5637a30996346065"
+  },
+  {
+   "bytes": 237721,
+   "file": "gtin/40.json",
+   "records": 3962,
+   "sha256": "953187d6458f7daadd35161a3c1d941731f0b77501b1622fc3a66d8462f73a28"
+  },
+  {
+   "bytes": 228061,
+   "file": "gtin/41.json",
+   "records": 3801,
+   "sha256": "d369804ecc1f829171f2b08ee63f9d1574cb5c5f833a25cbce0b5b6eca30aea7"
+  },
+  {
+   "bytes": 235261,
+   "file": "gtin/42.json",
+   "records": 3921,
+   "sha256": "db27c71c129d181faacdaa36015d45363e98b951a3da0034ace9f04c61964b7f"
+  },
+  {
+   "bytes": 227941,
+   "file": "gtin/43.json",
+   "records": 3799,
+   "sha256": "7a7118115e7b30903dc3a67017427ff4d3da4b5e762c2d6c591db9623d82657f"
+  },
+  {
+   "bytes": 233641,
+   "file": "gtin/44.json",
+   "records": 3894,
+   "sha256": "e995bc38a7e942b03e8f7d80d7cb43ebc3f78838e43e849df83fe15f0a403fec"
+  },
+  {
+   "bytes": 225841,
+   "file": "gtin/45.json",
+   "records": 3764,
+   "sha256": "f3d9b57945885de9ee89ae71449a551e2a8702d71c54d7212a69548090671352"
+  },
+  {
+   "bytes": 228421,
+   "file": "gtin/46.json",
+   "records": 3807,
+   "sha256": "fb4baeacbe339ab7d688a140a2cbadf1a1d517039286a178e8fa4ef91c1fbdec"
+  },
+  {
+   "bytes": 234181,
+   "file": "gtin/47.json",
+   "records": 3903,
+   "sha256": "042fa846749941abb2542f05f736fcb7bede6986f90328d4859c398b9df5e5d1"
+  },
+  {
+   "bytes": 232501,
+   "file": "gtin/48.json",
+   "records": 3875,
+   "sha256": "cf84ddd0c9a74947440ba1208cd62710b70d288d27d456f2aafb26103ebd23ca"
+  },
+  {
+   "bytes": 229681,
+   "file": "gtin/49.json",
+   "records": 3828,
+   "sha256": "f5a59b5445fc92ed49bc88a4ac39784ba24c198282bb6f0a5946439852384df4"
+  },
+  {
+   "bytes": 236761,
+   "file": "gtin/50.json",
+   "records": 3946,
+   "sha256": "4ea0247fa3ba673d2a54f7f13081e39a32d6e83466e3dd5583ae6c1dec051a42"
+  },
+  {
+   "bytes": 236401,
+   "file": "gtin/51.json",
+   "records": 3940,
+   "sha256": "4d995689e69b147a4b770cb552dc8fd514a18dde749638f299163a3cb3058cf4"
+  },
+  {
+   "bytes": 238021,
+   "file": "gtin/52.json",
+   "records": 3967,
+   "sha256": "d7e67f5bd89e5ae521507033326cd2faea3900fe8de2daf104a814d32037da09"
+  },
+  {
+   "bytes": 239161,
+   "file": "gtin/53.json",
+   "records": 3986,
+   "sha256": "1c9b846764e2232c85df2608a5f7b442011138c3cd625e1d42ba42677ddf1912"
+  },
+  {
+   "bytes": 240721,
+   "file": "gtin/54.json",
+   "records": 4012,
+   "sha256": "243e31e61b51b0b43f04d5af48757a12c0cc6f39b702f8bc268a5a2821c391c1"
+  },
+  {
+   "bytes": 237421,
+   "file": "gtin/55.json",
+   "records": 3957,
+   "sha256": "92e35c68f6510fcd0ece85512fe9e30ad651937441b9d0fde6b21556eac3ffa8"
+  },
+  {
+   "bytes": 233821,
+   "file": "gtin/56.json",
+   "records": 3897,
+   "sha256": "8112bca9cfad6fe9615a66bd79a6fc2bd3649b5ca1b93d5e8e703c4def928c22"
+  },
+  {
+   "bytes": 235921,
+   "file": "gtin/57.json",
+   "records": 3932,
+   "sha256": "a075b2c91baac936d8f9576eeb4cb2c373c76c8cf75e0bf36b1b1e7301fc0a00"
+  },
+  {
+   "bytes": 229321,
+   "file": "gtin/58.json",
+   "records": 3822,
+   "sha256": "34e5aa30b59cfff0dc50ac64512551912b1c4fef678295168e990b785b64e8e5"
+  },
+  {
+   "bytes": 235981,
+   "file": "gtin/59.json",
+   "records": 3933,
+   "sha256": "6d02f855d95ce2a1019584128213f0238df8732e4b1c0e18d84d81fa90c1623c"
+  },
+  {
+   "bytes": 222001,
+   "file": "gtin/60.json",
+   "records": 3700,
+   "sha256": "0feee8c23587e93f51821ea5ef4e3926483b9a39dfe55e481d51fc4f25139e8c"
+  },
+  {
+   "bytes": 226141,
+   "file": "gtin/61.json",
+   "records": 3769,
+   "sha256": "fd45c148bc435a06f0f72acc09ef83542ec3c13fbeeb2f328160ea324eac7f76"
+  },
+  {
+   "bytes": 225001,
+   "file": "gtin/62.json",
+   "records": 3750,
+   "sha256": "177b4e55b5172aac0dc9b96a946cb9fdd0f1624aaede27df75cfc79b32d1ca71"
+  },
+  {
+   "bytes": 228961,
+   "file": "gtin/63.json",
+   "records": 3816,
+   "sha256": "66ea5d657aff09af9cc7cca2e51545c6f5d01d57ef950ebf0c9a112deaeff10b"
+  },
+  {
+   "bytes": 222901,
+   "file": "gtin/64.json",
+   "records": 3715,
+   "sha256": "9e562fa14880a18a83eebbaed584e4ee87105708002ae2b9fdb2714decefde82"
+  },
+  {
+   "bytes": 225721,
+   "file": "gtin/65.json",
+   "records": 3762,
+   "sha256": "9676d4ee753f1b6d2434966662d9c761de6aeee72d89742c9ba4d697e23b9fbe"
+  },
+  {
+   "bytes": 225721,
+   "file": "gtin/66.json",
+   "records": 3762,
+   "sha256": "d7bf723924aed845c4498918b13c95b6ca8223be04ff3ffb72f04582eae14424"
+  },
+  {
+   "bytes": 226621,
+   "file": "gtin/67.json",
+   "records": 3777,
+   "sha256": "a32ef16d4632505270b97d45251bf725e6f93e2f5e07bf1a8f06edffa785b3ba"
+  },
+  {
+   "bytes": 221701,
+   "file": "gtin/68.json",
+   "records": 3695,
+   "sha256": "d6bfddf7fadf468cb0a3ac2cb047e95513142e7397b9b4e1e32d4c0729ef794c"
+  },
+  {
+   "bytes": 227761,
+   "file": "gtin/69.json",
+   "records": 3796,
+   "sha256": "043b4928aeb01ebacd35d823a83f68498822000ff38dec72131036750271ec5d"
+  },
+  {
+   "bytes": 209941,
+   "file": "gtin/70.json",
+   "records": 3499,
+   "sha256": "f0a3c2eeafc2d5df86c2b1df5d64d464fa75463aec25a2633275954edfd9a731"
+  },
+  {
+   "bytes": 207301,
+   "file": "gtin/71.json",
+   "records": 3455,
+   "sha256": "dfd7a38c36597de100721f0df45549ff7ef557db1774a9a80101a14c41fe61b4"
+  },
+  {
+   "bytes": 202681,
+   "file": "gtin/72.json",
+   "records": 3378,
+   "sha256": "eaa50eb5c6c64df4f7b0e1cb1a44b943b0a691704017d57c25e44391190db21c"
+  },
+  {
+   "bytes": 208861,
+   "file": "gtin/73.json",
+   "records": 3481,
+   "sha256": "fd5f8da74dd3ec8498770baae669ff48a1eefbb5e1ebd4464d8bfeac22bd8845"
+  },
+  {
+   "bytes": 210421,
+   "file": "gtin/74.json",
+   "records": 3507,
+   "sha256": "622fe026d61a72616c998b65d93b3d8a7672c3ed27e728f9fb2637622aa01f79"
+  },
+  {
+   "bytes": 207961,
+   "file": "gtin/75.json",
+   "records": 3466,
+   "sha256": "f6fb66ddfbeee31dcf96a9f2eec634e6cffb217c1145b765c915d2e2388c0bef"
+  },
+  {
+   "bytes": 214441,
+   "file": "gtin/76.json",
+   "records": 3574,
+   "sha256": "16a4bf23ac98bce3112ccdfacee50271d1f33adb9471c323a7af1275e90be4c0"
+  },
+  {
+   "bytes": 210241,
+   "file": "gtin/77.json",
+   "records": 3504,
+   "sha256": "83c113356fedd252bf5d873fbcbc102c5c79656b9e31c87d7960b5ce869b6909"
+  },
+  {
+   "bytes": 211801,
+   "file": "gtin/78.json",
+   "records": 3530,
+   "sha256": "3efe4185d9ebc31a545d72455598c6127edd3637ad0a00f85438a826dad58b04"
+  },
+  {
+   "bytes": 212521,
+   "file": "gtin/79.json",
+   "records": 3542,
+   "sha256": "198aecfd934a870a6497ad71adebef9190b6d06f71899c8539df37fef3969019"
+  },
+  {
+   "bytes": 203701,
+   "file": "gtin/80.json",
+   "records": 3395,
+   "sha256": "8f7f5d51011ee1cbeb8a3c2c086967d8f048c72b5f16435ab803e1ef0325df45"
+  },
+  {
+   "bytes": 212041,
+   "file": "gtin/81.json",
+   "records": 3534,
+   "sha256": "6e3cc714c38236edf6eb941ffd7dba159ca45f3a32ccc25845dfb15a9983589a"
+  },
+  {
+   "bytes": 210181,
+   "file": "gtin/82.json",
+   "records": 3503,
+   "sha256": "7e2724b97f81709dc4db5f0caa711de991f485b9b0d78a798dd78307e17b5b4d"
+  },
+  {
+   "bytes": 210781,
+   "file": "gtin/83.json",
+   "records": 3513,
+   "sha256": "dc76d25125791882559bcc02514a637c854af871658dd2111714db00fe14d573"
+  },
+  {
+   "bytes": 210361,
+   "file": "gtin/84.json",
+   "records": 3506,
+   "sha256": "5ac178ff8123885ca3329bbe3b8943844e1399d8f64139313fbb6d49fc7db19a"
+  },
+  {
+   "bytes": 209281,
+   "file": "gtin/85.json",
+   "records": 3488,
+   "sha256": "cb037f3816163cd9c06e61ac18ed3cfb898a299d6b498e6ebd6899f583a19080"
+  },
+  {
+   "bytes": 214081,
+   "file": "gtin/86.json",
+   "records": 3568,
+   "sha256": "c46c4b8e07705298d6c8c8a5fc019138bf9d2575cd4d6ae83590a7d697ea276a"
+  },
+  {
+   "bytes": 214681,
+   "file": "gtin/87.json",
+   "records": 3578,
+   "sha256": "f5ac595b897b501f91df237269f56453c9a767aaf73b9773f14a4a16d9ab072b"
+  },
+  {
+   "bytes": 208261,
+   "file": "gtin/88.json",
+   "records": 3471,
+   "sha256": "eed7055ee0a29750245d61c0088c53704b27202ff92973cfbbe4bb8490326d1d"
+  },
+  {
+   "bytes": 204601,
+   "file": "gtin/89.json",
+   "records": 3410,
+   "sha256": "0488cbc03bec58b916f3a6ed1daa491b4975943e76c1205a8266da46a8c47e55"
+  },
+  {
+   "bytes": 198661,
+   "file": "gtin/90.json",
+   "records": 3311,
+   "sha256": "7294742d6e0af4ebb889ec3a45f7a313d288d890eb9bb1b6f23c35d7653a96a3"
+  },
+  {
+   "bytes": 190981,
+   "file": "gtin/91.json",
+   "records": 3183,
+   "sha256": "e7637124438c04c3a51b06d9880cadd9acffe99d7f7f8fe718b346283d20608a"
+  },
+  {
+   "bytes": 198661,
+   "file": "gtin/92.json",
+   "records": 3311,
+   "sha256": "398e3191c655de4d05e4071debbe738d202d11b74b79ad06d1883d96126fcf66"
+  },
+  {
+   "bytes": 202261,
+   "file": "gtin/93.json",
+   "records": 3371,
+   "sha256": "6c8e471ec22709e39db9a877b1a58b0233153d39fc1237afe9f4772b9da58ee3"
+  },
+  {
+   "bytes": 203401,
+   "file": "gtin/94.json",
+   "records": 3390,
+   "sha256": "b2de0ffbb05faeee476f43851d3d4f4205eee01d7a7839b1a569f2922a746fef"
+  },
+  {
+   "bytes": 198181,
+   "file": "gtin/95.json",
+   "records": 3303,
+   "sha256": "35326339aa497ed40e3834dad14d317494543b59bd277aba6260de9663ab228c"
+  },
+  {
+   "bytes": 201301,
+   "file": "gtin/96.json",
+   "records": 3355,
+   "sha256": "dedf0c05f3297cefb6721a00bb35d3eabb77acc1591a1e4e416bd5096d6e0377"
+  },
+  {
+   "bytes": 195061,
+   "file": "gtin/97.json",
+   "records": 3251,
+   "sha256": "6e916377f0147fb74e9a2eac20cd965774cb2e5baa2fb5e32eb0631b17ec63e0"
+  },
+  {
+   "bytes": 198661,
+   "file": "gtin/98.json",
+   "records": 3311,
+   "sha256": "f25fa70b1d84e23e5524e853b316ff560ad3f330db14a17f305b41fdf4f9242c"
+  },
+  {
+   "bytes": 197281,
+   "file": "gtin/99.json",
+   "records": 3288,
+   "sha256": "fc372d46a5f5a019703107cae0cf8394dcd9aff6eee25a747343b48c7ebe3069"
   },
   {
    "bytes": 13182545,
@@ -1660,5 +2257,5 @@
    "sha256": "80ad920237774cab7ab35c39cac8b68bfb52f1bb11f578de29f06f9210dd7466"
   }
  ],
- "totalBytes": 805678484
+ "totalBytes": 805678583
 }

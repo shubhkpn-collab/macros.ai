@@ -140,6 +140,20 @@ report['search'] = {
     'misses': misses,
     'brandQueries': {'total': brand_n, 'top1BrandCorrect': brand_ok, 'detail': brand_results},
 }
+# A5: CLAIM SCOPE. Every metric states the population it was computed over, so
+# a sampled result can never be read as an exhaustive guarantee.
+report['claimScope'] = {
+    'searchCorpus': {'method': 'bounded_slice', 'population': len(cat),
+                     'note': 'a full in-memory token index over the whole catalog exhausts RAM'},
+    'barcodeLookup': {'method': 'random_sample', 'sampleSize': 1500,
+                      'population': len(full_index),
+                      'note': 'sampled from the complete current GTIN index'},
+    'integrityInvariants': {'method': 'exhaustive',
+                            'note': 'identity and fingerprint invariants are checked on EVERY '
+                                    'product and version during the build, not sampled'},
+    'eligibilityLedger': {'method': 'exhaustive',
+                          'note': 'every current product is classified exactly once'},
+}
 report['barcode'] = {
     'sampled': len(sample), 'exactLookupCorrect': exact_ok,
     'exactLookupPercent': round(exact_ok / (len(sample) - correctly_refused) * 1000) / 10,

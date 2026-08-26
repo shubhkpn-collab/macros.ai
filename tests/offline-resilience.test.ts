@@ -395,12 +395,17 @@ describe('PART A REFREEZE — corrupt entries are quarantined, never vanished', 
     // Safe metadata only — no invented nutrition.
     assert.equal('payload' in r.quarantined[0]!, false);
     assert.equal('nutritionSnapshot' in r.quarantined[0]!, false);
+    // A1: the reference itself must not embed an identifier.
+    assert.equal('storageId' in r.quarantined[0]!, false, 'path-shaped id removed');
+    assert.match(r.quarantined[0]!.storageRef, /^[0-9a-f]{16}$/);
+    assert.equal(r.quarantined[0]!.storageRef.includes(USER_A), false);
+    assert.equal(r.quarantined[0]!.storageRef.includes(encodeURIComponent(USER_A)), false);
   });
 
   test('A1: the dashboard reports DEGRADED integrity, not authoritative totals', () => {
     const day = logFor(USER_A, 'l1').localDate;
     const r = reconcileDay(USER_A, day, [], [entry(USER_A, 'l1')],
-      [{ storageId: 'u/x.json', reason: 'outbox_corrupt', detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_A }]);
+      [{ storageRef: 'ref-a', reason: 'outbox_corrupt', detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_A }]);
     assert.equal(r.localIntegrity, 'degraded');
     assert.equal(r.quarantinedCount, 1);
     assert.equal(r.effective.length, 1, 'readable logs still count');
@@ -416,7 +421,7 @@ describe('PART A REFREEZE — corrupt entries are quarantined, never vanished', 
   test("another user's corrupt record does not degrade THIS user's day", () => {
     const day = logFor(USER_A, 'l1').localDate;
     const r = reconcileDay(USER_A, day, [], [entry(USER_A, 'l1')],
-      [{ storageId: 'b/x.json', reason: 'outbox_corrupt', detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_B }]);
+      [{ storageRef: 'ref-b', reason: 'outbox_corrupt', detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_B }]);
     assert.equal(r.localIntegrity, 'complete');
   });
 
@@ -453,9 +458,19 @@ describe('PART A REFREEZE — corrupt entries are quarantined, never vanished', 
     store.put(entry(USER_A, 'good'));
     corrupt(dir, USER_A, 'broken.json', '{oops');
     const r = new FilesystemOutboxStore(dir).read();
-    // dueForSubmission only ever sees VALID entries; quarantine is a separate list.
-    const due = dueForSubmission(r.validEntries, 0);
+    const due = dueForSubmission(r.validEntries, 0, r.quarantined);
     assert.deepEqual(due.map((d) => d.logId), ['good']);
+  });
+
+  test('A2: quarantine is enforced AT THE BOUNDARY, not by caller discipline', () => {
+    // A miswired caller hands a quarantined record through as if it were valid.
+    const ref = 'deadbeefdeadbeef';
+    const smuggled = { ...entry(USER_A, 'bad'), storageRef: ref };
+    const due = dueForSubmission([smuggled, entry(USER_A, 'good')], 0,
+      [{ storageRef: ref, reason: 'outbox_checksum_mismatch',
+         detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_A }]);
+    assert.deepEqual(due.map((d) => d.logId), ['good'],
+      'the submission boundary itself must refuse it');
   });
 
   test('A3: a corrupt record is not auto-deleted', () => {
