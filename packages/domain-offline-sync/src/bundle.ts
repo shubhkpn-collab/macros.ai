@@ -123,8 +123,44 @@ export function decideActivation(
  */
 export type OfflineLookupMiss =
   | 'not_found_in_cached_catalog'
+  | 'not_offline_eligible'
+  | 'identifier_conflicted'
+  | 'identifier_needs_review'
+  | 'product_discontinued'
   | 'invalid_identifier'
   | 'catalog_missing';
+
+/**
+ * Why a valid barcode did not resolve offline.
+ *
+ * These are materially different situations and collapsing them into
+ * `not_found` misleads the user: a deliberately excluded product is not a stale
+ * cache, and neither is an invalid barcode. Only a check-digit failure is a
+ * statement about the code itself.
+ */
+export interface OfflineBarcodeContext {
+  /** Present in the bundle's exclusion ledger for a deliberate reason. */
+  readonly knownExcluded?: 'discontinued' | 'conflicted' | 'needs_review';
+  readonly catalogInstalled: boolean;
+  readonly catalogStale: boolean;
+}
+
+export function classifyOfflineMiss(
+  gtinValid: boolean,
+  context: OfflineBarcodeContext,
+): OfflineLookupMiss {
+  if (!gtinValid) return 'invalid_identifier';
+  if (!context.catalogInstalled) return 'catalog_missing';
+  switch (context.knownExcluded) {
+    case 'discontinued': return 'product_discontinued';
+    case 'conflicted': return 'identifier_conflicted';
+    case 'needs_review': return 'identifier_needs_review';
+    default:
+      // Genuinely absent from our copy — a claim about the cache, never about
+      // whether the product exists in the world.
+      return 'not_found_in_cached_catalog';
+  }
+}
 
 export interface CatalogFreshness {
   readonly bundleVersion: string;

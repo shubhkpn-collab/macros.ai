@@ -156,6 +156,64 @@ export function dueForSubmission(
     .sort((a, b) => a.sequence - b.sequence || a.logId.localeCompare(b.logId));
 }
 
+/**
+ * OUTBOX SCHEMA AND PER-ENTRY INTEGRITY.
+ *
+ * A locally confirmed log was already shown to the user as durable, so a
+ * corrupt record must never simply vanish from their day. The envelope carries
+ * a schema version and a payload checksum so partial or truncated files are
+ * DETECTED rather than silently skipped.
+ *
+ * This guards against corrupt or partially written files — not against a
+ * malicious device. Confidentiality remains the platform secure-storage
+ * adapter's responsibility.
+ */
+export const OUTBOX_SCHEMA_VERSION = 1;
+
+export interface OutboxEnvelope {
+  readonly schemaVersion: number;
+  readonly entry: OutboxEntry;
+  /** Deterministic checksum over the canonical entry encoding. */
+  readonly payloadSha256: string;
+}
+
+export type QuarantineReason =
+  | 'outbox_corrupt'
+  | 'outbox_checksum_mismatch'
+  | 'outbox_schema_unsupported';
+
+/**
+ * A quarantined record keeps only SAFE metadata. Nutrition is never guessed at
+ * or reconstructed — an unreadable log stays unreadable.
+ */
+export interface QuarantinedEntry {
+  readonly storageId: string;
+  readonly reason: QuarantineReason;
+  readonly detectedAt: string;
+  /** Present only when the envelope was readable enough to identify an owner. */
+  readonly userId?: string;
+}
+
+export interface OutboxReadResult {
+  readonly validEntries: readonly OutboxEntry[];
+  readonly quarantined: readonly QuarantinedEntry[];
+}
+
+export type LocalIntegrity = 'complete' | 'degraded';
+
+/**
+ * Integrity for ONE user. Another user's corrupt record must not degrade this
+ * user's dashboard, and must not be counted against them either.
+ */
+export function localIntegrityFor(
+  userId: string,
+  quarantined: readonly QuarantinedEntry[],
+): LocalIntegrity {
+  return quarantined.some((q) => q.userId === undefined || q.userId === userId)
+    ? 'degraded'
+    : 'complete';
+}
+
 /** Entries counted in the local dashboard: everything not yet server-truth. */
 export const unsyncedFor = (
   entries: readonly OutboxEntry[],

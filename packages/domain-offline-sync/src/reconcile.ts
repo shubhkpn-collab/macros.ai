@@ -1,5 +1,6 @@
 import type { FoodLogItem } from '@macros/contracts';
-import type { OutboxEntry } from './outbox.js';
+import type { LocalIntegrity, OutboxEntry, QuarantinedEntry } from './outbox.js';
+import { localIntegrityFor } from './outbox.js';
 
 /**
  * DASHBOARD RECONCILIATION.
@@ -15,6 +16,15 @@ export interface ReconciledDay {
   readonly effective: readonly FoodLogItem[];
   readonly pendingCount: number;
   readonly conflicts: readonly { readonly logId: string; readonly reason: string }[];
+  /**
+   * `degraded` when a locally confirmed record could not be read back.
+   *
+   * The totals below are then a LOWER BOUND, not the day's truth, and must not
+   * be presented as authoritative — a confirmed food silently vanishing from
+   * someone's day is worse than admitting the number is incomplete.
+   */
+  readonly localIntegrity: LocalIntegrity;
+  readonly quarantinedCount: number;
 }
 
 /**
@@ -29,6 +39,7 @@ export function reconcileDay(
   localDate: string,
   serverLogs: readonly FoodLogItem[],
   outbox: readonly OutboxEntry[],
+  quarantined: readonly QuarantinedEntry[] = [],
 ): ReconciledDay {
   const effective = new Map<string, FoodLogItem>();
   const conflicts: { logId: string; reason: string }[] = [];
@@ -77,5 +88,9 @@ export function reconcileDay(
     ),
     pendingCount,
     conflicts,
+    localIntegrity: localIntegrityFor(userId, quarantined),
+    quarantinedCount: quarantined.filter(
+      (q) => q.userId === undefined || q.userId === userId,
+    ).length,
   };
 }

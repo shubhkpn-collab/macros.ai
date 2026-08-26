@@ -59,13 +59,24 @@ write_shard('search/generic.ndjson', sorted(g_search, key=lambda r: r['productVe
 write_shard('authority/generic.ndjson', sorted(g_auth, key=lambda r: r['productVersionId']))
 
 # ---- BRANDED (frozen full release) -----------------------------------------
+# EXCLUSION LEDGER — mutually exclusive, first matching reason wins, so the
+# categories sum exactly to the current-product population.
+ledger = {'totalCurrentProducts': 0, 'excludedDiscontinued': 0,
+          'excludedConflicted': 0, 'excludedNeedsReview': 0, 'offlineEligible': 0}
 heads = {}
 for f in sorted(glob.glob('data/branded/products-*.ndjson')):
     for line in open(f):
         h = json.loads(line)
-        # Only CURRENT, clean identifiers are offline-loggable.
-        if h['isDiscontinued'] or h['identifierState'] in ('conflicted', 'needs_review'):
-            continue
+        ledger['totalCurrentProducts'] += 1
+        # A product excluded here is INTENTIONALLY not offline-loggable — it is
+        # not a cache failure and must never be described as one.
+        if h['isDiscontinued']:
+            ledger['excludedDiscontinued'] += 1; continue
+        if h['identifierState'] == 'conflicted':
+            ledger['excludedConflicted'] += 1; continue
+        if h['identifierState'] == 'needs_review':
+            ledger['excludedNeedsReview'] += 1; continue
+        ledger['offlineEligible'] += 1
         heads[h['currentProductVersionId']] = h
 
 # Bucketed by a hash of productVersionId so a lookup reads exactly ONE small
@@ -142,10 +153,30 @@ manifest = {
         'gtinEntries': len(gtin_index),
     },
     'authorityBuckets': AUTH_BUCKETS,
+    'eligibility': ledger,
     'shards': sorted(shards, key=lambda s: s['file']),
     'totalBytes': sum(s['bytes'] for s in shards),
 }
-json.dump(manifest, open(os.path.join(STAGE, 'manifest.json'), 'w'), indent=1, sort_keys=True)
+# A6: shard metrics per CLASS. Conflating authority and search shard sizes is
+# how "one ~15 MB authority shard" got stated without measurement supporting it.
+auth_sh = [s2 for s2 in shards if s2['file'].startswith('authority/')]
+srch_sh = [s2 for s2 in shards if s2['file'].startswith('search/')]
+gtin_bytes = next(s2['bytes'] for s2 in shards if s2['file'] == 'gtin-index.json')
+manifest['shardMetrics'] = {
+    'authorityShardCount': len(auth_sh),
+    'authorityTotalBytes': sum(s2['bytes'] for s2 in auth_sh),
+    'authorityAverageShardBytes': round(sum(s2['bytes'] for s2 in auth_sh) / max(len(auth_sh), 1)),
+    'authorityLargestShardBytes': max((s2['bytes'] for s2 in auth_sh), default=0),
+    'searchShardCount': len(srch_sh),
+    'searchTotalBytes': sum(s2['bytes'] for s2 in srch_sh),
+    'searchLargestShardBytes': max((s2['bytes'] for s2 in srch_sh), default=0),
+    'gtinIndexBytes': gtin_bytes,
+    'manifestBytes': 0,
+}
+_mp = os.path.join(STAGE, 'manifest.json')
+json.dump(manifest, open(_mp, 'w'), indent=1, sort_keys=True)
+manifest['shardMetrics']['manifestBytes'] = os.path.getsize(_mp)
+json.dump(manifest, open(_mp, 'w'), indent=1, sort_keys=True)
 
 # ATOMIC PROMOTION: the bundle only becomes visible once fully built.
 if os.path.exists(OUT): shutil.rmtree(OUT)
@@ -157,4 +188,9 @@ auth = sum(s['bytes'] for s in shards if s['file'].startswith('authority/'))
 print('generic', len(g_auth), '| branded', b_auth_rows, '| gtin', len(gtin_index))
 print('search MB', mb(srch), '| authority MB', mb(auth),
       '| gtin MB', mb(os.path.getsize(os.path.join(OUT,'gtin-index.json'))), '| TOTAL MB', mb(manifest['totalBytes']))
-print('shards', len(shards), '| largest MB', mb(max(s['bytes'] for s in shards)))
+sm = manifest['shardMetrics']
+print('ledger:', ledger)
+print('authority shards', sm['authorityShardCount'],
+      '| avg MB', mb(sm['authorityAverageShardBytes']),
+      '| largest MB', mb(sm['authorityLargestShardBytes']))
+print('search shards', sm['searchShardCount'], '| largest MB', mb(sm['searchLargestShardBytes']))

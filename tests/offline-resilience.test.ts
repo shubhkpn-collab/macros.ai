@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os';
 import {
   DEFAULT_RETRY_POLICY, SUPPORTED_SCHEMA_VERSION, applyResult, classify,
   decideActivation, deriveCapabilities, dueForSubmission, nextAttemptAt,
-  reconcileDay, recoverInFlight, unsyncedFor, verifyBundle,
+  reconcileDay, recoverInFlight, unsyncedFor, verifyBundle, classifyOfflineMiss,
   type OfflineCatalogManifest, type OutboxEntry, type RuntimeConditions,
 } from '@macros/domain-offline-sync';
 import {
@@ -372,5 +372,160 @@ describe('PART H — immutability across catalog updates', () => {
     const after = applyResult(before, { kind: 'accepted', outcome: 'appended' }, 0);
     assert.deepEqual(after.payload, before.payload, 'weight, snapshot and time untouched');
     assert.notEqual(after.state, before.state);
+  });
+});
+
+describe('PART A REFREEZE — corrupt entries are quarantined, never vanished', () => {
+  const corrupt = (dir: string, userId: string, name: string, body: string): void => {
+    mkdirSync(join(dir, encodeURIComponent(userId)), { recursive: true });
+    writeFileSync(join(dir, encodeURIComponent(userId), name), body);
+  };
+
+  test('A1: a corrupt record is QUARANTINED with safe metadata only', () => {
+    const dir = tmp();
+    const store = new FilesystemOutboxStore(dir);
+    store.put(entry(USER_A, 'good'));
+    corrupt(dir, USER_A, 'broken.json', '{not json');
+
+    const r = new FilesystemOutboxStore(dir).read();
+    assert.equal(r.validEntries.length, 1, 'valid entries still load');
+    assert.equal(r.validEntries[0]!.logId, 'good');
+    assert.equal(r.quarantined.length, 1);
+    assert.equal(r.quarantined[0]!.reason, 'outbox_corrupt');
+    // Safe metadata only — no invented nutrition.
+    assert.equal('payload' in r.quarantined[0]!, false);
+    assert.equal('nutritionSnapshot' in r.quarantined[0]!, false);
+  });
+
+  test('A1: the dashboard reports DEGRADED integrity, not authoritative totals', () => {
+    const day = logFor(USER_A, 'l1').localDate;
+    const r = reconcileDay(USER_A, day, [], [entry(USER_A, 'l1')],
+      [{ storageId: 'u/x.json', reason: 'outbox_corrupt', detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_A }]);
+    assert.equal(r.localIntegrity, 'degraded');
+    assert.equal(r.quarantinedCount, 1);
+    assert.equal(r.effective.length, 1, 'readable logs still count');
+  });
+
+  test('a clean queue reports COMPLETE integrity', () => {
+    const day = logFor(USER_A, 'l1').localDate;
+    const r = reconcileDay(USER_A, day, [], [entry(USER_A, 'l1')], []);
+    assert.equal(r.localIntegrity, 'complete');
+    assert.equal(r.quarantinedCount, 0);
+  });
+
+  test("another user's corrupt record does not degrade THIS user's day", () => {
+    const day = logFor(USER_A, 'l1').localDate;
+    const r = reconcileDay(USER_A, day, [], [entry(USER_A, 'l1')],
+      [{ storageId: 'b/x.json', reason: 'outbox_corrupt', detectedAt: '1970-01-01T00:00:00.000Z', userId: USER_B }]);
+    assert.equal(r.localIntegrity, 'complete');
+  });
+
+  test('A2: a checksum mismatch is DETECTED, not trusted', () => {
+    const dir = tmp();
+    new FilesystemOutboxStore(dir).put(entry(USER_A, 'l1'));
+    // Tamper with the payload while leaving the recorded checksum intact.
+    const f = join(dir, encodeURIComponent(USER_A), 'l1.json');
+    const env = JSON.parse(readFileSync(f, 'utf8'));
+    env.entry.payload.nutritionSnapshot.totals.kcal = 99999;
+    writeFileSync(f, JSON.stringify(env));
+
+    const r = new FilesystemOutboxStore(dir).read();
+    assert.equal(r.validEntries.length, 0, 'tampered nutrition is never counted');
+    assert.equal(r.quarantined[0]!.reason, 'outbox_checksum_mismatch');
+  });
+
+  test('A2: an unsupported future schema is quarantined, not half-read', () => {
+    const dir = tmp();
+    new FilesystemOutboxStore(dir).put(entry(USER_A, 'l1'));
+    const f = join(dir, encodeURIComponent(USER_A), 'l1.json');
+    const env = JSON.parse(readFileSync(f, 'utf8'));
+    env.schemaVersion = 99;
+    writeFileSync(f, JSON.stringify(env));
+
+    const r = new FilesystemOutboxStore(dir).read();
+    assert.equal(r.validEntries.length, 0);
+    assert.equal(r.quarantined[0]!.reason, 'outbox_schema_unsupported');
+  });
+
+  test('A3: a quarantined record is NEVER submitted to the server', () => {
+    const dir = tmp();
+    const store = new FilesystemOutboxStore(dir);
+    store.put(entry(USER_A, 'good'));
+    corrupt(dir, USER_A, 'broken.json', '{oops');
+    const r = new FilesystemOutboxStore(dir).read();
+    // dueForSubmission only ever sees VALID entries; quarantine is a separate list.
+    const due = dueForSubmission(r.validEntries, 0);
+    assert.deepEqual(due.map((d) => d.logId), ['good']);
+  });
+
+  test('A3: a corrupt record is not auto-deleted', () => {
+    const dir = tmp();
+    corrupt(dir, USER_A, 'broken.json', '{oops');
+    new FilesystemOutboxStore(dir).read();
+    assert.equal(existsSync(join(dir, encodeURIComponent(USER_A), 'broken.json')), true,
+      'kept for future repair/export tooling');
+  });
+
+  test('A2: the adapter does not claim power-loss durability', () => {
+    const src = readFileSync('packages/offline-adapters/src/storage.ts', 'utf8');
+    assert.match(src, /physical power-loss durability is NOT claimed/i);
+    // The word appears only in comments explaining its ABSENCE; what matters is
+    // that no fsync call exists to justify a durability claim.
+    assert.equal(/fsyncSync\(|\.sync\(\)/.test(src), false, 'no fsync call, so no such claim');
+  });
+});
+
+describe('PART A REFREEZE — offline eligibility ledger', () => {
+  const MANIFEST = 'data/offline-bundle-manifest.json';
+  const has = existsSync(MANIFEST);
+  const m = has ? JSON.parse(readFileSync(MANIFEST, 'utf8')) : null;
+
+  test('A4: authority pack equals the offline-ELIGIBLE population', {
+    skip: has ? false : 'bundle manifest not built',
+  }, () => {
+    const ledger = m.eligibility;
+    assert.notEqual(ledger, undefined, 'the manifest must carry an exclusion ledger');
+    const sum = ledger.excludedDiscontinued + ledger.excludedConflicted +
+      ledger.excludedNeedsReview + ledger.offlineEligible;
+    assert.equal(sum, ledger.totalCurrentProducts, 'exclusions are mutually exclusive');
+    assert.equal(ledger.offlineEligible, m.counts.brandedAuthorityRows,
+      'offlineEligible must equal the authority pack count');
+  });
+
+  test('A6: shard metrics are reported per class, not conflated', {
+    skip: has ? false : 'bundle manifest not built',
+  }, () => {
+    const s = m.shardMetrics;
+    assert.notEqual(s, undefined);
+    for (const k of ['authorityShardCount', 'authorityTotalBytes', 'authorityAverageShardBytes',
+                     'authorityLargestShardBytes', 'searchShardCount', 'searchLargestShardBytes',
+                     'gtinIndexBytes', 'manifestBytes']) {
+      assert.ok(typeof s[k] === 'number', `${k} must be measured`);
+    }
+    assert.ok(s.authorityLargestShardBytes >= s.authorityAverageShardBytes);
+  });
+});
+
+describe('PART A REFREEZE — offline barcode outcomes are distinguished', () => {
+  const ctx = (over: Partial<Parameters<typeof classifyOfflineMiss>[1]> = {}) =>
+    ({ catalogInstalled: true, catalogStale: false, ...over });
+
+  test('A5: a bad check digit is INVALID, regardless of cache state', () => {
+    assert.equal(classifyOfflineMiss(false, ctx()), 'invalid_identifier');
+    assert.equal(classifyOfflineMiss(false, ctx({ catalogInstalled: false })), 'invalid_identifier');
+  });
+
+  test('A5: an intentionally excluded product is NOT a cache miss', () => {
+    assert.equal(classifyOfflineMiss(true, ctx({ knownExcluded: 'discontinued' })), 'product_discontinued');
+    assert.equal(classifyOfflineMiss(true, ctx({ knownExcluded: 'conflicted' })), 'identifier_conflicted');
+    assert.equal(classifyOfflineMiss(true, ctx({ knownExcluded: 'needs_review' })), 'identifier_needs_review');
+  });
+
+  test('A5: a genuinely absent product is a CACHE statement, not an existence claim', () => {
+    assert.equal(classifyOfflineMiss(true, ctx()), 'not_found_in_cached_catalog');
+  });
+
+  test('A5: no catalog is distinguished from a catalog miss', () => {
+    assert.equal(classifyOfflineMiss(true, ctx({ catalogInstalled: false })), 'catalog_missing');
   });
 });

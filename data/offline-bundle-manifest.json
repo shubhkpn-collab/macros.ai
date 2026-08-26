@@ -9,6 +9,13 @@
   "genericSearchRows": 6877,
   "gtinEntries": 397737
  },
+ "eligibility": {
+  "excludedConflicted": 21933,
+  "excludedDiscontinued": 1813,
+  "excludedNeedsReview": 1416,
+  "offlineEligible": 409552,
+  "totalCurrentProducts": 434714
+ },
  "generatedFromCatalogDigests": {
   "brandedRecords": 455458,
   "brandedSourceChecksum": "71e15ee6cbf2c1de2ff4879fc4a00516d4bab81b91334ec2863661e55bd828fc",
@@ -20,6 +27,17 @@
   "version": "branded-version-fingerprint@1.0.0"
  },
  "requiredSchemaVersion": 1,
+ "shardMetrics": {
+  "authorityAverageShardBytes": 2509793,
+  "authorityLargestShardBytes": 15512557,
+  "authorityShardCount": 257,
+  "authorityTotalBytes": 645016689,
+  "gtinIndexBytes": 23864221,
+  "manifestBytes": 47612,
+  "searchLargestShardBytes": 13330146,
+  "searchShardCount": 12,
+  "searchTotalBytes": 136797574
+ },
  "shards": [
   {
    "bytes": 2454346,
