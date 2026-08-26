@@ -53,3 +53,7 @@ data/branded-catalog.json
 # Offline catalog bundle (768 MB, regenerable by tools/build-offline-bundle.py).
 # The manifest and a bounded real fixture are committed instead.
 data/offline-bundle/
+
+# Owner-supplied USDA archives (multi-GB); the README stays tracked.
+data/sources/*
+!data/sources/README.md

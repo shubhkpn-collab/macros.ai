@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from repo_paths import source_file, docs_output_dir, architecture_doc
 """
 BOUNDED-MEMORY SCAN of the USDA Branded archive.
 
@@ -8,7 +11,7 @@ individually by the real JSON parser. Peak memory stays at one record.
 """
 import json, subprocess, sys, collections
 
-ZIP = '/mnt/user-data/uploads/FoodData_Central_branded_food_json_2026-04-30_json.zip'
+ZIP = source_file('FoodData_Central_branded_food_json_2026-04-30_json.zip')
 LIMIT = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 
 def records():

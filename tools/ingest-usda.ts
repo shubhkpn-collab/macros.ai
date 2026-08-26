@@ -6,6 +6,7 @@
  * a value: a food missing core nutrients is rejected, and an extended nutrient
  * the source never reported stays absent.
  */
+import { sourceFile } from './repo-paths.js';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import {
@@ -27,8 +28,11 @@ import {
  * substituted with remembered data.
  */
 const CANDIDATE_FILES = [
-  ['Foundation', '/mnt/user-data/uploads/FoodData_Central_foundation_food_json_2026-04-30.json'],
-  ['SR Legacy', '/mnt/user-data/uploads/FoodData_Central_sr_legacy_food_json_2018-04.json'],
+  // Owner-supplied archives live outside Git. sourceFile() defaults to a
+  // repository-relative directory and honours MACROS_SOURCE_DIR, so no
+  // machine-specific path is baked into the pipeline.
+  ['Foundation', sourceFile('FoodData_Central_foundation_food_json_2026-04-30.json')],
+  ['SR Legacy', sourceFile('FoodData_Central_sr_legacy_food_json_2018-04.json')],
 ] as const;
 const FILES = CANDIDATE_FILES.filter(([, p]) => existsSync(p));
 const MISSING_ARCHIVES = CANDIDATE_FILES.filter(([, p]) => !existsSync(p)).map(([d]) => d);

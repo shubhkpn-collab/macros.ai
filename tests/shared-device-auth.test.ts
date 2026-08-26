@@ -1,3 +1,4 @@
+import { architectureDoc } from '../tools/repo-paths.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -139,7 +140,7 @@ describe('B4 — the boundary cannot be quietly re-opened', () => {
 });
 
 describe('PART 0 — documented status must not outrun the implementation', () => {
-  const DOC = '/mnt/user-data/outputs/macros-architecture/32-shared-device-authentication.md';
+  const DOC = architectureDoc('32-shared-device-authentication.md');
   const doc = (): string => readFileSync(DOC, 'utf8');
 
   test('the state machine is NOT claimed closed while its parts are unbuilt', () => {

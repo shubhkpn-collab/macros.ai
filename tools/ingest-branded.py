@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from repo_paths import source_file, docs_output_dir, architecture_doc
 """
 REAL BRANDED INGESTION v2 — authoritative identity, immutable versions.
 
@@ -12,7 +15,7 @@ Identity policy is versioned; see BRANDED_IDENTITY_VERSION.
 """
 import json, subprocess, sys, hashlib, collections, os, time, sqlite3, shutil
 
-ZIP = '/mnt/user-data/uploads/FoodData_Central_branded_food_json_2026-04-30_json.zip'
+ZIP = source_file('FoodData_Central_branded_food_json_2026-04-30_json.zip')
 INNER = 'FoodData_Central_branded_food_json_2026-04-30.json'
 WINDOW = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 

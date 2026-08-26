@@ -1,3 +1,4 @@
+import { architectureDoc } from '../tools/repo-paths.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -604,7 +605,7 @@ describe('CA-14 — preparation-aware retrieval', () => {
 describe('PART A — evidence patches', () => {
   test('A1: generated documentation never contradicts the report', () => {
     const doc = readFileSync(
-      '/mnt/user-data/outputs/macros-architecture/27-generic-catalog-semantic-integrity-and-search.md',
+      architectureDoc('27-generic-catalog-semantic-integrity-and-search.md'),
       'utf8',
     );
     if (report.missingArchives.length === 0) {

@@ -1,5 +1,7 @@
 /** Generates catalog documentation FROM the canonical machine report. */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { docsOutputDir } from './repo-paths.js';
+import { join } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 const r = JSON.parse(readFileSync('data/usda-import-report.json', 'utf8'));
 const s = r.stats, q = r.search;
 const cov = r.coverage.map((c: any) => `| ${c.nutrientId} | ${c.known}/${c.total} | ${c.percent}% |`).join('\n');
@@ -178,5 +180,12 @@ if (r.crossSource.conceptConvergence.count > 0) {
 }
 p('- Search metrics come from a human-authored regression corpus, not real users.');
 
-writeFileSync('/mnt/user-data/outputs/macros-architecture/27-generic-catalog-semantic-integrity-and-search.md', L.join('\n') + '\n');
+// Canonical output is repository-owned so a plain checkout works with no
+// environment variable set. MACROS_DOCS_OUT optionally redirects an export.
+const outDir = docsOutputDir();
+mkdirSync(outDir, { recursive: true });
+writeFileSync(
+  join(outDir, '27-generic-catalog-semantic-integrity-and-search.md'),
+  L.join('\n') + '\n',
+);
 console.log('generated from report | published', s.publishedSeed, '| Top-1', q.top1Percent + '%');
