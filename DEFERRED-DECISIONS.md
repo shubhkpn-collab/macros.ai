@@ -281,6 +281,19 @@ integrity surfaced, per-entry checksums, exact eligibility ledger.
 | AU-2 | **Session persistence across restart.** With no secure persistent session proof available, restart must degrade to a neutral/locked state rather than reopening the last user. | Depends on AU-1. | With AU-1 |
 | OF-6 | **Outbox repair tooling** for quarantined records, now addressable by opaque `storageRef`. | Operational tooling. | Support tooling |
 
+## PostgreSQL attempt (2026-08-26) — BLOCKED, nothing resolved
+
+A PostgreSQL 17 server is running on the owner's Mac, but this execution
+environment is a sandboxed Linux VM with **no default route and no egress**;
+`127.0.0.1:5432` is the container's own loopback. Reachability was tested, not
+assumed. No simulation was performed and **no deferred item was resolved**.
+
+RT-1, P-3, P-4, P-6, B-5, FC-3 and HH-1 all **remain open** — every claim about
+migrations 0001–0005 still rests on static inspection alone.
+
+Handoff artifacts: `macros-postgres-handoff.bundle` (verified complete history)
+plus `README-POSTGRES-HANDOFF.md`.
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
