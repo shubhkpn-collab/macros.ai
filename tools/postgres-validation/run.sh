@@ -43,20 +43,24 @@ psql_owner() { psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" "$@"; 
 # PostgreSQL authentication. SET ROLE still applies RLS, because macros_app is
 # NOSUPERUSER NOBYPASSRLS.
 psql_app() {
-  local file="" ; local inline=""
+  local file="" inline="" tuples=""
   while [ $# -gt 0 ]; do
     case "$1" in
-      -f) file="$2"; shift 2 ;;
-      -c) inline="$2"; shift 2 ;;
-      *) shift ;;
+      -f)  file="$2"; shift 2 ;;
+      -c)  inline="$2"; shift 2 ;;
+      -tA) tuples="-tA"; shift ;;
+      *)   shift ;;
     esac
   done
   if [ -n "$file" ]; then
     { echo "SET ROLE macros_app;"; cat "$file"; } |
-      psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" -f -
+      psql -v ON_ERROR_STOP=1 $tuples -h "$PGHOST" -p "$PGPORT" -d "$DB" -f -
   else
+    # -tA (tuples-only, unaligned) whenever the shell consumes the value: the
+    # default aligned table emits a header and a `-----` separator, and parsing
+    # by line number picked up the separator instead of the answer.
     printf 'SET ROLE macros_app;\n%s\n' "$inline" |
-      psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" -f -
+      psql -v ON_ERROR_STOP=1 $tuples -h "$PGHOST" -p "$PGPORT" -d "$DB" -f -
   fi
 }
 
@@ -234,12 +238,46 @@ step "test helpers"  psql_owner -f "$SQL/05-test-helpers.sql"
 step "fixtures"      psql_owner -1 -f "$SQL/10-fixtures.sql"
 section "DATA INTEGRITY (constraints, as owner)"
 step "data integrity" psql_owner -f "$SQL/15-data-integrity.sql"
-ROLEPROPS=$(psql_owner -tAc "SELECT rolsuper||'/'||rolbypassrls FROM pg_roles WHERE rolname='macros_app';")
-say "  macros_app rolsuper/rolbypassrls: $ROLEPROPS (must be f/f)"
-[ "$ROLEPROPS" = "f/f" ] || { say "  [FAIL] test role could bypass RLS"; FAILURES=$((FAILURES + 1)); }
-EFFECTIVE=$(psql_app -c "SELECT current_user;" 2>/dev/null | sed -n '3p' | tr -d ' ')
-say "  effective role inside assertions: ${EFFECTIVE:-unknown} (must be macros_app)"
-[ "$EFFECTIVE" = "macros_app" ] || { say "  [FAIL] assertions are NOT running as macros_app"; FAILURES=$((FAILURES + 1)); }
+# The database asserts its own invariants and RAISEs on violation, so nothing
+# depends on whether a boolean renders as `f`, `false` or `FALSE` — the previous
+# check compared against "f/f" and failed against the real server's "false/false"
+# while the role was in fact correct.
+if psql_owner -q -f - >/dev/null 2>&1 <<'ROLECHECK'
+DO $$
+DECLARE ok boolean;
+BEGIN
+  SELECT NOT rolsuper AND NOT rolbypassrls INTO ok
+    FROM pg_roles WHERE rolname = 'macros_app';
+  IF ok IS NULL THEN
+    RAISE EXCEPTION 'macros_app role does not exist';
+  END IF;
+  IF NOT ok THEN
+    RAISE EXCEPTION 'macros_app can bypass RLS — every policy assertion would be meaningless';
+  END IF;
+END;
+$$;
+ROLECHECK
+then
+  say "  [OK] macros_app exists, is not superuser, cannot bypass RLS"
+else
+  say "  [FAIL] macros_app privilege invariant violated"; FAILURES=$((FAILURES + 1))
+fi
+
+# Same approach for the effective role: asserted INSIDE the SET ROLE session.
+if psql_app -f - >/dev/null 2>&1 <<'USERCHECK'
+DO $$
+BEGIN
+  IF current_user <> 'macros_app' THEN
+    RAISE EXCEPTION 'assertions are running as %, not macros_app', current_user;
+  END IF;
+END;
+$$;
+USERCHECK
+then
+  say "  [OK] assertions execute as macros_app (asserted in-database)"
+else
+  say "  [FAIL] assertions are NOT running as macros_app"; FAILURES=$((FAILURES + 1))
+fi
 
 # --- C5..C9 POLICY MATRICES (as the NON-privileged role) ---------------------
 section "RLS MATRIX (as macros_app)"

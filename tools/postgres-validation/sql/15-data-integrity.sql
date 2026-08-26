@@ -7,41 +7,83 @@
 -- A bare `(snapshot ->> 'kcal')::numeric = kcal` evaluates to UNKNOWN when the
 -- key is absent, and CHECK accepts UNKNOWN. Omitting a required authoritative
 -- fact therefore passed while a wrong value failed.
+-- Each case is (label, snapshot). Probes run one per transaction-less block so
+-- one expected rejection cannot terminate the file — which is exactly what
+-- happened on the first real run: the malformed-numeric case raised
+-- invalid_text_representation (22P02) during the ->>::numeric cast, the handler
+-- caught only check_violation, and psql aborted before the remaining probes.
 DO $$
 DECLARE
-  cases text[] := ARRAY[
-    '{"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}',           -- no gramsConsumed
-    '{"gramsConsumed":100,"totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}',                            -- no productVersionId
-    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1"}',                                                        -- no totals
-    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"proteinG":10,"carbohydrateG":5,"fatG":2}}',    -- no kcal
-    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"carbohydrateG":5,"fatG":2}}',       -- no proteinG
-    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"fatG":2}}',           -- no carbohydrateG
-    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5}}',  -- no fatG
-    '{"gramsConsumed":"one hundred","productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}' -- wrong type
+  labels text[] := ARRAY[
+    'missing gramsConsumed','missing productVersionId','missing totals','missing kcal',
+    'missing proteinG','missing carbohydrateG','missing fatG',
+    'non-numeric gramsConsumed','wrong gramsConsumed value','wrong kcal value',
+    'totals is not an object'
   ];
-  c text; accepted int := 0;
+  cases text[] := ARRAY[
+    '{"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":100,"totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1"}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"proteinG":10,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"fatG":2}}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5}}',
+    '{"gramsConsumed":"one hundred","productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":55,"productVersionId":"prod-test-1@v1","totals":{"kcal":100,"proteinG":10,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":{"kcal":9999,"proteinG":10,"carbohydrateG":5,"fatG":2}}',
+    '{"gramsConsumed":100,"productVersionId":"prod-test-1@v1","totals":"not an object"}'
+  ];
+  i int; accepted int := 0; invalid int := 0; rejected int := 0;
 BEGIN
-  FOREACH c IN ARRAY cases LOOP
+  FOR i IN 1 .. array_length(cases, 1) LOOP
     BEGIN
       INSERT INTO food_logs (
         user_id, log_id, product_id, product_version_id, grams, logged_at,
         event_timezone, event_utc_offset_minutes, local_date, nutrition_calc_version,
         weight_capture, nutrition_snapshot, kcal, protein_g, carbohydrate_g, fat_g)
-      VALUES ('11111111-1111-4111-8111-111111111111', 'integrity-probe', 'prod-test-1',
+      VALUES ('11111111-1111-4111-8111-111111111111', 'integrity-probe-' || i, 'prod-test-1',
         'prod-test-1@v1', 100, now(), 'UTC', 0, current_date, 'test',
-        '{"grams":100}'::jsonb, c::jsonb, 100, 10, 5, 2);
+        '{"grams":100}'::jsonb, cases[i]::jsonb, 100, 10, 5, 2);
+
+      -- Reaching here means the malformed row was ACCEPTED: a real failure.
       accepted := accepted + 1;
-      RAISE WARNING 'ACCEPTED malformed snapshot: %', left(c, 60);
-      DELETE FROM food_logs WHERE log_id = 'integrity-probe';
-    EXCEPTION WHEN check_violation THEN
-      NULL;  -- correctly rejected
+      RAISE WARNING 'ACCEPTED malformed snapshot [%]: %', labels[i], left(cases[i], 70);
+      DELETE FROM food_logs WHERE log_id = 'integrity-probe-' || i;
+
+    EXCEPTION
+      -- The specific, legitimate rejection mechanisms:
+      --   23514 check_violation            — a presence/agreement CHECK failed
+      --   22P02 invalid_text_representation — ->>::numeric on non-numeric text
+      --   22003 numeric_value_out_of_range  — value outside the column domain
+      WHEN check_violation OR invalid_text_representation OR numeric_value_out_of_range THEN
+        rejected := rejected + 1;
+      WHEN OTHERS THEN
+        -- Deliberately NOT a pass. An unrelated error would prove nothing about
+        -- the integrity constraints under test.
+        invalid := invalid + 1;
+        RAISE WARNING 'INVALID TEST [%]: unexpected % (%)', labels[i], SQLSTATE, SQLERRM;
     END;
   END LOOP;
 
   IF accepted > 0 THEN
-    RAISE EXCEPTION 'FAIL snapshot-integrity: % malformed snapshots were accepted', accepted;
+    RAISE EXCEPTION 'FAIL snapshot-integrity: % malformed snapshots were ACCEPTED', accepted;
   END IF;
-  RAISE NOTICE 'PASS snapshot-integrity: all 8 malformed snapshots rejected';
+  IF invalid > 0 THEN
+    RAISE EXCEPTION 'FAIL snapshot-integrity: % probes failed for unrelated reasons', invalid;
+  END IF;
+  RAISE NOTICE 'PASS snapshot-integrity: all % malformed snapshots rejected', rejected;
+END;
+$$;
+
+-- Nothing from the probe matrix may have survived.
+DO $$
+DECLARE leaked int;
+BEGIN
+  SELECT count(*) INTO leaked FROM food_logs WHERE log_id LIKE 'integrity-probe%';
+  IF leaked <> 0 THEN
+    RAISE EXCEPTION 'FAIL probe-persistence: % malformed probe rows persisted', leaked;
+  END IF;
+  RAISE NOTICE 'PASS probe-persistence: no malformed probe row was stored';
 END;
 $$;
 
@@ -60,8 +102,11 @@ BEGIN
       100, 10, 5, 2);
     DELETE FROM food_logs WHERE log_id = 'integrity-capture';
     RAISE EXCEPTION 'FAIL capture-integrity: weight_capture without grams accepted';
-  EXCEPTION WHEN check_violation THEN
-    RAISE NOTICE 'PASS capture-integrity: missing weight_capture.grams rejected';
+  EXCEPTION
+    WHEN check_violation OR invalid_text_representation OR numeric_value_out_of_range THEN
+      RAISE NOTICE 'PASS capture-integrity: missing weight_capture.grams rejected (%)', SQLSTATE;
+    WHEN OTHERS THEN
+      RAISE EXCEPTION 'INVALID TEST capture-integrity: unexpected % (%)', SQLSTATE, SQLERRM;
   END;
 END;
 $$;

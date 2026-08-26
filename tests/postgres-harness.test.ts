@@ -306,3 +306,89 @@ describe('postgres harness — expected-negative accounting', () => {
       'the harness must never reset the owner database');
   });
 });
+
+describe('postgres harness — round-2 real-execution fixes', () => {
+  const runner4 = readFileSync(repoPath('tools', 'postgres-validation', 'run.sh'), 'utf8');
+  const integrity = readFileSync(join(SQL_DIR, '15-data-integrity.sql'), 'utf8');
+
+  test('malformed NUMERIC text is an expected rejection, not an abort', () => {
+    // The real run died here: "one hundred" fails the ->>::numeric cast with
+    // invalid_text_representation (22P02), the handler caught only
+    // check_violation, and psql aborted the whole file.
+    assert.match(integrity, /invalid_text_representation/);
+    assert.match(integrity, /numeric_value_out_of_range/);
+    assert.match(integrity, /check_violation/);
+  });
+
+  test('one expected rejection cannot terminate the probe matrix', () => {
+    // Every probe runs in its own BEGIN/EXCEPTION block inside a loop, and each
+    // uses a distinct log_id so a survivor is attributable.
+    assert.match(integrity, /FOR i IN 1 \.\. array_length\(cases, 1\) LOOP/);
+    assert.match(integrity, /'integrity-probe-' \|\| i/);
+    assert.ok(integrity.includes('rejected := rejected + 1'));
+  });
+
+  test('the full adversarial matrix is present', () => {
+    for (const label of ['missing gramsConsumed', 'missing productVersionId', 'missing totals',
+                         'missing kcal', 'missing proteinG', 'missing carbohydrateG',
+                         'missing fatG', 'non-numeric gramsConsumed', 'wrong gramsConsumed value',
+                         'wrong kcal value', 'totals is not an object']) {
+      assert.ok(integrity.includes(label), `missing probe: ${label}`);
+    }
+    assert.match(integrity, /missing weight_capture\.grams|weight_capture\.grams must be present/);
+  });
+
+  test('WHEN OTHERS is never treated as a pass', () => {
+    // A blanket handler would be another false green: an unrelated error proves
+    // nothing about the constraints under test.
+    for (const m of integrity.matchAll(/WHEN OTHERS THEN([\s\S]{0,240}?)(?=WHEN |END;)/g)) {
+      const body = m[1]!;
+      assert.ok(/INVALID TEST|invalid := invalid \+ 1/.test(body),
+        'WHEN OTHERS must record a failure, never a pass');
+      assert.equal(/RAISE NOTICE 'PASS/.test(body), false);
+    }
+  });
+
+  test('malformed probe rows are asserted ABSENT afterwards', () => {
+    assert.match(integrity, /FAIL probe-persistence/);
+    assert.match(integrity, /log_id LIKE 'integrity-probe%'/);
+  });
+
+  test('the role check does not compare rendered booleans', () => {
+    // The real server printed "false/false"; the harness expected "f/f" and
+    // failed a role that was in fact correct.
+    assert.equal(/"\$ROLEPROPS" = "f\/f"/.test(runner4), false,
+      'presentation-string comparison must not return');
+    assert.match(runner4, /NOT rolsuper AND NOT rolbypassrls/,
+      'the database must assert the invariant itself');
+    assert.match(runner4, /can bypass RLS/);
+  });
+
+  test('current_user cannot consume a separator or header line', () => {
+    // `sed -n '3p'` on aligned output picked up the `-----` separator.
+    assert.equal(/sed -n '3p'/.test(runner4), false, 'line-number parsing must not return');
+    assert.match(runner4, /IF current_user <> 'macros_app' THEN/,
+      'asserted in-database inside the SET ROLE session');
+  });
+
+  test('every shell-consumed gate value is machine-readable', () => {
+    for (const m of runner4.matchAll(/^[A-Z_]+=\$\(psql[^)]*\)/gm)) {
+      assert.ok(m[0].includes('-tA'),
+        `gate value must use tuples-only output: ${m[0].slice(0, 70)}`);
+    }
+  });
+
+  test('psql_app supports -tA for machine-readable reads', () => {
+    assert.match(runner4, /-tA\)\s*tuples="-tA"/);
+  });
+
+  test('migrations were NOT touched this round', () => {
+    // This run produced no evidence requiring a production-schema change.
+    const core = readFileSync(join(MIG_DIR, '0001_core_schema.sql'), 'utf8');
+    assert.match(core, /food_logs_snapshot_shape/, 'integrity constraints intact');
+    assert.match(core, /FOREIGN KEY \(current_product_version_id, product_id\)/);
+    const household2 = readFileSync(join(MIG_DIR, '0005_households.sql'), 'utf8');
+    assert.match(household2, /transfer_household_ownership/);
+    assert.match(household2, /is_active_household_member/);
+  });
+});

@@ -5,26 +5,60 @@
 >
 > **FIRST REAL EXECUTION: 2026-08-26, PostgreSQL 17.11, database `macros_dev`.**
 
-## Real execution evidence
+## Real execution evidence (round 2 — PostgreSQL 17.11, `macros_dev`)
 
-| Result | Status |
+### RUNTIME VALIDATED against a live server
+
+| Area | Evidence |
 |---|---|
-| Connectivity (`PGHOST=/tmp`) | **VALIDATED** |
-| Safety guard (`macros_dev` only) | **PASS** |
-| Test auth prerequisite | **PASS** |
-| **Migrations 0001–0005, run 1** | **applied=5, skipped=0 — FIRST REAL EXECUTION PASSED** |
-| Migrations, run 2 (idempotency) | applied=0, skipped=5 — **VALIDATED** |
-| Ledger rows | 5 |
-| Checksum-drift refusal | **behaviour proven** (`deadbeef` refused) |
-| Schema | tables=14, rls_enabled=13, policies=21, indexes=29 |
-| RLS behavioural matrix | **NOT YET EXECUTED** |
-| Idempotency concurrency | **NOT YET EXECUTED** |
-| Household database privacy | **NOT YET EXECUTED** |
+| Connectivity (`PGHOST=/tmp`) | validated |
+| Migrations 0001–0005 | applied, then skipped on re-run; ledger = 5 |
+| Migration ledger / checksum drift | drift refused, checksum restored |
+| Schema | 14 tables, 13 RLS enabled+forced, 21 policies, 29 indexes |
+| **RLS user isolation** | profile, goals, food logs both directions; forged insert denied **SQLSTATE 42501**; UPDATE/DELETE denied; composite `(user_id, log_id)`; anonymous sees nothing |
+| **Household database privacy** | owner reads none of a member's nutrition **while administering**; member privacy symmetric; shared metadata readable; outsider denied |
+| **Household ownership transfer** | legitimate transfer succeeds; non-owner, outsider, out-of-household target, self-transfer and removed target all denied; rollback leaves ownership intact |
+| **No RLS recursion** | memberships, households, devices, seats |
+| Authorization helper scope | returns only the caller's own fact |
+| Connection identity clearing | after COMMIT, ROLLBACK **and** ERROR |
+| Catalog ordinary-user immutability | read allowed; INSERT/UPDATE/DELETE denied |
+| **Food-log uniqueness under 32-session race** | exactly 1 logical row |
+| Food-log conflict non-overwrite | original immutable |
+| Correction / void isolation | self-void allowed, cross-user denied, history intact |
+| SQL-level offline duplicate/overwrite prevention | retry stays 1 row |
 
-The migrations are real now: 14 tables, 21 policies and 29 indexes exist in a
-live database, and the ledger correctly skips on re-run.
+Development timings: daily logs 23 ms · RLS profile 22 ms · membership 22 ms.
 
-### The harness accounting bug the real run exposed
+### Precision about what these prove
+
+- The 32-session race proves **database uniqueness**, not the application's
+  `inserted` / `replayed_existing` / `idempotency_conflict` classification — no
+  repository code participated.
+- The offline test proves **SQL duplicate/overwrite behaviour**, not client ACK
+  or outbox settlement.
+
+### Still PARTIAL
+
+- **DATA-INTEGRITY ADVERSARIAL MATRIX — PARTIAL.** The malformed-numeric probe
+  raised `invalid_text_representation` (22P02) during the `->>::numeric` cast;
+  the handler caught only `check_violation`, so psql aborted the file before the
+  remaining probes. Fixed by accepting the specific legitimate rejection classes
+  (23514 / 22P02 / 22003), running each probe in its own block, and asserting
+  afterwards that no probe row persisted. Rerun required.
+- **POSTGRESQL RUNTIME VALIDATION — PARTIAL** until that rerun is clean. RT-1
+  stays open.
+
+### Two harness parsing bugs the real server exposed
+
+The role check compared `rolsuper||'/'||rolbypassrls` against `"f/f"`, but
+PostgreSQL rendered `false/false` — a correct role failing on presentation
+format. And `current_user` was read with `sed -n '3p'` from aligned output,
+which picked up the `-----` separator. Both are now **asserted inside the
+database**, which raises on violation, so nothing depends on how a boolean
+renders or how a table is laid out. Every remaining shell-consumed gate value
+uses `-tA`.
+
+### The harness accounting bug### The harness accounting bug the real run exposed
 
 `apply_migrations` both incremented the global `FAILURES` counter **and**
 returned nonzero on checksum drift. That is right for unexpected drift during
