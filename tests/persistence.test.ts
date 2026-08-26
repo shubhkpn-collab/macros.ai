@@ -518,6 +518,7 @@ describe('MIGRATIONS — static assertions (RLS runtime verification PENDING)', 
       '0002_rls.sql',
       '0003_catalog_identifiers.sql',
       '0004_food_log_corrections.sql',
+      '0005_households.sql',
     ]);
   });
 
@@ -545,8 +546,23 @@ describe('MIGRATIONS — static assertions (RLS runtime verification PENDING)', 
   }
 
   test('NO update or delete policy exists on any append-only table', () => {
-    assert.ok(!/FOR UPDATE/i.test(sql), 'append-only data must have no UPDATE policy');
-    assert.ok(!/FOR DELETE/i.test(sql), 'append-only data must have no DELETE policy');
+    // Scoped to the APPEND-ONLY migrations. Household metadata (0005) is
+    // legitimately mutable — a display name changes, a membership is removed,
+    // a device is rebound — so a blanket ban across every migration would be
+    // asserting the wrong invariant, not a stronger one.
+    const appendOnly = files
+      .filter((f) => !f.startsWith('0005'))
+      .map((f) => readFileSync(join(dir, f), 'utf8')).join('\n');
+    assert.ok(!/FOR UPDATE/i.test(appendOnly), 'append-only data must have no UPDATE policy');
+    assert.ok(!/FOR DELETE/i.test(appendOnly), 'append-only data must have no DELETE policy');
+  });
+
+  test('household metadata never grants UPDATE over personal tables', () => {
+    const household = readFileSync(join(dir, '0005_households.sql'), 'utf8');
+    for (const personal of ['food_logs', 'user_profile_versions', 'energy_goal_versions']) {
+      assert.equal(household.includes(personal), false,
+        `0005 must not touch ${personal} — admin is not nutrition access`);
+    }
   });
 
   test('authenticated grants are SELECT/INSERT only, and never on the catalog', () => {
@@ -554,8 +570,14 @@ describe('MIGRATIONS — static assertions (RLS runtime verification PENDING)', 
     assert.match(sql, /GRANT SELECT, INSERT ON food_logs\s+TO authenticated/);
     assert.match(sql, /GRANT SELECT\s+ON catalog_products\s+TO authenticated/);
     assert.match(sql, /GRANT SELECT\s+ON product_versions\s+TO authenticated/);
-    assert.ok(!/GRANT[^;]*UPDATE[^;]*TO authenticated/i.test(sql));
-    assert.ok(!/GRANT[^;]*DELETE[^;]*TO authenticated/i.test(sql));
+    // Again scoped: 0005 grants UPDATE on household tables only, never on
+    // personal or catalog data.
+    const appendOnly = files
+      .filter((f) => !f.startsWith('0005'))
+      .map((f) => readFileSync(join(dir, f), 'utf8')).join('\n');
+    assert.ok(!/GRANT[^;]*UPDATE[^;]*TO authenticated/i.test(appendOnly));
+    assert.ok(!/GRANT[^;]*DELETE[^;]*TO authenticated/i.test(appendOnly));
+    assert.ok(!/GRANT[^;]*DELETE[^;]*TO authenticated/i.test(sql), 'no DELETE grant anywhere');
     assert.ok(!/GRANT[^;]*INSERT ON (catalog_products|product_versions)/i.test(sql));
   });
 

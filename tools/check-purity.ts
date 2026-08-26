@@ -42,6 +42,9 @@ const PURE_DOMAIN = [
   // Offline capability, bundle verification, outbox and reconciliation are
   // pure decision logic: no clock, no IO, no storage, no network.
   'packages/domain-offline-sync',
+  // Household identity, permissions, sessions and voice-switch resolution are
+  // pure: no clock, no IO, no auth provider, no biometrics.
+  'packages/domain-household',
   // Canonical nutrient registry, units, aggregation and view preferences.
   // Pure: no clock, no IO, no LLM — a nutrient value is never invented here.
   'packages/domain-nutrients',

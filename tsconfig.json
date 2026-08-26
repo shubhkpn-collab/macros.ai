@@ -30,6 +30,7 @@
       "@macros/tablet-app-core": ["packages/tablet-app-core/src/index.ts"],
       "@macros/domain-catalog": ["packages/domain-catalog/src/index.ts"],
       "@macros/offline-adapters": ["packages/offline-adapters/src/index.ts"],
+      "@macros/domain-household": ["packages/domain-household/src/index.ts"],
       "@macros/domain-offline-sync": ["packages/domain-offline-sync/src/index.ts"],
       "@macros/catalog-runtime": ["packages/catalog-runtime/src/index.ts"],
       "@macros/catalog-ingestion": ["packages/catalog-ingestion/src/index.ts"],
