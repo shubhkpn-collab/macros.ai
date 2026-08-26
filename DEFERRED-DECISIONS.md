@@ -241,6 +241,20 @@ through the ProductCard contract.
 | B-4 | **Package images.** Nothing scraped. | Licensing. | Image sourcing |
 | RC-5 | Recommendation quality — engineering evaluation only. | Needs real users. | Post-pilot |
 
+## From OFFLINE RESILIENCE CLOSURE (2026-08-26)
+
+**RT-3 RESOLVED** — durable pending food-log capture and idempotent sync are
+engineering-closed, including crash-after-accept and in-flight recovery.
+**RT-4 RESOLVED** — a real offline catalog cache exists: 6,877 generic and
+409,552 branded current products with full authority, 768 MB total.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| OF-1 | **PLATFORM SECURE LOCAL STORAGE VALIDATION.** Pending logs are private nutrition behaviour and must live in keystore-backed storage. Implemented as a port; the filesystem adapter reports `isSecure: false` and is development-only. | No Android/RN tooling. | Device tooling |
+| OF-2 | **Offline correction/void sync.** Base food-log sync is closed; typed correction operations are not transported yet. The outbox payload can carry them without a rewrite. | Correction application paths are not complete. | Correction UX milestone |
+| OF-3 | **Bundle download/staging over the network.** Verification, atomic activation and last-known-good rollback are implemented and tested against the filesystem. | No device update channel. | OTA milestone |
+| OF-4 | **On-device ASR for offline voice.** Cloud voice is reported unavailable rather than hanging. | No local ASR. | Voice runtime |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**

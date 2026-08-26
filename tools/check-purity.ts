@@ -39,6 +39,9 @@ const PURE_DOMAIN = [
   // Deterministic candidate/filter/rank. No LLM, no network, no clock, no
   // randomness — recommendation must be reproducible from its inputs alone.
   'packages/domain-recommendation',
+  // Offline capability, bundle verification, outbox and reconciliation are
+  // pure decision logic: no clock, no IO, no storage, no network.
+  'packages/domain-offline-sync',
   // Canonical nutrient registry, units, aggregation and view preferences.
   // Pure: no clock, no IO, no LLM — a nutrient value is never invented here.
   'packages/domain-nutrients',
@@ -68,6 +71,8 @@ const PRODUCTION = [
   // be built. It reads node:crypto for migration checksums, so it is not pure —
   // but it still may not reach an LLM SDK, a transport library or the test kit.
   'packages/runtime-config',
+  // Filesystem/dev adapters for offline storage and bundles.
+  'packages/offline-adapters',
 ];
 
 /** Transport and hardware libraries must not reach the pure capture logic. */
