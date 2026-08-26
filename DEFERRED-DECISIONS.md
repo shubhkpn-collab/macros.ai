@@ -270,6 +270,17 @@ integrity surfaced, per-entry checksums, exact eligibility ledger.
 | HH-4 | **Invitation delivery** (email/SMS) and multi-owner households. | Out of scope. | Household UX |
 | OF-5 | **Outbox repair/export tooling** for quarantined records. They are retained, never auto-deleted. | Needs a UX decision. | Support tooling |
 
+## From SHARED-DEVICE AUTHENTICATION (2026-08-25)
+
+**HH-2 REMAINS OPEN.** A fake dev adapter is not a provider.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| HH-2 | **Real online auth provider.** The boundary and mint path are closed; no Supabase/Auth0/Firebase integration exists. | Deliberately out of scope. | Provider selection |
+| AU-1 | **Platform secure offline member unlock.** Device-local credential verification needs Android keystore-backed storage. Explicitly NOT resolved by the existence of a port — no plaintext PIN, password or biometric material is stored anywhere, and nothing here may be called secure device unlock. | Pending Android tooling. | Android runtime work |
+| AU-2 | **Session persistence across restart.** With no secure persistent session proof available, restart must degrade to a neutral/locked state rather than reopening the last user. | Depends on AU-1. | With AU-1 |
+| OF-6 | **Outbox repair tooling** for quarantined records, now addressable by opaque `storageRef`. | Operational tooling. | Support tooling |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
