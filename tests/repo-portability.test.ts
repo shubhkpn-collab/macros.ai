@@ -24,12 +24,43 @@ describe('repository filesystem portability', () => {
     }
   });
 
-  test('no helper returns a Claude-sandbox path by default', () => {
-    for (const p of [REPO_ROOT, DOCS_ARCHITECTURE, docsOutputDir(), sourceFile('x.json')]) {
-      for (const forbidden of ['/mnt/user-data', '/home/claude/macros/..', '/Users/']) {
-        assert.equal(p.includes(forbidden), false, `${p} leaks ${forbidden}`);
-      }
+  test('every default resolves BENEATH the checkout, wherever that is', () => {
+    // The real invariant. A directory blocklist is the wrong test twice over:
+    // a macOS checkout legitimately sits under /Users, and this sandbox's
+    // checkout legitimately sits under /home/claude. What matters is that
+    // nothing defaults to a location OUTSIDE the repository.
+    for (const p of [DOCS_ARCHITECTURE, docsOutputDir(), sourceFile('x.json')]) {
+      assert.ok(p.startsWith(REPO_ROOT), `${p} must resolve beneath ${REPO_ROOT}`);
     }
+  });
+
+  test('no default points at an external artifact directory', () => {
+    // /mnt/user-data/outputs was never part of any checkout — that specific
+    // escape is what broke the Mac clone.
+    for (const p of [DOCS_ARCHITECTURE, docsOutputDir()]) {
+      assert.equal(p.includes('/mnt/user-data'), false, `${p} escapes the repository`);
+    }
+  });
+
+  test('a runtime-resolved macOS path under /Users is VALID', () => {
+    // The invariant is that paths derive from the checkout, not that they avoid
+    // any particular directory name. On macOS the answer starts with /Users.
+    assert.equal(isAbsolute(REPO_ROOT), true);
+    assert.equal(existsSync(repoPath('package.json')), true);
+    assert.ok(DOCS_ARCHITECTURE.startsWith(REPO_ROOT), 'docs resolve beneath the checkout');
+    assert.ok(sourceFile('x.json').startsWith(REPO_ROOT) || process.env['MACROS_SOURCE_DIR'],
+      'sources default beneath the checkout unless explicitly overridden');
+  });
+
+  test('the STATIC guard still rejects a hard-coded machine literal', () => {
+    // Runtime resolution vs source literal is the whole distinction:
+    //   VALID   → repoRoot resolving to /Users/someone/macros-local
+    //   INVALID → const ROOT = '/Users/someone/macros-local'
+    const guard = readFileSync(repoPath('tools', 'check-portability.ts'), 'utf8');
+    assert.ok(/Users/.test(guard), 'the static guard must still screen /Users literals');
+    assert.ok(guard.includes('user-data'), 'and the sandbox roots');
+    // ...and it inspects SOURCE TEXT, never a resolved runtime value.
+    assert.ok(guard.includes('readFileSync'));
   });
 
   test('generated docs default to the repository with NO env var set', () => {

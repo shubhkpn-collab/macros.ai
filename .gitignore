@@ -61,3 +61,4 @@ data/sources/*
 # node_modules is machine-generated; package-lock.json IS tracked when it can be
 # generated against a reachable registry (see docs/architecture/PORTABILITY.md).
 node_modules/
+artifacts/

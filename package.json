@@ -10,7 +10,8 @@
     "check:portability": "node --import tsx tools/check-portability.ts",
     "check:auth": "node --import tsx tools/check-auth-boundary.ts",
     "docs:generate": "node --import tsx tools/gen-catalog-doc.ts",
-    "check:toolchain": "node --import tsx tools/check-toolchain.ts"
+    "check:toolchain": "node --import tsx tools/check-toolchain.ts",
+    "postgres:validate": "bash tools/postgres-validation/run.sh"
   },
   "engines": {
     "node": ">=22.0.0",
