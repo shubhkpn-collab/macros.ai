@@ -45,6 +45,8 @@ const PURE_DOMAIN = [
   // Household identity, permissions, sessions and voice-switch resolution are
   // pure: no clock, no IO, no auth provider, no biometrics.
   'packages/domain-household',
+  // Authenticated subject minting. Pure: no provider SDK, no network, no clock.
+  'packages/domain-auth',
   // Canonical nutrient registry, units, aggregation and view preferences.
   // Pure: no clock, no IO, no LLM — a nutrient value is never invented here.
   'packages/domain-nutrients',

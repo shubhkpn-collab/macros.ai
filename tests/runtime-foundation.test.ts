@@ -165,7 +165,7 @@ describe('B12 — auth binding', () => {
     assert.ok(!('kind' in r));
     if ('kind' in r) return;
     assert.equal(r.userId, USER);
-    assert.equal(r.authenticatedSubjectId, USER);
+    assert.equal(r.userId, USER);
   });
 
   test('a client claiming ANOTHER user is refused', () => {

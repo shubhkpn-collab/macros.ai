@@ -1,3 +1,4 @@
+import { mintSubject, type AuthenticatedSubject } from '@macros/domain-auth';
 import { appError, type AppError } from './errors.js';
 
 /**
@@ -17,6 +18,10 @@ export interface AuthSession {
   readonly subjectId: string;
   readonly issuedAt: string;
   readonly expiresAt: string;
+  /** Provider session handle, when the provider supplies one. */
+  readonly sessionId?: string;
+  readonly displayName?: string;
+  readonly householdId?: string | null;
 }
 
 export interface AuthSessionProvider {
@@ -38,7 +43,7 @@ export function subjectFromSession(
   session: AuthSession,
   nowIso: string,
   claimedUserId?: string,
-): { readonly userId: string; readonly authenticatedSubjectId: string } | AppError {
+): AuthenticatedSubject | AppError {
   if (!UUID_SHAPE.test(session.subjectId)) {
     return appError('authentication', 'invalid_subject', 'Session subject is not a valid identity.');
   }
@@ -55,7 +60,19 @@ export function subjectFromSession(
   if (claimedUserId !== undefined && claimedUserId !== session.subjectId) {
     return appError('authorization', 'subject_mismatch', 'Not permitted for this profile.');
   }
-  return { userId: session.subjectId, authenticatedSubjectId: session.subjectId };
+  // ONE derivation path. Previously this returned its own subject-shaped
+  // literal, which was a second place identity could be constructed; it now
+  // mints through the same branded routine everything else uses.
+  const minted = mintSubject(
+    { subjectId: session.subjectId, sessionId: session.sessionId ?? session.subjectId,
+      issuedAt: session.issuedAt, expiresAt: session.expiresAt },
+    { displayName: session.displayName ?? 'Member', householdId: session.householdId ?? null,
+      nowIso, authorized: true, deviceBound: true },
+  );
+  if (!minted.ok) {
+    return appError('authentication', minted.reason, 'Your session could not be verified.');
+  }
+  return minted.subject;
 }
 
 /** Test/development only. Rejected in production by the composition root. */

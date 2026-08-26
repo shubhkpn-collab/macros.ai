@@ -1,3 +1,4 @@
+import { mintSubjectForTests } from '@macros/domain-auth';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -9,8 +10,7 @@ import {
   DevScaleAdapter,
   assertSubjectBinding,
   type AppEnvironment,
-  type AppSubject,
-} from '@macros/tablet-app-core';
+  type AppSubject, appSubjectFrom } from '@macros/tablet-app-core';
 import {
   InMemoryEnergyGoalRepository,
   InMemoryFoodLogRepository,
@@ -54,11 +54,8 @@ class SequenceIds {
   }
 }
 
-const subjectFor = (userId: string, name: string): AppSubject => ({
-  authenticatedSubjectId: userId,
-  userId,
-  displayName: name,
-});
+const subjectFor = (userId: string, name: string): AppSubject =>
+  appSubjectFrom(mintSubjectForTests(userId, { displayName: name }));
 
 const goalFor = (userId: string, id: string, delta: number): EnergyGoalVersion => ({
   goalVersionId: id,
@@ -131,16 +128,20 @@ describe('SESSION AND IDENTITY', () => {
     assert.ok(h.app.getState().subject.displayName.length > 0, 'the UI can always show who is active');
   });
 
-  test('a subject whose authenticated id differs from its domain id is refused', () => {
-    assert.throws(
-      () => assertSubjectBinding({ authenticatedSubjectId: USER_B, userId: USER_A, displayName: 'x' }),
-      /does not match/,
-    );
+  test('a mismatched subject is now UNREPRESENTABLE, not merely refused', () => {
+    // The old runtime assertion existed because a caller could build a subject
+    // whose authenticated id differed from its domain id. appSubjectFrom now
+    // derives all three identities from one AuthenticatedSubject, so there is
+    // no field left to disagree.
+    const subject = appSubjectFrom(mintSubjectForTests(USER_A, { displayName: 'Alex' }));
+    assert.equal(subject.authenticatedSubjectId, subject.userId);
+    assert.equal(subject.userId, USER_A);
+    assert.ok(subject.sessionId.length > 0, 'provenance travels with the subject');
   });
 
-  test('a non-UUID user id is refused so we cannot drift from the RLS boundary', () => {
+  test('a non-UUID user id is still refused at the RLS boundary', () => {
     assert.throws(
-      () => assertSubjectBinding({ authenticatedSubjectId: 'dev-1', userId: 'dev-1', displayName: 'x' }),
+      () => assertSubjectBinding(appSubjectFrom(mintSubjectForTests('dev-1'))),
       /UUID-shaped/,
     );
   });

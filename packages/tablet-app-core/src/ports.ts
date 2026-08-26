@@ -1,3 +1,4 @@
+import type { AuthenticatedSubject } from '@macros/domain-auth';
 import type { Instant } from '@macros/contracts';
 
 /**
@@ -38,10 +39,35 @@ export interface IdGenerator {
  * Real auth/session binding is an MVP-1 / runtime-backend concern. This
  * milestone closes only the contract.
  */
+/**
+ * The active user, DERIVED from an AuthenticatedSubject.
+ *
+ * Previously this was a plain literal any caller could construct, so the
+ * privilege boundary was a naming convention: anything that could name a userId
+ * could act as that user. It is now obtainable only via `appSubjectFrom`, which
+ * requires an unforgeable `AuthenticatedSubject`.
+ */
 export interface AppSubject {
   readonly authenticatedSubjectId: string;
   readonly userId: string;
   readonly displayName: string;
+  /** Proof of provenance: which verified session this subject came from. */
+  readonly sessionId: string;
+}
+
+/**
+ * THE ONLY WAY to produce an AppSubject.
+ *
+ * The three identities coincide by construction rather than by assertion —
+ * there is no field a caller could set to a different user.
+ */
+export function appSubjectFrom(authenticated: AuthenticatedSubject): AppSubject {
+  return {
+    authenticatedSubjectId: authenticated.userId,
+    userId: authenticated.userId,
+    displayName: authenticated.displayName,
+    sessionId: authenticated.sessionId,
+  };
 }
 
 const UUID_SHAPE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

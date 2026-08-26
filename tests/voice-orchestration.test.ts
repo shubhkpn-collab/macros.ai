@@ -1,9 +1,10 @@
+import { mintSubjectForTests } from '@macros/domain-auth';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { DeterministicVoiceParser, type VoiceUtterance } from '@macros/domain-voice';
 import { VoiceOrchestrator } from '@macros/voice-orchestration';
 import type { VoiceOption, VoiceResponse } from '@macros/domain-voice';
-import { TabletAppController, DevScaleAdapter, type AppEnvironment, type AppSubject } from '@macros/tablet-app-core';
+import { TabletAppController, DevScaleAdapter, type AppEnvironment, type AppSubject, appSubjectFrom } from '@macros/tablet-app-core';
 import {
   InMemoryEnergyGoalRepository, InMemoryFoodLogRepository,
   InMemoryProductVersionRepository, InMemoryUserProfileRepository,
@@ -30,7 +31,8 @@ class SequenceIds {
   private n = 0;
   next(): string { this.n += 1; return `00000000-0000-4000-8000-${String(this.n).padStart(12, '0')}`; }
 }
-const subjectFor = (userId: string, name: string): AppSubject => ({ authenticatedSubjectId: userId, userId, displayName: name });
+const subjectFor = (userId: string, name: string): AppSubject =>
+  appSubjectFrom(mintSubjectForTests(userId, { displayName: name }));
 const goalFor = (userId: string, id: string, delta: number): EnergyGoalVersion => ({
   goalVersionId: id, userId, effectiveFrom: instant('2026-01-01T00:00:00.000Z'),
   goal: delta > 0 ? 'gain' : delta < 0 ? 'lose' : 'maintain', targetDeltaKcal: delta,
