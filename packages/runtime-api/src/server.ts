@@ -1,3 +1,4 @@
+import { subjectUserId, type AuthenticatedSubject } from '@macros/domain-auth';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import {
   HTTP_STATUS, appError, fromUnknown, toWireError,
@@ -24,6 +25,15 @@ export interface RequestContext {
   readonly requestId: string;
   readonly userId: string;
   readonly body: Record<string, unknown>;
+  /**
+   * The ACTUAL subject minted from the verified session.
+   *
+   * Reducing authentication to a `userId` string destroys the unforgeable
+   * capability that `withAuthenticatedDatabaseSubject` requires, and a handler
+   * would then have to reconstruct one — which is exactly the impersonation
+   * hole the branded type exists to close. Undefined only on public routes.
+   */
+  readonly subject?: AuthenticatedSubject;
 }
 
 export interface RouteHandler {
@@ -34,6 +44,12 @@ export interface Route {
   readonly method: 'GET' | 'POST';
   readonly path: string;
   readonly schema?: Schema;
+  /**
+   * Narrowly scoped decoder for STRUCTURED bodies. The flat `Schema` validator
+   * cannot express a nested FoodLogItem, and bypassing validation to wire a
+   * route would let unknown network JSON reach persistence.
+   */
+  readonly decode?: (body: Record<string, unknown>) => unknown | AppError;
   /** Public routes skip auth; everything else requires a verified session. */
   readonly public?: boolean;
   readonly handler: RouteHandler;
@@ -110,14 +126,26 @@ export class MacrosApi {
       }
 
       let userId = '';
+      let authenticated: AuthenticatedSubject | undefined;
       if (route.public !== true) {
         const bound = await this.authenticate(req, body);
         if (isAppError(bound)) { this.fail(res, bound, requestId); return; }
-        userId = bound;
+        // The SUBJECT is carried forward, not a string derived from it.
+        authenticated = bound;
+        userId = subjectUserId(bound);
         subject = subjectRef(userId);
       }
 
-      const result = await route.handler({ requestId, userId, body });
+      if (route.decode !== undefined) {
+        const decoded = route.decode(body);
+        if (isAppError(decoded)) { this.fail(res, decoded, requestId, subject); return; }
+        body = { ...body, decoded };
+      }
+
+      const result = await route.handler({
+        requestId, userId, body,
+        ...(authenticated !== undefined ? { subject: authenticated } : {}),
+      });
       if (isAppError(result)) { this.fail(res, result, requestId, subject); return; }
 
       this.deps.logger.log({
@@ -141,7 +169,7 @@ export class MacrosApi {
   private async authenticate(
     req: IncomingMessage,
     body: Record<string, unknown>,
-  ): Promise<string | AppError> {
+  ): Promise<AuthenticatedSubject | AppError> {
     const header = req.headers['authorization'];
     if (typeof header !== 'string' || !header.startsWith('Bearer ')) {
       return appError('authentication', 'missing_credential', 'Not signed in.');
@@ -150,9 +178,9 @@ export class MacrosApi {
     if (isAppError(session)) return session;
 
     const claimed = typeof body['userId'] === 'string' ? (body['userId'] as string) : undefined;
-    const bound = subjectFromSession(session, this.deps.now(), claimed);
-    if (isAppError(bound)) return bound;
-    return bound.userId;
+    // subjectFromSession already refuses a claimed userId that differs from the
+    // session subject, so a body userId is at most a claim to check.
+    return subjectFromSession(session, this.deps.now(), claimed);
   }
 
   private parseJson(raw: string): unknown | AppError {

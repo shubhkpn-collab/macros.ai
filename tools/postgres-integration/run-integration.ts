@@ -21,6 +21,8 @@ import {
   applyResult, dueForSubmission, recoverInFlight, type OutboxEntry,
 } from '@macros/domain-offline-sync';
 import type { FoodLogItem } from '@macros/contracts';
+import { MacrosApi, foodLogRoute } from '@macros/runtime-api';
+import { FakeAuthSessionProvider, StructuredLogger, loadRoleConfig, type RuntimeConfig } from '@macros/runtime-config';
 
 const HOST = process.env['PGHOST'] ?? '/tmp';
 const PORT = Number(process.env['PGPORT'] ?? 5432);
@@ -309,6 +311,89 @@ async function main(): Promise<void> {
       : fail('identity residue after failure', residual);
   } catch (e) { fail('failure behaviour', String(e)); }
 
+  // --- RT-8: settlement through the REAL HTTP application path ------------
+  section('RT-8 — REAL HTTP: outbox -> MacrosApi auth -> pg -> PostgreSQL');
+  const httpLog = `http-${RUN}`;
+  let api: { close: () => Promise<void> } | undefined;
+  try {
+    const started = await startApi(pool);
+    api = started;
+    const url = `http://127.0.0.1:${started.port}/food-logs`;
+    const payload = logFor(USER_A, httpLog, 250);
+
+    let entry: OutboxEntry = {
+      userId: USER_A, logId: httpLog, payload,
+      state: 'pending', attempts: 0, sequence: 1,
+    };
+    entry = { ...entry, state: 'in_flight' };
+
+    // 1-6. Real HTTP submission with a real Bearer credential.
+    const first = await post(url, started.tokenA, { foodLog: payload });
+    first.status === 200 && first.body['outcome'] === 'appended'
+      ? ok('HTTP submission committed through the real server path')
+      : fail('HTTP submit', `${first.status} ${JSON.stringify(first.body).slice(0, 90)}`);
+
+    // 7-8. Crash BEFORE applyResult: the entry is still in_flight.
+    const recovered = recoverInFlight([entry]);
+    recovered[0]!.state === 'pending'
+      ? ok('crash before ACK recovers to pending')
+      : fail('crash recovery', recovered[0]!.state);
+
+    // 9-12. Resend the same entry over HTTP.
+    const retry = await post(url, started.tokenA, { foodLog: payload });
+    retry.body['outcome'] === 'replayed_existing'
+      ? ok('HTTP retry returns replayed_existing')
+      : fail('HTTP retry', String(retry.body['outcome']));
+
+    const settled = applyResult(recovered[0]!,
+      { kind: 'accepted', outcome: retry.body['outcome'] as never }, Date.now());
+    settled.state === 'acked' ? ok('outbox settles ACKED via HTTP') : fail('settlement', settled.state);
+
+    // 13. Exactly one row.
+    const rows = await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql) => {
+      const r = await sql.query<{ n: string }>(
+        'SELECT count(*)::text AS n FROM food_logs WHERE log_id = $1', [httpLog]);
+      return Number(r[0]!.n);
+    });
+    rows === 1 ? ok('exactly 1 row after HTTP crash + retry') : fail('duplicate via HTTP', String(rows));
+
+    // Conflict over HTTP.
+    const conflict = await post(url, started.tokenA, { foodLog: logFor(USER_A, httpLog, 888) });
+    const conflicted = applyResult(settled,
+      { kind: 'accepted', outcome: conflict.body['outcome'] as never }, Date.now());
+    conflict.body['outcome'] === 'idempotency_conflict' && conflicted.state === 'conflict'
+      ? ok('HTTP conflict settles as conflict, nothing overwritten')
+      : fail('HTTP conflict', `${String(conflict.body['outcome'])}/${conflicted.state}`);
+
+    // --- HTTP authorization adversarial cases ---------------------------
+    section('HTTP AUTHORIZATION');
+    const noAuth = await post(url, null, { foodLog: logFor(USER_A, `na-${RUN}`, 100) });
+    noAuth.status === 401 ? ok('no Bearer token -> 401') : fail('missing token', String(noAuth.status));
+
+    const forged = await post(url, started.tokenA, { foodLog: logFor(USER_B, `forge-${RUN}`, 100) });
+    forged.status === 403
+      ? ok("A's token cannot write B's log -> 403")
+      : fail('forged user', `${forged.status}`);
+
+    const forgedRows = await withAuthenticatedDatabaseSubject(pool, subjectB, async (sql) => {
+      const r = await sql.query<{ n: string }>(
+        'SELECT count(*)::text AS n FROM food_logs WHERE log_id = $1', [`forge-${RUN}`]);
+      return Number(r[0]!.n);
+    });
+    forgedRows === 0 ? ok('ZERO forged rows written') : fail('forged row written', String(forgedRows));
+
+    const malformed = await post(url, started.tokenA, { foodLog: { logId: 'x' } });
+    malformed.status === 400
+      ? ok('malformed payload -> 400, no persistence')
+      : fail('malformed payload', String(malformed.status));
+
+    const leak = JSON.stringify(malformed.body) + JSON.stringify(forged.body);
+    /postgres:\/\/|password|at Object\.|SELECT |pg_/.test(leak)
+      ? fail('error leaked SQL, stack or credentials')
+      : ok('errors leak no SQL, stack, URL or credential');
+  } catch (e) { fail('HTTP settlement', String(e)); }
+  finally { if (api !== undefined) await api.close(); }
+
   // --- Deterministic cleanup ---------------------------------------------
   section('CLEANUP');
   try {
@@ -316,7 +401,8 @@ async function main(): Promise<void> {
     // database is never dropped. Append-only tables deny DELETE to the
     // application role, so cleanup runs as the connecting (owner) role.
     await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql) => {
-      await sql.query('DELETE FROM food_logs WHERE log_id IN ($1, $2)', [raceLog, offlineLog]);
+      await sql.query('DELETE FROM food_logs WHERE log_id IN ($1, $2, $3)',
+        [raceLog, offlineLog, httpLog]);
       await sql.query('DELETE FROM energy_goal_versions WHERE goal_version_id = $1', [goalId]);
       await sql.query('DELETE FROM user_profile_versions WHERE profile_version_id = $1', [profileId]);
       return null;
@@ -342,3 +428,78 @@ async function main(): Promise<void> {
 }
 
 void main();
+
+// ---------------------------------------------------------------------------
+// Minimal IO helpers. No business logic.
+// ---------------------------------------------------------------------------
+
+/** Start the REAL MacrosApi with the REAL food-log route on an ephemeral port. */
+async function startApi(pool: PgPoolLike): Promise<{
+  port: number; tokenA: string; close: () => Promise<void>;
+}> {
+  // The fake auth PROVIDER is acceptable (HH-2 is a separate milestone), but the
+  // authentication MACHINERY below is the real MacrosApi path — Bearer header,
+  // session verification and subjectFromSession — with no
+  // mintSubjectForTests shortcut anywhere.
+  const auth = new FakeAuthSessionProvider({
+    'token-a': {
+      subjectId: USER_A,
+      issuedAt: '2026-01-01T00:00:00.000Z',
+      expiresAt: '2099-01-01T00:00:00.000Z',
+    },
+  });
+
+  const loaded = loadRoleConfig('server', {
+    environment: 'development',
+    appVersion: '1.0.0',
+    apiVersion: 'macros-api@1.0.0',
+    expectedSchemaVersion: '0005',
+    // Server-side only. The pool for this harness is socket-based; this value
+    // exists so the server config validates.
+    databaseAppUrl: `postgres://localhost/${DB}`,
+    auth: 'synthetic', assistant: 'synthetic', scale: 'synthetic',
+    activity: 'synthetic', catalog: 'synthetic',
+    logLevel: 'error',
+    maxRequestBytes: 65536,
+  });
+  if (!loaded.ok) throw new Error('integration config invalid');
+
+  const api = new MacrosApi({
+    config: loaded.config as RuntimeConfig,
+    auth,
+    logger: new StructuredLogger({ write: () => undefined }, 'error'),
+    versions: { app: '1.0.0', api: 'macros-api@1.0.0', schema: '0005' },
+    now: () => new Date().toISOString(),
+    health: () => ({ databaseReachable: 'ready', migrationsApplied: true, configValid: true }),
+  } as never);
+
+  api.route(foodLogRoute({ pool }));
+
+  const server = api.createServer();
+  const port = await new Promise<number>((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      const addr = server.address();
+      resolve(typeof addr === 'object' && addr !== null ? addr.port : 0);
+    });
+  });
+  return {
+    port, tokenA: 'token-a',
+    close: () => new Promise<void>((resolve) => server.close(() => resolve())),
+  };
+}
+
+async function post(
+  url: string, token: string | null, body: unknown,
+): Promise<{ status: number; body: Record<string, unknown> }> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(token !== null ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  let parsed: Record<string, unknown> = {};
+  try { parsed = (await res.json()) as Record<string, unknown>; } catch { /* empty */ }
+  return { status: res.status, body: parsed };
+}

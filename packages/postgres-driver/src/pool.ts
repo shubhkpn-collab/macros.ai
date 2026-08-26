@@ -18,7 +18,13 @@ import type { SqlExecutor } from '@macros/persistence';
  */
 export interface PgClientLike {
   query(text: string, params?: readonly unknown[]): Promise<{ rows: unknown[] }>;
-  release(err?: boolean): void;
+  /**
+   * `release(true)` (or an Error) tells pg to DESTROY the connection instead of
+   * returning it to the pool. That matters when a ROLLBACK failed: the session
+   * may still hold an open transaction or a stale `SET LOCAL`, and handing it
+   * to the next request could leak one user's identity into another's.
+   */
+  release(destroy?: boolean | Error): void;
 }
 
 export interface PgPoolLike {
@@ -82,4 +88,39 @@ export function executorFor(client: PgClientLike): SqlExecutor {
       return result.rows as readonly T[];
     },
   };
+}
+
+/**
+ * SERVER COMPOSITION.
+ *
+ * The security rule is not "no connection strings" — it is that database
+ * credentials exist ONLY at the server IO edge. `RuntimeConfig.database.appUrl`
+ * is exactly that: already validated, server-side, and never sent to a tablet.
+ *
+ * The URL is consumed here and never retained, returned or logged. Errors
+ * deliberately carry no connection detail, because a driver failure message is
+ * a common way a credential ends up in a log.
+ */
+export async function createApplicationPool(appUrl: string): Promise<PgPoolLike> {
+  const moduleName = 'pg';
+  let pg: { Pool?: new (c: unknown) => PgPoolLike; default?: { Pool: new (c: unknown) => PgPoolLike } };
+  try {
+    pg = (await import(/* @vite-ignore */ moduleName)) as typeof pg;
+  } catch {
+    throw new Error('postgres-driver: the `pg` package is not installed. Run `npm ci`.');
+  }
+  const PoolCtor = pg.Pool ?? pg.default?.Pool;
+  if (PoolCtor === undefined) {
+    throw new Error('postgres-driver: `pg` loaded but exposes no Pool constructor');
+  }
+  try {
+    return new PoolCtor({
+      connectionString: appUrl,
+      max: 10,
+      connectionTimeoutMillis: 5_000,
+    });
+  } catch {
+    // Never interpolate appUrl into an error.
+    throw new Error('postgres-driver: could not construct the application pool');
+  }
 }

@@ -76,6 +76,8 @@ export async function withAuthenticatedDatabaseSubject<T>(
   }
 
   let began = false;
+  // A connection whose cleanup did not complete must never return to the pool.
+  let discardClient = false;
   try {
     await client.query('BEGIN');
     began = true;
@@ -100,17 +102,34 @@ export async function withAuthenticatedDatabaseSubject<T>(
     }
 
     const result = await work(executorFor(client));
-    await client.query('COMMIT');
+    try {
+      await client.query('COMMIT');
+    } catch (commitError) {
+      // The transaction outcome is indeterminate. Attempt cleanup, and if that
+      // also fails the session is unusable.
+      try {
+        await client.query('ROLLBACK');
+      } catch {
+        discardClient = true;
+      }
+      throw commitError;
+    }
     return result;
   } catch (error) {
     if (began) {
-      // Best effort: a failed ROLLBACK must not mask the original error, and
-      // the client is discarded rather than returned to the pool dirty.
-      try { await client.query('ROLLBACK'); } catch { /* discarded below */ }
+      try {
+        await client.query('ROLLBACK');
+      } catch {
+        // Cleanup failed: the session may still hold an open transaction or a
+        // stale SET LOCAL. Destroy it rather than return it dirty. The original
+        // error is preserved — cleanup noise must not replace it.
+        discardClient = true;
+      }
     }
     throw error;
   } finally {
-    client.release();
+    // release(true) destroys the connection; plain release() returns it.
+    client.release(discardClient ? true : undefined);
   }
 }
 
