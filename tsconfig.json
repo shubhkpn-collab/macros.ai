@@ -47,6 +47,7 @@
       "@macros/core-loop": [
         "./packages/core-loop/src/index.ts"
       ],
+      "@macros/postgres-driver": ["./packages/postgres-driver/src/index.ts"],
       "@macros/persistence": [
         "./packages/persistence/src/index.ts"
       ],

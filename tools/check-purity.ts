@@ -78,6 +78,8 @@ const PRODUCTION = [
   'packages/runtime-config',
   // Filesystem/dev adapters for offline storage and bundles.
   'packages/offline-adapters',
+  // The pg driver edge: IO by definition, never a pure domain.
+  'packages/postgres-driver',
 ];
 
 /** Transport and hardware libraries must not reach the pure capture logic. */
