@@ -132,6 +132,32 @@ New members can never be added offline. We cannot learn offline that the server
 removed someone, so cached authorisation is bounded rather than claiming instant
 revocation — and the snapshot is emphatically not authentication.
 
+## 12b. Ownership transfer requires a dedicated database operation
+
+`transferOwnership` in the domain returns one state containing exactly one
+active owner. **Persistence cannot apply that with two ordinary UPDATEs**, and
+the reason is worth recording because both constraints are individually correct:
+
+- `household_single_active_owner` forbids two active owners, so the outgoing
+  owner must be **demoted before** the incoming one is promoted;
+- `memberships_admin` authorizes each statement through
+  `is_active_household_owner()`, so once the caller is demoted they are no
+  longer an owner and the promote is **denied by RLS**.
+
+Together they make the legitimate transfer impossible through the ordinary
+path. Authorization must be evaluated against the **pre-transfer** state while
+both writes execute atomically, so persistence calls
+`public.transfer_household_ownership(household_id, target_user_id)`.
+
+It is `SECURITY DEFINER` solely to cross that intermediate state. It derives the
+actor from `auth.uid()` internally (no caller-supplied actor), requires the
+caller to be an active owner and the target an active member, locks the
+household row to serialize competing transfers, demotes before promoting, and
+fails closed unless exactly one active owner remains. It touches only
+`household_memberships.role`, returns `void`, and reaches no nutrition,
+profile or goal data — household administration still grants zero access to
+another adult's private data.
+
 ## 13. Persistence and future RLS
 
 Migration 0005 creates `households`, `household_memberships`, `household_devices`

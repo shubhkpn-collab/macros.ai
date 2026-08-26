@@ -232,7 +232,7 @@ for i in $(seq 1 "$RACERS"); do
       weight_capture, nutrition_snapshot, kcal, protein_g, carbohydrate_g, fat_g)
     VALUES ('11111111-1111-4111-8111-111111111111','$RACE_ID','prod-test-1','prod-test-1@v1',
       100, now(),'UTC',0,current_date,'test','{\"grams\":100}'::jsonb,
-      '{\"totals\":{\"kcal\":100}}'::jsonb,100,10,5,2)
+      '{\"gramsConsumed\":100,\"productVersionId\":\"prod-test-1@v1\",\"totals\":{\"kcal\":100,\"proteinG\":10,\"carbohydrateG\":5,\"fatG\":2}}'::jsonb,100,10,5,2)
     ON CONFLICT (user_id, log_id) DO NOTHING;
     COMMIT;" >/dev/null 2>&1 &
 done
@@ -263,7 +263,7 @@ psql_app -q -c "
     weight_capture, nutrition_snapshot, kcal, protein_g, carbohydrate_g, fat_g)
   VALUES ('11111111-1111-4111-8111-111111111111','$RACE_ID','prod-test-1','prod-test-1@v1',
     100, now(),'UTC',0,current_date,'test','{\"grams\":100}'::jsonb,
-    '{\"totals\":{\"kcal\":100}}'::jsonb,100,10,5,2)
+    '{\"gramsConsumed\":100,\"productVersionId\":\"prod-test-1@v1\",\"totals\":{\"kcal\":100,\"proteinG\":10,\"carbohydrateG\":5,\"fatG\":2}}'::jsonb,100,10,5,2)
   ON CONFLICT (user_id, log_id) DO NOTHING;
   COMMIT;" >/dev/null 2>&1
 AFTER_ROWS=$(psql_owner -tAc "SELECT count(*) FROM food_logs WHERE log_id='$RACE_ID';")
@@ -280,7 +280,7 @@ psql_app -q -c "
     weight_capture, nutrition_snapshot, kcal, protein_g, carbohydrate_g, fat_g)
   VALUES ('11111111-1111-4111-8111-111111111111','$RACE_ID','prod-test-1','prod-test-1@v1',
     999, now(),'UTC',0,current_date,'test','{\"grams\":999}'::jsonb,
-    '{\"totals\":{\"kcal\":999}}'::jsonb,999,99,99,99)
+    '{\"gramsConsumed\":999,\"productVersionId\":\"prod-test-1@v1\",\"totals\":{\"kcal\":999,\"proteinG\":99,\"carbohydrateG\":99,\"fatG\":99}}'::jsonb,999,99,99,99)
   ON CONFLICT (user_id, log_id) DO NOTHING;
   COMMIT;" >/dev/null 2>&1
 AFTER=$(psql_owner -tAc "SELECT kcal FROM food_logs WHERE log_id='$RACE_ID';")

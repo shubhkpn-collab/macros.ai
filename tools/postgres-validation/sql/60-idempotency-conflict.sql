@@ -18,7 +18,12 @@ BEGIN
     weight_capture, nutrition_snapshot, kcal, protein_g, carbohydrate_g, fat_g)
   VALUES (auth.uid(), 'shared-log-id', 'prod-test-1', 'prod-test-1@v1',
     777, now(), 'UTC', 0, current_date, 'test',
-    '{"grams":777}'::jsonb, '{"totals":{"kcal":777}}'::jsonb, 777, 7, 7, 7)
+    '{"grams":777}'::jsonb,
+    -- STRUCTURALLY VALID and self-consistent. The insert must be refused
+    -- because (user_id, log_id) already identifies another immutable payload —
+    -- never because the JSON was malformed, which would prove nothing.
+    '{"gramsConsumed":777,"productVersionId":"prod-test-1@v1","totals":{"kcal":777,"proteinG":7,"carbohydrateG":7,"fatG":7}}'::jsonb,
+    777, 7, 7, 7)
   ON CONFLICT (user_id, log_id) DO NOTHING;
 
   SELECT kcal INTO after_kcal FROM food_logs

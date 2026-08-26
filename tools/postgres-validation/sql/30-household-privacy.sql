@@ -124,22 +124,127 @@ END;
 $$;
 ROLLBACK;
 
+-- --- 6b. The LEGITIMATE transfer goes through the dedicated atomic operation --
+-- Two ordinary UPDATEs cannot work: demote-first is required by the unique
+-- index, but memberships_admin authorizes via is_active_household_owner(), so
+-- after the demote the caller is no longer an owner and the promote is denied.
 BEGIN;
 SELECT auth.set_test_uid(:'A'::uuid);
-UPDATE household_memberships SET role = 'member'
-  WHERE household_id = 'hh-test' AND user_id = '11111111-1111-4111-8111-111111111111';
-UPDATE household_memberships SET role = 'owner'
-  WHERE household_id = 'hh-test' AND user_id = '22222222-2222-4222-8222-222222222222';
 DO $$
-DECLARE n int;
+DECLARE owners int; a_role text; b_role text;
 BEGIN
-  SELECT count(*) INTO n FROM household_memberships
-   WHERE household_id = 'hh-test' AND role = 'owner' AND status = 'active';
-  IF n <> 1 THEN RAISE EXCEPTION 'FAIL transfer: % active owners after transfer', n; END IF;
-  RAISE NOTICE 'PASS transfer: demote-then-promote in one transaction leaves exactly 1 owner';
+  PERFORM public.transfer_household_ownership('hh-test',
+          '22222222-2222-4222-8222-222222222222'::uuid);
+
+  SELECT count(*) INTO owners FROM household_memberships
+   WHERE household_id = 'hh-test' AND status = 'active' AND role = 'owner';
+  SELECT role INTO a_role FROM household_memberships
+   WHERE household_id = 'hh-test' AND user_id = '11111111-1111-4111-8111-111111111111';
+  SELECT role INTO b_role FROM household_memberships
+   WHERE household_id = 'hh-test' AND user_id = '22222222-2222-4222-8222-222222222222';
+
+  IF owners <> 1 THEN RAISE EXCEPTION 'FAIL transfer: % active owners', owners; END IF;
+  IF a_role <> 'member' THEN RAISE EXCEPTION 'FAIL transfer: A is still %', a_role; END IF;
+  IF b_role <> 'owner'  THEN RAISE EXCEPTION 'FAIL transfer: B is %', b_role; END IF;
+  RAISE NOTICE 'PASS transfer: A->member, B->owner, exactly 1 active owner';
 END;
 $$;
 ROLLBACK;  -- leave fixtures untouched
+
+-- --- 6c. Adversarial: who may NOT transfer ---------------------------------
+BEGIN;
+SELECT auth.set_test_uid(:'B'::uuid);   -- B is a MEMBER, not the owner
+DO $$
+BEGIN
+  BEGIN
+    PERFORM public.transfer_household_ownership('hh-test',
+            '11111111-1111-4111-8111-111111111111'::uuid);
+    RAISE EXCEPTION 'FAIL transfer-nonowner: a member transferred ownership';
+  EXCEPTION WHEN insufficient_privilege THEN
+    RAISE NOTICE 'PASS transfer-nonowner refused';
+  END;
+END;
+$$;
+ROLLBACK;
+
+BEGIN;
+SELECT auth.set_test_uid('33333333-3333-4333-8333-333333333333'::uuid);  -- outsider
+DO $$
+BEGIN
+  BEGIN
+    PERFORM public.transfer_household_ownership('hh-test',
+            '22222222-2222-4222-8222-222222222222'::uuid);
+    RAISE EXCEPTION 'FAIL transfer-outsider: a non-member transferred ownership';
+  EXCEPTION WHEN insufficient_privilege THEN
+    RAISE NOTICE 'PASS transfer-outsider refused';
+  END;
+END;
+$$;
+ROLLBACK;
+
+BEGIN;
+SELECT auth.set_test_uid(:'A'::uuid);
+DO $$
+BEGIN
+  -- Target outside the household.
+  BEGIN
+    PERFORM public.transfer_household_ownership('hh-test',
+            '33333333-3333-4333-8333-333333333333'::uuid);
+    RAISE EXCEPTION 'FAIL transfer-outside-target: promoted a non-member';
+  EXCEPTION WHEN invalid_parameter_value THEN
+    RAISE NOTICE 'PASS transfer-outside-target refused';
+  END;
+
+  -- Caller == target.
+  BEGIN
+    PERFORM public.transfer_household_ownership('hh-test',
+            '11111111-1111-4111-8111-111111111111'::uuid);
+    RAISE EXCEPTION 'FAIL transfer-self: self-transfer accepted';
+  EXCEPTION WHEN invalid_parameter_value THEN
+    RAISE NOTICE 'PASS transfer-self refused';
+  END;
+END;
+$$;
+ROLLBACK;
+
+-- A removed member is not an eligible target.
+BEGIN;
+SELECT auth.set_test_uid(:'A'::uuid);
+UPDATE household_memberships SET status = 'removed', ended_at = now()
+ WHERE household_id = 'hh-test' AND user_id = '22222222-2222-4222-8222-222222222222';
+DO $$
+BEGIN
+  BEGIN
+    PERFORM public.transfer_household_ownership('hh-test',
+            '22222222-2222-4222-8222-222222222222'::uuid);
+    RAISE EXCEPTION 'FAIL transfer-removed-target: promoted a removed member';
+  EXCEPTION WHEN invalid_parameter_value THEN
+    RAISE NOTICE 'PASS transfer-removed-target refused';
+  END;
+END;
+$$;
+ROLLBACK;
+
+-- A failed transfer leaves ownership exactly as it was.
+BEGIN;
+SELECT auth.set_test_uid(:'A'::uuid);
+DO $$
+DECLARE a_role text;
+BEGIN
+  BEGIN
+    PERFORM public.transfer_household_ownership('hh-test',
+            '33333333-3333-4333-8333-333333333333'::uuid);
+  EXCEPTION WHEN OTHERS THEN NULL;
+  END;
+  SELECT role INTO a_role FROM household_memberships
+   WHERE household_id = 'hh-test' AND user_id = '11111111-1111-4111-8111-111111111111';
+  IF a_role <> 'owner' THEN
+    RAISE EXCEPTION 'FAIL transfer-rollback: A lost ownership after a failed transfer';
+  END IF;
+  RAISE NOTICE 'PASS transfer-rollback: original ownership intact';
+END;
+$$;
+ROLLBACK;
 
 -- --- 7. Zero-owner: document which layer actually prevents it --------------
 BEGIN;

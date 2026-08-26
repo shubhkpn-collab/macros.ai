@@ -159,3 +159,90 @@ describe('postgres harness — static self-checks', () => {
     assert.match(runner, /outbox settlement are NOT validated/);
   });
 });
+
+describe('postgres harness — payload validity and transfer path', () => {
+  const runner2 = readFileSync(repoPath('tools', 'postgres-validation', 'run.sh'), 'utf8');
+  const hh = readFileSync(join(SQL_DIR, '30-household-privacy.sql'), 'utf8');
+  const rls = readFileSync(join(SQL_DIR, '20-rls-matrix.sql'), 'utf8');
+  const conflict = readFileSync(join(SQL_DIR, '60-idempotency-conflict.sql'), 'utf8');
+  const household = readFileSync(join(MIG_DIR, '0005_households.sql'), 'utf8');
+
+  const REQUIRED = ['gramsConsumed', 'productVersionId', 'kcal', 'proteinG',
+                    'carbohydrateG', 'fatG'];
+
+  test('race and replay payloads carry a COMPLETE snapshot', () => {
+    // 0001 now requires these keys to be PRESENT. An incomplete payload would
+    // fail on the CHECK before the uniqueness behaviour was ever exercised.
+    for (const key of REQUIRED) {
+      assert.ok(runner2.includes(key), `race/replay payload is missing ${key}`);
+    }
+    assert.equal(/'\{\\"totals\\":\{\\"kcal\\":\d+\}\}'/.test(runner2), false,
+      'the truncated snapshot shape must not return');
+  });
+
+  test('the CONFLICTING payload is structurally valid too', () => {
+    // It must be refused for identity, never for malformed JSON — otherwise the
+    // conflict test proves nothing about idempotency.
+    for (const key of REQUIRED) {
+      assert.ok(conflict.includes(key), `conflict payload is missing ${key}`);
+    }
+    assert.ok(conflict.includes('777'), 'conflict payload differs from the original');
+  });
+
+  test('the forged-user RLS probe uses a VALID payload', () => {
+    const probe = rls.slice(rls.indexOf('forged'), rls.indexOf('forged') + 1400);
+    for (const key of REQUIRED) {
+      assert.ok(probe.includes(key), `forged probe payload is missing ${key}`);
+    }
+    assert.equal(/'\{\}'::jsonb, '\{\}'::jsonb/.test(rls), false,
+      'empty payloads let a CHECK failure masquerade as an RLS pass');
+  });
+
+  test('check_violation can NEVER count as authorization success', () => {
+    assert.match(rls, /INVALID TEST forged-insert/,
+      'a constraint failure must be reported as an invalid test, not a pass');
+    assert.equal(/WHEN insufficient_privilege OR check_violation THEN\s*\n\s*RAISE NOTICE 'PASS forged/.test(rls),
+      false, 'the conflated exception handler must not return');
+  });
+
+  test('ownership transfer has a dedicated ATOMIC database operation', () => {
+    // Two ordinary UPDATEs cannot work: demote-first is required by the unique
+    // index, but the admin policy denies the promote once the caller is demoted.
+    assert.match(household, /CREATE OR REPLACE FUNCTION public\.transfer_household_ownership/);
+    assert.match(household, /FOR UPDATE/, 'competing transfers must be serialized');
+    assert.match(hh, /transfer_household_ownership\('hh-test'/,
+      'the legitimate transfer test must use the real operation');
+  });
+
+  test('the transfer function derives the actor from auth.uid()', () => {
+    const fn = household.slice(household.indexOf('transfer_household_ownership'));
+    assert.match(fn, /v_actor uuid := auth\.uid\(\)/);
+    // No "from user" argument: a caller cannot transfer someone else's household.
+    assert.equal(/transfer_household_ownership\(\s*p_household_id\s+text,\s*p_target_user_id\s+uuid,/.test(household),
+      false, 'the signature must not accept a caller-supplied actor');
+    assert.match(fn, /SET search_path = public, pg_catalog/);
+    assert.equal(/EXECUTE format\(|EXECUTE '/.test(fn.slice(0, 3000)), false, 'no dynamic SQL');
+  });
+
+  test('the transfer function is not executable by PUBLIC', () => {
+    assert.match(household, /REVOKE ALL ON FUNCTION public\.transfer_household_ownership\(text, uuid\) FROM PUBLIC/);
+    assert.match(household, /GRANT EXECUTE ON FUNCTION public\.transfer_household_ownership\(text, uuid\) TO authenticated/);
+  });
+
+  test('transfer is adversarially tested from every wrong angle', () => {
+    for (const probe of ['transfer-nonowner', 'transfer-outsider', 'transfer-outside-target',
+                         'transfer-self', 'transfer-removed-target', 'transfer-rollback']) {
+      assert.ok(hh.includes(probe), `missing adversarial case: ${probe}`);
+    }
+  });
+
+  test('household nutrition privacy remains untouched', () => {
+    // The transfer function must not have become a route to private data.
+    const fn = household.slice(household.indexOf('transfer_household_ownership'),
+                               household.indexOf('REVOKE ALL ON FUNCTION public.transfer'));
+    for (const table of ['food_logs', 'user_profile_versions', 'energy_goal_versions']) {
+      assert.equal(fn.includes(table), false, `transfer must not touch ${table}`);
+    }
+    assert.match(household, /RETURNS void/, 'it returns no data at all');
+  });
+});

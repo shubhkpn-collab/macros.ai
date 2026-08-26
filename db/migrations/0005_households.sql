@@ -133,6 +133,111 @@ REVOKE ALL ON FUNCTION public.is_active_household_owner(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_active_household_member(text) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.is_active_household_owner(text) TO authenticated;
 
+
+-- ---------------------------------------------------------------------------
+-- ATOMIC OWNERSHIP TRANSFER
+-- ---------------------------------------------------------------------------
+-- Ownership transfer cannot be expressed as two ordinary UPDATE statements.
+--
+--   * `household_single_active_owner` forbids two active owners, so the caller
+--     must be DEMOTED BEFORE the target is promoted; and
+--   * `memberships_admin` authorizes each statement via
+--     is_active_household_owner(), so after the demote the caller is no longer
+--     an owner and the promote is denied.
+--
+-- The two constraints are individually correct and jointly make the legitimate
+-- transfer impossible through the ordinary path. Authorization must therefore be
+-- evaluated against the PRE-TRANSFER state while both writes execute atomically,
+-- which is exactly what this function does — and the only reason it is
+-- SECURITY DEFINER.
+--
+-- It is NOT a general RLS bypass:
+--   * the actor is derived from auth.uid() INTERNALLY — there is no "from user"
+--     argument, so a caller cannot transfer someone else's household;
+--   * it verifies the caller is an ACTIVE OWNER of that household first;
+--   * it touches only `role` on household_memberships — no nutrition, no
+--     profile, no goals, and it returns no private data of any kind;
+--   * locked search_path, schema-qualified relations, no dynamic SQL;
+--   * EXECUTE revoked from PUBLIC and granted only to authenticated.
+
+CREATE OR REPLACE FUNCTION public.transfer_household_ownership(
+    p_household_id   text,
+    p_target_user_id uuid
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+DECLARE
+  v_actor uuid := auth.uid();
+  v_owner_count int;
+BEGIN
+  IF v_actor IS NULL THEN
+    RAISE EXCEPTION 'transfer denied: no authenticated subject'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+
+  IF p_target_user_id = v_actor THEN
+    RAISE EXCEPTION 'transfer denied: caller and target are the same user'
+      USING ERRCODE = 'invalid_parameter_value';
+  END IF;
+
+  -- Serialize competing transfers: two concurrent callers must not both read a
+  -- pre-transfer state and each promote a different target.
+  PERFORM 1 FROM public.households h
+   WHERE h.household_id = p_household_id
+   FOR UPDATE;
+
+  -- Authorization against the PRE-transfer state.
+  IF NOT EXISTS (
+    SELECT 1 FROM public.household_memberships m
+     WHERE m.household_id = p_household_id
+       AND m.user_id = v_actor
+       AND m.status = 'active'
+       AND m.role = 'owner'
+  ) THEN
+    RAISE EXCEPTION 'transfer denied: caller is not an active owner of this household'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+
+  -- The target must already be an ACTIVE member. Invited or removed members are
+  -- not eligible, so a transfer can never resurrect a departed membership.
+  IF NOT EXISTS (
+    SELECT 1 FROM public.household_memberships m
+     WHERE m.household_id = p_household_id
+       AND m.user_id = p_target_user_id
+       AND m.status = 'active'
+  ) THEN
+    RAISE EXCEPTION 'transfer denied: target is not an active member of this household'
+      USING ERRCODE = 'invalid_parameter_value';
+  END IF;
+
+  -- DEMOTE FIRST, then promote: the reverse order transiently creates two
+  -- active owners and is rejected by household_single_active_owner.
+  UPDATE public.household_memberships
+     SET role = 'member'
+   WHERE household_id = p_household_id AND user_id = v_actor;
+
+  UPDATE public.household_memberships
+     SET role = 'owner'
+   WHERE household_id = p_household_id AND user_id = p_target_user_id;
+
+  -- Fail closed rather than commit a household with the wrong owner count. Any
+  -- exception rolls the whole function back, leaving ownership unchanged.
+  SELECT count(*) INTO v_owner_count
+    FROM public.household_memberships m
+   WHERE m.household_id = p_household_id AND m.status = 'active' AND m.role = 'owner';
+
+  IF v_owner_count <> 1 THEN
+    RAISE EXCEPTION 'transfer aborted: % active owners after transfer', v_owner_count;
+  END IF;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.transfer_household_ownership(text, uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.transfer_household_ownership(text, uuid) TO authenticated;
+
 -- ---------------------------------------------------------------------------
 -- RLS — shared household rows are membership-aware; personal rows are untouched
 -- ---------------------------------------------------------------------------

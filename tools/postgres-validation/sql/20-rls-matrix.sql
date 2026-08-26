@@ -87,12 +87,22 @@ BEGIN
       user_id, log_id, product_id, product_version_id, grams, logged_at,
       event_timezone, event_utc_offset_minutes, local_date, nutrition_calc_version,
       weight_capture, nutrition_snapshot, kcal, protein_g, carbohydrate_g, fat_g)
+    -- FULLY VALID payload. With `{}` here a broken RLS policy could let the
+    -- forged row through and the JSON CHECK would reject it instead — the test
+    -- would report PASS while authorization was wide open. The row must be
+    -- refusable for exactly one reason: it is not this caller's to write.
     VALUES ('22222222-2222-4222-8222-222222222222', 'forged', 'prod-test-1',
       'prod-test-1@v1', 50, now(), 'UTC', 0, current_date, 'test',
-      '{}'::jsonb, '{}'::jsonb, 1, 1, 1, 1);
-    RAISE EXCEPTION 'FAIL forged-insert: A inserted a log owned by B';
-  EXCEPTION WHEN insufficient_privilege OR check_violation THEN
-    RAISE NOTICE 'PASS forged-insert refused';
+      '{"grams":50}'::jsonb,
+      '{"gramsConsumed":50,"productVersionId":"prod-test-1@v1","totals":{"kcal":50,"proteinG":5,"carbohydrateG":2.5,"fatG":1}}'::jsonb,
+      50, 5, 2.5, 1);
+    RAISE EXCEPTION 'FAIL forged-insert: A inserted a log owned by B (RLS did not deny)';
+  EXCEPTION
+    WHEN insufficient_privilege THEN
+      RAISE NOTICE 'PASS forged-insert refused by authorization (SQLSTATE 42501)';
+    WHEN check_violation THEN
+      -- A constraint failure proves nothing about authorization.
+      RAISE EXCEPTION 'INVALID TEST forged-insert: rejected by CHECK, not RLS — %', SQLERRM;
   END;
 END;
 $$;
