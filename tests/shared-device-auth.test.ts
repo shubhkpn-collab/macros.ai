@@ -137,3 +137,35 @@ describe('B4 — the boundary cannot be quietly re-opened', () => {
     assert.equal(AUTH_SUBJECT_VERSION, 'auth-subject@1.0.0');
   });
 });
+
+describe('PART 0 — documented status must not outrun the implementation', () => {
+  const DOC = '/mnt/user-data/outputs/macros-architecture/32-shared-device-authentication.md';
+  const doc = (): string => readFileSync(DOC, 'utf8');
+
+  test('the state machine is NOT claimed closed while its parts are unbuilt', () => {
+    const text = doc();
+    assert.match(text, /SHARED-DEVICE AUTHENTICATION STATE MACHINE — PARTIAL/);
+    assert.equal(
+      /SHARED-DEVICE AUTHENTICATION STATE MACHINE — ENGINEERING CLOSED/.test(text),
+      false,
+      'the status claimed more than the code does',
+    );
+  });
+
+  test('the unbuilt pieces are named explicitly rather than omitted', () => {
+    const text = doc();
+    for (const missing of [
+      'Two-phase switch', 'Privacy shield', 'MemberAuthenticationPort',
+      'OfflineMemberUnlockVerifier', 'replay protection', 'Restart-to-neutral',
+    ]) {
+      assert.ok(text.includes(missing), `${missing} must be listed as not implemented`);
+    }
+  });
+
+  test('a claimed-closed item must correspond to real exported code', () => {
+    // The one closure claimed here is the subject boundary, which must exist.
+    assert.match(doc(), /AUTHENTICATED SUBJECT BOUNDARY — ENGINEERING CLOSED/);
+    assert.equal(typeof mintSubject, 'function');
+    assert.equal(typeof appSubjectFrom, 'function');
+  });
+});
