@@ -281,7 +281,37 @@ integrity surfaced, per-entry checksums, exact eligibility ledger.
 | AU-2 | **Session persistence across restart.** With no secure persistent session proof available, restart must degrade to a neutral/locked state rather than reopening the last user. | Depends on AU-1. | With AU-1 |
 | OF-6 | **Outbox repair tooling** for quarantined records, now addressable by opaque `storageRef`. | Operational tooling. | Support tooling |
 
-## PostgreSQL FIRST REAL EXECUTION (2026-08-26) — PARTIAL
+## PostgreSQL RUNTIME VALIDATION — CLOSED (2026-08-26)
+
+Executed against real PostgreSQL 17.11 / `macros_dev`. **PASS — all runtime
+assertions succeeded.** Sandbox suite at that commit: 1,369 tests, 0 failures.
+
+**RESOLVED by execution:**
+
+| # | Item | Proven by |
+|---|---|---|
+| RT-1 | PostgreSQL runtime validation | full green run |
+| P-3 | auth.uid ↔ domain user binding | RLS isolation, forged-insert denial (42501) |
+| P-4 | connection identity plumbing | identity cleared after COMMIT, ROLLBACK and ERROR |
+| P-6 | migration runner | apply, skip-on-rerun, checksum-drift refusal |
+| B-5 | migration 0003 runtime validation | catalog permissions and identifier schema |
+| FC-3 | migration 0004 runtime validation | correction/void isolation |
+| HH-1 | migration 0005 RLS runtime validation | household privacy, transfer, no recursion |
+
+**POSTGRESQL / RLS FOUNDATION — FROZEN.** Migrations 0001–0005 and their
+policies, helpers and constraints are not modified without new runtime evidence.
+
+**STILL OPEN — precision preserved:**
+
+| # | Item | Why it is NOT closed |
+|---|---|---|
+| RT-6 | **Real application PostgreSQL driver** | Validation used `psql`. No production Node code talks to PostgreSQL. |
+| RT-7 | **Application idempotency classification** | The 32-session race proved *database* uniqueness only. `inserted` / `replayed_existing` / `idempotency_conflict` is a repository behaviour and no repository code participated. |
+| RT-8 | **Offline client ACK / outbox settlement** | The offline test proved SQL-level duplicate and overwrite prevention. The sync adapter did not participate. |
+| P-2 | Catalog privileged ingestion path | Not built. |
+| — | `package-lock.json` / `npm ci` | Generated on the Mac; commit it to close. |
+
+## Superseded: PostgreSQL FIRST REAL EXECUTION (2026-08-26) — PARTIAL
 
 Executed on PostgreSQL 17.11 against `macros_dev`. **Migrations 0001–0005
 applied successfully for the first time**, re-run correctly skipped all five,

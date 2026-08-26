@@ -1,194 +1,87 @@
-# 33 — PostgreSQL Validation Harness
+# 33 — PostgreSQL Runtime Validation
 
-> **POSTGRESQL VALIDATION HARNESS — ENGINEERING READY FOR MAC EXECUTION**
-> **POSTGRESQL RUNTIME VALIDATION — PENDING OWNER MAC EXECUTION**
+> **RT-1 POSTGRESQL RUNTIME VALIDATION — CLOSED**
+> **POSTGRESQL / RLS FOUNDATION — FROZEN**
 >
-> **FIRST REAL EXECUTION: 2026-08-26, PostgreSQL 17.11, database `macros_dev`.**
+> Executed against **real PostgreSQL 17.11**, database `macros_dev`, Unix socket
+> `/tmp`. Final result: **PASS — all runtime assertions succeeded.**
 
-## Real execution evidence (round 2 — PostgreSQL 17.11, `macros_dev`)
+## 1. Why this document is different
 
-### RUNTIME VALIDATED against a live server
+Every earlier claim about migrations 0001–0005 rested on static inspection. This
+one rests on execution. The distinction mattered: the live server exposed defects
+that reading the SQL had not, and it also cleared three "failures" that turned
+out to be harness bugs rather than schema problems.
 
-| Area | Evidence |
+## 2. Validated artifact
+
+The schema below is what actually ran. `0001` hashes to `893f053…`, which is the
+file checksum the server itself reported during the drift test — the validated
+schema is byte-identical to what is committed.
+
+| Migration | SHA-256 (first 16) |
 |---|---|
-| Connectivity (`PGHOST=/tmp`) | validated |
-| Migrations 0001–0005 | applied, then skipped on re-run; ledger = 5 |
-| Migration ledger / checksum drift | drift refused, checksum restored |
-| Schema | 14 tables, 13 RLS enabled+forced, 21 policies, 29 indexes |
-| **RLS user isolation** | profile, goals, food logs both directions; forged insert denied **SQLSTATE 42501**; UPDATE/DELETE denied; composite `(user_id, log_id)`; anonymous sees nothing |
-| **Household database privacy** | owner reads none of a member's nutrition **while administering**; member privacy symmetric; shared metadata readable; outsider denied |
-| **Household ownership transfer** | legitimate transfer succeeds; non-owner, outsider, out-of-household target, self-transfer and removed target all denied; rollback leaves ownership intact |
-| **No RLS recursion** | memberships, households, devices, seats |
-| Authorization helper scope | returns only the caller's own fact |
-| Connection identity clearing | after COMMIT, ROLLBACK **and** ERROR |
-| Catalog ordinary-user immutability | read allowed; INSERT/UPDATE/DELETE denied |
-| **Food-log uniqueness under 32-session race** | exactly 1 logical row |
-| Food-log conflict non-overwrite | original immutable |
-| Correction / void isolation | self-void allowed, cross-user denied, history intact |
-| SQL-level offline duplicate/overwrite prevention | retry stays 1 row |
+| `0001_core_schema.sql` | `893f053bad0fc8fa` |
+| `0002_rls.sql` | `bfce51222390960f` |
+| `0003_catalog_identifiers.sql` | `3e2e99c2d8e79294` |
+| `0004_food_log_corrections.sql` | `d2dfaef3317cbfc1` |
+| `0005_households.sql` | `6a377b9183381322` |
 
-Development timings: daily logs 23 ms · RLS profile 22 ms · membership 22 ms.
+## 3. Runtime-validated results
 
-### Precision about what these prove
-
-- The 32-session race proves **database uniqueness**, not the application's
-  `inserted` / `replayed_existing` / `idempotency_conflict` classification — no
-  repository code participated.
-- The offline test proves **SQL duplicate/overwrite behaviour**, not client ACK
-  or outbox settlement.
-
-### Round 3 (real run): everything passed except one test-logic error
-
-The malformed-snapshot matrix now runs to completion on the real server, so
-those fixes are runtime-proven. The single remaining failure was
-`FAIL head-ownership`, and it was **the test, not the schema**.
-
-`catalog_products_head_fk` is `DEFERRABLE INITIALLY DEFERRED` — necessarily so,
-because `catalog_products.current_product_version_id` references
-`product_versions` while `product_versions.product_id` references
-`catalog_products`. That cycle cannot be populated with an immediate
-constraint.
-
-The consequence: an invalid cross-product UPDATE does **not** raise on the spot;
-the violation is queued until commit. The probe raised its own `FAIL` before
-PostgreSQL had ever been asked to evaluate the constraint, and so reported a
-broken FK that was working correctly. Fixed with
-`SET CONSTRAINTS catalog_products_head_fk IMMEDIATE` after the invalid UPDATE,
-wrapped in its own transaction that rolls back, followed by an assertion that
-`prod-test-2` still points at `prod-test-2@v1`.
-
-The production FK was **not** made immediate to satisfy the test.
-
-### Expected-negative results belong at the process boundary
-
-The live server proved the FK works:
-
-```
-insert or update on table "catalog_products" violates foreign key
-constraint "catalog_products_head_fk"
-```
-
-That is the correct production behaviour. The remaining problem was purely
-classification: a deferred FK violation **necessarily** reaches psql as an
-error, so inside a shared SQL file it failed the whole `data integrity` step no
-matter which PL/pgSQL exception form was tried.
-
-The probe now lives in `16-head-ownership-negative.sql` and runs in its own psql
-process, classified by `expect_fk_violation`:
-
-| Outcome | Verdict |
+| Area | Result |
 |---|---|
-| nonzero + `23503` + `catalog_products_head_fk` | **PASS** |
-| exit 0 | **FAIL** — the invalid head was accepted |
-| nonzero + unrelated SQLSTATE | **FAIL / INVALID TEST** |
+| Connectivity | PASS |
+| Migrations 0001–0005 | PASS (applied, then skipped on re-run) |
+| Ledger / re-run / checksum-drift refusal | PASS |
+| Data-integrity adversarial matrix | PASS |
+| Catalog head-ownership FK (deferred, composite) | PASS — SQLSTATE 23503 |
+| RLS user isolation | PASS — both directions; forged insert denied 42501 |
+| **Household privacy** | PASS — owner reads none of a member's nutrition while administering |
+| Household ownership transfer | PASS — all adversarial cases |
+| RLS recursion protection | PASS |
+| Connection identity clearing | PASS — after COMMIT, ROLLBACK and ERROR |
+| Catalog permissions | PASS — readable, not mutable by ordinary users |
+| Correction / void isolation | PASS |
+| **32 concurrent submissions** | PASS — exactly 1 row |
+| SQL-level offline replay / conflict | PASS |
 
-The generic `step()` helper never sees it, so no global failure is recorded for
-the expected rejection. The transaction never commits, and the runner then
-queries the real database to confirm `prod-test-2` still points at
-`prod-test-2@v1`.
+Sandbox suite at the validated commit: **1,369 tests, 0 failures.**
 
-### Still PARTIAL
+Development timings (not SLAs): daily logs 23 ms · RLS profile 22 ms ·
+membership 22 ms.
 
-- **DATA-INTEGRITY ADVERSARIAL MATRIX — PARTIAL.** The malformed-numeric probe
-  raised `invalid_text_representation` (22P02) during the `->>::numeric` cast;
-  the handler caught only `check_violation`, so psql aborted the file before the
-  remaining probes. Fixed by accepting the specific legitimate rejection classes
-  (23514 / 22P02 / 22003), running each probe in its own block, and asserting
-  afterwards that no probe row persisted. Rerun required.
-- **POSTGRESQL RUNTIME VALIDATION — PARTIAL** until that rerun is clean. RT-1
-  stays open.
+## 4. Precision — what these results do NOT prove
 
-### Two harness parsing bugs the real server exposed
+These limits are part of the evidence, not footnotes to it.
 
-The role check compared `rolsuper||'/'||rolbypassrls` against `"f/f"`, but
-PostgreSQL rendered `false/false` — a correct role failing on presentation
-format. And `current_user` was read with `sed -n '3p'` from aligned output,
-which picked up the `-----` separator. Both are now **asserted inside the
-database**, which raises on violation, so nothing depends on how a boolean
-renders or how a table is laid out. Every remaining shell-consumed gate value
-uses `-tA`.
+- The 32-session race proves **database uniqueness**. It does **not** prove the
+  application's `inserted` / `replayed_existing` / `idempotency_conflict`
+  classification, because no repository code participated in the race.
+- The offline test proves **SQL-level duplicate and overwrite prevention**. It
+  does **not** prove client ACK handling or outbox settlement, because the
+  offline sync adapter did not participate.
+- **RT-6 — a real application PostgreSQL driver — remains separate and pending.**
+  The local driver for validation was `psql`. No production Node code talks to
+  PostgreSQL yet.
 
-### The harness accounting bug### The harness accounting bug the real run exposed
+## 5. What the live server found that reading did not
 
-`apply_migrations` both incremented the global `FAILURES` counter **and**
-returned nonzero on checksum drift. That is right for unexpected drift during
-normal setup — and wrong for the deliberate probe that injects drift precisely
-to prove the runner refuses it. The probe printed its `[OK]`, the counter stayed
-incremented, and the setup gate aborted a run that had just succeeded.
+Recorded because it is the argument for executing rather than reviewing:
 
-**Fix:** the helper now reports only through its return status (`0` consistent,
-`3` drift refused, `1` apply failed) and touches no global state. Each caller
-decides what a nonzero result means. `step()` was audited for the same pattern
-and is correct, because every one of its call sites is a positive expectation.
+- `CHECK` accepts UNKNOWN, so a **missing** JSON key satisfied a constraint that
+  a wrong value would have failed.
+- Household RLS policies self-queried `household_memberships`, causing infinite
+  recursion across the whole household schema.
+- Ownership transfer was **impossible** — the unique-owner index and the admin
+  policy were individually correct and jointly deadlocked.
+- The catalog head FK allowed one product to adopt another product's version.
+- Several harness bugs that would each have produced a false green: expected
+  negatives contaminating the failure count, `check_violation` accepted as proof
+  of authorization, and boolean/format parsing failing a role that was correct.
 
-Restoration is now asserted rather than assumed: the ledger checksum is read
-back and compared against the file's SHA-256, and a failed restoration is a real
-failure.
+## 6. Frozen
 
-### Note on database state
-
-`macros_dev` is legitimately no longer fresh. `applied=0 skipped=5` on both runs
-is the expected result from here. The harness never drops or resets it.
-
-## One command
-
-```bash
-npm run postgres:validate
-```
-
-Writes `artifacts/postgres-validation-report.txt` (gitignored) and exits nonzero
-on any failure.
-
-## Safety
-
-Refuses to run unless the database is exactly `macros_dev`, with an explicit
-second refusal for `postgres`, `template0`, `template1`, `production`, `prod`.
-The guard runs **before** anything else, in both shell and SQL. There is no
-`DROP DATABASE` or `DROP SCHEMA` anywhere in the harness.
-
-## Test-only auth harness
-
-Production migrations use Supabase's `auth.uid()` and an `authenticated` role;
-vanilla PostgreSQL has neither. `sql/00-harness.sql` supplies the minimum
-equivalent — an `auth` schema, `auth.uid()` reading a **transaction-local**
-setting, and roles created `NOSUPERUSER NOBYPASSRLS`.
-
-It lives outside `db/migrations/` deliberately: production RLS must not be
-weakened for local convenience, and the production schema must never depend on
-anything defined here.
-
-**The false-green risk this guards against:** running policy assertions as the
-table owner or a superuser bypasses RLS entirely and every test passes
-meaninglessly. The runner asserts `rolsuper=false` and `rolbypassrls=false`
-before any matrix runs, and the matrices themselves re-assert it.
-
-## What executes
-
-| Area | Assertions |
-|---|---|
-| Migrations 0001–0005 | apply, re-run skips, ledger with SHA-256 |
-| Checksum drift | altered history is refused |
-| Failed migration | not recorded as applied (one transaction each) |
-| Schema | tables, RLS enabled/forced, policies, indexes from `pg_catalog` |
-| User isolation | profile, goals, food logs — SELECT/INSERT/UPDATE/DELETE, both directions |
-| Forged insert | A cannot insert a log owned by B |
-| Composite identity | `(user_id, log_id)` keeps A and B separate |
-| Anonymous session | sees zero rows |
-| **Household privacy** | owner reads **none** of member's private data while administering |
-| Shared metadata | active members read it; outsiders do not |
-| Owner constraint | second active owner rejected; promote-before-demote rejected |
-| Zero owners | reported honestly as **domain-enforced, not DB-enforced** |
-| Catalog | readable, not mutable by ordinary users |
-| Connection identity | cleared after COMMIT, ROLLBACK and error |
-| Concurrency | 32 parallel sessions, one identity → exactly 1 row |
-| Offline replay | retry after simulated crash → still 1 row |
-| Offline conflict | differing payload never overwrites |
-| Corrections (0004) | self-void allowed, cross-user refused, history intact |
-| Timings | development only |
-
-## Known limitations
-
-- **Not executed.** Every status stays pending until the Mac run returns.
-- The local driver is `psql`, not a Node Postgres client — **RT-6 remains
-  pending** until real application code uses one.
-- `package-lock.json` is still uncommitted; `npm ci` reproducibility is unproven.
+The PostgreSQL and RLS foundation is frozen. Migrations 0001–0005 and the
+policies, helpers and constraints they define are not to be modified without new
+runtime evidence of a defect.

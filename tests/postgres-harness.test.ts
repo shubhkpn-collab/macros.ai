@@ -1,6 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { repoPath } from '../tools/repo-paths.js';
 
@@ -484,5 +485,40 @@ describe('postgres harness — expected-negative at the process boundary', () =>
     assert.match(core3, /FOREIGN KEY \(current_product_version_id, product_id\)/);
     assert.match(core3, /DEFERRABLE INITIALLY DEFERRED/);
     assert.match(core3, /food_logs_snapshot_shape/);
+  });
+});
+
+describe('postgres foundation — frozen after runtime validation', () => {
+  const doc33 = readFileSync(
+    repoPath('docs', 'architecture', '33-postgres-validation-harness.md'), 'utf8');
+
+  test('the validated migrations are pinned by checksum', () => {
+    // Doc 33 records the SHA-256 of every migration that actually executed. If
+    // a migration changes without new runtime evidence, this fails.
+    for (const f of readdirSync(MIG_DIR)) {
+      const digest = createHash('sha256')
+        .update(readFileSync(join(MIG_DIR, f))).digest('hex').slice(0, 16);
+      assert.ok(doc33.includes(digest),
+        `${f} (${digest}) differs from the runtime-validated artifact`);
+    }
+  });
+
+  test('the documented limits are not quietly dropped', () => {
+    // These bound what the green run proved. Losing them would overstate it.
+    // Matched on content, not layout: the doc is hard-wrapped.
+    const flat = doc33.replace(/\s+/g, ' ');
+    assert.ok(flat.includes('proves **database uniqueness**'));
+    assert.ok(flat.includes("does **not** prove the application's"),
+      'the race must not be read as proving application classification');
+    assert.ok(flat.includes('does **not** prove client ACK handling or outbox settlement'));
+    assert.ok(flat.includes('RT-6 — a real application PostgreSQL driver — remains separate and pending'));
+  });
+
+  test('RT-6, RT-7 and RT-8 remain open in the deferred register', () => {
+    const deferred = readFileSync(repoPath('DEFERRED-DECISIONS.md'), 'utf8');
+    assert.match(deferred, /RT-1 \| PostgreSQL runtime validation/);
+    for (const open of ['RT-6', 'RT-7', 'RT-8']) {
+      assert.ok(deferred.includes(open), `${open} must stay recorded as open`);
+    }
   });
 });
