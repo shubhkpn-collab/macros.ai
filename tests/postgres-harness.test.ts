@@ -394,29 +394,22 @@ describe('postgres harness — round-2 real-execution fixes', () => {
 });
 
 describe('postgres harness — deferred FK evaluation', () => {
-  const integrity2 = readFileSync(join(SQL_DIR, '15-data-integrity.sql'), 'utf8');
+  const negativeProbe = readFileSync(join(SQL_DIR, '16-head-ownership-negative.sql'), 'utf8');
   const core2 = readFileSync(join(MIG_DIR, '0001_core_schema.sql'), 'utf8');
 
-  test('the head-ownership probe FORCES the deferred constraint to evaluate', () => {
-    // catalog_products_head_fk is INITIALLY DEFERRED, so an invalid UPDATE does
-    // not raise immediately — the violation waits for commit. The first version
-    // of this test raised its own FAIL before PostgreSQL was ever asked to
-    // check, reporting a broken FK that was in fact working.
-    const probe = integrity2.slice(integrity2.indexOf('FINDING 2'));
-    assert.match(probe, /SET CONSTRAINTS catalog_products_head_fk IMMEDIATE/);
-    const forceIdx = probe.indexOf('SET CONSTRAINTS');
-    const failIdx = probe.indexOf("RAISE EXCEPTION 'FAIL head-ownership");
-    assert.ok(forceIdx < failIdx,
-      'the constraint must be evaluated BEFORE the failure is raised');
-    assert.match(probe, /WHEN foreign_key_violation THEN/);
+  test('the probe FORCES the deferred constraint to evaluate', () => {
+    // The FK is INITIALLY DEFERRED, so an invalid UPDATE does not raise at the
+    // statement — the violation waits for commit. SET CONSTRAINTS ... IMMEDIATE
+    // makes it surface at a point the runner controls.
+    assert.match(negativeProbe, /SET CONSTRAINTS catalog_products_head_fk IMMEDIATE/);
+    const updateIdx = negativeProbe.indexOf('UPDATE catalog_products');
+    const forceIdx = negativeProbe.indexOf('SET CONSTRAINTS');
+    assert.ok(updateIdx < forceIdx, 'the invalid UPDATE must precede the forced check');
   });
 
-  test('the valid head is asserted preserved afterwards', () => {
-    const probe = integrity2.slice(integrity2.indexOf('FINDING 2'));
-    assert.match(probe, /FAIL head-preservation/);
-    assert.match(probe, /IS DISTINCT FROM 'prod-test-2@v1'/);
-    // The probe rolls back, so the rejected assignment cannot leak forward.
-    assert.match(probe, /ROLLBACK;/);
+  test('the probe never commits, so the invalid state cannot persist', () => {
+    assert.match(negativeProbe, /BEGIN;/);
+    assert.equal(/^COMMIT;/m.test(negativeProbe), false, 'it must never commit');
   });
 
   test('the production FK stays DEFERRABLE INITIALLY DEFERRED', () => {
@@ -426,5 +419,70 @@ describe('postgres harness — deferred FK evaluation', () => {
     assert.match(core2, /FOREIGN KEY \(current_product_version_id, product_id\)/);
     assert.match(core2, /REFERENCES product_versions \(product_version_id, product_id\)/);
     assert.match(core2, /DEFERRABLE INITIALLY DEFERRED/);
+  });
+});
+
+describe('postgres harness — expected-negative at the process boundary', () => {
+  const runner5 = readFileSync(repoPath('tools', 'postgres-validation', 'run.sh'), 'utf8');
+  const negative = readFileSync(join(SQL_DIR, '16-head-ownership-negative.sql'), 'utf8');
+  const integrity3 = readFileSync(join(SQL_DIR, '15-data-integrity.sql'), 'utf8');
+  const core3 = readFileSync(join(MIG_DIR, '0001_core_schema.sql'), 'utf8');
+
+  test('the head-ownership probe runs in its OWN psql process', () => {
+    // A deferred FK violation necessarily reaches psql as an error. Inside a
+    // shared file that fails the entire step; at the process boundary the
+    // runner can classify exit status and SQLSTATE instead.
+    assert.match(runner5, /expect_fk_violation "head ownership" "\$SQL\/16-head-ownership-negative\.sql"/);
+    assert.equal(/FINDING 2|head-ownership/.test(integrity3.replace(/^--.*$/gm, '')), false,
+      'the negative probe must no longer live in 15-data-integrity.sql');
+  });
+
+  test('exit 0 is a FAILURE — acceptance means the FK did not reject', () => {
+    const helper = runner5.slice(runner5.indexOf('expect_fk_violation() {'),
+                                 runner5.indexOf('say "MACROS.AI'));
+    assert.match(helper, /if \[ "\$status" -eq 0 \]/);
+    assert.match(helper, /was ACCEPTED \(exit 0\)/);
+    const zeroBranch = helper.slice(helper.indexOf('-eq 0 ]'), helper.indexOf('if grep -q'));
+    assert.match(zeroBranch, /FAILURES=\$\(\(FAILURES \+ 1\)\)/);
+  });
+
+  test('23503 on catalog_products_head_fk is the PASS', () => {
+    assert.match(runner5, /"23503" "catalog_products_head_fk"/);
+    const helper = runner5.slice(runner5.indexOf('expect_fk_violation() {'),
+                                 runner5.indexOf('say "MACROS.AI'));
+    assert.match(helper, /SQLSTATE \$want_state/);
+    assert.match(helper, /\$want_constraint/);
+    assert.match(helper, /VERBOSITY=verbose/, 'SQLSTATE must be available in the output');
+  });
+
+  test('an unrelated SQL error is a FAILURE, not a pass', () => {
+    const helper = runner5.slice(runner5.indexOf('expect_fk_violation() {'),
+                                 runner5.indexOf('say "MACROS.AI'));
+    assert.match(helper, /failed for an UNRELATED reason/);
+    const elseBranch = helper.slice(helper.lastIndexOf('else'));
+    assert.match(elseBranch, /FAILURES=\$\(\(FAILURES \+ 1\)\)/);
+    // Never a blanket pass on any nonzero exit.
+    assert.equal(/status" -ne 0 \][\s\S]{0,80}\[OK\]/.test(helper), false);
+  });
+
+  test('the original product head is asserted afterwards', () => {
+    assert.match(runner5, /HEAD2=\$\(psql_owner -tAc/);
+    assert.match(runner5, /\[ "\$HEAD2" = "prod-test-2@v1" \]/);
+    assert.match(runner5, /head not preserved/);
+    // The probe never commits, so the rollback is what preserves it.
+    assert.match(negative, /BEGIN;/);
+    assert.match(negative, /SET CONSTRAINTS catalog_products_head_fk IMMEDIATE/);
+  });
+
+  test('the fixtures create prod-test-2 for the probe', () => {
+    const fixtures = readFileSync(join(SQL_DIR, '10-fixtures.sql'), 'utf8');
+    assert.match(fixtures, /'prod-test-2'/);
+    assert.match(fixtures, /'prod-test-2@v1'/);
+  });
+
+  test('migrations remain untouched and the FK stays deferred', () => {
+    assert.match(core3, /FOREIGN KEY \(current_product_version_id, product_id\)/);
+    assert.match(core3, /DEFERRABLE INITIALLY DEFERRED/);
+    assert.match(core3, /food_logs_snapshot_shape/);
   });
 });

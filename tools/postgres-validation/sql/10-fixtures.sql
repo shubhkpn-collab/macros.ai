@@ -40,6 +40,26 @@ INSERT INTO product_versions (
   now()
 ) ON CONFLICT (product_version_id) DO NOTHING;
 
+-- A SECOND product, used by 16-head-ownership-negative.sql to prove a head
+-- cannot adopt another product's version.
+INSERT INTO catalog_products (product_id, current_product_version_id, is_active)
+VALUES ('prod-test-2', 'prod-test-2@v1', true)
+ON CONFLICT (product_id) DO NOTHING;
+
+INSERT INTO product_versions (
+  product_version_id, product_id, version_no, display_name, preparation_state,
+  basis, source, effective_from
+) VALUES (
+  'prod-test-2@v1', 'prod-test-2', 1, 'Other food', 'as_sold',
+  '{"kind":"per_100g","kcal":50,"proteinG":1,"carbohydrateG":1,"fatG":1}'::jsonb,
+  '{"kind":"synthetic_test","verificationStatus":"synthetic_test"}'::jsonb,
+  now()
+) ON CONFLICT (product_version_id) DO NOTHING;
+
+-- Reset the head in case an earlier run left it altered.
+UPDATE catalog_products SET current_product_version_id = 'prod-test-2@v1'
+ WHERE product_id = 'prod-test-2';
+
 INSERT INTO user_profile_versions
   (profile_version_id, user_id, effective_from, age_years, sex, body_weight_kg, height_cm)
 VALUES

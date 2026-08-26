@@ -111,67 +111,7 @@ BEGIN
 END;
 $$;
 
--- --- FINDING 2: a head may only point at a version of its OWN product ------
---
--- catalog_products_head_fk is DEFERRABLE INITIALLY DEFERRED, and that deferral
--- is REQUIRED: catalog_products.current_product_version_id references
--- product_versions, while product_versions.product_id references
--- catalog_products — a legitimate cycle that could not be populated otherwise.
---
--- The consequence for testing: an invalid UPDATE does NOT raise immediately.
--- The violation is queued until commit. The first version of this test raised
--- its own FAIL before PostgreSQL had ever been asked to evaluate the
--- constraint, so it reported a broken FK when the FK was fine.
---
--- SET CONSTRAINTS ... IMMEDIATE forces the pending check at a point we control.
-
--- Setup runs in its own statement so the fixtures commit normally.
-INSERT INTO catalog_products (product_id, current_product_version_id, is_active)
-VALUES ('prod-test-2', 'prod-test-2@v1', true) ON CONFLICT DO NOTHING;
-
-INSERT INTO product_versions (
-  product_version_id, product_id, version_no, display_name, preparation_state,
-  basis, source, effective_from)
-VALUES ('prod-test-2@v1', 'prod-test-2', 1, 'Other food', 'as_sold',
-  '{"kind":"per_100g","kcal":50,"proteinG":1,"carbohydrateG":1,"fatG":1}'::jsonb,
-  '{"kind":"synthetic_test","verificationStatus":"synthetic_test"}'::jsonb, now())
-ON CONFLICT DO NOTHING;
-
--- The probe is wrapped in its own transaction so the invalid state is rolled
--- back whatever happens, leaving the valid head untouched for the assertion
--- that follows.
-BEGIN;
-DO $$
-BEGIN
-  BEGIN
-    -- Product 2 tries to adopt product 1's version — another food's nutrition.
-    UPDATE catalog_products SET current_product_version_id = 'prod-test-1@v1'
-     WHERE product_id = 'prod-test-2';
-
-    -- Force the DEFERRED constraint to be evaluated now. Without this the
-    -- violation simply waits for commit and the test proves nothing.
-    SET CONSTRAINTS catalog_products_head_fk IMMEDIATE;
-
-    -- Reaching here means the constraint genuinely failed to reject it.
-    RAISE EXCEPTION 'FAIL head-ownership: a head adopted ANOTHER product''s version';
-  EXCEPTION
-    WHEN foreign_key_violation THEN
-      RAISE NOTICE 'PASS head-ownership: deferred composite FK rejected the cross-product head (SQLSTATE %)', SQLSTATE;
-  END;
-END;
-$$;
-ROLLBACK;
-
--- The rejected assignment must not have persisted: the original valid head
--- stands.
-DO $$
-DECLARE head text;
-BEGIN
-  SELECT current_product_version_id INTO head
-    FROM catalog_products WHERE product_id = 'prod-test-2';
-  IF head IS DISTINCT FROM 'prod-test-2@v1' THEN
-    RAISE EXCEPTION 'FAIL head-preservation: head is % after the rejected update', head;
-  END IF;
-  RAISE NOTICE 'PASS head-preservation: prod-test-2 still points at prod-test-2@v1';
-END;
-$$;
+-- NOTE: the head-ownership probe lives in 16-head-ownership-negative.sql.
+-- It expects a DEFERRED FK violation, which necessarily reaches psql as an
+-- error and would fail this whole file. Expected-negative results belong at the
+-- PROCESS boundary, where the runner can classify the exit status and SQLSTATE.

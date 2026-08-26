@@ -59,6 +59,34 @@ wrapped in its own transaction that rolls back, followed by an assertion that
 
 The production FK was **not** made immediate to satisfy the test.
 
+### Expected-negative results belong at the process boundary
+
+The live server proved the FK works:
+
+```
+insert or update on table "catalog_products" violates foreign key
+constraint "catalog_products_head_fk"
+```
+
+That is the correct production behaviour. The remaining problem was purely
+classification: a deferred FK violation **necessarily** reaches psql as an
+error, so inside a shared SQL file it failed the whole `data integrity` step no
+matter which PL/pgSQL exception form was tried.
+
+The probe now lives in `16-head-ownership-negative.sql` and runs in its own psql
+process, classified by `expect_fk_violation`:
+
+| Outcome | Verdict |
+|---|---|
+| nonzero + `23503` + `catalog_products_head_fk` | **PASS** |
+| exit 0 | **FAIL** — the invalid head was accepted |
+| nonzero + unrelated SQLSTATE | **FAIL / INVALID TEST** |
+
+The generic `step()` helper never sees it, so no global failure is recorded for
+the expected rejection. The transaction never commits, and the runner then
+queries the real database to confirm `prod-test-2` still points at
+`prod-test-2@v1`.
+
 ### Still PARTIAL
 
 - **DATA-INTEGRITY ADVERSARIAL MATRIX — PARTIAL.** The malformed-numeric probe

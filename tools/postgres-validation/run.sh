@@ -78,6 +78,40 @@ step() { # step <name> <command...>
   rm -f "$log"
 }
 
+
+# Owns EXPECTED-NEGATIVE process semantics. The generic step() helper treats any
+# nonzero exit as a failure, which is exactly wrong for a probe whose whole
+# purpose is to be rejected by the database.
+#
+#   expect_fk_violation <name> <sql-file> <sqlstate> <constraint>
+expect_fk_violation() {
+  local name="$1" file="$2" want_state="$3" want_constraint="$4"
+  local log; log="$(mktemp)"
+
+  # VERBOSITY=verbose surfaces SQLSTATE and the constraint name in the error.
+  PGOPTIONS="" psql -v ON_ERROR_STOP=1 -v VERBOSITY=verbose \
+    -h "$PGHOST" -p "$PGPORT" -d "$DB" -f "$file" >"$log" 2>&1
+  local status=$?
+
+  if [ "$status" -eq 0 ]; then
+    say "  [FAIL] $name: the invalid assignment was ACCEPTED (exit 0)"
+    FAILURES=$((FAILURES + 1)); rm -f "$log"; return
+  fi
+
+  if grep -q "SQLSTATE $want_state" "$log" && grep -q "$want_constraint" "$log"; then
+    say "  [OK] $name: rejected with SQLSTATE $want_state on $want_constraint"
+  elif grep -qi "violates foreign key constraint \"$want_constraint\"" "$log"; then
+    # Older/quieter builds may not echo the SQLSTATE token; the constraint name
+    # in the violation message is equally specific.
+    say "  [OK] $name: rejected by $want_constraint"
+  else
+    say "  [FAIL] $name: failed for an UNRELATED reason (expected $want_state/$want_constraint)"
+    grep -E "ERROR|SQLSTATE|DETAIL" "$log" | head -4 | sed 's/^/      /' | tee -a "$REPORT" >/dev/null
+    FAILURES=$((FAILURES + 1))
+  fi
+  rm -f "$log"
+}
+
 say "MACROS.AI PostgreSQL runtime validation"
 say "database: $DB @ $PGHOST:$PGPORT"
 say "started:  $(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -238,6 +272,19 @@ step "test helpers"  psql_owner -f "$SQL/05-test-helpers.sql"
 step "fixtures"      psql_owner -1 -f "$SQL/10-fixtures.sql"
 section "DATA INTEGRITY (constraints, as owner)"
 step "data integrity" psql_owner -f "$SQL/15-data-integrity.sql"
+
+# Expected-negative, classified at the PROCESS boundary.
+expect_fk_violation "head ownership" "$SQL/16-head-ownership-negative.sql" \
+  "23503" "catalog_products_head_fk"
+
+# The rejected transaction never committed, so the valid head must survive.
+HEAD2=$(psql_owner -tAc "SELECT current_product_version_id FROM catalog_products WHERE product_id='prod-test-2';")
+if [ "$HEAD2" = "prod-test-2@v1" ]; then
+  say "  [OK] head preserved: prod-test-2 still points at prod-test-2@v1"
+else
+  say "  [FAIL] head not preserved: prod-test-2 -> ${HEAD2:-<missing>}"
+  FAILURES=$((FAILURES + 1))
+fi
 # The database asserts its own invariants and RAISEs on violation, so nothing
 # depends on whether a boolean renders as `f`, `false` or `FALSE` — the previous
 # check compared against "f/f" and failed against the real server's "false/false"
