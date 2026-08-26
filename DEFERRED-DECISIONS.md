@@ -281,7 +281,22 @@ integrity surfaced, per-entry checksums, exact eligibility ledger.
 | AU-2 | **Session persistence across restart.** With no secure persistent session proof available, restart must degrade to a neutral/locked state rather than reopening the last user. | Depends on AU-1. | With AU-1 |
 | OF-6 | **Outbox repair tooling** for quarantined records, now addressable by opaque `storageRef`. | Operational tooling. | Support tooling |
 
-## PostgreSQL attempt (2026-08-26) — BLOCKED, nothing resolved
+## PostgreSQL FIRST REAL EXECUTION (2026-08-26) — PARTIAL
+
+Executed on PostgreSQL 17.11 against `macros_dev`. **Migrations 0001–0005
+applied successfully for the first time**, re-run correctly skipped all five,
+and the ledger holds 5 rows. Schema verified live: 14 tables, 13 with RLS, 21
+policies, 29 indexes.
+
+A harness accounting bug aborted the run before the behavioural suites, so:
+
+- **RT-1 REMAINS OPEN** — RLS matrix, household privacy and idempotency
+  concurrency have **not** executed.
+- **P-6 (migration runner) — runtime validated**: apply, skip-on-rerun,
+  checksum-drift refusal all proven against a real server.
+- P-3, P-4, B-5, FC-3, HH-1 remain open pending the behavioural run.
+
+## Superseded: PostgreSQL attempt (earlier 2026-08-26) — BLOCKED, nothing resolved
 
 A PostgreSQL 17 server is running on the owner's Mac, but this execution
 environment is a sandboxed Linux VM with **no default route and no egress**;

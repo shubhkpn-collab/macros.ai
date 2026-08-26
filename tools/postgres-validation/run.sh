@@ -107,6 +107,13 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
 );
 SQL
 
+# Reports outcome through its RETURN STATUS and output. It deliberately does
+# NOT touch the global FAILURES counter: only the caller knows whether a nonzero
+# result is a defect or the expected outcome of a negative probe.
+#
+#   0 = all migrations consistent and applied/skipped
+#   3 = checksum drift refused
+#   1 = a migration failed to apply
 apply_migrations() {
   local mode="$1" applied=0 skipped=0
   for file in "$MIGRATIONS"/*.sql; do
@@ -117,8 +124,8 @@ apply_migrations() {
 
     if [ -n "$recorded" ]; then
       if [ "$recorded" != "$sum" ]; then
-        say "  [FAIL] $id CHECKSUM DRIFT (recorded ${recorded:0:12}, file ${sum:0:12})"
-        FAILURES=$((FAILURES + 1)); return 1
+        say "  [refused] $id CHECKSUM DRIFT (recorded ${recorded:0:12}, file ${sum:0:12})"
+        return 3
       fi
       skipped=$((skipped + 1)); continue
     fi
@@ -136,37 +143,69 @@ apply_migrations() {
        psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" -f - >/dev/null 2>&1; then
       applied=$((applied + 1))
     else
-      say "  [FAIL] $id failed to apply"
+      say "  [error] $id failed to apply"
       local still; still="$(psql_owner -tAc "SELECT count(*) FROM schema_migrations WHERE migration_id='$id';")"
       if [ "$still" = "0" ]; then say "     [OK] not recorded as applied (correct)"; fi
-      FAILURES=$((FAILURES + 1)); return 1
+      return 1
     fi
   done
   say "  [$mode] applied=$applied skipped=$skipped"
 }
 
 MIG_START=$(date +%s)
-apply_migrations "run 1"
+if ! apply_migrations "run 1"; then
+  say "  [FAIL] migrations did not apply cleanly"; FAILURES=$((FAILURES + 1))
+fi
 MIG_SECS=$(( $(date +%s) - MIG_START ))
 say "  migration duration: ${MIG_SECS}s"
 
+# A second run must skip everything. An already-migrated database is a VALID
+# starting state: applied=0 skipped=5 on both runs is expected after the first
+# real execution.
 say "  re-running (idempotency)..."
-apply_migrations "run 2"
+if ! apply_migrations "run 2"; then
+  say "  [FAIL] re-run did not skip cleanly"; FAILURES=$((FAILURES + 1))
+fi
 LEDGER=$(psql_owner -tAc "SELECT count(*) FROM schema_migrations;")
 say "  ledger rows: $LEDGER (expect 5)"
 [ "$LEDGER" = "5" ] || { say "  [FAIL] expected 5 ledger rows"; FAILURES=$((FAILURES + 1)); }
 
 # --- C19 CHECKSUM DRIFT REFUSAL ---------------------------------------------
-section "CHECKSUM DRIFT REFUSAL"
+section "CHECKSUM DRIFT REFUSAL (intentional negative probe)"
+REAL1="$(shasum -a 256 "$MIGRATIONS/0001_core_schema.sql" 2>/dev/null | cut -d' ' -f1 \
+        || sha256sum "$MIGRATIONS/0001_core_schema.sql" | cut -d' ' -f1)"
+
 psql_owner -q -c "UPDATE schema_migrations SET checksum='deadbeef' WHERE migration_id='0001_core_schema.sql';" >/dev/null
-if apply_migrations "drift" 2>/dev/null; then
-  say "  [FAIL] drifted checksum was accepted"; FAILURES=$((FAILURES + 1))
+
+# EXPECTED-NEGATIVE ACCOUNTING: here a nonzero result is the CORRECT outcome.
+# apply_migrations no longer decides this globally, so a refusal cannot leave
+# the failure counter incremented and abort the run that it just passed.
+apply_migrations "drift probe" >/dev/null 2>&1
+DRIFT_STATUS=$?
+if [ "$DRIFT_STATUS" -eq 3 ]; then
+  say "  [OK] runner refused the altered migration history (expected)"
 else
-  say "  [OK] runner refused the altered migration history"
+  say "  [FAIL] drifted checksum was ACCEPTED (status $DRIFT_STATUS)"
+  FAILURES=$((FAILURES + 1))
 fi
-psql_owner -q -c "UPDATE schema_migrations SET checksum=(SELECT checksum FROM schema_migrations WHERE migration_id='0001_core_schema.sql') WHERE false;" >/dev/null 2>&1
-REAL1="$(shasum -a 256 "$MIGRATIONS/0001_core_schema.sql" 2>/dev/null | cut -d' ' -f1 || sha256sum "$MIGRATIONS/0001_core_schema.sql" | cut -d' ' -f1)"
+
+# Restoration is mandatory: leaving a bogus checksum behind would poison every
+# later run of this harness.
 psql_owner -q -c "UPDATE schema_migrations SET checksum='$REAL1' WHERE migration_id='0001_core_schema.sql';" >/dev/null
+RESTORED="$(psql_owner -tAc "SELECT checksum FROM schema_migrations WHERE migration_id='0001_core_schema.sql';")"
+if [ "$RESTORED" = "$REAL1" ]; then
+  say "  [OK] ledger checksum restored and matches the file SHA-256"
+else
+  say "  [FAIL] checksum NOT restored (ledger ${RESTORED:0:12}, file ${REAL1:0:12})"
+  FAILURES=$((FAILURES + 1))
+fi
+
+# And the restored ledger must once again be clean.
+if apply_migrations "post-restore" >/dev/null 2>&1; then
+  say "  [OK] ledger consistent after restoration"
+else
+  say "  [FAIL] ledger still inconsistent after restoration"; FAILURES=$((FAILURES + 1))
+fi
 
 # --- C3 SCHEMA INSPECTION ----------------------------------------------------
 section "SCHEMA INVARIANTS (from PostgreSQL catalogs)"

@@ -246,3 +246,63 @@ describe('postgres harness — payload validity and transfer path', () => {
     assert.match(household, /RETURNS void/, 'it returns no data at all');
   });
 });
+
+describe('postgres harness — expected-negative accounting', () => {
+  const runner3 = readFileSync(repoPath('tools', 'postgres-validation', 'run.sh'), 'utf8');
+  const helper = runner3.slice(runner3.indexOf('apply_migrations() {'),
+                               runner3.indexOf('MIG_START='));
+
+  test('apply_migrations does NOT touch the global failure counter', () => {
+    // THE BUG, proven by the first real run: the helper both incremented
+    // FAILURES and returned nonzero on checksum drift. The deliberate drift
+    // probe then reported PASS while the counter stayed incremented, so the
+    // setup gate aborted a run that had actually succeeded.
+    assert.equal(helper.includes('FAILURES'), false,
+      'only the caller can know whether a nonzero result is a defect');
+  });
+
+  test('the helper distinguishes REFUSAL from ERROR by status code', () => {
+    assert.match(helper, /return 3/, 'checksum drift must be distinguishable');
+    assert.match(helper, /return 1/, 'a genuine apply failure must differ');
+  });
+
+  test('deliberate drift counts as PASS and increments nothing', () => {
+    const probe = runner3.slice(runner3.indexOf('CHECKSUM DRIFT REFUSAL'),
+                                runner3.indexOf('SCHEMA INVARIANTS'));
+    assert.match(probe, /DRIFT_STATUS=\$\?/, 'the caller must capture the status');
+    assert.match(probe, /-eq 3 \]/, 'refusal is the expected outcome');
+    assert.match(probe, /runner refused the altered migration history/);
+    // Only ACCEPTING the drift may count as a failure.
+    const acceptBranch = probe.slice(probe.indexOf('else'), probe.indexOf('# Restoration'));
+    assert.match(acceptBranch, /drifted checksum was ACCEPTED/);
+    assert.match(acceptBranch, /FAILURES/);
+  });
+
+  test('the checksum is restored AND asserted afterwards', () => {
+    const probe = runner3.slice(runner3.indexOf('CHECKSUM DRIFT REFUSAL'),
+                                runner3.indexOf('SCHEMA INVARIANTS'));
+    assert.match(probe, /RESTORED=/, 'restoration must be read back');
+    assert.match(probe, /\[ "\$RESTORED" = "\$REAL1" \]/,
+      'restored ledger checksum must equal the file SHA-256');
+    assert.match(probe, /checksum NOT restored[\s\S]{0,120}FAILURES/,
+      'a failed restoration is a REAL failure');
+    assert.match(probe, /ledger consistent after restoration/);
+  });
+
+  test('unexpected migration failure is still a real failure', () => {
+    // The fix must not have blunted genuine error detection.
+    const setup = runner3.slice(runner3.indexOf('MIG_START='),
+                                runner3.indexOf('CHECKSUM DRIFT REFUSAL'));
+    assert.match(setup, /if ! apply_migrations "run 1"; then[\s\S]{0,160}FAILURES/);
+    assert.match(setup, /if ! apply_migrations "run 2"; then[\s\S]{0,160}FAILURES/);
+  });
+
+  test('an already-migrated database is a valid starting state', () => {
+    // After the first real execution, applied=0 skipped=5 on BOTH runs.
+    const setup = runner3.slice(runner3.indexOf('MIG_START='),
+                                runner3.indexOf('CHECKSUM DRIFT REFUSAL'));
+    assert.match(setup, /already-migrated database is a VALID/i);
+    assert.equal(/DROP DATABASE|DROP SCHEMA|dropdb/.test(runner3), false,
+      'the harness must never reset the owner database');
+  });
+});
