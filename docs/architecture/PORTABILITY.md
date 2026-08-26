@@ -45,3 +45,52 @@ export MACROS_SOURCE_DIR=~/Downloads/usda
 
 Prose and recorded ingestion provenance are deliberately exempt: history is
 evidence, and rewriting it to satisfy a linter would falsify the record.
+
+
+## Toolchain reproducibility
+
+`package.json` once declared scripts that invoke `tsc` and `tsx` but declared no
+devDependencies. A fresh clone therefore had to guess: a Mac installing "latest"
+received a TypeScript generation that had **removed** `baseUrl`, and `npm run
+typecheck` failed with `TS5102` plus 28 `TS5090` errors on every `paths` entry —
+while the authoring environment passed. Same commit, different result.
+
+### Declared tooling
+
+| Tool | Pin |
+|---|---|
+| `typescript` | `6.0.3` (exact) |
+| `tsx` | `4.21.0` (exact) |
+| `@types/node` | `25.6.0` (exact) |
+| Node | `>=22.0.0` (`engines`, `.nvmrc`) |
+
+Exact pins, not ranges: a caret would reproduce the same class of drift.
+
+### Install policy
+
+```bash
+npm ci        # preferred once package-lock.json exists
+npm install   # generates the lockfile; commit it
+```
+
+**No global `tsc` or `tsx` is required.** All scripts resolve binaries from the
+repository's `node_modules`.
+
+> **`package-lock.json` is not yet committed.** The authoring sandbox has no npm
+> registry access (403), so any lockfile produced there points at a global
+> install directory with no `resolved` URLs or `integrity` hashes — worse than
+> none, because `npm ci` would fail or resolve wrongly. Run `npm install` on a
+> machine with registry access and commit the result.
+
+### tsconfig decision
+
+Modernized rather than pinned. `baseUrl` was removed and all 28 `paths` targets
+made relative (`./packages/...`), which is the form supported by **both** the
+current and newer compiler generations. `ignoreDeprecations: "6.0"` — the escape
+hatch that was keeping `baseUrl` alive — is gone, since nothing deprecated
+remains. Pinning to an older compiler would have preserved a config already on a
+removal path.
+
+Verified: all 28 aliases still resolve, all 25 packages pass the purity check,
+and the full suite passes. `npm run check:toolchain` fails the build if the
+installed tooling drifts from what is declared.

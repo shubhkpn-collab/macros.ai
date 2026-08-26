@@ -3,7 +3,9 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -11,39 +13,99 @@
     "noFallthroughCasesInSwitch": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "ignoreDeprecations": "6.0",
-    "types": ["node"],
-    "baseUrl": ".",
+    "types": [
+      "node"
+    ],
     "paths": {
-      "@macros/contracts": ["packages/contracts/src/index.ts"],
-      "@macros/domain-nutrition": ["packages/domain-nutrition/src/index.ts"],
-      "@macros/domain-energy": ["packages/domain-energy/src/index.ts"],
-      "@macros/domain-macros": ["packages/domain-macros/src/index.ts"],
-      "@macros/activity-provider": ["packages/activity-provider/src/index.ts"],
-      "@macros/scale-protocol": ["packages/scale-protocol/src/index.ts"],
-      "@macros/domain-weight": ["packages/domain-weight/src/index.ts"],
-      "@macros/scale-simulator": ["packages/scale-simulator/src/index.ts"],
-      "@macros/domain-food-log": ["packages/domain-food-log/src/index.ts"],
-      "@macros/core-loop": ["packages/core-loop/src/index.ts"],
-      "@macros/persistence": ["packages/persistence/src/index.ts"],
-      "@macros/domain-food-search": ["packages/domain-food-search/src/index.ts"],
-      "@macros/tablet-app-core": ["packages/tablet-app-core/src/index.ts"],
-      "@macros/domain-catalog": ["packages/domain-catalog/src/index.ts"],
-      "@macros/offline-adapters": ["packages/offline-adapters/src/index.ts"],
-      "@macros/domain-auth": ["packages/domain-auth/src/index.ts"],
-      "@macros/domain-household": ["packages/domain-household/src/index.ts"],
-      "@macros/domain-offline-sync": ["packages/domain-offline-sync/src/index.ts"],
-      "@macros/catalog-runtime": ["packages/catalog-runtime/src/index.ts"],
-      "@macros/catalog-ingestion": ["packages/catalog-ingestion/src/index.ts"],
-      "@macros/runtime-config": ["packages/runtime-config/src/index.ts"],
-      "@macros/runtime-api": ["packages/runtime-api/src/index.ts"],
-      "@macros/assistant-core": ["packages/assistant-core/src/index.ts"],
-      "@macros/domain-nutrients": ["packages/domain-nutrients/src/index.ts"],
-      "@macros/domain-recommendation": ["packages/domain-recommendation/src/index.ts"],
-      "@macros/domain-voice": ["packages/domain-voice/src/index.ts"],
-      "@macros/voice-orchestration": ["packages/voice-orchestration/src/index.ts"],
-      "@macros/testkit": ["packages/testkit/src/index.ts"]
+      "@macros/contracts": [
+        "./packages/contracts/src/index.ts"
+      ],
+      "@macros/domain-nutrition": [
+        "./packages/domain-nutrition/src/index.ts"
+      ],
+      "@macros/domain-energy": [
+        "./packages/domain-energy/src/index.ts"
+      ],
+      "@macros/domain-macros": [
+        "./packages/domain-macros/src/index.ts"
+      ],
+      "@macros/activity-provider": [
+        "./packages/activity-provider/src/index.ts"
+      ],
+      "@macros/scale-protocol": [
+        "./packages/scale-protocol/src/index.ts"
+      ],
+      "@macros/domain-weight": [
+        "./packages/domain-weight/src/index.ts"
+      ],
+      "@macros/scale-simulator": [
+        "./packages/scale-simulator/src/index.ts"
+      ],
+      "@macros/domain-food-log": [
+        "./packages/domain-food-log/src/index.ts"
+      ],
+      "@macros/core-loop": [
+        "./packages/core-loop/src/index.ts"
+      ],
+      "@macros/persistence": [
+        "./packages/persistence/src/index.ts"
+      ],
+      "@macros/domain-food-search": [
+        "./packages/domain-food-search/src/index.ts"
+      ],
+      "@macros/tablet-app-core": [
+        "./packages/tablet-app-core/src/index.ts"
+      ],
+      "@macros/domain-catalog": [
+        "./packages/domain-catalog/src/index.ts"
+      ],
+      "@macros/offline-adapters": [
+        "./packages/offline-adapters/src/index.ts"
+      ],
+      "@macros/domain-auth": [
+        "./packages/domain-auth/src/index.ts"
+      ],
+      "@macros/domain-household": [
+        "./packages/domain-household/src/index.ts"
+      ],
+      "@macros/domain-offline-sync": [
+        "./packages/domain-offline-sync/src/index.ts"
+      ],
+      "@macros/catalog-runtime": [
+        "./packages/catalog-runtime/src/index.ts"
+      ],
+      "@macros/catalog-ingestion": [
+        "./packages/catalog-ingestion/src/index.ts"
+      ],
+      "@macros/runtime-config": [
+        "./packages/runtime-config/src/index.ts"
+      ],
+      "@macros/runtime-api": [
+        "./packages/runtime-api/src/index.ts"
+      ],
+      "@macros/assistant-core": [
+        "./packages/assistant-core/src/index.ts"
+      ],
+      "@macros/domain-nutrients": [
+        "./packages/domain-nutrients/src/index.ts"
+      ],
+      "@macros/domain-recommendation": [
+        "./packages/domain-recommendation/src/index.ts"
+      ],
+      "@macros/domain-voice": [
+        "./packages/domain-voice/src/index.ts"
+      ],
+      "@macros/voice-orchestration": [
+        "./packages/voice-orchestration/src/index.ts"
+      ],
+      "@macros/testkit": [
+        "./packages/testkit/src/index.ts"
+      ]
     }
   },
-  "include": ["packages/*/src/**/*.ts", "tests/**/*.ts", "tools/**/*.ts"]
+  "include": [
+    "packages/*/src/**/*.ts",
+    "tests/**/*.ts",
+    "tools/**/*.ts"
+  ]
 }

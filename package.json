@@ -6,9 +6,19 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "check:purity": "node --import tsx tools/check-purity.ts",
-    "verify": "npm run check:purity && npm run check:portability && npm run check:auth && npm run typecheck && npm run test",
+    "verify": "npm run check:toolchain && npm run check:purity && npm run check:portability && npm run check:auth && npm run typecheck && npm run test",
     "check:portability": "node --import tsx tools/check-portability.ts",
     "check:auth": "node --import tsx tools/check-auth-boundary.ts",
-    "docs:generate": "node --import tsx tools/gen-catalog-doc.ts"
+    "docs:generate": "node --import tsx tools/gen-catalog-doc.ts",
+    "check:toolchain": "node --import tsx tools/check-toolchain.ts"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "tsx": "4.21.0",
+    "typescript": "6.0.3"
   }
 }
