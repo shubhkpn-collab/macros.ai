@@ -35,7 +35,30 @@ for forbidden in postgres template0 template1 production prod; do
 done
 
 psql_owner() { psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" "$@"; }
-psql_app()   { PGUSER=macros_app psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" "$@"; }
+
+# The application role is reached via SET ROLE on the OWNER's already-working
+# connection. macros_app is NOLOGIN on purpose: assuming the local pg_hba.conf
+# happens to permit a brand-new passwordless TCP login would make validation
+# depend on the owner's machine configuration, and "fix" it by weakening
+# PostgreSQL authentication. SET ROLE still applies RLS, because macros_app is
+# NOSUPERUSER NOBYPASSRLS.
+psql_app() {
+  local file="" ; local inline=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -f) file="$2"; shift 2 ;;
+      -c) inline="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  if [ -n "$file" ]; then
+    { echo "SET ROLE macros_app;"; cat "$file"; } |
+      psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" -f -
+  else
+    printf 'SET ROLE macros_app;\n%s\n' "$inline" |
+      psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" -f -
+  fi
+}
 
 step() { # step <name> <command...>
   local name="$1"; shift
@@ -65,6 +88,15 @@ say "current_database: $(psql_owner -tAc 'SELECT current_database();' 2>&1)"
 psql_owner -f "$SQL/01-safety.sql" >/dev/null 2>&1 || { say "FATAL: safety guard refused"; exit 2; }
 say "safety guard: PASS (database is macros_dev)"
 
+# --- BLOCKER 1: the auth compatibility boundary must exist BEFORE migrations,
+# because 0002 references auth.uid() and the authenticated role.
+section "TEST-ONLY AUTH PREREQUISITE (installed BEFORE migrations)"
+if psql_owner -1 -f "$SQL/00-prereq.sql" >/dev/null 2>&1; then
+  say "  [OK] auth schema, auth.uid(), authenticated role"
+else
+  say "  [FATAL] prerequisite install failed — migrations cannot run"; exit 2
+fi
+
 # --- C4 MIGRATION LEDGER -----------------------------------------------------
 section "MIGRATIONS + LEDGER"
 psql_owner -q <<'SQL' >/dev/null 2>&1
@@ -91,10 +123,17 @@ apply_migrations() {
       skipped=$((skipped + 1)); continue
     fi
 
-    # Each migration runs in ONE transaction: a failure rolls back AND leaves
-    # the ledger untouched, so a failed migration is never marked applied.
-    if psql_owner -1 -f "$file" >/dev/null 2>&1; then
-      psql_owner -q -c "INSERT INTO schema_migrations (migration_id, checksum) VALUES ('$id','$sum');" >/dev/null
+    # BLOCKER 2: DDL and the ledger insert are ONE transaction in ONE psql
+    # process. Two psql invocations are two transactions: a crash between them
+    # leaves the schema applied and the ledger empty, which is exactly the
+    # inconsistency the ledger exists to prevent. Migration files contain DDL
+    # only; this layer owns BEGIN/COMMIT.
+    if { echo "BEGIN;";
+         cat "$file";
+         echo ";";
+         echo "INSERT INTO schema_migrations (migration_id, checksum) VALUES ('$id','$sum');";
+         echo "COMMIT;"; } |
+       psql -v ON_ERROR_STOP=1 -h "$PGHOST" -p "$PGPORT" -d "$DB" -f - >/dev/null 2>&1; then
       applied=$((applied + 1))
     else
       say "  [FAIL] $id failed to apply"
@@ -143,13 +182,25 @@ IDX=$(psql_owner -tAc "SELECT count(*) FROM pg_indexes WHERE schemaname='public'
 say "  tables=$TBL rls_enabled=$RLS policies=$POL indexes=$IDX"
 [ "$POL" -gt 0 ] || { say "  [FAIL] no policies present"; FAILURES=$((FAILURES + 1)); }
 
-# --- C2 HARNESS + FIXTURES ---------------------------------------------------
-section "TEST HARNESS (test-only, not a production migration)"
-step "auth harness"  psql_owner -f "$SQL/00-harness.sql"
-step "fixtures"      psql_owner -f "$SQL/10-fixtures.sql"
+# --- Setup gate: no point running 20 behavioural tests on a broken schema.
+if [ "$FAILURES" -ne 0 ]; then
+  section "ABORTED"
+  say "Migration setup failed. Skipping behavioural tests to avoid cascade noise."
+  say "Report: $REPORT"
+  exit 1
+fi
+
+section "TEST HELPERS + FIXTURES"
+step "test helpers"  psql_owner -f "$SQL/05-test-helpers.sql"
+step "fixtures"      psql_owner -1 -f "$SQL/10-fixtures.sql"
+section "DATA INTEGRITY (constraints, as owner)"
+step "data integrity" psql_owner -f "$SQL/15-data-integrity.sql"
 ROLEPROPS=$(psql_owner -tAc "SELECT rolsuper||'/'||rolbypassrls FROM pg_roles WHERE rolname='macros_app';")
 say "  macros_app rolsuper/rolbypassrls: $ROLEPROPS (must be f/f)"
 [ "$ROLEPROPS" = "f/f" ] || { say "  [FAIL] test role could bypass RLS"; FAILURES=$((FAILURES + 1)); }
+EFFECTIVE=$(psql_app -c "SELECT current_user;" 2>/dev/null | sed -n '3p' | tr -d ' ')
+say "  effective role inside assertions: ${EFFECTIVE:-unknown} (must be macros_app)"
+[ "$EFFECTIVE" = "macros_app" ] || { say "  [FAIL] assertions are NOT running as macros_app"; FAILURES=$((FAILURES + 1)); }
 
 # --- C5..C9 POLICY MATRICES (as the NON-privileged role) ---------------------
 section "RLS MATRIX (as macros_app)"
@@ -171,7 +222,8 @@ RACE_ID="race-$(date +%s)"
 RACERS="${MACROS_RACERS:-32}"
 RACE_START=$(date +%s%N)
 for i in $(seq 1 "$RACERS"); do
-  PGUSER=macros_app psql -q -h "$PGHOST" -p "$PGPORT" -d "$DB" -c "
+  psql -q -h "$PGHOST" -p "$PGPORT" -d "$DB" -c "
+    SET ROLE macros_app;
     BEGIN;
     SELECT auth.set_test_uid('11111111-1111-4111-8111-111111111111'::uuid);
     INSERT INTO food_logs (
@@ -190,6 +242,9 @@ ROWS=$(psql_owner -tAc "SELECT count(*) FROM food_logs WHERE log_id='$RACE_ID';"
 say "  $RACERS concurrent submissions of one identity -> $ROWS row(s) in ${RACE_MS}ms"
 if [ "$ROWS" = "1" ]; then
   say "  [OK] exactly one logical row; no duplicates"
+  say "  SCOPE: this proves DATABASE uniqueness only. Application classification"
+  say "         (inserted / replayed_existing / idempotency_conflict) is NOT"
+  say "         proven here — no repository code participated in this race."
 else
   say "  [FAIL] expected 1 row, got $ROWS"; FAILURES=$((FAILURES + 1))
 fi
@@ -212,7 +267,7 @@ psql_app -q -c "
   ON CONFLICT (user_id, log_id) DO NOTHING;
   COMMIT;" >/dev/null 2>&1
 AFTER_ROWS=$(psql_owner -tAc "SELECT count(*) FROM food_logs WHERE log_id='$RACE_ID';")
-[ "$AFTER_ROWS" = "1" ] && say "  [OK] retry after simulated crash -> still 1 row (replayed_existing)" \
+[ "$AFTER_ROWS" = "1" ] && say "  [OK] retry after simulated crash -> still 1 row (duplicate prevented at the DB)" \
   || { say "  [FAIL] retry created duplicates ($AFTER_ROWS rows)"; FAILURES=$((FAILURES + 1)); }
 
 # Conflict: same identity, DIFFERENT payload. Original must be untouched.
@@ -231,6 +286,9 @@ psql_app -q -c "
 AFTER=$(psql_owner -tAc "SELECT kcal FROM food_logs WHERE log_id='$RACE_ID';")
 if [ "$BEFORE" = "$AFTER" ]; then
   say "  [OK] conflicting payload did NOT overwrite (kcal $BEFORE unchanged)"
+  say "  SCOPE: SQL-level duplicate/overwrite prevention only. Client ACK state and"
+  say "         outbox settlement are NOT validated here — the offline sync adapter"
+  say "         did not participate."
 else
   say "  [FAIL] last-write-wins: kcal $BEFORE -> $AFTER"; FAILURES=$((FAILURES + 1))
 fi

@@ -74,6 +74,65 @@ CREATE TABLE IF NOT EXISTS household_seat_entitlements (
     -- as authority to delete a member.
 );
 
+
+-- ---------------------------------------------------------------------------
+-- MEMBERSHIP HELPERS — RLS RECURSION FIX
+-- ---------------------------------------------------------------------------
+-- The original policies queried household_memberships from inside a policy ON
+-- household_memberships, which PostgreSQL evaluates recursively and which fails
+-- with "infinite recursion detected in policy for relation". Because
+-- household, device and seat policies all reach membership transitively, the
+-- whole household schema was affected.
+--
+-- The fix is a narrowly scoped SECURITY DEFINER predicate. It runs as the owner
+-- so its internal read is not itself policy-checked, which breaks the cycle
+-- without disabling or forcing off RLS anywhere.
+--
+-- SECURITY PROPERTIES, deliberately constrained:
+--   * returns a BOOLEAN authorization fact only — never a row, never data;
+--   * derives the subject from auth.uid() INTERNALLY. There is no userId
+--     argument, so a caller cannot ask "is some OTHER user a member?" and it
+--     cannot be used to enumerate anyone;
+--   * explicit locked search_path, schema-qualified relations, no dynamic SQL;
+--   * grants nothing over private nutrition — household admin remains separate
+--     from data access, exactly as before.
+
+CREATE OR REPLACE FUNCTION public.is_active_household_member(p_household_id text)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.household_memberships m
+     WHERE m.household_id = p_household_id
+       AND m.user_id = auth.uid()
+       AND m.status = 'active'
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_active_household_owner(p_household_id text)
+RETURNS boolean
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.household_memberships m
+     WHERE m.household_id = p_household_id
+       AND m.user_id = auth.uid()
+       AND m.status = 'active'
+       AND m.role = 'owner'
+  );
+$$;
+
+REVOKE ALL ON FUNCTION public.is_active_household_member(text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_active_household_owner(text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_active_household_member(text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.is_active_household_owner(text) TO authenticated;
+
 -- ---------------------------------------------------------------------------
 -- RLS — shared household rows are membership-aware; personal rows are untouched
 -- ---------------------------------------------------------------------------
@@ -89,61 +148,45 @@ ALTER TABLE household_seat_entitlements FORCE  ROW LEVEL SECURITY;
 -- An ACTIVE member may read shared household metadata.
 CREATE POLICY households_select ON households
     FOR SELECT TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships hm
-                WHERE hm.household_id = households.household_id
-                  AND hm.user_id = auth.uid() AND hm.status = 'active')
+        public.is_active_household_member(households.household_id)
     );
 
 -- Only the ACTIVE owner may change it.
 CREATE POLICY households_update ON households
     FOR UPDATE TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships hm
-                WHERE hm.household_id = households.household_id
-                  AND hm.user_id = auth.uid() AND hm.status = 'active' AND hm.role = 'owner')
+        public.is_active_household_owner(households.household_id)
     );
 
 -- Members see the roster (names/roles live in profile tables, not here).
 CREATE POLICY memberships_select ON household_memberships
     FOR SELECT TO authenticated USING (
         user_id = auth.uid()
-        OR EXISTS (SELECT 1 FROM household_memberships me
-                   WHERE me.household_id = household_memberships.household_id
-                     AND me.user_id = auth.uid() AND me.status = 'active')
+        OR public.is_active_household_member(household_memberships.household_id)
     );
 
 CREATE POLICY memberships_admin ON household_memberships
     FOR ALL TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships me
-                WHERE me.household_id = household_memberships.household_id
-                  AND me.user_id = auth.uid() AND me.status = 'active' AND me.role = 'owner')
+        public.is_active_household_owner(household_memberships.household_id)
     );
 
 CREATE POLICY devices_select ON household_devices
     FOR SELECT TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships hm
-                WHERE hm.household_id = household_devices.household_id
-                  AND hm.user_id = auth.uid() AND hm.status = 'active')
+        public.is_active_household_member(household_devices.household_id)
     );
 
 CREATE POLICY devices_admin ON household_devices
     FOR ALL TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships hm
-                WHERE hm.household_id = household_devices.household_id
-                  AND hm.user_id = auth.uid() AND hm.status = 'active' AND hm.role = 'owner')
+        public.is_active_household_owner(household_devices.household_id)
     );
 
 CREATE POLICY seats_select ON household_seat_entitlements
     FOR SELECT TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships hm
-                WHERE hm.household_id = household_seat_entitlements.household_id
-                  AND hm.user_id = auth.uid() AND hm.status = 'active')
+        public.is_active_household_member(household_seat_entitlements.household_id)
     );
 
 CREATE POLICY seats_admin ON household_seat_entitlements
     FOR ALL TO authenticated USING (
-        EXISTS (SELECT 1 FROM household_memberships hm
-                WHERE hm.household_id = household_seat_entitlements.household_id
-                  AND hm.user_id = auth.uid() AND hm.status = 'active' AND hm.role = 'owner')
+        public.is_active_household_owner(household_seat_entitlements.household_id)
     );
 
 GRANT SELECT, INSERT, UPDATE ON households, household_memberships,

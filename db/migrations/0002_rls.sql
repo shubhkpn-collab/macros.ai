@@ -13,7 +13,7 @@
 -- and nothing else. There are deliberately NO update or delete policies on
 -- immutable facts, so a missing policy is not an oversight — it is the control.
 
-BEGIN;
+-- NOTE: no BEGIN/COMMIT here. The runner owns the transaction (see 0001).
 
 -- ---------------------------------------------------------------------------
 -- User-private tables
@@ -91,4 +91,3 @@ GRANT SELECT, INSERT ON food_logs             TO authenticated;
 GRANT SELECT           ON catalog_products    TO authenticated;
 GRANT SELECT           ON product_versions    TO authenticated;
 
-COMMIT;

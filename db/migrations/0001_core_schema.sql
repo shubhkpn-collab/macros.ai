@@ -9,7 +9,8 @@
 --   * identity of a log is (user_id, log_id), never log_id alone
 --   * history is never destroyed by a cascade
 
-BEGIN;
+-- NOTE: no BEGIN/COMMIT here. The migration runner wraps this file AND the
+-- ledger insert in ONE transaction, so schema and ledger can never disagree.
 
 -- ---------------------------------------------------------------------------
 -- Versioned user profile (append-only, effective-dated)
@@ -83,8 +84,13 @@ CREATE TABLE product_versions (
 -- A head may only point at a version of its own product.
 ALTER TABLE catalog_products
     ADD CONSTRAINT catalog_products_head_fk
-    FOREIGN KEY (current_product_version_id)
-    REFERENCES product_versions (product_version_id)
+    -- COMPOSITE, not a bare version reference. Referencing only
+    -- product_versions(product_version_id) would let product A adopt a version
+    -- belonging to product B, silently attaching another food's nutrition to
+    -- the head. The composite target (product_version_id, product_id) makes
+    -- that unrepresentable rather than merely discouraged.
+    FOREIGN KEY (current_product_version_id, product_id)
+    REFERENCES product_versions (product_version_id, product_id)
     DEFERRABLE INITIALLY DEFERRED;
 
 CREATE INDEX idx_product_versions_product ON product_versions (product_id, version_no DESC);
@@ -125,6 +131,31 @@ CREATE TABLE food_logs (
     -- cannot represent that and rounds on insert. Comparing the raw JSONB value
     -- to the rounded column would reject every such log. The snapshot remains
     -- authoritative; these columns are a rounded query projection of it.
+    -- PRESENCE FIRST. A CHECK evaluates to UNKNOWN when a JSON key is absent,
+    -- and UNKNOWN is ACCEPTED — so omitting a required fact satisfied the old
+    -- constraint while a wrong value failed it. Presence is asserted explicitly
+    -- before any comparison.
+    CONSTRAINT food_logs_snapshot_shape CHECK (
+        jsonb_typeof(nutrition_snapshot) = 'object'
+        AND nutrition_snapshot ? 'gramsConsumed'
+        AND nutrition_snapshot ? 'productVersionId'
+        AND nutrition_snapshot ? 'totals'
+        AND jsonb_typeof(nutrition_snapshot -> 'totals') = 'object'
+        AND (nutrition_snapshot -> 'totals') ? 'kcal'
+        AND (nutrition_snapshot -> 'totals') ? 'proteinG'
+        AND (nutrition_snapshot -> 'totals') ? 'carbohydrateG'
+        AND (nutrition_snapshot -> 'totals') ? 'fatG'
+        AND jsonb_typeof(nutrition_snapshot -> 'gramsConsumed') = 'number'
+        AND jsonb_typeof(nutrition_snapshot -> 'totals' -> 'kcal') = 'number'
+        AND jsonb_typeof(nutrition_snapshot -> 'totals' -> 'proteinG') = 'number'
+        AND jsonb_typeof(nutrition_snapshot -> 'totals' -> 'carbohydrateG') = 'number'
+        AND jsonb_typeof(nutrition_snapshot -> 'totals' -> 'fatG') = 'number'
+    ),
+    CONSTRAINT food_logs_capture_shape CHECK (
+        jsonb_typeof(weight_capture) = 'object'
+        AND weight_capture ? 'grams'
+        AND jsonb_typeof(weight_capture -> 'grams') = 'number'
+    ),
     CONSTRAINT food_logs_snapshot_grams_agree
         CHECK (round((nutrition_snapshot ->> 'gramsConsumed')::numeric, 3) = grams),
     CONSTRAINT food_logs_snapshot_version_agree
@@ -154,4 +185,3 @@ CREATE TABLE food_logs (
 CREATE INDEX idx_food_logs_user_local_date ON food_logs (user_id, local_date);
 CREATE INDEX idx_food_logs_product_version ON food_logs (product_version_id);
 
-COMMIT;

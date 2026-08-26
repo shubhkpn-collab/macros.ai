@@ -16,6 +16,18 @@ BEGIN
   END;
 
   BEGIN
+    INSERT INTO product_versions (
+      product_version_id, product_id, version_no, display_name, preparation_state,
+      basis, source, effective_from)
+    VALUES ('forged@v1', 'prod-test-1', 99, 'Forged', 'as_sold',
+      '{"kind":"per_100g","kcal":1,"proteinG":1,"carbohydrateG":1,"fatG":1}'::jsonb,
+      '{"kind":"synthetic_test"}'::jsonb, now());
+    RAISE EXCEPTION 'FAIL catalog-insert: ordinary user inserted a catalog version';
+  EXCEPTION WHEN insufficient_privilege THEN
+    RAISE NOTICE 'PASS catalog-insert refused';
+  END;
+
+  BEGIN
     DELETE FROM product_versions;
     RAISE EXCEPTION 'FAIL catalog-delete: ordinary user deleted catalog rows';
   EXCEPTION WHEN insufficient_privilege THEN

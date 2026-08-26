@@ -442,7 +442,14 @@ describe('B37/B38 — migration structure and future RLS matrix', () => {
     const policies = sql.split('CREATE POLICY').slice(1);
     assert.ok(policies.length >= 8);
     for (const p of policies) {
-      assert.ok(p.includes("status = 'active'") || p.includes('user_id = auth.uid()'),
+      // Active-membership scoping now lives inside the SECURITY DEFINER
+      // helpers (which check status = 'active' themselves), introduced to break
+      // the RLS recursion. Self-scoping is unchanged.
+      assert.ok(
+        p.includes('is_active_household_member') ||
+        p.includes('is_active_household_owner') ||
+        p.includes("status = 'active'") ||
+        p.includes('user_id = auth.uid()'),
         'every policy must be membership- or self-scoped');
     }
   });
