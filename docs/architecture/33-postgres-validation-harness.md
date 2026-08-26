@@ -37,6 +37,28 @@ Development timings: daily logs 23 ms · RLS profile 22 ms · membership 22 ms.
 - The offline test proves **SQL duplicate/overwrite behaviour**, not client ACK
   or outbox settlement.
 
+### Round 3 (real run): everything passed except one test-logic error
+
+The malformed-snapshot matrix now runs to completion on the real server, so
+those fixes are runtime-proven. The single remaining failure was
+`FAIL head-ownership`, and it was **the test, not the schema**.
+
+`catalog_products_head_fk` is `DEFERRABLE INITIALLY DEFERRED` — necessarily so,
+because `catalog_products.current_product_version_id` references
+`product_versions` while `product_versions.product_id` references
+`catalog_products`. That cycle cannot be populated with an immediate
+constraint.
+
+The consequence: an invalid cross-product UPDATE does **not** raise on the spot;
+the violation is queued until commit. The probe raised its own `FAIL` before
+PostgreSQL had ever been asked to evaluate the constraint, and so reported a
+broken FK that was working correctly. Fixed with
+`SET CONSTRAINTS catalog_products_head_fk IMMEDIATE` after the invalid UPDATE,
+wrapped in its own transaction that rolls back, followed by an assertion that
+`prod-test-2` still points at `prod-test-2@v1`.
+
+The production FK was **not** made immediate to satisfy the test.
+
 ### Still PARTIAL
 
 - **DATA-INTEGRITY ADVERSARIAL MATRIX — PARTIAL.** The malformed-numeric probe

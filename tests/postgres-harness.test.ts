@@ -392,3 +392,39 @@ describe('postgres harness — round-2 real-execution fixes', () => {
     assert.match(household2, /is_active_household_member/);
   });
 });
+
+describe('postgres harness — deferred FK evaluation', () => {
+  const integrity2 = readFileSync(join(SQL_DIR, '15-data-integrity.sql'), 'utf8');
+  const core2 = readFileSync(join(MIG_DIR, '0001_core_schema.sql'), 'utf8');
+
+  test('the head-ownership probe FORCES the deferred constraint to evaluate', () => {
+    // catalog_products_head_fk is INITIALLY DEFERRED, so an invalid UPDATE does
+    // not raise immediately — the violation waits for commit. The first version
+    // of this test raised its own FAIL before PostgreSQL was ever asked to
+    // check, reporting a broken FK that was in fact working.
+    const probe = integrity2.slice(integrity2.indexOf('FINDING 2'));
+    assert.match(probe, /SET CONSTRAINTS catalog_products_head_fk IMMEDIATE/);
+    const forceIdx = probe.indexOf('SET CONSTRAINTS');
+    const failIdx = probe.indexOf("RAISE EXCEPTION 'FAIL head-ownership");
+    assert.ok(forceIdx < failIdx,
+      'the constraint must be evaluated BEFORE the failure is raised');
+    assert.match(probe, /WHEN foreign_key_violation THEN/);
+  });
+
+  test('the valid head is asserted preserved afterwards', () => {
+    const probe = integrity2.slice(integrity2.indexOf('FINDING 2'));
+    assert.match(probe, /FAIL head-preservation/);
+    assert.match(probe, /IS DISTINCT FROM 'prod-test-2@v1'/);
+    // The probe rolls back, so the rejected assignment cannot leak forward.
+    assert.match(probe, /ROLLBACK;/);
+  });
+
+  test('the production FK stays DEFERRABLE INITIALLY DEFERRED', () => {
+    // Deferral is required: catalog_products and product_versions reference
+    // each other cyclically. Making it immediate to satisfy a test would break
+    // legitimate population.
+    assert.match(core2, /FOREIGN KEY \(current_product_version_id, product_id\)/);
+    assert.match(core2, /REFERENCES product_versions \(product_version_id, product_id\)/);
+    assert.match(core2, /DEFERRABLE INITIALLY DEFERRED/);
+  });
+});
