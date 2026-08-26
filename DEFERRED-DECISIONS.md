@@ -255,6 +255,21 @@ engineering-closed, including crash-after-accept and in-flight recovery.
 | OF-3 | **Bundle download/staging over the network.** Verification, atomic activation and last-known-good rollback are implemented and tested against the filesystem. | No device update channel. | OTA milestone |
 | OF-4 | **On-device ASR for offline voice.** Cloud voice is reported unavailable rather than hanging. | No local ASR. | Voice runtime |
 
+## From HOUSEHOLD IDENTITY CLOSURE (2026-08-27)
+
+**AS-5 RESOLVED** — household voice switching with trusted membership resolution
+and explicit confirmation; no biometrics, no LLM-supplied identity.
+**OFFLINE RESILIENCE REFROZEN** — corrupt records quarantined with degraded
+integrity surfaced, per-entry checksums, exact eligibility ledger.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| HH-1 | **PostgreSQL RLS runtime validation** for households. Migration 0005 authored and statically tested; no policy executed. | No PostgreSQL. | Runtime DB gate |
+| HH-2 | **Real auth provider.** The domain consumes a trusted subject; only a fake provider exists. | No provider chosen. | Auth integration |
+| HH-3 | **Billing provider and seat commercial policy.** Seats are capacity-only; grace periods and restrictions undesigned. | Separate domain. | Billing milestone |
+| HH-4 | **Invitation delivery** (email/SMS) and multi-owner households. | Out of scope. | Household UX |
+| OF-5 | **Outbox repair/export tooling** for quarantined records. They are retained, never auto-deleted. | Needs a UX decision. | Support tooling |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
