@@ -126,7 +126,14 @@ describe('REAL branded ingestion (skipped when artifacts are absent)', () => {
     assert.ok(report.stats.duplicateGtinGroups > 0, 'real duplicates exist');
     assert.ok(report.identifierConflictCount > 0, 'real conflicts exist');
     for (const c of report.identifierConflicts) {
-      assert.ok(c.brands.length > 1, 'a conflict means materially different brands');
+      // Under branded-gtin-lifecycle@1.0.0 a conflict means the records are
+      // NOT semantically compatible and NOT linked by foodUpdateLog. A brand
+      // string difference alone is explicitly no longer sufficient — a
+      // corporate rename is not a product change.
+      assert.equal(c.verdict, 'identifier_reassignment_conflict');
+      assert.equal(c.semanticallyCompatible, false, c.gtin14);
+      assert.equal(c.updateLogLinked, false, c.gtin14);
+      assert.ok(c.sourceRecordIds.length > 1);
     }
   });
 

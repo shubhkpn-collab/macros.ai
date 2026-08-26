@@ -1,196 +1,76 @@
 {
  "addedSugars": [
   {
-   "availableDate": "8/11/2018",
-   "brandName": "AHOLD",
-   "brandOwner": "Ahold USA, Inc. ",
-   "category": "Canned Vegetables",
-   "dataSource": "LI",
+   "availableDate": "2/23/2026",
+   "brandName": "Angie's BOOMCHICKAPOP",
+   "brandOwner": "[[Conagra Brands, Inc]]",
+   "category": "Snacks",
+   "dataSource": "GDSN",
    "discontinuedDate": null,
-   "factualFingerprint": "5f124a1ab2a6380509eed49c12a1a869776da3c8bc8c90e6fb1b44cb64edf160",
-   "gtin14": "00688267022111",
-   "gtinRaw": "688267022111",
+   "factualFingerprint": "b3fdded19644d764f73ccb20b2e0aab6c974982190947f8a60d74fbe449c2490",
+   "gtin14": "00000000924665",
+   "gtinRaw": "00000000924665",
    "gtinRejection": null,
-   "householdServingText": "1/2 cup",
-   "ingredientsText": "PEAS, WATER, SUGAR, SALT.",
+   "householdServingText": "2 cups (28g)",
+   "ingredientsText": "Popcorn, Sunflower Oil, Sugar, Salt.",
    "isDiscontinued": false,
    "labelFacts": {
     "declared": {
-     "addedSugar": 3.0,
-     "calcium": 20.0,
-     "calories": 80.0,
-     "carbohydrates": 16.0,
+     "addedSugar": 8.01,
+     "calcium": 0.0,
+     "calories": 140,
+     "carbohydrates": 18.0,
      "cholesterol": 0.0,
-     "fat": 0.0,
-     "fiber": 4.0,
-     "iron": 1.0,
-     "protein": 4.0,
-     "saturatedFat": 0.0,
-     "sodium": 380,
-     "sugars": 6.0,
+     "fat": 8.01,
+     "fiber": 1.99,
+     "iron": 0.3,
+     "potassium": 30.0,
+     "protein": 1.0,
+     "saturatedFat": 0.501,
+     "sodium": 110,
+     "sugars": 8.01,
      "transFat": 0.0
     },
-    "householdServingText": "1/2 cup",
-    "servingSize": 125,
-    "servingSizeUnit": "g"
+    "householdServingText": "2 cups (28g)",
+    "servingSize": 28,
+    "servingSizeUnit": "grm"
    },
-   "marketCountry": "United States",
-   "modifiedDate": "8/11/2018",
-   "packageWeight": "15 oz/425 g",
+   "marketCountry": "US",
+   "modifiedDate": "2/23/2026",
+   "packageWeight": "7 ONZ",
    "per100g": {
     "added_sugars": {
-     "amount": 2.4,
-     "nutrientId": "added_sugars",
-     "unit": "g"
-    },
-    "calcium": {
-     "amount": 16.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 12.8,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 64.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 3.2,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 0.8,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 3.2,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 0.0,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 304,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 4.8,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1320721",
-    "1612856",
-    "1795463",
-    "524248"
-   ],
-   "productId": "bprod_000077d181a39700",
-   "productVersionId": "bprod_000077d181a39700@f5f124a1ab2a63805",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 125.0,
-   "servingUnit": "g",
-   "sourceDescription": "SWEET PEAS",
-   "sourceRecordId": "1920495",
-   "sourceRecordIds": [
-    "1920495"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "7/11/2020",
-   "brandName": "HIGH LINER",
-   "brandOwner": "High Liner Foods (USA) Incorporated",
-   "category": "Frozen Fish & Seafood",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "f23fa71153660008bd1332423a68a87ab601c3ba44cdd47b81574d7e0aaef777",
-   "gtin14": "00041600011751",
-   "gtinRaw": "041600011751",
-   "gtinRejection": null,
-   "householdServingText": "3/4 cup",
-   "ingredientsText": "INGREDIENTS: MINCED SHRIMP, WHEAT FLOUR, VEGETABLE OIL (CANOLA, COTTONSEED, AND/OR SOYBEAN), WATER, MODIFIED CORN STARCH, SOY PROTEIN CONCENTRATE, CONTAINS 2% OR LESS OF: SALT, GUAR GUM, MODIFIED CELLULOSE, SODIUM ALGINATE, SUGAR, CALCIUM CHLORIDE, NONFAT MILK, EXPELLER PRESSED CANOLA OIL, LEAVENING (SODIUM ALUMINUM PHOSPHATE, SODIUM BICARBONATE), NATURAL AND ARTIFICIAL FLAVORS, WHEY, YEAST, SODIUM TRIPOLYPHOSPHATE (TO RETAIN MOISTURE), SODIUM BISULFITE (AS A PRESERVATIVE).",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "addedSugar": 1.01,
-     "calcium": 40.3,
-     "calories": 240,
-     "carbohydrates": 24.0,
-     "cholesterol": 35.3,
-     "fat": 13.0,
-     "fiber": 1.01,
-     "iron": 0.899,
-     "potassium": 120,
-     "protein": 8.0,
-     "saturatedFat": 2.0,
-     "sodium": 730,
-     "sugars": 1.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "3/4 cup",
-    "servingSize": 84,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "7/11/2020",
-   "packageWeight": "16 oz/454 g",
-   "per100g": {
-    "added_sugars": {
-     "amount": 1.2,
-     "nutrientId": "added_sugars",
-     "unit": "g"
-    },
-    "calcium": {
-     "amount": 48.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
      "amount": 28.6,
+     "nutrientId": "added_sugars",
+     "unit": "g"
+    },
+    "calcium": {
+     "amount": 0.0,
+     "nutrientId": "calcium",
+     "unit": "mg"
+    },
+    "carbohydrate": {
+     "amount": 64.3,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
     "cholesterol": {
-     "amount": 42.0,
+     "amount": 0.0,
      "nutrientId": "cholesterol",
      "unit": "mg"
     },
     "energy_kcal": {
-     "amount": 286,
+     "amount": 500,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 15.5,
+     "amount": 28.6,
      "nutrientId": "fat",
      "unit": "g"
     },
     "fiber": {
-     "amount": 1.2,
+     "amount": 7.1,
      "nutrientId": "fiber",
      "unit": "g"
     },
@@ -200,173 +80,60 @@
      "unit": "mg"
     },
     "potassium": {
-     "amount": 143,
+     "amount": 107,
      "nutrientId": "potassium",
      "unit": "mg"
     },
     "protein": {
-     "amount": 9.52,
+     "amount": 3.57,
      "nutrientId": "protein",
      "unit": "g"
     },
     "saturated_fat": {
-     "amount": 2.38,
+     "amount": 1.79,
      "nutrientId": "saturated_fat",
      "unit": "g"
     },
     "sodium": {
-     "amount": 869,
+     "amount": 393,
      "nutrientId": "sodium",
      "unit": "mg"
     },
     "total_sugars": {
-     "amount": 1.19,
+     "amount": 28.6,
      "nutrientId": "total_sugars",
      "unit": "g"
+    },
+    "vitamin_a": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_a",
+     "unit": "ug"
+    },
+    "vitamin_c": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_c",
+     "unit": "mg"
+    },
+    "vitamin_d": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_d",
+     "unit": "ug"
     }
    },
    "priorSourceRecordIds": [
-    "1217077",
-    "1509134",
-    "828614",
-    "961459"
+    "2689143",
+    "2699210",
+    "2740249"
    ],
-   "productId": "bprod_0003cfdde3696b78",
-   "productVersionId": "bprod_0003cfdde3696b78@ff23fa71153660008",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 84.0,
-   "servingUnit": "g",
-   "sourceDescription": "SHRIMP POPPERS",
-   "sourceRecordId": "1870535",
+   "productId": "bprod_23d270259016287e",
+   "productVersionId": "bprod_23d270259016287e@fb3fdded19644d764",
+   "publicationDate": "3/12/2026",
+   "servingGrams": null,
+   "servingUnit": "grm",
+   "sourceDescription": "TRADER JOES Kettle Corn",
+   "sourceRecordId": "2754302",
    "sourceRecordIds": [
-    "1870535"
-   ],
-   "subbrandName": "FISHER BOY",
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "4/8/2020",
-   "brandName": "GREEN GIANT",
-   "brandOwner": "Growers Express LLC",
-   "category": "Pizza Mixes & Other Dry Dinners",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "a459aa4ed8c08e4c33065db1a54f880215e2a24dc1e632133e82a2bd8bf97893",
-   "gtin14": "00605806010385",
-   "gtinRaw": "605806010385",
-   "gtinRejection": null,
-   "householdServingText": "1/2 cup",
-   "ingredientsText": "CAULIFLOWER SAUCE: TOMATOES (TOMATOES, TOMATO JUICE, CITRIC ACID, CALCIUM CHLORIDE), CORN, BLACK BEANS, CHIPOTLE PUREE (CHIPOTLE PEPPERS, TOMATO PUREE, VINEGAR, WATER, SALT, SUGAR, GARLIC, SOYBEAN OIL, CITRIC ACID), RED PEPPERS, ONIONS, BROWN SUGAR, TOMATO PASTE, CRUSHED GARLIC (GARLIC, WATER, SALT, LEMON CONCENTRATE), JALAPENO PEPPERS, VINEGAR, CORN STARCH, CHILI POWDER [SPICES AND SPICE EXTRACTS (CHILI, GARLIC, OREGANO, CUMIN, PAPRIKA, CORIANDER, PAPRIKA OLEORESIN), SALT], CILANTRO, SALT, SUGAR, CONCENTRATED LEMON JUICE, SPICES. CHEESE: CHEDDAR CHEESE [PASTEURIZED MILK, CHEESE CULTURE, SALT, ENZYMES, ANNATTO (VEGETABLE COLOR)], POWDERED CELLULOSE CHIP STRIPS: CORN MASA FLOUR, SUNFLOWER, SAFFLOWER AND/OR CANOLA OIL, SEASONING (TOMATO POWDER, ONION POWDER, SALT, GARLIC POWDER, PAPRIKA [COLOR], SPICES, MALTODEXTRIN, SUGAR, CORN SYRUP SOLIDS, SAFFLOWER OIL, DEHYDRATED JALAPENO PEPPER, NATURAL FLAVOR [MALTODEXTRIN], AUTOLYZED YEAST EXTRACT, LIME JUICE SOLIDS, DISODIUM INOSINATE, DISODIUM GUANYLATE) (TO PREVENT CAKING), NATAMYCIN (A NATURAL MOLD INHIBITOR).",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "addedSugar": 1.98,
-     "calcium": 60.5,
-     "calories": 90.2,
-     "carbohydrates": 13.0,
-     "cholesterol": 5.5,
-     "fat": 3.0,
-     "fiber": 1.98,
-     "iron": 1.44,
-     "potassium": 210,
-     "protein": 4.0,
-     "saturatedFat": 1.0,
-     "sodium": 160,
-     "sugars": 4.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "1/2 cup",
-    "servingSize": 110,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "4/8/2020",
-   "packageWeight": "9.3 oz/263 g",
-   "per100g": {
-    "added_sugars": {
-     "amount": 1.8,
-     "nutrientId": "added_sugars",
-     "unit": "g"
-    },
-    "calcium": {
-     "amount": 55.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 11.8,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 5.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 82.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 2.73,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 1.8,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 1.31,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "potassium": {
-     "amount": 191,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 3.64,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 0.91,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 145,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 3.64,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1124137",
-    "1406644",
-    "1698922",
-    "734196",
-    "905118"
-   ],
-   "productId": "bprod_0005a3c9e094eabf",
-   "productVersionId": "bprod_0005a3c9e094eabf@fa459aa4ed8c08e4c",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 110.0,
-   "servingUnit": "g",
-   "sourceDescription": "CAULIFLOWER CRUMBLES CHOPPED CAULIFLOWER IN A SWEET CORN & ZESTY BLACK BEAN SALSA WITH SEASONED TORTILLA STRIPS & SHARP CHEDDAR CHEESE BURRITO VEGGIE BOWL, CAULIFLOWER CRUMBLES",
-   "sourceRecordId": "1972769",
-   "sourceRecordIds": [
-    "1972769"
+    "2754302"
    ],
    "subbrandName": null,
    "tradeChannels": [
@@ -374,123 +141,276 @@
    ]
   },
   {
-   "availableDate": "3/18/2019",
-   "brandName": "SAM'S GRANOLA",
-   "brandOwner": "Bytelady Publishing",
-   "category": "Cereal",
+   "availableDate": "8/22/2019",
+   "brandName": "KELLOGG'S",
+   "brandOwner": "Butler Home Products, LLC",
+   "category": "Cakes, Cupcakes, Snack Cakes",
    "dataSource": "LI",
    "discontinuedDate": null,
-   "factualFingerprint": "0717695c212bee126cff764e6ebeac7d0363e08a7b3a65cec61d89d10a0618ec",
-   "gtin14": "00804551765933",
-   "gtinRaw": "804551765933",
+   "factualFingerprint": "41352495014165c5e1907d61dca9434ee46f36784db5700705486440a51b64cb",
+   "gtin14": "00000001117387",
+   "gtinRaw": "01117387",
    "gtinRejection": null,
-   "householdServingText": "1/3 cup",
-   "ingredientsText": "BARLEY, OATS, MAPLE SYRUP (GRADE A AMBER), CASHEW, PUMPKIN SEED, CANOLA OIL, SUGAR, FREEZE-DRIED CORN, CARAMEL CORN (POPCORN, BROWN SUGAR, BUTTER, CORN SYRUP, BAKING SODA, SALT), FREEZE-DRIED STRAWBERRY, SALT.",
+   "householdServingText": "1 BAR",
+   "ingredientsText": "TOASTED RICE CEREAL (RICE, SUGAR, SALT, MALT FLAVOR, NIACINAMIDE, REDUCED IRON, VITAMIN B2, [RIBOFLAVIN], FOLIC ACID), CORN SYRUP, FRUCTOSE, VEGETABLE OIL (SOYBEAN AND PALM OIL WITH TBHQ FOR FRESHNESS), SUGAR, CORN SYRUP SOLIDS, CONTAINS 2% OR LESS OF VEGETABLE GLYCERIN, DEXTROSE, GELATIN, NATURAL AND ARTIFICIAL FLAVORS (CONTAINS MILK), SALT, DATEM, ACETYLATED MONOGLYCERIDES, SOY LECITHIN, BHT (FOR FRESHNESS).",
    "isDiscontinued": false,
    "labelFacts": {
     "declared": {
-     "addedSugar": 5.01,
-     "calcium": 0.0,
-     "calories": 130,
-     "carbohydrates": 18.0,
-     "cholesterol": 0.0,
-     "fat": 5.01,
-     "fiber": 3.0,
-     "iron": 0.999,
-     "potassium": 99.0,
-     "protein": 3.0,
-     "saturatedFat": 2.5,
-     "sodium": 20.1,
-     "sugars": 5.01,
+     "addedSugar": 8.01,
+     "calories": 90.0,
+     "carbohydrates": 17.0,
+     "fat": 2.0,
+     "iron": 0.7,
+     "protein": 1.0,
+     "saturatedFat": 0.499,
+     "sodium": 105,
+     "sugars": 8.01,
      "transFat": 0.0
     },
-    "householdServingText": "1/3 cup",
-    "servingSize": 30,
+    "householdServingText": "1 BAR",
+    "servingSize": 22,
     "servingSizeUnit": "g"
    },
    "marketCountry": "United States",
-   "modifiedDate": "3/18/2019",
-   "packageWeight": "9 oz/255 g",
+   "modifiedDate": "8/22/2019",
+   "packageWeight": null,
    "per100g": {
     "added_sugars": {
-     "amount": 16.7,
+     "amount": 36.4,
      "nutrientId": "added_sugars",
      "unit": "g"
     },
-    "calcium": {
-     "amount": 0.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
     "carbohydrate": {
-     "amount": 60.0,
+     "amount": 77.3,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
     "energy_kcal": {
-     "amount": 433,
+     "amount": 409,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 16.7,
+     "amount": 9.09,
      "nutrientId": "fat",
      "unit": "g"
     },
-    "fiber": {
-     "amount": 10.0,
-     "nutrientId": "fiber",
-     "unit": "g"
+    "folate": {
+     "amount": 318,
+     "nutrientId": "folate",
+     "unit": "ug"
     },
     "iron": {
-     "amount": 3.33,
+     "amount": 3.18,
      "nutrientId": "iron",
      "unit": "mg"
     },
-    "potassium": {
-     "amount": 330,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
     "protein": {
-     "amount": 10.0,
+     "amount": 4.55,
      "nutrientId": "protein",
      "unit": "g"
     },
     "saturated_fat": {
-     "amount": 8.33,
+     "amount": 2.27,
      "nutrientId": "saturated_fat",
      "unit": "g"
     },
     "sodium": {
-     "amount": 67.0,
+     "amount": 477,
      "nutrientId": "sodium",
      "unit": "mg"
     },
     "total_sugars": {
-     "amount": 16.7,
+     "amount": 36.4,
      "nutrientId": "total_sugars",
      "unit": "g"
     }
    },
    "priorSourceRecordIds": [
-    "1821501",
-    "700804"
+    "1427205",
+    "1719484",
+    "942310"
    ],
-   "productId": "bprod_0009b1ac3a78ac11",
-   "productVersionId": "bprod_0009b1ac3a78ac11@f0717695c212bee12",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 30.0,
+   "productId": "bprod_b9e8809331c2c4f0",
+   "productVersionId": "bprod_b9e8809331c2c4f0@f41352495014165c5",
+   "publicationDate": "10/28/2021",
+   "servingGrams": 22.0,
    "servingUnit": "g",
-   "sourceDescription": "STATE FAIR STRAWBERRY - CARAMEL CORN, STRAWBERRY, CARAMEL",
-   "sourceRecordId": "1964542",
+   "sourceDescription": "CRISPY MARSHMALLOW SQUARES, MARSHMALLOW",
+   "sourceRecordId": "2156340",
    "sourceRecordIds": [
-    "1964542"
+    "2156340"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "6/19/2023",
+   "brandName": "MTN DEW",
+   "brandOwner": "Pepsi-Cola North America Inc.",
+   "category": "Soda",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "d9b2adf625159b4ce08cd68ae1fa8d03d1226ac734dac612aa139d9b92fa70ae",
+   "gtin14": "00000001208801",
+   "gtinRaw": "01208801",
+   "gtinRejection": null,
+   "householdServingText": "12 fl oz",
+   "ingredientsText": "CARBONATED WATER, HIGH FRUCTOSE CORN SYRUP, CONCENTRATED ORANGE JUICE, CITRIC ACID, NATURAL FLAVOR, SODIUM BENZOATE (PRESERVES FRESHNESS), CAFFEINE, SODIUM CITRATE, GUM ARABIC, ERYTHORBIC ACID (PRESERVES FRESHNESS), CALCIUM DISODIUM EDTA (TO PROTECT FLAVOR), YELLOW 5.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "addedSugar": 46.1,
+     "calories": 169,
+     "carbohydrates": 46.1,
+     "fat": 0.0,
+     "protein": 0.0,
+     "sodium": 61.2,
+     "sugars": 46.1
+    },
+    "householdServingText": "12 fl oz",
+    "servingSize": 360,
+    "servingSizeUnit": "mlt"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "6/19/2023",
+   "packageWeight": "288 fl oz/8.52 L",
+   "per100g": {
+    "added_sugars": {
+     "amount": 12.8,
+     "nutrientId": "added_sugars",
+     "unit": "g"
+    },
+    "carbohydrate": {
+     "amount": 12.8,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "energy_kcal": {
+     "amount": 47.0,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 0.0,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "protein": {
+     "amount": 0.0,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 17.0,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 12.8,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    }
+   },
+   "priorSourceRecordIds": [],
+   "productId": "bprod_cec88f5c63981592",
+   "productVersionId": "bprod_cec88f5c63981592@fd9b2adf625159b4c",
+   "publicationDate": "7/13/2023",
+   "servingGrams": null,
+   "servingUnit": "mlt",
+   "sourceDescription": "SODA",
+   "sourceRecordId": "2611490",
+   "sourceRecordIds": [
+    "2611490"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "1/9/2023",
+   "brandName": "MTN DEW",
+   "brandOwner": "Pepsi-Cola North America Inc.",
+   "category": "Soda",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "d453b23d5c6eadfe6cfe378d43c4061a06825e5716801c5bdc978f2c943fafde",
+   "gtin14": "00000001229707",
+   "gtinRaw": "01229707",
+   "gtinRejection": null,
+   "householdServingText": "12 fl oz",
+   "ingredientsText": "CARBONATED WATER, HIGH FRUCTOSE CORN SYRUP, CONCENTRATED ORANGE JUICE, CITRIC ACID, NATURAL FLAVOR, SODIUM BENZOATE (PRESERVES FRESHNESS), CAFFEINE, SODIUM CITRATE, GUM ARABIC, ERYTHORBIC ACID (PRESERVES FRESHNESS), CALCIUM DISODIUM EDTA (TO PROTECT FLAVOR), YELLOW 5.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "addedSugar": 46.1,
+     "calories": 169,
+     "carbohydrates": 46.1,
+     "fat": 0.0,
+     "protein": 0.0,
+     "sodium": 61.2,
+     "sugars": 46.1
+    },
+    "householdServingText": "12 fl oz",
+    "servingSize": 360,
+    "servingSizeUnit": "mlt"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "1/9/2023",
+   "packageWeight": "1 L/1.05 Quart",
+   "per100g": {
+    "added_sugars": {
+     "amount": 12.8,
+     "nutrientId": "added_sugars",
+     "unit": "g"
+    },
+    "carbohydrate": {
+     "amount": 12.8,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "energy_kcal": {
+     "amount": 47.0,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 0.0,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "protein": {
+     "amount": 0.0,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 17.0,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 12.8,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    }
+   },
+   "priorSourceRecordIds": [
+    "1624720",
+    "2494455"
+   ],
+   "productId": "bprod_181977f699097066",
+   "productVersionId": "bprod_181977f699097066@fd453b23d5c6eadfe",
+   "publicationDate": "11/16/2023",
+   "servingGrams": null,
+   "servingUnit": "mlt",
+   "sourceDescription": "SODA",
+   "sourceRecordId": "2673792",
+   "sourceRecordIds": [
+    "2673792"
    ],
    "subbrandName": null,
    "tradeChannels": [
@@ -500,235 +420,197 @@
  ],
  "discontinued": [
   {
-   "availableDate": "9/1/2020",
-   "brandName": "ENSURE",
-   "brandOwner": "Abbott Laboratories Inc ",
-   "category": "Energy, Protein & Muscle Recovery Drinks",
-   "dataSource": "LI",
-   "discontinuedDate": "5/25/2021",
-   "factualFingerprint": "9398fb90757bb821847a9e8c3ead177238c40778b5fbfa83df96e43662c6a615",
-   "gtin14": "00070074668918",
-   "gtinRaw": "070074668918",
+   "availableDate": "7/8/2024",
+   "brandName": "EMERALD",
+   "brandOwner": "Snyder's-Lance INC.",
+   "category": "Nuts/Seeds - Prepared/Processed",
+   "dataSource": "GDSN",
+   "discontinuedDate": "7/8/2024",
+   "factualFingerprint": "00339e8dd070ff15061347bef38fb865f6d1c83c22276b64ac105969967b70e9",
+   "gtin14": "00010300942191",
+   "gtinRaw": "00010300942191",
    "gtinRejection": null,
-   "householdServingText": "1 carton",
-   "ingredientsText": "WATER, MILK PROTEIN CONCENTRATE, COLOMBIAN COFFEE EXTRACT, CALCIUM CASEINATE; LESS THAN 0.5% OF: INULIN, CORN MALTODEXTRIN, CELLULOSE GEL, SUNFLOWER OIL, NATURAL AND ARTIFICIAL FLAVOR, POTASSIUM PHOSPHATE, SODIUM PHOSPHATE, SALT, CELLULOSE GUM, SODIUM ASCORBATE, SUCRALOSE, ACESULFAME POTASSIUM, CARRAGEENAN, DL-ALPHA-TOCOPHERYL ACETATE, NIACINAMIDE, ZINC GLUCONATE, CALCIUM PANTOTHENATE, VITAMIN A PALMITATE, PYRIDOXINE HYDROCHLORIDE, THIAMINE HYDROCHLORIDE, RIBOFLAVIN, MANGANESE GLUCONATE, BETA-CAROTENE, FOLIC ACID, BIOTIN, CHROMIUM CHLORIDE, POTASSIUM IODIDE, PHYLLOQUINONE, SODIUM MOLYBDATE, SODIUM SELENITE, VITAMIN D3, AND VITAMIN B12.",
+   "householdServingText": "Amount per serving",
+   "ingredientsText": "INGREDIENTS:  CASHEWS, Seasoning (Dextrose, Salt, Sugar, Maltodextrin, Onion Powder, Natural Flavor, Torula Yeast, Yeast Extract, Garlic Powder, Jalapeno Powder, Parsley) Vegetable and Nut Oil Blend (ALMOND, BRAZIL NUT, Canola, CASHEW, PEANUT, PECAN, Safflower, Sunflower and/or WALNUT Oils).",
    "isDiscontinued": true,
    "labelFacts": {
     "declared": {
-     "calcium": 18000.0,
-     "calories": 4490.0,
-     "carbohydrates": 180,
-     "cholesterol": 749,
-     "fat": 44.9,
-     "fiber": 60.1,
-     "iron": 5.41,
-     "potassium": 12300.0,
-     "protein": 901,
-     "saturatedFat": 15.0,
-     "sodium": 6900.0,
-     "sugars": 30.0,
+     "addedSugar": 1.03,
+     "calcium": 0.0,
+     "calories": 202,
+     "carbohydrates": 11.1,
+     "cholesterol": 0.0,
+     "fat": 16.2,
+     "fiber": 1.03,
+     "iron": 2.23,
+     "potassium": 223,
+     "protein": 6.05,
+     "saturatedFat": 2.53,
+     "sodium": 192,
+     "sugars": 3.03,
      "transFat": 0.0
     },
-    "householdServingText": "1 carton",
-    "servingSize": 330,
-    "servingSizeUnit": "ml"
+    "householdServingText": "Amount per serving",
+    "servingSize": 35.400001525878906,
+    "servingSizeUnit": "grm"
    },
    "marketCountry": "United States",
-   "modifiedDate": "9/1/2020",
-   "packageWeight": "1.32 L",
+   "modifiedDate": "7/8/2024",
+   "packageWeight": "1.25 ONZ",
    "per100g": {
+    "added_sugars": {
+     "amount": 2.9,
+     "nutrientId": "added_sugars",
+     "unit": "g"
+    },
     "calcium": {
-     "amount": 5460.0,
+     "amount": 0.0,
      "nutrientId": "calcium",
      "unit": "mg"
     },
     "carbohydrate": {
-     "amount": 54.6,
+     "amount": 31.4,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
     "cholesterol": {
-     "amount": 227,
+     "amount": 0.0,
      "nutrientId": "cholesterol",
      "unit": "mg"
     },
     "energy_kcal": {
-     "amount": 1360.0,
+     "amount": 571,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 13.6,
+     "amount": 45.7,
      "nutrientId": "fat",
      "unit": "g"
     },
     "fiber": {
-     "amount": 18.2,
+     "amount": 2.9,
      "nutrientId": "fiber",
      "unit": "g"
     },
-    "folate": {
-     "amount": 1460.0,
-     "nutrientId": "folate",
-     "unit": "ug"
-    },
     "iron": {
-     "amount": 1.64,
+     "amount": 6.29,
      "nutrientId": "iron",
      "unit": "mg"
     },
-    "magnesium": {
-     "amount": 218,
-     "nutrientId": "magnesium",
-     "unit": "mg"
-    },
-    "niacin": {
-     "amount": 54.5,
-     "nutrientId": "niacin",
-     "unit": "mg"
-    },
-    "phosphorus": {
-     "amount": 2730.0,
-     "nutrientId": "phosphorus",
-     "unit": "mg"
-    },
     "potassium": {
-     "amount": 3730.0,
+     "amount": 629,
      "nutrientId": "potassium",
      "unit": "mg"
     },
     "protein": {
-     "amount": 273,
+     "amount": 17.1,
      "nutrientId": "protein",
      "unit": "g"
     },
-    "riboflavin": {
-     "amount": 3.86,
-     "nutrientId": "riboflavin",
-     "unit": "mg"
-    },
     "saturated_fat": {
-     "amount": 4.55,
+     "amount": 7.14,
      "nutrientId": "saturated_fat",
      "unit": "g"
     },
     "sodium": {
-     "amount": 2090.0,
+     "amount": 543,
      "nutrientId": "sodium",
      "unit": "mg"
     },
-    "thiamin": {
-     "amount": 2.0,
-     "nutrientId": "thiamin",
-     "unit": "mg"
-    },
     "total_sugars": {
-     "amount": 9.09,
+     "amount": 8.57,
      "nutrientId": "total_sugars",
      "unit": "g"
     },
-    "vitamin_b12": {
-     "amount": 10.9,
-     "nutrientId": "vitamin_b12",
+    "vitamin_d": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_d",
      "unit": "ug"
-    },
-    "vitamin_b6": {
-     "amount": 4.54,
-     "nutrientId": "vitamin_b6",
-     "unit": "mg"
-    },
-    "vitamin_c": {
-     "amount": 246,
-     "nutrientId": "vitamin_c",
-     "unit": "mg"
-    },
-    "zinc": {
-     "amount": 61.4,
-     "nutrientId": "zinc",
-     "unit": "mg"
     }
    },
    "priorSourceRecordIds": [
-    "1038563",
-    "1076457",
-    "1427940",
-    "1720219",
-    "943844"
+    "2491420",
+    "2554921",
+    "2650571",
+    "2692488",
+    "2697857"
    ],
-   "productId": "bprod_0060d46555818634",
-   "productVersionId": "bprod_0060d46555818634@f9398fb90757bb821",
-   "publicationDate": "6/17/2021",
+   "productId": "bprod_bbcdae02355e3944",
+   "productVersionId": "bprod_bbcdae02355e3944@f00339e8dd070ff15",
+   "publicationDate": "8/15/2024",
    "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "CAFE MOCHA MAX PROTEIN NUTRITION SHAKE, CAFE MOCHA",
-   "sourceRecordId": "1838285",
+   "servingUnit": "grm",
+   "sourceDescription": "Emerald Nuts Jalapeno Cashews, 1.25 oz",
+   "sourceRecordId": "2702268",
    "sourceRecordIds": [
-    "1838285"
+    "2702268"
    ],
    "subbrandName": null,
    "tradeChannels": [
-    "NO_TRADE_CHANNEL"
+    "CHILD_NUTRITION_FOOD_PROGRAMS",
+    "GROCERY"
    ]
   },
   {
-   "availableDate": "4/30/2020",
-   "brandName": "ZONEPERFECT",
-   "brandOwner": "Abbott Laboratories Inc ",
-   "category": "Energy, Protein & Muscle Recovery Drinks",
-   "dataSource": "LI",
-   "discontinuedDate": "5/25/2021",
-   "factualFingerprint": "84d85907726613dcae7d842313f0ae17a8ce5009a7a5d43175f3de17e47429e3",
-   "gtin14": "00638102672995",
-   "gtinRaw": "638102672995",
+   "availableDate": "12/4/2020",
+   "brandName": "Odwalla",
+   "brandOwner": "The Coca-Cola Company",
+   "category": "Milk/Milk Substitutes",
+   "dataSource": "GDSN",
+   "discontinuedDate": "12/31/2020",
+   "factualFingerprint": "7bf1a4b59b63fd4f6c32da5cc9462fafe56685a4dcd0f120ab8c04cfe2aaa17d",
+   "gtin14": "00014054032627",
+   "gtinRaw": "00014054032627",
    "gtinRejection": null,
-   "householdServingText": "11 OZA",
-   "ingredientsText": "FILTERED WATER, COCONUT CREAM, MILK PROTEIN CONCENTRATE, STRUCTURED LIPID (INTERESTERIFIED CANOLA, MEDIUM-CHAIN TRIGLYCERIDES), COLD BREW COFFEE EXTRACT; LESS THAN 1% OF: ALMOND BUTTER, CALCIUM BETA-HYDROXY-BETA-METHYLBUTYRATE, SALT, NATURAL FLAVORS, MONOPOTASSIUM PHOSPHATE, CAFFEINE, SODIUM ASCORBATE (VITAMIN C - FOR FRESHNESS), ORGANIC STEVIA, GUM ACACIA, AND GELLAN GUM.",
+   "householdServingText": "1 Bottle",
+   "ingredientsText": "ALMONDMILK (WATER AND ALMONDS), CANE SUGAR, PEA PROTEIN, LESS THAN 1% OF: DUTCH COCOA (PROCESSED WITH ALKALI), NATURAL FLAVORS, CALCIUM PHOSPHATE, SEA SALT, PECTIN, GELLAN GUM AND SUNFLOWER LECITHIN.",
    "isDiscontinued": true,
    "labelFacts": {
     "declared": {
-     "calcium": 448,
-     "calories": 202,
-     "carbohydrates": 2.99,
-     "cholesterol": 9.75,
-     "fat": 17.0,
+     "calcium": 456,
+     "calories": 242,
+     "carbohydrates": 36.5,
+     "cholesterol": 0.0,
+     "fat": 7.11,
      "fiber": 0.0,
-     "potassium": 1000.0,
-     "protein": 10.0,
-     "saturatedFat": 11.0,
-     "sodium": 140,
-     "sugars": 1.01,
+     "iron": 0.0,
+     "protein": 8.12,
+     "saturatedFat": 0.0,
+     "sodium": 556,
+     "sugars": 32.5,
      "transFat": 0.0
     },
-    "householdServingText": "11 OZA",
-    "servingSize": 325,
-    "servingSizeUnit": "ml"
+    "householdServingText": "1 Bottle",
+    "servingSize": 456,
+    "servingSizeUnit": "mlt"
    },
    "marketCountry": "United States",
-   "modifiedDate": "4/30/2020",
-   "packageWeight": null,
+   "modifiedDate": "12/4/2020",
+   "packageWeight": "15.2 OZA",
    "per100g": {
     "calcium": {
-     "amount": 138,
+     "amount": 100,
      "nutrientId": "calcium",
      "unit": "mg"
     },
     "carbohydrate": {
-     "amount": 0.92,
+     "amount": 8.01,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
     "cholesterol": {
-     "amount": 3.0,
+     "amount": 0.0,
      "nutrientId": "cholesterol",
      "unit": "mg"
     },
     "energy_kcal": {
-     "amount": 62.0,
+     "amount": 53.0,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 5.23,
+     "amount": 1.56,
      "nutrientId": "fat",
      "unit": "g"
     },
@@ -737,324 +619,310 @@
      "nutrientId": "fiber",
      "unit": "g"
     },
-    "potassium": {
-     "amount": 308,
-     "nutrientId": "potassium",
+    "iron": {
+     "amount": 0.0,
+     "nutrientId": "iron",
      "unit": "mg"
     },
     "protein": {
-     "amount": 3.08,
+     "amount": 1.78,
      "nutrientId": "protein",
      "unit": "g"
     },
     "saturated_fat": {
-     "amount": 3.38,
+     "amount": 0.0,
      "nutrientId": "saturated_fat",
      "unit": "g"
     },
     "sodium": {
-     "amount": 43.0,
+     "amount": 122,
      "nutrientId": "sodium",
      "unit": "mg"
     },
     "total_sugars": {
-     "amount": 0.31,
+     "amount": 7.12,
      "nutrientId": "total_sugars",
      "unit": "g"
+    },
+    "vitamin_a": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_a",
+     "unit": "ug"
+    },
+    "vitamin_c": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_c",
+     "unit": "mg"
+    },
+    "vitamin_d": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_d",
+     "unit": "ug"
     }
    },
    "priorSourceRecordIds": [
-    "1026127",
-    "1398382",
-    "1690643",
-    "710740",
-    "899668"
+    "2516899",
+    "355501",
+    "612232",
+    "771468"
    ],
-   "productId": "bprod_018d1c1b9ccf1bbc",
-   "productVersionId": "bprod_018d1c1b9ccf1bbc@f84d85907726613dc",
-   "publicationDate": "6/17/2021",
+   "productId": "bprod_1a4d2c63802b0bda",
+   "productVersionId": "bprod_1a4d2c63802b0bda@f7bf1a4b59b63fd4f",
+   "publicationDate": "12/19/2024",
    "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "BUTTER COFFEE SHAKES, BUTTER COFFEE",
-   "sourceRecordId": "1838113",
+   "servingUnit": "mlt",
+   "sourceDescription": "Odwalla Almondmilk Shake Mocha Latte Bottle, 15.2 fl oz",
+   "sourceRecordId": "2720402",
    "sourceRecordIds": [
-    "1838113"
+    "2720402"
    ],
-   "subbrandName": null,
+   "subbrandName": "Odwalla Almondmilk Shake Mocha Latte",
    "tradeChannels": [
     "NO_TRADE_CHANNEL"
    ]
   },
   {
-   "availableDate": "3/11/2018",
-   "brandName": "PERFECTLY SIMPLE",
-   "brandOwner": "Abbott Laboratories Inc ",
-   "category": "Snack, Energy & Granola Bars",
-   "dataSource": "LI",
-   "discontinuedDate": "5/25/2021",
-   "factualFingerprint": "ece3f1da3ed0be63af4b7899cdd4f96ad4fadbb36158768fad90de710318ae04",
-   "gtin14": "00638102641519",
-   "gtinRaw": "638102641519",
+   "availableDate": "12/4/2020",
+   "brandName": "Odwalla",
+   "brandOwner": "The Coca-Cola Company",
+   "category": "Milk/Milk Substitutes",
+   "dataSource": "GDSN",
+   "discontinuedDate": "12/31/2020",
+   "factualFingerprint": "38db489bf9b139456a3e38cde5875a3bc46041ec2219039ab2284f08c045bc36",
+   "gtin14": "00014054032658",
+   "gtinRaw": "00014054032658",
    "gtinRejection": null,
-   "householdServingText": "1 BAR",
-   "ingredientsText": "SOY PROTEIN ISOLATE, BROWN RICE SYRUP, ROASTED CASHEWS, CHOCOLATE LIQUOR, SUGAR, CRYSTALLINE FRUCTOSE, ALMOND BUTTER, DUTCH-PROCESS COCOA (PROCESSED WITH ALKALI), HIGH OLEIC SAFFLOWER OIL, CORN SYRUP, CREAM, TAPIOCA STARCH; LESS THAN 2% OF THE FOLLOWING: NATURAL FLAVORS, SALT, PALM KERNEL OIL, COCOA BUTTER, MILK PROTEIN ISOLATE, PEANUT OIL, MADAGASCAR VANILLA, SOY LECITHIN, PASTEURIZED WHOLE EGG POWDER, XANTHAN GUM, LOCUST BEAN GUM, GUM ARABIC.",
+   "householdServingText": "1 Bottle",
+   "ingredientsText": "FILTERED WATER, ALMONDMILK (WATER AND ALMONDS), CANE SUGAR, PEA PROTEIN, LESS THAN 1% OF: NATURAL FLAVORS, CALCIUM PHOSPHATE, VANILLA EXTRACT, SEA SALT, PECTIN, GELLAN GUM, SUNGLOWER LECITHIN AND CINNAMON.",
    "isDiscontinued": true,
    "labelFacts": {
     "declared": {
-     "calories": 190,
-     "carbohydrates": 15.0,
-     "cholesterol": 4.8,
-     "fat": 9.0,
-     "fiber": 1.0,
-     "potassium": 140,
-     "protein": 11.0,
-     "saturatedFat": 3.0,
-     "sodium": 190,
-     "sugars": 9.0,
+     "calcium": 456,
+     "calories": 233,
+     "carbohydrates": 31.5,
+     "cholesterol": 0.0,
+     "fat": 7.11,
+     "fiber": 0.0,
+     "iron": 0.0,
+     "protein": 8.12,
+     "saturatedFat": 0.0,
+     "sodium": 556,
+     "sugars": 29.4,
      "transFat": 0.0
     },
-    "householdServingText": "1 BAR",
-    "servingSize": 40,
-    "servingSizeUnit": "g"
+    "householdServingText": "1 Bottle",
+    "servingSize": 456,
+    "servingSizeUnit": "mlt"
    },
    "marketCountry": "United States",
-   "modifiedDate": "3/11/2018",
-   "packageWeight": "200 g",
+   "modifiedDate": "12/4/2020",
+   "packageWeight": "15.2 OZA",
    "per100g": {
-    "carbohydrate": {
-     "amount": 37.5,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 12.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 475,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 22.5,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 2.5,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "potassium": {
-     "amount": 350,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 27.5,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 7.5,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 475,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 22.5,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "538926"
-   ],
-   "productId": "bprod_0193cf2e592ab6e0",
-   "productVersionId": "bprod_0193cf2e592ab6e0@fece3f1da3ed0be63",
-   "publicationDate": "6/17/2021",
-   "servingGrams": 40.0,
-   "servingUnit": "g",
-   "sourceDescription": "ROASTED CASHEW & DARK CHOCOLATE BAR",
-   "sourceRecordId": "1837898",
-   "sourceRecordIds": [
-    "1837898"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "6/8/2020",
-   "brandName": "ZONEPERFECT",
-   "brandOwner": "Abbott Laboratories Inc ",
-   "category": "Snack, Energy & Granola Bars",
-   "dataSource": "LI",
-   "discontinuedDate": "5/25/2021",
-   "factualFingerprint": "de99ff96c0c5ba47ff981a92b7adaa07513ed43b4a5a6b60ffe17bef06c36b54",
-   "gtin14": "00638102628695",
-   "gtinRaw": "638102628695",
-   "gtinRejection": null,
-   "householdServingText": "1 BAR",
-   "ingredientsText": "YOGURT FLAVORED COATING (DRIED CANE SYRUP, FRACTIONATED PALM KERNEL OIL, NONFAT MILK, NONFAT YOGURT POWDER [CULTURED NONFAT MILK], SOY LECITHIN, MODIFIED CORN STARCH, LACTIC ACID, VANILLA EXTRACT), SOY PROTEIN ISOLATE, SOLUBLE CORN FIBER, YELLOW CAKE PIECES (UNBLEACHED WHEAT FLOUR, SUGAR, PALM OIL, WATER, NONFAT MILK POWDER, SALT, NATURAL FLAVOR), CORN SYRUP, FRUCTOSE SYRUP, MALTODEXTRIN, BUTTER (CREAM, SALT), EVAPORATED CANE SYRUP, PASTEURIZED WHOLE EGG POWDER, SOY PROTEIN NUGGETS (ISOLATED SOY PROTEIN, RICE FLOUR, MALT, SALT), FRUCTOOLIGOSACCHARIDES; LESS THAN 2% OF THE FOLLOWING: HIGH OLEIC SAFFLOWER OIL, NATURAL FLAVOR, CALCIUM PHOSPHATE, MIXED TOCOPHEROLS. VITAMIN AND MINERAL BLEND (MAGNESIUM OXIDE, ASCORBIC ACID [VIT C], COPPER GLUCONATE, FERRIC ORTHOPHOSPHATE [IRON], NIACINAMIDE [VIT B3], DL-ALPHA-TOCOPHERYL ACETATE [VIT E], ZINC OXIDE, BIOTIN [VIT B7], CALCIUM PANTOTHENATE [VIT B5], BETA-CAROTENE [VIT A], VITAMIN A PALMITATE, PHYTONADIONE [VIT K1], PYRIDOXINE HYDROCHLORIDE [VIT B6], MANGANESE SULFATE, RIBOFLAVIN [VIT B2], THIAMINE MONONITRATE [VIT B1], POTASSIUM IODIDE, SODIUM SELENITE, CYANOCOBALAMIN [VIT B12], CHROMIUM CHLORIDE, FOLIC ACID [VIT B9], SODIUM MOLYBDATE).",
-   "isDiscontinued": true,
-   "labelFacts": {
-    "declared": {
-     "addedSugar": 11.0,
-     "calcium": 100,
-     "calories": 150,
-     "carbohydrates": 20.0,
-     "cholesterol": 24.8,
-     "fat": 5.98,
-     "fiber": 3.01,
-     "iron": 2.7,
-     "potassium": 20.0,
-     "protein": 5.0,
-     "saturatedFat": 3.0,
-     "sodium": 80.2,
-     "sugars": 11.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "1 BAR",
-    "servingSize": 35,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "6/8/2020",
-   "packageWeight": "175 g",
-   "per100g": {
-    "added_sugars": {
-     "amount": 31.4,
-     "nutrientId": "added_sugars",
-     "unit": "g"
-    },
     "calcium": {
-     "amount": 286,
+     "amount": 100,
      "nutrientId": "calcium",
      "unit": "mg"
     },
     "carbohydrate": {
-     "amount": 57.1,
+     "amount": 6.9,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
     "cholesterol": {
-     "amount": 71.0,
+     "amount": 0.0,
      "nutrientId": "cholesterol",
      "unit": "mg"
     },
     "energy_kcal": {
-     "amount": 429,
+     "amount": 51.0,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 17.1,
+     "amount": 1.56,
      "nutrientId": "fat",
      "unit": "g"
     },
     "fiber": {
-     "amount": 8.6,
+     "amount": 0.0,
      "nutrientId": "fiber",
      "unit": "g"
     },
     "iron": {
-     "amount": 7.71,
+     "amount": 0.0,
      "nutrientId": "iron",
      "unit": "mg"
     },
-    "magnesium": {
-     "amount": 114,
-     "nutrientId": "magnesium",
-     "unit": "mg"
-    },
-    "niacin": {
-     "amount": 5.71,
-     "nutrientId": "niacin",
-     "unit": "mg"
-    },
-    "phosphorus": {
-     "amount": 229,
-     "nutrientId": "phosphorus",
-     "unit": "mg"
-    },
-    "potassium": {
-     "amount": 57.0,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
     "protein": {
-     "amount": 14.3,
+     "amount": 1.78,
      "nutrientId": "protein",
      "unit": "g"
     },
-    "riboflavin": {
-     "amount": 0.729,
-     "nutrientId": "riboflavin",
-     "unit": "mg"
-    },
     "saturated_fat": {
-     "amount": 8.57,
+     "amount": 0.0,
      "nutrientId": "saturated_fat",
      "unit": "g"
     },
     "sodium": {
-     "amount": 229,
+     "amount": 122,
      "nutrientId": "sodium",
      "unit": "mg"
     },
-    "thiamin": {
-     "amount": 1.0,
-     "nutrientId": "thiamin",
-     "unit": "mg"
-    },
     "total_sugars": {
-     "amount": 31.4,
+     "amount": 6.45,
      "nutrientId": "total_sugars",
      "unit": "g"
     },
-    "vitamin_b12": {
-     "amount": 4.29,
-     "nutrientId": "vitamin_b12",
+    "vitamin_a": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_a",
      "unit": "ug"
     },
-    "vitamin_b6": {
-     "amount": 1.14,
-     "nutrientId": "vitamin_b6",
-     "unit": "mg"
-    },
     "vitamin_c": {
-     "amount": 13.7,
+     "amount": 0.0,
      "nutrientId": "vitamin_c",
      "unit": "mg"
     },
-    "zinc": {
-     "amount": 8.57,
-     "nutrientId": "zinc",
+    "vitamin_d": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_d",
+     "unit": "ug"
+    }
+   },
+   "priorSourceRecordIds": [
+    "2516900",
+    "354333",
+    "612100",
+    "769134"
+   ],
+   "productId": "bprod_e93f96ad483e3b9f",
+   "productVersionId": "bprod_e93f96ad483e3b9f@f38db489bf9b13945",
+   "publicationDate": "12/19/2024",
+   "servingGrams": null,
+   "servingUnit": "mlt",
+   "sourceDescription": "Odwalla Almondmilk Shake Snickerdoodle Bottle, 15.2 fl oz",
+   "sourceRecordId": "2720403",
+   "sourceRecordIds": [
+    "2720403"
+   ],
+   "subbrandName": "Odwalla Almondmilk Shake Snickerdoodle",
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "8/11/2020",
+   "brandName": "PEPPERIDGE FARM",
+   "brandOwner": "Pepperidge Farm Inc.",
+   "category": "Biscuits/Cookies",
+   "dataSource": "GDSN",
+   "discontinuedDate": "8/6/2020",
+   "factualFingerprint": "a28fe68dc70bc34b3bf7a079ce9a594ff68098798ba15b18c4ff0dda39202b9a",
+   "gtin14": "00014100042181",
+   "gtinRaw": "00014100042181",
+   "gtinRejection": null,
+   "householdServingText": "Amount per serving",
+   "ingredientsText": "MADE FROM: UNBLEACHED ENRICHED WHEAT FLOUR (FLOUR, NIACIN, REDUCED IRON, THIAMINE MONONITRATE [VITAMIN B1], RIBOFLAVIN [VITAMIN B2], FOLIC ACID), SEMI SWEET CHOCOLATE (CHOCOLATE LIQUOR, SUGAR, DEXTROSE, COCOA BUTTER, SOY LECITHIN, VANILLA EXTRACT), FRUCTOSE, SUGAR, VEGETABLE OILS (PALM AND/OR INTERESTERIFIED AND HYDROGENATED SOYBEAN), BROWN SUGAR (SUGAR, INVERT SUGAR, MOLASSES), COCOA PROCESSED WITH ALKALI (DUTCHED), EGGS, CORN SYRUP SOLIDS, BUTTER (CREAM, SALT), CONTAINS 2 PERCENT OR LESS OF: CREAM CHEESE (MILK AND CREAM, CULTURES, SALT, CAROB BEAN GUM), CORNSTARCH, LEAVENING (BAKING SODA, AMMONIUM BICARBONATE, MONOCALCIUM PHOSPHATE), NONFAT MILK, SALT, VANILLA EXTRACT AND SODIUM PHOSPHATE. CONTAINS: WHEAT, SOY, EGGS, MILK.",
+   "isDiscontinued": true,
+   "labelFacts": {
+    "declared": {
+     "calcium": 20.2,
+     "calories": 140,
+     "carbohydrates": 21.0,
+     "cholesterol": 9.92,
+     "fat": 6.01,
+     "fiber": 0.992,
+     "iron": 1.8,
+     "protein": 2.0,
+     "saturatedFat": 3.0,
+     "sodium": 89.9,
+     "sugars": 11.0,
+     "transFat": 0.0
+    },
+    "householdServingText": "Amount per serving",
+    "servingSize": 31,
+    "servingSizeUnit": "g"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "8/11/2020",
+   "packageWeight": "8.6 ONZ",
+   "per100g": {
+    "calcium": {
+     "amount": 65.0,
+     "nutrientId": "calcium",
+     "unit": "mg"
+    },
+    "carbohydrate": {
+     "amount": 67.7,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "cholesterol": {
+     "amount": 32.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
+    "energy_kcal": {
+     "amount": 452,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 19.4,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "fiber": {
+     "amount": 3.2,
+     "nutrientId": "fiber",
+     "unit": "g"
+    },
+    "iron": {
+     "amount": 5.81,
+     "nutrientId": "iron",
+     "unit": "mg"
+    },
+    "protein": {
+     "amount": 6.45,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 9.68,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 290,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 35.5,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    },
+    "vitamin_c": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_c",
      "unit": "mg"
     }
    },
    "priorSourceRecordIds": [
-    "1057341",
-    "1292796",
-    "1584903",
-    "494602"
+    "1461645",
+    "2221573",
+    "2227801",
+    "2231591"
    ],
-   "productId": "bprod_02677d4ed3313ab5",
-   "productVersionId": "bprod_02677d4ed3313ab5@fde99ff96c0c5ba47",
-   "publicationDate": "6/17/2021",
-   "servingGrams": 35.0,
+   "productId": "bprod_3d45feec3ae85422",
+   "productVersionId": "bprod_3d45feec3ae85422@fa28fe68dc70bc34b",
+   "publicationDate": "4/1/2022",
+   "servingGrams": 31.0,
    "servingUnit": "g",
-   "sourceDescription": "NUTRITION BARS, YELLOW CUPCAKE",
-   "sourceRecordId": "1837775",
+   "sourceDescription": "PEPPERIDGE FARM COOKIES",
+   "sourceRecordId": "2233790",
    "sourceRecordIds": [
-    "1837775"
+    "2233790"
    ],
    "subbrandName": null,
    "tradeChannels": [
@@ -1065,581 +933,449 @@
  "identifierConflicts": [
   {
    "brands": [
-    "mondelez",
-    "trident"
+    "ahold",
+    "maola"
    ],
    "descriptions": [
-    "TRIDENT GUM ORIGINAL SUGAR FREE1X18 PC",
-    "ORIGINAL FLAVOR SUGAR FREE GUM WITH XYLITOL, ORIGINAL"
+    "ORGANIC BLUE CORN TORTILLA CHIPS",
+    "Maola Milk, Whole, Chocolate, Extra Rich"
    ],
-   "gtin14": "00012546612296",
+   "gtin14": "00000000000000",
    "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "1458374",
-    "1047043"
+    "555505",
+    "2755471"
    ],
    "updateLogLinked": false,
    "verdict": "identifier_reassignment_conflict"
   },
   {
    "brands": [
-    "bigdrum",
-    "wonka"
+    "americanpowerproducts",
+    "lidl"
    ],
    "descriptions": [
-    "WONKA, POPPIN' POPS!, FRUITY BLAST ICE POPS, STRAWBERRY, ORANGE & LEMO",
-    "SLTEST_DISCONTINUED_USI_NESTLE POPPIN' POPS"
+    "ORIGINAL APPLE SAUCE, ORIGINAL",
+    "ORIGINAL ORGANIC APPLESAUCE, ORIGINAL"
    ],
-   "gtin14": "00072554267116",
+   "gtin14": "00000020867157",
    "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "1911373",
-    "584329"
+    "2156991",
+    "2626388"
    ],
    "updateLogLinked": false,
    "verdict": "identifier_reassignment_conflict"
   },
   {
    "brands": [
-    "conagra",
-    "conagrapackaged"
+    "moyerspotatochips",
+    "teisseire"
    ],
    "descriptions": [
-    "MEDIUM SLOW-BRAISED PORK CHILE VERDE WITH ROASTED POBLANOS, ONIONS, JA",
-    "MEDIUM SLOW-BRAISED PORK CHILE VERDE WITH ROASTED POBLANOS, ONIONS, JA"
+    "NATURALLY FLAVORED BEVERAGE ENHANCER WITH OTHER NATURAL FLAVORS, APPLE",
+    "GOURMET DROPS"
    ],
-   "gtin14": "00604183160522",
+   "gtin14": "00000050413201",
    "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "722910",
-    "1728515"
+    "2381361",
+    "414732"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "athenaimports"
+   ],
+   "descriptions": [
+    "FANCY FRUIT COCKTAIL IN LIGHT SYRUP, FANCY FRUIT COCKTAIL",
+    "FANCY IN LIGHT SYRUP FRUIT COCKTAIL"
+   ],
+   "gtin14": "00008127000491",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2307765",
+    "2559896"
    ],
    "updateLogLinked": false,
    "verdict": "identifier_reassignment_conflict"
   }
  ],
  "lifecycleUpdate": [],
- "missingOrInvalidGtin": [
-  {
-   "availableDate": "5/6/2019",
-   "brandName": "PGM",
-   "brandOwner": "Andre Romanelli, Inc.",
-   "category": "Other Cooking Sauces",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "664e0fcde35b3c59d22f6ec80174ad00e8f6fa678a22c6f10911be19b4493e24",
-   "gtin14": null,
-   "gtinRaw": "83327200238",
-   "gtinRejection": "unsupported_length",
-   "householdServingText": "1 Tbsp",
-   "ingredientsText": "CONCENTRATED GRAPE MUST WINE VINEGAR [ACIDITY 6%], APPLE JUICE. FLAVORS, NATURAL CHILI PEPPER FLAVOUR.",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calories": 24.0,
-     "carbohydrates": 5.9,
-     "cholesterol": 0.0,
-     "fat": 0.0,
-     "fiber": 0.0,
-     "protein": 0.0,
-     "saturatedFat": 0.0,
-     "sodium": 1.05,
-     "sugars": 5.6,
-     "transFat": 0.0
-    },
-    "householdServingText": "1 Tbsp",
-    "servingSize": 15,
-    "servingSizeUnit": "ml"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "5/6/2019",
-   "packageWeight": "250 mL/8.45 fl oz",
-   "per100g": {
-    "carbohydrate": {
-     "amount": 39.3,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 160,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 0.0,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "protein": {
-     "amount": 0.0,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 0.0,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 7.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 37.3,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1780123",
-    "463716",
-    "640442"
-   ],
-   "productId": "bprod_001e27039bc6f5a7",
-   "productVersionId": "bprod_001e27039bc6f5a7@f664e0fcde35b3c59",
-   "publicationDate": "7/29/2021",
-   "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "VINEGAR, BBQ",
-   "sourceRecordId": "1894293",
-   "sourceRecordIds": [
-    "1894293"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "5/1/2019",
-   "brandName": "FAREWAY",
-   "brandOwner": "Fareway Stores, Inc.",
-   "category": "Pasta by Shape & Type",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "511178497c902b5af53dedb3661b78dc573234fb4bb8845a11dbbe64555ad4e2",
-   "gtin14": null,
-   "gtinRaw": "02133340095",
-   "gtinRejection": "unsupported_length",
-   "householdServingText": "2 ONZ",
-   "ingredientsText": "100% WHOLE WHEAT DURUM FLOUR.",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calcium": 0.0,
-     "calories": 210,
-     "carbohydrates": 41.0,
-     "cholesterol": 0.0,
-     "fat": 1.5,
-     "fiber": 5.99,
-     "iron": 1.8,
-     "protein": 7.0,
-     "saturatedFat": 0.0,
-     "sodium": 0.0,
-     "sugars": 2.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "2 ONZ",
-    "servingSize": 56,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "5/1/2019",
-   "packageWeight": "13.25 oz/375 g",
-   "per100g": {
-    "calcium": {
-     "amount": 0.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 73.2,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 375,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 2.68,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 10.7,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 3.21,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 12.5,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 0.0,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 0.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 3.57,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    },
-    "vitamin_c": {
-     "amount": 0.0,
-     "nutrientId": "vitamin_c",
-     "unit": "mg"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1791727",
-    "509881"
-   ],
-   "productId": "bprod_004607c1816f1136",
-   "productVersionId": "bprod_004607c1816f1136@f511178497c902b5a",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 56.0,
-   "servingUnit": "g",
-   "sourceDescription": "WHOLE WHEAT PENNE RIGATE, MACARONI PRODUCT",
-   "sourceRecordId": "1914516",
-   "sourceRecordIds": [
-    "1914516"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "6/27/2021",
-   "brandName": "WEGMANS",
-   "brandOwner": "Wegmans Food Markets, Inc. ",
-   "category": "Tomatoes",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "00e6801df258dcc10570a89b2838506bf0af221cc23f70b196d104c2379fcbed",
-   "gtin14": null,
-   "gtinRaw": "07789036265",
-   "gtinRejection": "unsupported_length",
-   "householdServingText": "0.5 cup",
-   "ingredientsText": "ORGANIC TOMATOES, ORGANIC TOMATO JUICE, SEA SALT, CALCIUM CHLORIDE, NATURALLY DERIVED CITRIC ACID.",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calcium": 39.6,
-     "calories": 20.4,
-     "carbohydrates": 5.0,
-     "cholesterol": 0.0,
-     "fat": 0.0,
-     "fiber": 2.04,
-     "iron": 0.36,
-     "potassium": 230,
-     "protein": 0.996,
-     "saturatedFat": 0.0,
-     "sodium": 220,
-     "sugars": 3.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "0.5 cup",
-    "servingSize": 120,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "6/27/2021",
-   "packageWeight": "13.5 oz/411 g",
-   "per100g": {
-    "calcium": {
-     "amount": 33.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 4.17,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 17.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 1.7,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 0.3,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "potassium": {
-     "amount": 192,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 0.83,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 0.0,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 183,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 2.5,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    },
-    "vitamin_c": {
-     "amount": 1.0,
-     "nutrientId": "vitamin_c",
-     "unit": "mg"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1266207",
-    "1558287",
-    "1779763",
-    "462607"
-   ],
-   "productId": "bprod_004c78e7b69b0ac1",
-   "productVersionId": "bprod_004c78e7b69b0ac1@f00e6801df258dcc1",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 120.0,
-   "servingUnit": "g",
-   "sourceDescription": "DICED TOMATOES IN JUICE",
-   "sourceRecordId": "1893740",
-   "sourceRecordIds": [
-    "1893740"
-   ],
-   "subbrandName": "ORGANIC",
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "5/14/2020",
-   "brandName": null,
-   "brandOwner": "SO DELICIOUS DAIRY FREE",
-   "category": "Plant Based Milk",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "05f1d243c1fec827754897a3267467b2e3b02b0546c7a3f8d63b26966d0188ad",
-   "gtin14": null,
-   "gtinRaw": "744473912334",
-   "gtinRejection": "bad_check_digit",
-   "householdServingText": "1 cup",
-   "ingredientsText": "INGREDIENTS: ORGANIC COCONUTMILK (FILTERED WATER, ORGANIC COCONUT CREAM), ORGANIC CANE SUGAR, COCOA (PROCESSED WITH ALKALI), KOSHER SEA SALT, VITAMIN AND MINERAL BLEND (CALCIUM PHOSPHATE, MAGNESIUM PHOSPHATE, CALCIUM CARBONATE, L-SELENOMETHIONINE (SELENIUM), VITAMIN A ACETATE, VITAMIN D2, ZINC OXIDE, VITAMIN B12), GUAR GUM, XANTHAN GUM, REB A (STEVIA LEAF SWEETENER), MONK FRUIT EXTRACT, NATURAL FLAVOR.",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calcium": 130,
-     "calories": 91.2,
-     "carbohydrates": 13.0,
-     "cholesterol": 0.0,
-     "fat": 4.99,
-     "fiber": 1.92,
-     "iron": 1.39,
-     "potassium": 199,
-     "protein": 1.01,
-     "saturatedFat": 4.01,
-     "sodium": 161,
-     "sugars": 10.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "1 cup",
-    "servingSize": 240,
-    "servingSizeUnit": "ml"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "5/14/2020",
-   "packageWeight": null,
-   "per100g": {
-    "calcium": {
-     "amount": 54.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 5.42,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 38.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 2.08,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 0.8,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 0.58,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "magnesium": {
-     "amount": 23.0,
-     "nutrientId": "magnesium",
-     "unit": "mg"
-    },
-    "potassium": {
-     "amount": 83.0,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 0.42,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 1.67,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 67.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 4.17,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    },
-    "vitamin_b12": {
-     "amount": 1.25,
-     "nutrientId": "vitamin_b12",
-     "unit": "ug"
-    },
-    "zinc": {
-     "amount": 0.46,
-     "nutrientId": "zinc",
-     "unit": "mg"
-    }
-   },
-   "priorSourceRecordIds": [],
-   "productId": "bprod_006343580be91688",
-   "productVersionId": "bprod_006343580be91688@f05f1d243c1fec827",
-   "publicationDate": "6/26/2020",
-   "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "CHOCOLATE COCONUT MILK, CHOCOLATE",
-   "sourceRecordId": "1044755",
-   "sourceRecordIds": [
-    "1044755"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  }
- ],
+ "missingOrInvalidGtin": [],
  "validGtin": [
   {
-   "availableDate": "7/14/2017",
-   "brandName": "STOCK OPTIONS",
-   "brandOwner": "Stock Options, LLC",
-   "category": "Other Cooking Sauces",
+   "availableDate": "4/16/2018",
+   "brandName": null,
+   "brandOwner": "AHOLD",
+   "category": "Chips, Pretzels & Snacks",
    "dataSource": "LI",
    "discontinuedDate": null,
-   "factualFingerprint": "c6f66ac82aef65e23aafa00df9fe71e564f2ef25617b624563d73e7180fbed19",
-   "gtin14": "00881769641815",
-   "gtinRaw": "881769641815",
+   "factualFingerprint": "5d283303126d361f2ecdbbfc3e133cf6f513a143a8a5e559921772e9d4995c6f",
+   "gtin14": "00000000000000",
+   "gtinRaw": "000000000000",
    "gtinRejection": null,
    "householdServingText": "1 ONZ",
-   "ingredientsText": "BEEF STOCK (MADE FROM FILTERED WATER, ROASTED BEEF BONES, ONIONS, CELERY, LEEKS, CARROTS, TOMATO PASTE, RED WINE, PARSLEY, THYME, GARLIC, PEPPERCORNS, CLOVES AND BAY LEAVES)",
+   "ingredientsText": "ORGANIC BLUE CORN, ORGANIC SUNFLOWER OIL, SEA SALT, TRACE OF LIME.",
    "isDiscontinued": false,
    "labelFacts": {
     "declared": {
-     "calories": 17.1,
-     "carbohydrates": 2.0,
-     "fat": 0.101,
+     "calcium": 40.0,
+     "calories": 140,
+     "carbohydrates": 19.0,
+     "cholesterol": 0.0,
+     "fat": 7.0,
      "fiber": 1.01,
+     "iron": 0.361,
      "protein": 2.0,
-     "saturatedFat": 0.0,
-     "sodium": 75.9,
-     "sugars": 0.801
+     "saturatedFat": 1.0,
+     "sodium": 80.1,
+     "sugars": 0.0,
+     "transFat": 0.0
     },
     "householdServingText": "1 ONZ",
     "servingSize": 28,
     "servingSizeUnit": "g"
    },
    "marketCountry": "United States",
-   "modifiedDate": "7/14/2017",
-   "packageWeight": "0.375 PT/6 fl oz",
+   "modifiedDate": "4/16/2018",
+   "packageWeight": null,
    "per100g": {
+    "calcium": {
+     "amount": 143,
+     "nutrientId": "calcium",
+     "unit": "mg"
+    },
     "carbohydrate": {
-     "amount": 7.14,
+     "amount": 67.9,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
+    "cholesterol": {
+     "amount": 0.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
     "energy_kcal": {
-     "amount": 61.0,
+     "amount": 500,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 0.36,
+     "amount": 25.0,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "fiber": {
+     "amount": 3.6,
+     "nutrientId": "fiber",
+     "unit": "g"
+    },
+    "iron": {
+     "amount": 1.29,
+     "nutrientId": "iron",
+     "unit": "mg"
+    },
+    "protein": {
+     "amount": 7.14,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 3.57,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 286,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 0.0,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    },
+    "vitamin_c": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_c",
+     "unit": "mg"
+    }
+   },
+   "priorSourceRecordIds": [],
+   "productId": "bprod_0bb720460f4b77fc",
+   "productVersionId": "bprod_0bb720460f4b77fc@f5d283303126d361f",
+   "publicationDate": "4/1/2019",
+   "servingGrams": 28.0,
+   "servingUnit": "g",
+   "sourceDescription": "ORGANIC BLUE CORN TORTILLA CHIPS",
+   "sourceRecordId": "555505",
+   "sourceRecordIds": [
+    "555505"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": null,
+   "brandName": "Maola",
+   "brandOwner": null,
+   "category": "Milk/Milk Substitutes",
+   "dataSource": "Euromonitor",
+   "discontinuedDate": null,
+   "factualFingerprint": "753af9f8ccf8c607805b227dde91580641829630dc29f9d30a238ff352dfaa8e",
+   "gtin14": "00000000000000",
+   "gtinRaw": "00000000000000",
+   "gtinRejection": null,
+   "householdServingText": null,
+   "ingredientsText": "Milk, Sugar, Cocoa ( Processed with Alkali), Salt, Guar Gum, Gellan Gum, Natural Flavor, Vitamin D3.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "calories": 36.0,
+     "carbohydrates": 6.6,
+     "fat": 0.45,
+     "fiber": 0.6,
+     "protein": 1.5,
+     "saturatedFat": 0.3,
+     "sodium": 25.5,
+     "sugars": 4.8
+    },
+    "householdServingText": null,
+    "servingSize": 30,
+    "servingSizeUnit": "g"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": null,
+   "packageWeight": null,
+   "per100g": {
+    "carbohydrate": {
+     "amount": 22.0,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "energy_kcal": {
+     "amount": 120,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 1.5,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "fiber": {
+     "amount": 2.0,
+     "nutrientId": "fiber",
+     "unit": "g"
+    },
+    "protein": {
+     "amount": 5.0,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 1.0,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 85.0,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 16.0,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    }
+   },
+   "priorSourceRecordIds": [],
+   "productId": "bprod_c17adab8bbdc00c8",
+   "productVersionId": "bprod_c17adab8bbdc00c8@f753af9f8ccf8c607",
+   "publicationDate": "4/23/2026",
+   "servingGrams": 30.0,
+   "servingUnit": "g",
+   "sourceDescription": "Maola Milk, Whole, Chocolate, Extra Rich",
+   "sourceRecordId": "2755471",
+   "sourceRecordIds": [
+    "2755471"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "8/12/2018",
+   "brandName": "TRADER JOE'S",
+   "brandOwner": "Moyer's Potato Chips",
+   "category": "Chips, Pretzels & Snacks",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "7561051e2d7521344375a365ece0d0a600fa008506e0a3bcb061274b1e2538d4",
+   "gtin14": "00000000005487",
+   "gtinRaw": "00005487",
+   "gtinRejection": null,
+   "householdServingText": "1 ONZ",
+   "ingredientsText": "UNPEELED POTATOES, SUNFLOWER OIL, SEA SALT.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "calcium": 0.0,
+     "calories": 150,
+     "carbohydrates": 16.0,
+     "cholesterol": 0.0,
+     "fat": 8.99,
+     "fiber": 1.01,
+     "iron": 0.361,
+     "potassium": 431,
+     "protein": 2.0,
+     "saturatedFat": 1.0,
+     "sodium": 105,
+     "sugars": 0.0,
+     "transFat": 0.0
+    },
+    "householdServingText": "1 ONZ",
+    "servingSize": 28,
+    "servingSizeUnit": "g"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "8/12/2018",
+   "packageWeight": "198 g/7 oz",
+   "per100g": {
+    "calcium": {
+     "amount": 0.0,
+     "nutrientId": "calcium",
+     "unit": "mg"
+    },
+    "carbohydrate": {
+     "amount": 57.1,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "cholesterol": {
+     "amount": 0.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
+    "energy_kcal": {
+     "amount": 536,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 32.1,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "fiber": {
+     "amount": 3.6,
+     "nutrientId": "fiber",
+     "unit": "g"
+    },
+    "iron": {
+     "amount": 1.29,
+     "nutrientId": "iron",
+     "unit": "mg"
+    },
+    "potassium": {
+     "amount": 1540.0,
+     "nutrientId": "potassium",
+     "unit": "mg"
+    },
+    "protein": {
+     "amount": 7.14,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 3.57,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 375,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 0.0,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    },
+    "vitamin_c": {
+     "amount": 21.4,
+     "nutrientId": "vitamin_c",
+     "unit": "mg"
+    }
+   },
+   "priorSourceRecordIds": [
+    "1759872",
+    "359586"
+   ],
+   "productId": "bprod_6b269c8a7a70dbb8",
+   "productVersionId": "bprod_6b269c8a7a70dbb8@f7561051e2d752134",
+   "publicationDate": "7/29/2021",
+   "servingGrams": 28.0,
+   "servingUnit": "g",
+   "sourceDescription": "POTATO CHIPS, SEA SALT",
+   "sourceRecordId": "1850914",
+   "sourceRecordIds": [
+    "1850914"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "1/20/2018",
+   "brandName": "TRADER JOE'S",
+   "brandOwner": "Starion, LLC",
+   "category": "Pickles, Olives, Peppers & Relishes",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "8648a3e7c4481586935c4c00b2441f505e918dc15726feccb73066c6cf3face4",
+   "gtin14": "00000000006163",
+   "gtinRaw": "00006163",
+   "gtinRejection": null,
+   "householdServingText": "1 ONZ",
+   "ingredientsText": "GHERKINS (CUCUMBERS), WATER, VINEGAR, SALT, ONIONS,MUSTGARD SEEDS, TARRAGON, GARLIC PEPPER, NATURAL FLAVOR, CONTAINS SULFITIES.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "calories": 5.04,
+     "carbohydrates": 1.0,
+     "fat": 0.0,
+     "fiber": 1.01,
+     "protein": 0.0,
+     "sodium": 339
+    },
+    "householdServingText": "1 ONZ",
+    "servingSize": 28,
+    "servingSizeUnit": "g"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "1/20/2018",
+   "packageWeight": "12.35 oz/350 g",
+   "per100g": {
+    "carbohydrate": {
+     "amount": 3.57,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "energy_kcal": {
+     "amount": 18.0,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 0.0,
      "nutrientId": "fat",
      "unit": "g"
     },
@@ -1649,39 +1385,29 @@
      "unit": "g"
     },
     "protein": {
-     "amount": 7.14,
+     "amount": 0.0,
      "nutrientId": "protein",
      "unit": "g"
     },
-    "saturated_fat": {
-     "amount": 0.0,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
     "sodium": {
-     "amount": 271,
+     "amount": 1210.0,
      "nutrientId": "sodium",
      "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 2.86,
-     "nutrientId": "total_sugars",
-     "unit": "g"
     }
    },
    "priorSourceRecordIds": [
-    "1794709",
-    "520281"
+    "1804860",
+    "557566"
    ],
-   "productId": "bprod_000009a9f4575678",
-   "productVersionId": "bprod_000009a9f4575678@fc6f66ac82aef65e2",
+   "productId": "bprod_82f7b92e9f64be49",
+   "productVersionId": "bprod_82f7b92e9f64be49@f8648a3e7c4481586",
    "publicationDate": "7/29/2021",
    "servingGrams": 28.0,
    "servingUnit": "g",
-   "sourceDescription": "BEEF DEMI-GLACE",
-   "sourceRecordId": "1919108",
+   "sourceDescription": "TRADER JOE'S, CORNICHONS",
+   "sourceRecordId": "1937196",
    "sourceRecordIds": [
-    "1919108"
+    "1937196"
    ],
    "subbrandName": null,
    "tradeChannels": [
@@ -1689,55 +1415,49 @@
    ]
   },
   {
-   "availableDate": "8/11/2018",
-   "brandName": "AHOLD",
-   "brandOwner": "Ahold USA, Inc. ",
-   "category": "Canned Vegetables",
+   "availableDate": "6/25/2017",
+   "brandName": null,
+   "brandOwner": "TRADER JOE'S",
+   "category": "Tomatoes",
    "dataSource": "LI",
    "discontinuedDate": null,
-   "factualFingerprint": "5f124a1ab2a6380509eed49c12a1a869776da3c8bc8c90e6fb1b44cb64edf160",
-   "gtin14": "00688267022111",
-   "gtinRaw": "688267022111",
+   "factualFingerprint": "87e79aad48378427c00f973f024a219ab5fef8233f2663cb1605e049502af2f9",
+   "gtin14": "00000000010894",
+   "gtinRaw": "00010894",
    "gtinRejection": null,
-   "householdServingText": "1/2 cup",
-   "ingredientsText": "PEAS, WATER, SUGAR, SALT.",
+   "householdServingText": "0.5 cup",
+   "ingredientsText": "ORGANIC TOMATOES, ORGANIC TOMATO JUICE FROM CONCENTRATE (WATER, ORGANIC TOMATO CONCENTRATE), SEA SALT, CITRIC ACID, CALCIUM CHLORIDE",
    "isDiscontinued": false,
    "labelFacts": {
     "declared": {
-     "addedSugar": 3.0,
-     "calcium": 20.0,
-     "calories": 80.0,
-     "carbohydrates": 16.0,
+     "calcium": 19.5,
+     "calories": 29.9,
+     "carbohydrates": 6.01,
      "cholesterol": 0.0,
      "fat": 0.0,
-     "fiber": 4.0,
-     "iron": 1.0,
-     "protein": 4.0,
+     "fiber": 1.04,
+     "iron": 0.715,
+     "protein": 1.0,
      "saturatedFat": 0.0,
-     "sodium": 380,
-     "sugars": 6.0,
+     "sodium": 170,
+     "sugars": 4.0,
      "transFat": 0.0
     },
-    "householdServingText": "1/2 cup",
-    "servingSize": 125,
+    "householdServingText": "0.5 cup",
+    "servingSize": 130,
     "servingSizeUnit": "g"
    },
    "marketCountry": "United States",
-   "modifiedDate": "8/11/2018",
-   "packageWeight": "15 oz/425 g",
+   "modifiedDate": "6/25/2017",
+   "packageWeight": null,
    "per100g": {
-    "added_sugars": {
-     "amount": 2.4,
-     "nutrientId": "added_sugars",
-     "unit": "g"
-    },
     "calcium": {
-     "amount": 16.0,
+     "amount": 15.0,
      "nutrientId": "calcium",
      "unit": "mg"
     },
     "carbohydrate": {
-     "amount": 12.8,
+     "amount": 4.62,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
@@ -1747,7 +1467,7 @@
      "unit": "mg"
     },
     "energy_kcal": {
-     "amount": 64.0,
+     "amount": 23.0,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
@@ -1757,17 +1477,17 @@
      "unit": "g"
     },
     "fiber": {
-     "amount": 3.2,
+     "amount": 0.8,
      "nutrientId": "fiber",
      "unit": "g"
     },
     "iron": {
-     "amount": 0.8,
+     "amount": 0.55,
      "nutrientId": "iron",
      "unit": "mg"
     },
     "protein": {
-     "amount": 3.2,
+     "amount": 0.77,
      "nutrientId": "protein",
      "unit": "g"
     },
@@ -1777,31 +1497,31 @@
      "unit": "g"
     },
     "sodium": {
-     "amount": 304,
+     "amount": 131,
      "nutrientId": "sodium",
      "unit": "mg"
     },
     "total_sugars": {
-     "amount": 4.8,
+     "amount": 3.08,
      "nutrientId": "total_sugars",
      "unit": "g"
+    },
+    "vitamin_c": {
+     "amount": 1.8,
+     "nutrientId": "vitamin_c",
+     "unit": "mg"
     }
    },
-   "priorSourceRecordIds": [
-    "1320721",
-    "1612856",
-    "1795463",
-    "524248"
-   ],
-   "productId": "bprod_000077d181a39700",
-   "productVersionId": "bprod_000077d181a39700@f5f124a1ab2a63805",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 125.0,
+   "priorSourceRecordIds": [],
+   "productId": "bprod_1fca820afb154d11",
+   "productVersionId": "bprod_1fca820afb154d11@f87e79aad48378427",
+   "publicationDate": "4/1/2019",
+   "servingGrams": 130.0,
    "servingUnit": "g",
-   "sourceDescription": "SWEET PEAS",
-   "sourceRecordId": "1920495",
+   "sourceDescription": "ORGANIC TOMATOES, DICED IN TOMATO JUICE",
+   "sourceRecordId": "386120",
    "sourceRecordIds": [
-    "1920495"
+    "386120"
    ],
    "subbrandName": null,
    "tradeChannels": [
@@ -1809,46 +1529,175 @@
    ]
   },
   {
-   "availableDate": "11/7/2017",
-   "brandName": "PUR",
-   "brandOwner": "Everything Saturday Inc.",
-   "category": "Chewing Gum & Mints",
+   "availableDate": "8/14/2019",
+   "brandName": "TRADER JOE'S",
+   "brandOwner": "Harris Research Inc.",
+   "category": "Salad Dressing & Mayonnaise",
    "dataSource": "LI",
    "discontinuedDate": null,
-   "factualFingerprint": "567d2a7d97bbbf1ad1f2e9d05e5ad4f811e91327f618768fdb6e34be2d386de7",
-   "gtin14": "00830028001099",
-   "gtinRaw": "830028001099",
+   "factualFingerprint": "0ce548d5dc514dcd09aa32b8e11125efd36d5bcfbb72984b776cb6895aad5d31",
+   "gtin14": "00000000014816",
+   "gtinRaw": "00014816",
    "gtinRejection": null,
-   "householdServingText": "1 MINT",
-   "ingredientsText": "XYLITOL, MAIZE DEXTRIN (FIBER), NATURAL MINT FLAVOURING.",
+   "householdServingText": "1 Tbsp",
+   "ingredientsText": "WATER, EXPELLER PRESSED CANOLA OIL, CORNSTARCH, DISTILLED VINEGAR, APPLE CIDER VINEGAR, SALT, SOY PROTEIN ISOLATE, XANTHAN GUM, LEMON JUICE CONCENTRATE, ONION POWDER, MIXED TOCOPHEROLS (VITAMIN E) AND ROSEMARY EXTRACT FOR FRESHNESS, MUSTARD OIL, OLEORESIN PAPRIKA, OLEORESIN TURMERIC.",
    "isDiscontinued": false,
    "labelFacts": {
     "declared": {
-     "calories": 3.0,
-     "carbohydrates": 1.1,
-     "fat": 0.0,
-     "protein": 0.0
+     "calcium": 0.0,
+     "calories": 35.0,
+     "carbohydrates": 1.0,
+     "cholesterol": 0.0,
+     "fat": 3.5,
+     "fiber": 0.0,
+     "iron": 0.0,
+     "protein": 0.0,
+     "saturatedFat": 0.0,
+     "sodium": 105,
+     "sugars": 0.0,
+     "transFat": 0.0
     },
-    "householdServingText": "1 MINT",
-    "servingSize": 1.100000023841858,
+    "householdServingText": "1 Tbsp",
+    "servingSize": 15,
     "servingSizeUnit": "g"
    },
    "marketCountry": "United States",
-   "modifiedDate": "11/7/2017",
-   "packageWeight": "22 g/0.8 oz",
+   "modifiedDate": "8/14/2019",
+   "packageWeight": null,
    "per100g": {
+    "calcium": {
+     "amount": 0.0,
+     "nutrientId": "calcium",
+     "unit": "mg"
+    },
     "carbohydrate": {
-     "amount": 100,
+     "amount": 6.67,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
+    "cholesterol": {
+     "amount": 0.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
     "energy_kcal": {
-     "amount": 273,
+     "amount": 233,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
+     "amount": 23.3,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "fiber": {
      "amount": 0.0,
+     "nutrientId": "fiber",
+     "unit": "g"
+    },
+    "iron": {
+     "amount": 0.0,
+     "nutrientId": "iron",
+     "unit": "mg"
+    },
+    "protein": {
+     "amount": 0.0,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 0.0,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 700,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    },
+    "total_sugars": {
+     "amount": 0.0,
+     "nutrientId": "total_sugars",
+     "unit": "g"
+    },
+    "vitamin_c": {
+     "amount": 0.0,
+     "nutrientId": "vitamin_c",
+     "unit": "mg"
+    }
+   },
+   "priorSourceRecordIds": [
+    "1333642",
+    "1625792",
+    "539502"
+   ],
+   "productId": "bprod_5cf676cd35e077a0",
+   "productVersionId": "bprod_5cf676cd35e077a0@f0ce548d5dc514dcd",
+   "publicationDate": "10/28/2021",
+   "servingGrams": 15.0,
+   "servingUnit": "g",
+   "sourceDescription": "REDUCED FAT MAYO DRESSING",
+   "sourceRecordId": "2107657",
+   "sourceRecordIds": [
+    "2107657"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  }
+ ],
+ "volumeOnlyServing": [
+  {
+   "availableDate": "7/14/2017",
+   "brandName": "TRADER GIOTTO'S",
+   "brandOwner": "Ciel De Bleu, Inc.",
+   "category": "Vegetable & Cooking Oils",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "010565917e6980c8de1d8c5b23f6bf371b69b21320d80cfa214f4e2dd04393f2",
+   "gtin14": "00000000014373",
+   "gtinRaw": "00014373",
+   "gtinRejection": null,
+   "householdServingText": "1 Tbsp",
+   "ingredientsText": "REFINED OLIVE OIL, EXTRA VIRGIN OLIVE OIL.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "calories": 120,
+     "carbohydrates": 0.0,
+     "cholesterol": 0.0,
+     "fat": 14.0,
+     "protein": 0.0,
+     "saturatedFat": 2.0,
+     "sodium": 0.0,
+     "transFat": 0.0
+    },
+    "householdServingText": "1 Tbsp",
+    "servingSize": 15,
+    "servingSizeUnit": "ml"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "7/14/2017",
+   "packageWeight": "33.8 fl oz/1 L",
+   "per100g": {
+    "carbohydrate": {
+     "amount": 0.0,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "cholesterol": {
+     "amount": 0.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
+    "energy_kcal": {
+     "amount": 800,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 93.3,
      "nutrientId": "fat",
      "unit": "g"
     },
@@ -1856,21 +1705,31 @@
      "amount": 0.0,
      "nutrientId": "protein",
      "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 13.3,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 0.0,
+     "nutrientId": "sodium",
+     "unit": "mg"
     }
    },
    "priorSourceRecordIds": [
-    "1776214",
-    "446609"
+    "1789253",
+    "498918"
    ],
-   "productId": "bprod_0000997367f758ef",
-   "productVersionId": "bprod_0000997367f758ef@f567d2a7d97bbbf1a",
+   "productId": "bprod_4fc520672675d5bc",
+   "productVersionId": "bprod_4fc520672675d5bc@f010565917e6980c8",
    "publicationDate": "7/29/2021",
-   "servingGrams": 1.100000023841858,
-   "servingUnit": "g",
-   "sourceDescription": "MINTS, PEPPERMINT",
-   "sourceRecordId": "1886930",
+   "servingGrams": null,
+   "servingUnit": "ml",
+   "sourceDescription": "TRADER GIOTTO'S, IMPORTED OLIVE OIL",
+   "sourceRecordId": "1910160",
    "sourceRecordIds": [
-    "1886930"
+    "1910160"
    ],
    "subbrandName": null,
    "tradeChannels": [
@@ -1879,48 +1738,228 @@
   },
   {
    "availableDate": "7/14/2017",
-   "brandName": "OLD NEIGHBORHOOD",
-   "brandOwner": "Demakes Enterprises Inc.",
-   "category": "Sausages, Hotdogs & Brats",
+   "brandName": "TRADER GIOTTO'S",
+   "brandOwner": "Ciel De Bleu, Inc.",
+   "category": "Vegetable & Cooking Oils",
    "dataSource": "LI",
    "discontinuedDate": null,
-   "factualFingerprint": "c274f641aef3de93a6f9b0e4817a0e317853e13718b7752ee94d9cd60b3982cd",
-   "gtin14": "00052294025146",
-   "gtinRaw": "052294025146",
+   "factualFingerprint": "ae4439bfbb45dd2ff28e1684e64f0b669ca3bf613e67e3f093971c3f0471f5f7",
+   "gtin14": "00000000014649",
+   "gtinRaw": "00014649",
    "gtinRejection": null,
-   "householdServingText": "1 FRANKFURT",
-   "ingredientsText": "BEEF AND PORK, WATER, SALT, CONTAINS LESS THAN 2% OF: NONFAT DRY MILK, CORN SYRUP, FLAVORING, DEXTROSE, SODIUM PHOSPHATE, ASCORBIC ACID (VITAMIN C), SODIUM NITRITE, OLEORESIN OF PAPRIKA.",
+   "householdServingText": "1 Tbsp",
+   "ingredientsText": "EXTRA VIRGIN OLIVE OIL",
    "isDiscontinued": false,
    "labelFacts": {
     "declared": {
-     "calcium": 0.0,
-     "calories": 140,
-     "carbohydrates": 2.0,
-     "cholesterol": 25.0,
-     "fat": 13.0,
-     "fiber": 0.0,
-     "iron": 0.54,
-     "protein": 6.0,
-     "saturatedFat": 4.0,
-     "sodium": 400,
-     "sugars": 0.0,
+     "calories": 120,
+     "carbohydrates": 0.0,
+     "cholesterol": 0.0,
+     "fat": 14.0,
+     "protein": 0.0,
+     "saturatedFat": 2.0,
+     "sodium": 0.0,
      "transFat": 0.0
     },
-    "householdServingText": "1 FRANKFURT",
-    "servingSize": 50,
-    "servingSizeUnit": "g"
+    "householdServingText": "1 Tbsp",
+    "servingSize": 15,
+    "servingSizeUnit": "ml"
    },
    "marketCountry": "United States",
    "modifiedDate": "7/14/2017",
-   "packageWeight": "14 oz/397 g",
+   "packageWeight": "16.9 fl oz/500 mL",
+   "per100g": {
+    "carbohydrate": {
+     "amount": 0.0,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "cholesterol": {
+     "amount": 0.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
+    "energy_kcal": {
+     "amount": 800,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 93.3,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "protein": {
+     "amount": 0.0,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 13.3,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 0.0,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    }
+   },
+   "priorSourceRecordIds": [
+    "1296627",
+    "1588736",
+    "498900"
+   ],
+   "productId": "bprod_adc1ba81b3c4bdfe",
+   "productVersionId": "bprod_adc1ba81b3c4bdfe@fae4439bfbb45dd2f",
+   "publicationDate": "10/28/2021",
+   "servingGrams": null,
+   "servingUnit": "ml",
+   "sourceDescription": "TRADER GIOTTO'S, EXTRA VIRGIN OLIVE OIL",
+   "sourceRecordId": "2084927",
+   "sourceRecordIds": [
+    "2084927"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "11/3/2022",
+   "brandName": "TRADER GIOTTO'S",
+   "brandOwner": "Sk Wear",
+   "category": "Vegetable & Cooking Oils",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "314c8043720300f745702b69023ed20ac62c750a67d788c800fff67e83b3c425",
+   "gtin14": "00000000014656",
+   "gtinRaw": "00014656",
+   "gtinRejection": null,
+   "householdServingText": "1 Tbsp",
+   "ingredientsText": "EXTRA VIRGIN OLIVE OIL",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "calories": 120,
+     "carbohydrates": 0.0,
+     "cholesterol": 0.0,
+     "fat": 14.0,
+     "protein": 0.0,
+     "saturatedFat": 2.0,
+     "sodium": 0.0,
+     "transFat": 0.0
+    },
+    "householdServingText": "1 Tbsp",
+    "servingSize": 15,
+    "servingSizeUnit": "ml"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "11/3/2022",
+   "packageWeight": "33.8 fl oz/1 L",
+   "per100g": {
+    "carbohydrate": {
+     "amount": 0.0,
+     "nutrientId": "carbohydrate",
+     "unit": "g"
+    },
+    "cholesterol": {
+     "amount": 0.0,
+     "nutrientId": "cholesterol",
+     "unit": "mg"
+    },
+    "energy_kcal": {
+     "amount": 800,
+     "nutrientId": "energy_kcal",
+     "unit": "kcal"
+    },
+    "fat": {
+     "amount": 93.3,
+     "nutrientId": "fat",
+     "unit": "g"
+    },
+    "protein": {
+     "amount": 0.0,
+     "nutrientId": "protein",
+     "unit": "g"
+    },
+    "saturated_fat": {
+     "amount": 13.3,
+     "nutrientId": "saturated_fat",
+     "unit": "g"
+    },
+    "sodium": {
+     "amount": 0.0,
+     "nutrientId": "sodium",
+     "unit": "mg"
+    }
+   },
+   "priorSourceRecordIds": [
+    "1296637",
+    "1588746",
+    "2084933",
+    "2440023",
+    "498928"
+   ],
+   "productId": "bprod_b163d0c06a7ab565",
+   "productVersionId": "bprod_b163d0c06a7ab565@f314c8043720300f7",
+   "publicationDate": "1/26/2023",
+   "servingGrams": null,
+   "servingUnit": "ml",
+   "sourceDescription": "TRADER GIOTTO'S, OLIVE OIL",
+   "sourceRecordId": "2455941",
+   "sourceRecordIds": [
+    "2455941"
+   ],
+   "subbrandName": null,
+   "tradeChannels": [
+    "NO_TRADE_CHANNEL"
+   ]
+  },
+  {
+   "availableDate": "7/14/2017",
+   "brandName": "TRADER JOE'S",
+   "brandOwner": "Lookingglass Winery",
+   "category": "Cream",
+   "dataSource": "LI",
+   "discontinuedDate": null,
+   "factualFingerprint": "ff2da191345e44cb0ebde07cf1b38090a23e68d53640bcb8f356098217bdcb27",
+   "gtin14": "00000000062176",
+   "gtinRaw": "00062176",
+   "gtinRejection": null,
+   "householdServingText": "2 Tbsp",
+   "ingredientsText": "MILK, CREAM.",
+   "isDiscontinued": false,
+   "labelFacts": {
+    "declared": {
+     "calcium": 39.9,
+     "calories": 39.9,
+     "carbohydrates": 2.0,
+     "cholesterol": 15.0,
+     "fat": 3.0,
+     "fiber": 0.0,
+     "iron": 0.0,
+     "protein": 0.999,
+     "saturatedFat": 2.0,
+     "sodium": 15.0,
+     "sugars": 0.999,
+     "transFat": 0.0
+    },
+    "householdServingText": "2 Tbsp",
+    "servingSize": 30,
+    "servingSizeUnit": "ml"
+   },
+   "marketCountry": "United States",
+   "modifiedDate": "7/14/2017",
+   "packageWeight": "1 PT/473 mL",
    "per100g": {
     "calcium": {
-     "amount": 0.0,
+     "amount": 133,
      "nutrientId": "calcium",
      "unit": "mg"
     },
     "carbohydrate": {
-     "amount": 4.0,
+     "amount": 6.67,
      "nutrientId": "carbohydrate",
      "unit": "g"
     },
@@ -1930,434 +1969,12 @@
      "unit": "mg"
     },
     "energy_kcal": {
-     "amount": 280,
+     "amount": 133,
      "nutrientId": "energy_kcal",
      "unit": "kcal"
     },
     "fat": {
-     "amount": 26.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 0.0,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 1.08,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 12.0,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 8.0,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 800,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 0.0,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    },
-    "vitamin_c": {
-     "amount": 2.4,
-     "nutrientId": "vitamin_c",
-     "unit": "mg"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1776692",
-    "448935"
-   ],
-   "productId": "bprod_00016288c91a3803",
-   "productVersionId": "bprod_00016288c91a3803@fc274f641aef3de93",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 50.0,
-   "servingUnit": "g",
-   "sourceDescription": "FRANKFURTS SAUSAGE",
-   "sourceRecordId": "1887930",
-   "sourceRecordIds": [
-    "1887930"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "4/14/2018",
-   "brandName": "TRIDENT",
-   "brandOwner": "Mondelez USA",
-   "category": "Confectionery Products",
-   "dataSource": "GDSN",
-   "discontinuedDate": null,
-   "factualFingerprint": "30113505234b5f4177bb5c83bbec587195487501c50266007d566b70ea345485",
-   "gtin14": "00012546001564",
-   "gtinRaw": "00012546001564",
-   "gtinRejection": null,
-   "householdServingText": "1 Stick (2.4g)",
-   "ingredientsText": "INGREDIENTS: MALTITOL, MALTITOL SYRUP, GUM BASE, SORBITOL, MANNITOL, NATURAL AND ARTIFICIAL FLAVOR; LESS THAN 2% OF: ACESULFAME POTASSIUM, ASPARTAME, BHT (TO MAINTAIN FRESHNESS), BLUE 2 LAKE, CANDELILLA WAX, GELATIN, HYDROGENATED COCONUT OIL, RED 40 LAKE, SOY LECITHIN, SUCRALOSE, YELLOW 5 LAKE. PHENYLKETONURICS: CONTAINS PHENYLALANINE",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calories": 4.99,
-     "carbohydrates": 2.0,
-     "fat": 0.0,
-     "protein": 0.0,
-     "sodium": 0.0,
-     "sugars": 0.0
-    },
-    "householdServingText": "1 Stick (2.4g)",
-    "servingSize": 2.4000000953674316,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "4/14/2018",
-   "packageWeight": null,
-   "per100g": {
-    "carbohydrate": {
-     "amount": 83.3,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "energy_kcal": {
-     "amount": 208,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "protein": {
-     "amount": 0.0,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 0.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 0.0,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1167788",
-    "353161",
-    "766848"
-   ],
-   "productId": "bprod_0001d39c5c670ee7",
-   "productVersionId": "bprod_0001d39c5c670ee7@f30113505234b5f41",
-   "publicationDate": "3/19/2021",
-   "servingGrams": 2.4000000953674316,
-   "servingUnit": "g",
-   "sourceDescription": "TRIDENT LAYERS GUM GRAPE LEMONADE 1X14 PC",
-   "sourceRecordId": "1459790",
-   "sourceRecordIds": [
-    "1459790"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "7/11/2020",
-   "brandName": "HIGH LINER",
-   "brandOwner": "High Liner Foods (USA) Incorporated",
-   "category": "Frozen Fish & Seafood",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "f23fa71153660008bd1332423a68a87ab601c3ba44cdd47b81574d7e0aaef777",
-   "gtin14": "00041600011751",
-   "gtinRaw": "041600011751",
-   "gtinRejection": null,
-   "householdServingText": "3/4 cup",
-   "ingredientsText": "INGREDIENTS: MINCED SHRIMP, WHEAT FLOUR, VEGETABLE OIL (CANOLA, COTTONSEED, AND/OR SOYBEAN), WATER, MODIFIED CORN STARCH, SOY PROTEIN CONCENTRATE, CONTAINS 2% OR LESS OF: SALT, GUAR GUM, MODIFIED CELLULOSE, SODIUM ALGINATE, SUGAR, CALCIUM CHLORIDE, NONFAT MILK, EXPELLER PRESSED CANOLA OIL, LEAVENING (SODIUM ALUMINUM PHOSPHATE, SODIUM BICARBONATE), NATURAL AND ARTIFICIAL FLAVORS, WHEY, YEAST, SODIUM TRIPOLYPHOSPHATE (TO RETAIN MOISTURE), SODIUM BISULFITE (AS A PRESERVATIVE).",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "addedSugar": 1.01,
-     "calcium": 40.3,
-     "calories": 240,
-     "carbohydrates": 24.0,
-     "cholesterol": 35.3,
-     "fat": 13.0,
-     "fiber": 1.01,
-     "iron": 0.899,
-     "potassium": 120,
-     "protein": 8.0,
-     "saturatedFat": 2.0,
-     "sodium": 730,
-     "sugars": 1.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "3/4 cup",
-    "servingSize": 84,
-    "servingSizeUnit": "g"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "7/11/2020",
-   "packageWeight": "16 oz/454 g",
-   "per100g": {
-    "added_sugars": {
-     "amount": 1.2,
-     "nutrientId": "added_sugars",
-     "unit": "g"
-    },
-    "calcium": {
-     "amount": 48.0,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 28.6,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 42.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 286,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 15.5,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "fiber": {
-     "amount": 1.2,
-     "nutrientId": "fiber",
-     "unit": "g"
-    },
-    "iron": {
-     "amount": 1.07,
-     "nutrientId": "iron",
-     "unit": "mg"
-    },
-    "potassium": {
-     "amount": 143,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
-    "protein": {
-     "amount": 9.52,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "saturated_fat": {
-     "amount": 2.38,
-     "nutrientId": "saturated_fat",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 869,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 1.19,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1217077",
-    "1509134",
-    "828614",
-    "961459"
-   ],
-   "productId": "bprod_0003cfdde3696b78",
-   "productVersionId": "bprod_0003cfdde3696b78@ff23fa71153660008",
-   "publicationDate": "7/29/2021",
-   "servingGrams": 84.0,
-   "servingUnit": "g",
-   "sourceDescription": "SHRIMP POPPERS",
-   "sourceRecordId": "1870535",
-   "sourceRecordIds": [
-    "1870535"
-   ],
-   "subbrandName": "FISHER BOY",
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  }
- ],
- "volumeOnlyServing": [
-  {
-   "availableDate": "3/23/2021",
-   "brandName": "CANADA PURE",
-   "brandOwner": "Canada Pure Water Company Ltd",
-   "category": "Water",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "5b41cfa2a7c03e19bd884b92a234e4f0e8b4f022d01faf719a753bbc3385f3a5",
-   "gtin14": "00743287801952",
-   "gtinRaw": "743287801952",
-   "gtinRejection": null,
-   "householdServingText": "8 OZA",
-   "ingredientsText": "CARBONATED WATER, CANE SUGAR, CITRIC ACID, NATURAL FLAVOR, ASCORBIC ACID (VITAMIN C), POTASSIUM BENZOATE, POTASSIUM SORBATE (TO PRESERVE FRESHNESS).",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calories": 50.4,
-     "carbohydrates": 12.0,
-     "cholesterol": 0.0,
-     "fat": 0.0,
-     "protein": 0.0,
-     "sodium": 0.0,
-     "sugars": 12.0
-    },
-    "householdServingText": "8 OZA",
-    "servingSize": 240,
-    "servingSizeUnit": "ml"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "3/23/2021",
-   "packageWeight": "15 oz/445 mL",
-   "per100g": {
-    "carbohydrate": {
-     "amount": 5.0,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 0.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 21.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "protein": {
-     "amount": 0.0,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 0.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 5.0,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    },
-    "vitamin_c": {
-     "amount": 2.5,
-     "nutrientId": "vitamin_c",
-     "unit": "mg"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1313984",
-    "1606101",
-    "1793247",
-    "515872"
-   ],
-   "productId": "bprod_000289454077993c",
-   "productVersionId": "bprod_000289454077993c@f5b41cfa2a7c03e19",
-   "publicationDate": "7/29/2021",
-   "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "TRIPLE BERRY SPARKLING WATER BEVERAGE, TRIPLE BERRY",
-   "sourceRecordId": "1917120",
-   "sourceRecordIds": [
-    "1917120"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "10/13/2017",
-   "brandName": "KEMPS",
-   "brandOwner": "Kemps LLC ",
-   "category": "Milk",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "a8a75a82331597a4d12295f65651dcabeb560bbed21c7b7d06e12069e5fc47bd",
-   "gtin14": "00041483031372",
-   "gtinRaw": "041483031372",
-   "gtinRejection": null,
-   "householdServingText": "1 cup",
-   "ingredientsText": "LOWFAT MILK, VITAMIN A PALMITATE AND VITAMIN D3 ADDED.",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calcium": 300,
-     "calories": 111,
-     "carbohydrates": 13.0,
-     "cholesterol": 9.44,
-     "fat": 2.5,
-     "fiber": 0.0,
-     "iron": 0.0,
-     "potassium": 411,
-     "protein": 8.0,
-     "saturatedFat": 1.51,
-     "sodium": 135,
-     "sugars": 12.0,
-     "transFat": 0.0
-    },
-    "householdServingText": "1 cup",
-    "servingSize": 236,
-    "servingSizeUnit": "ml"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "10/13/2017",
-   "packageWeight": "1 GAL/3.78 L",
-   "per100g": {
-    "calcium": {
-     "amount": 127,
-     "nutrientId": "calcium",
-     "unit": "mg"
-    },
-    "carbohydrate": {
-     "amount": 5.51,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "cholesterol": {
-     "amount": 4.0,
-     "nutrientId": "cholesterol",
-     "unit": "mg"
-    },
-    "energy_kcal": {
-     "amount": 47.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 1.06,
+     "amount": 10.0,
      "nutrientId": "fat",
      "unit": "g"
     },
@@ -2371,221 +1988,46 @@
      "nutrientId": "iron",
      "unit": "mg"
     },
-    "potassium": {
-     "amount": 174,
-     "nutrientId": "potassium",
-     "unit": "mg"
-    },
     "protein": {
-     "amount": 3.39,
+     "amount": 3.33,
      "nutrientId": "protein",
      "unit": "g"
     },
     "saturated_fat": {
-     "amount": 0.64,
+     "amount": 6.67,
      "nutrientId": "saturated_fat",
      "unit": "g"
     },
     "sodium": {
-     "amount": 57.0,
+     "amount": 50.0,
      "nutrientId": "sodium",
      "unit": "mg"
     },
     "total_sugars": {
-     "amount": 5.08,
+     "amount": 3.33,
      "nutrientId": "total_sugars",
      "unit": "g"
     },
     "vitamin_c": {
-     "amount": 1.0,
+     "amount": 0.0,
      "nutrientId": "vitamin_c",
      "unit": "mg"
     }
    },
    "priorSourceRecordIds": [
-    "1347480",
-    "1639645",
-    "1802273",
-    "550380"
+    "1298296",
+    "1590404",
+    "500902"
    ],
-   "productId": "bprod_000990686f0b343e",
-   "productVersionId": "bprod_000990686f0b343e@fa8a75a82331597a4",
-   "publicationDate": "7/29/2021",
+   "productId": "bprod_d5eaaa216b4ffa7b",
+   "productVersionId": "bprod_d5eaaa216b4ffa7b@fff2da191345e44cb",
+   "publicationDate": "10/28/2021",
    "servingGrams": null,
    "servingUnit": "ml",
-   "sourceDescription": "1% LOWFAT MILK",
-   "sourceRecordId": "1932198",
+   "sourceDescription": "TRADER JOE'S, HALF & HALF",
+   "sourceRecordId": "2085968",
    "sourceRecordIds": [
-    "1932198"
-   ],
-   "subbrandName": "SELECT",
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "7/14/2017",
-   "brandName": "SIMPLY BALANCED",
-   "brandOwner": "Target Stores",
-   "category": "Fruit & Vegetable Juice, Nectars & Fruit Drinks",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "8bb25ffce95d7ae0ea36f031d544bcf52efd6a742235419841c6861496adca43",
-   "gtin14": "00085239285145",
-   "gtinRaw": "085239285145",
-   "gtinRejection": null,
-   "householdServingText": "1 BOX",
-   "ingredientsText": "ORGANIC FRUIT JUICE (FILTERED WATER SUFFICIENT TO RECONSTITUTE ORGANIC APPLE JUICE CONCENTRATE), ASCORBIC ACID (VITAMIN C).",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calories": 90.0,
-     "carbohydrates": 24.0,
-     "fat": 0.0,
-     "protein": 0.0,
-     "sodium": 4.0,
-     "sugars": 24.0
-    },
-    "householdServingText": "1 BOX",
-    "servingSize": 200,
-    "servingSizeUnit": "ml"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "7/14/2017",
-   "packageWeight": "6.75 fl oz/200 mL",
-   "per100g": {
-    "carbohydrate": {
-     "amount": 12.0,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "energy_kcal": {
-     "amount": 45.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "protein": {
-     "amount": 0.0,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 2.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 12.0,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    },
-    "vitamin_c": {
-     "amount": 30.0,
-     "nutrientId": "vitamin_c",
-     "unit": "mg"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1278574",
-    "1570663",
-    "478341"
-   ],
-   "productId": "bprod_00137ecb7404f5f3",
-   "productVersionId": "bprod_00137ecb7404f5f3@f8bb25ffce95d7ae0",
-   "publicationDate": "7/29/2021",
-   "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "ORGANIC JUICE, APPLE",
-   "sourceRecordId": "1901085",
-   "sourceRecordIds": [
-    "1901085"
-   ],
-   "subbrandName": null,
-   "tradeChannels": [
-    "NO_TRADE_CHANNEL"
-   ]
-  },
-  {
-   "availableDate": "5/7/2018",
-   "brandName": "CLEAR CHOICE",
-   "brandOwner": "Cott Beverages Wyomissing Inc.",
-   "category": "Water",
-   "dataSource": "LI",
-   "discontinuedDate": null,
-   "factualFingerprint": "c07a5b248b635f6be2b100dc0451d5e14cb60a7ac19b41e99ca29ec47858fdcb",
-   "gtin14": "00074220009365",
-   "gtinRaw": "074220009365",
-   "gtinRejection": null,
-   "householdServingText": "8 OZA",
-   "ingredientsText": "CARBONATED WATER, CITRIC ACID, NATURAL FLAVOR, POTASSIUM CITRATE, ASPARTAME, POTASSIUM BENZOATE (A PRESERVATIVE), ACESULFAME POTASSIUM, MALIC ACID.",
-   "isDiscontinued": false,
-   "labelFacts": {
-    "declared": {
-     "calories": 0.0,
-     "carbohydrates": 0.0,
-     "fat": 0.0,
-     "protein": 0.0,
-     "sodium": 0.0,
-     "sugars": 0.0
-    },
-    "householdServingText": "8 OZA",
-    "servingSize": 240,
-    "servingSizeUnit": "ml"
-   },
-   "marketCountry": "United States",
-   "modifiedDate": "5/7/2018",
-   "packageWeight": "33.8 fl oz/1 L",
-   "per100g": {
-    "carbohydrate": {
-     "amount": 0.0,
-     "nutrientId": "carbohydrate",
-     "unit": "g"
-    },
-    "energy_kcal": {
-     "amount": 0.0,
-     "nutrientId": "energy_kcal",
-     "unit": "kcal"
-    },
-    "fat": {
-     "amount": 0.0,
-     "nutrientId": "fat",
-     "unit": "g"
-    },
-    "protein": {
-     "amount": 0.0,
-     "nutrientId": "protein",
-     "unit": "g"
-    },
-    "sodium": {
-     "amount": 0.0,
-     "nutrientId": "sodium",
-     "unit": "mg"
-    },
-    "total_sugars": {
-     "amount": 0.0,
-     "nutrientId": "total_sugars",
-     "unit": "g"
-    }
-   },
-   "priorSourceRecordIds": [
-    "1219691",
-    "1511752",
-    "411248"
-   ],
-   "productId": "bprod_00141ad1fc88d673",
-   "productVersionId": "bprod_00141ad1fc88d673@fc07a5b248b635f6b",
-   "publicationDate": "7/29/2021",
-   "servingGrams": null,
-   "servingUnit": "ml",
-   "sourceDescription": "WATER, PEACH",
-   "sourceRecordId": "1871602",
-   "sourceRecordIds": [
-    "1871602"
+    "2085968"
    ],
    "subbrandName": null,
    "tradeChannels": [

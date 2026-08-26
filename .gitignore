@@ -42,3 +42,10 @@ Thumbs.db
 # from the archive by tools/ingest-branded.py — the checksum manifest and the
 # machine report are committed instead.
 data/branded-catalog.json
+
+# Full-release branded build outputs (regenerable from the archive by
+# tools/ingest-branded.py; ~1 GB). The manifest, report and compact fixtures
+# are committed instead.
+data/branded/
+data/runtime/
+data/branded-catalog.json

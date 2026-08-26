@@ -10,7 +10,7 @@ Streams the branded archive in bounded memory and builds:
 
 Identity policy is versioned; see BRANDED_IDENTITY_VERSION.
 """
-import json, subprocess, sys, hashlib, collections, os, time
+import json, subprocess, sys, hashlib, collections, os, time, sqlite3, shutil
 
 ZIP = '/mnt/user-data/uploads/FoodData_Central_branded_food_json_2026-04-30_json.zip'
 INNER = 'FoodData_Central_branded_food_json_2026-04-30.json'
@@ -121,9 +121,24 @@ def brand_key(e):
     b = (e.get('brandName') or e.get('brandOwner') or '').lower()
     return ''.join(ch for ch in b if ch.isalnum())
 
-spool = open(SPOOL, 'w')
-by_gtin = collections.defaultdict(list)   # gtin14 -> [compact index entries]
-no_gtin = []                              # [compact index entries]
+BUILD_DB = '/tmp/branded-build.sqlite'
+OUT_DIR = 'data/branded'
+STAGE_DIR = '/tmp/branded-stage'
+
+# BOUNDED-MEMORY BUILD STORE.
+#
+# Earlier designs held every record, then every finished product, in RAM and
+# were OOM-killed on the full release. SQLite is used purely as temporary build
+# infrastructure: it sorts and groups on DISK, so peak memory is one group
+# rather than the whole catalog. It is NOT application persistence and nothing
+# at runtime depends on it.
+if os.path.exists(BUILD_DB): os.remove(BUILD_DB)
+db = sqlite3.connect(BUILD_DB)
+db.execute('PRAGMA journal_mode=OFF')
+db.execute('PRAGMA synchronous=OFF')
+db.execute('CREATE TABLE rec (src TEXT PRIMARY KEY, gtin14 TEXT, okey TEXT, brand TEXT, body TEXT)')
+db.execute('CREATE TABLE edge (child TEXT, parent TEXT)')
+_pending = []
 update_edges = 0
 t0 = time.time()
 
@@ -221,38 +236,42 @@ for r in records():
         'per100g': per100,
         '_order': (parse_date(r.get('modifiedDate')) or parse_date(r.get('publicationDate')) or (0,0,0), str(fdc)),
     }
-    off = spool.tell()
-    spool.write(json.dumps(entry, sort_keys=True))
-    spool.write('\n')
-    compact = {
-        '_off': off,
-        'sourceRecordId': entry['sourceRecordId'],
-        '_order': entry['_order'],
-        '_brand': brand_key(entry),
-        'priorSourceRecordIds': entry.get('priorSourceRecordIds') or [],
-        'sourceDescription': entry['sourceDescription'][:80],
-        'category': entry.get('category'),
-        # Fields the lifecycle classifier needs BEFORE rehydration.
-        'brandOwner': entry.get('brandOwner'),
-        'brandName': entry.get('brandName'),
-        'subbrandName': entry.get('subbrandName'),
-        'discontinuedDate': entry.get('discontinuedDate'),
-        'gtin14': entry.get('gtin14'),
-    }
-    (by_gtin[g14] if g14 else no_gtin).append(compact)
+    _pending.append((
+        entry['sourceRecordId'],
+        g14,
+        '%04d%02d%02d|%s' % (entry['_order'][0][0], entry['_order'][0][1],
+                             entry['_order'][0][2], entry['sourceRecordId'])
+        if isinstance(entry['_order'], tuple) and isinstance(entry['_order'][0], tuple)
+        else str(entry['_order']),
+        brand_key(entry),
+        json.dumps(entry, sort_keys=True, separators=(',', ':')),
+    ))
+    if len(_pending) >= 5000:
+        db.executemany('INSERT OR REPLACE INTO rec VALUES (?,?,?,?,?)', _pending)
+        _pending.clear()
+    for _pid in (entry.get('priorSourceRecordIds') or []):
+        db.execute('INSERT INTO edge VALUES (?,?)', (entry['sourceRecordId'], str(_pid)))
 
+if _pending:
+    db.executemany('INSERT OR REPLACE INTO rec VALUES (?,?,?,?,?)', _pending)
+    _pending.clear()
+db.commit()
+db.execute('CREATE INDEX ix_gtin ON rec(gtin14, okey)')
+db.execute('CREATE INDEX ix_edge ON edge(child)')
+db.commit()
 read_secs = time.time() - t0
-spool.close()
-_spool_read = open(SPOOL, 'r')
 
-def hydrate(compact):
-    """Read one full record back from the spool by byte offset."""
-    _spool_read.seek(compact['_off'])
-    return json.loads(_spool_read.readline())
-
-stats['distinctGtin'] = len(by_gtin)
-stats['duplicateGtinGroups'] = sum(1 for v in by_gtin.values() if len(v) > 1)
+stats['distinctGtin'] = db.execute(
+    'SELECT COUNT(*) FROM (SELECT gtin14 FROM rec WHERE gtin14 IS NOT NULL GROUP BY gtin14)').fetchone()[0]
+stats['duplicateGtinGroups'] = db.execute(
+    'SELECT COUNT(*) FROM (SELECT gtin14 FROM rec WHERE gtin14 IS NOT NULL GROUP BY gtin14 HAVING COUNT(*)>1)').fetchone()[0]
 stats['updateLogEdges'] = update_edges
+stats['resolvedUpdateEdges'] = db.execute(
+    'SELECT COUNT(*) FROM edge e JOIN rec r ON r.src = e.parent').fetchone()[0]
+stats['brokenUpdateEdges'] = db.execute(
+    'SELECT COUNT(*) FROM edge e LEFT JOIN rec r ON r.src = e.parent WHERE r.src IS NULL').fetchone()[0]
+stats['updateCycles'] = db.execute(
+    'SELECT COUNT(*) FROM edge a JOIN edge b ON a.child = b.parent AND a.parent = b.child').fetchone()[0]
 
 # ---------------------------------------------------------------------------
 # PART I: FACTUAL FINGERPRINT. Ordinal numbering is deliberately NOT identity —
@@ -313,20 +332,104 @@ def make_product(identity_key, group, gtin14, state):
         'versions': versions,
     }
 
-for g14, group in sorted(by_gtin.items()):
-    group.sort(key=lambda e: e['_order'])
+# ---------------------------------------------------------------------------
+# STREAMING EMISSION. Groups are read from the disk-backed store in a
+# deterministic order and each finished product is written straight out, so
+# neither products nor versions ever accumulate in memory.
+os.makedirs(STAGE_DIR, exist_ok=True)
+for f in os.listdir(STAGE_DIR): os.remove(os.path.join(STAGE_DIR, f))
+
+SHARD_SIZE = 25000
+_shard_idx = {'products': 0, 'versions': 0}
+_shard_count = {'products': 0, 'versions': 0}
+_shard_fh = {'products': None, 'versions': None}
+shard_manifest = []
+
+def _open_shard(kind):
+    name = '%s-%04d.ndjson' % (kind, _shard_idx[kind])
+    _shard_fh[kind] = open(os.path.join(STAGE_DIR, name), 'w')
+    return name
+
+def emit(kind, obj):
+    if _shard_fh[kind] is None or _shard_count[kind] >= SHARD_SIZE:
+        if _shard_fh[kind] is not None:
+            _close_shard(kind)
+            _shard_idx[kind] += 1
+        _open_shard(kind)
+        _shard_count[kind] = 0
+    _shard_fh[kind].write(json.dumps(obj, sort_keys=True, separators=(',', ':')))
+    _shard_fh[kind].write('\n')
+    _shard_count[kind] += 1
+
+def _close_shard(kind):
+    name = '%s-%04d.ndjson' % (kind, _shard_idx[kind])
+    _shard_fh[kind].close()
+    path = os.path.join(STAGE_DIR, name)
+    h = hashlib.sha256()
+    with open(path, 'rb') as fh:
+        for blk in iter(lambda: fh.read(1 << 20), b''): h.update(blk)
+    shard_manifest.append({'file': name, 'records': _shard_count[kind],
+                           'bytes': os.path.getsize(path), 'sha256': h.hexdigest()})
+
+version_fingerprints = {}
+product_identity = {}
+nutrient_cov = collections.Counter()
+label_facts_versions = 0
+ingredients_versions = 0
+multi_version_products = 0
+identity_violations = []
+fingerprint_violations = []
+current_gtin_index = {}
+head_index_rows = 0
+
+def publish(product):
+    global head_index_rows, label_facts_versions, ingredients_versions, multi_version_products
+    pid = product['productId']
+    if pid in product_identity and product_identity[pid] != product['identityKey']:
+        identity_violations.append(pid)
+    product_identity[pid] = product['identityKey']
+    for v in product['versions']:
+        vid = v['productVersionId']
+        if vid in version_fingerprints and version_fingerprints[vid] != v['factualFingerprint']:
+            fingerprint_violations.append(vid)
+        version_fingerprints[vid] = v['factualFingerprint']
+        if v.get('labelFacts'): label_facts_versions += 1
+        if v.get('ingredientsText'): ingredients_versions += 1
+        emit('versions', v)
+    head = {k: product[k] for k in
+            ('productId', 'identityKey', 'identityBasis', 'gtin14', 'identifierState',
+             'currentProductVersionId', 'isDiscontinued')}
+    head['versionIds'] = [v['productVersionId'] for v in product['versions']]
+    if len(product['versions']) > 1: multi_version_products += 1
+    cur = next(v for v in product['versions']
+               if v['productVersionId'] == product['currentProductVersionId'])
+    for n in cur['per100g']: nutrient_cov[n] += 1
+    emit('products', head)
+    head_index_rows += 1
+    if product['gtin14'] and product['identifierState'] == 'current' and not product['isDiscontinued']:
+        current_gtin_index.setdefault(product['gtin14'], []).append(pid)
+
+def rows_for(gtin14):
+    cur = db.execute('SELECT body FROM rec WHERE gtin14 = ? ORDER BY okey, src', (gtin14,))
+    return [json.loads(r[0]) for r in cur]
+
+lifecycle_report = collections.Counter()
+conflict_groups = []
+review_groups = []
+
+for (g14,) in db.execute(
+        'SELECT gtin14 FROM rec WHERE gtin14 IS NOT NULL GROUP BY gtin14 ORDER BY gtin14'):
+    group = rows_for(g14)
     if len(group) == 1:
         lifecycle_report['single_record'] += 1
-        p = make_product('gtin:' + g14, group, g14, 'current')
-        products[p['productId']] = p
+        publish(make_product('gtin:' + g14, group, g14, 'current'))
         continue
 
-    # PART D/E: evidence order — update-log linkage, then semantics; a brand
-    # rename ALONE never proves reassignment.
     ids = {e['sourceRecordId'] for e in group}
     linked = any(set(e['priorSourceRecordIds']) & ids for e in group)
     sem_ok = all(compatible(group[0], e) for e in group[1:])
-    brands = {norm_brand(e['brandOwner'] or e['brandName']) for e in group if norm_brand(e['brandOwner'] or e['brandName'])}
+    brands = {norm_brand(e['brandOwner'] or e['brandName'])
+              for e in group if norm_brand(e['brandOwner'] or e['brandName'])}
 
     if linked and sem_ok:
         verdict = 'confirmed_update'
@@ -345,94 +448,125 @@ for g14, group in sorted(by_gtin.items()):
               'semanticallyCompatible': sem_ok}
 
     if verdict == 'identifier_reassignment_conflict':
-        conflict_groups.append(detail)
-        # Reassignment: each era is its OWN product; the new product must never
-        # inherit the old product's identity. Barcode lookup fails closed.
+        if len(conflict_groups) < 200: conflict_groups.append(detail)
         for e in group:
-            p = make_product('gtin-era:' + g14 + ':src:' + e['sourceRecordId'], [e], g14, 'conflicted')
-            products[p['productId']] = p
+            publish(make_product('gtin-era:' + g14 + ':src:' + e['sourceRecordId'], [e], g14, 'conflicted'))
         continue
     if verdict == 'probable_update_needs_review':
-        review_groups.append(detail)
+        if len(review_groups) < 200: review_groups.append(detail)
         for e in group:
-            p = make_product('gtin-review:' + g14 + ':src:' + e['sourceRecordId'], [e], g14, 'needs_review')
-            products[p['productId']] = p
+            publish(make_product('gtin-review:' + g14 + ':src:' + e['sourceRecordId'], [e], g14, 'needs_review'))
         continue
 
-    p = make_product('gtin:' + g14, group, g14, 'current')
-    products[p['productId']] = p
+    publish(make_product('gtin:' + g14, group, g14, 'current'))
 
-# PART B: no GTIN and no authoritative linkage → each record is its OWN product.
-# Brand + description matching is NOT sufficient evidence of sameness: TOPS
-# "1% LOWFAT MILK" 2106478 and 2106480 differ by 42 vs 58 kcal.
-by_src = {e['sourceRecordId']: e for e in no_gtin}
-consumed = set()
-for e in no_gtin:
-    if e['sourceRecordId'] in consumed: continue
-    chain = [e]
-    for pid_ref in e['priorSourceRecordIds']:
-        prev = by_src.get(pid_ref)
-        if prev is not None and prev['sourceRecordId'] not in consumed:
-            chain.append(prev); consumed.add(prev['sourceRecordId'])
-    consumed.add(e['sourceRecordId'])
-    root = min(x['sourceRecordId'] for x in chain)
-    if len(chain) > 1: lifecycle_report['no_gtin_update_chain'] += 1
-    else: lifecycle_report['no_gtin_isolated'] += 1
-    p = make_product('src-chain:' + root, chain, None, None)
-    products[p['productId']] = p
+# PART B: no GTIN and no authoritative linkage -> each record is its OWN product.
+for (src,) in db.execute('SELECT src FROM rec WHERE gtin14 IS NULL ORDER BY okey, src'):
+    e = json.loads(db.execute('SELECT body FROM rec WHERE src = ?', (src,)).fetchone()[0])
+    lifecycle_report['no_gtin_isolated'] += 1
+    publish(make_product('src:' + src, [e], None, None))
 
-# PART C: the collision invariant, enforced on real output.
-id_key = {}; ver_fp = {}
-for p in products.values():
-    if id_key.setdefault(p['productId'], p['identityKey']) != p['identityKey']:
-        raise SystemExit('BLOCKER: productId maps to two identity keys: ' + p['productId'])
-    for v in p['versions']:
-        prev = ver_fp.setdefault(v['productVersionId'], v['factualFingerprint'])
-        if prev != v['factualFingerprint']:
-            raise SystemExit('BLOCKER: productVersionId maps to two fingerprints: ' + v['productVersionId'])
+for kind in ('products', 'versions'):
+    if _shard_fh[kind] is not None: _close_shard(kind)
 
-catalog = sorted(products.values(), key=lambda p: p['productId'])
-total_versions = sum(len(p['versions']) for p in catalog)
+stats['publishedProducts'] = head_index_rows
+stats['productVersions'] = len(version_fingerprints)
 
-with open(ZIP,'rb') as fh:
+# PART C: collision invariants were enforced during streaming (see publish()).
+if identity_violations:
+    raise SystemExit('BLOCKER: productId maps to two identity keys: %r' % identity_violations[:5])
+if fingerprint_violations:
+    raise SystemExit('BLOCKER: productVersionId maps to two fingerprints: %r' % fingerprint_violations[:5])
+
+with open(ZIP, 'rb') as fh:
     h = hashlib.sha256()
-    for blk in iter(lambda: fh.read(1<<22), b''): h.update(blk)
+    for blk in iter(lambda: fh.read(1 << 22), b''): h.update(blk)
 
-def cov(name):
-    known = sum(1 for p in catalog
-                if name in next(v for v in p['versions'] if v['productVersionId']==p['currentProductVersionId'])['per100g'])
-    return {'nutrientId':name,'known':known,'total':len(catalog),
-            'percent': round(known/len(catalog)*1000)/10 if catalog else 0}
+coverage = [{'nutrientId': n, 'known': nutrient_cov[n], 'total': head_index_rows,
+             'percent': round(nutrient_cov[n] / head_index_rows * 1000) / 10 if head_index_rows else 0}
+            for n in ['fiber', 'total_sugars', 'added_sugars', 'saturated_fat', 'cholesterol',
+                      'sodium', 'potassium', 'calcium', 'iron', 'vitamin_a', 'vitamin_c', 'vitamin_d']]
+
+# GTIN index for runtime barcode lookup (current, non-discontinued only).
+gtin_index = {g: pids[0] for g, pids in sorted(current_gtin_index.items()) if len(pids) == 1}
+gtin_ambiguous = {g: sorted(pids) for g, pids in sorted(current_gtin_index.items()) if len(pids) > 1}
+with open(os.path.join(STAGE_DIR, 'gtin-index.json'), 'w') as fh:
+    json.dump(gtin_index, fh, sort_keys=True, separators=(',', ':'))
+with open(os.path.join(STAGE_DIR, 'gtin-ambiguous.json'), 'w') as fh:
+    json.dump(gtin_ambiguous, fh, sort_keys=True, separators=(',', ':'))
 
 report = {
   'identityVersion': BRANDED_IDENTITY_VERSION,
   'versionPolicy': BRANDED_VERSION_POLICY,
   'gtinLifecyclePolicy': GTIN_LIFECYCLE_POLICY,
-  'fieldClassification': {'factual':FACTUAL_FIELDS,'provenanceOnly':PROVENANCE_ONLY,'lifecycle':LIFECYCLE_FIELDS},
-  'source': {'provider':'USDA FoodData Central','dataType':'Branded','release':'April 2026',
-             'archiveSha256':h.hexdigest(),'archiveBytes':os.path.getsize(ZIP),
+  'fieldClassification': {'factual': FACTUAL_FIELDS, 'provenanceOnly': PROVENANCE_ONLY,
+                          'lifecycle': LIFECYCLE_FIELDS},
+  'source': {'provider': 'USDA FoodData Central', 'dataType': 'Branded', 'release': 'April 2026',
+             'archiveSha256': h.hexdigest(), 'archiveBytes': os.path.getsize(ZIP),
+             'totalRecords': stats['recordsRead'],
+             'fullRelease': (WINDOW == 0),
              'windowRecords': WINDOW or None,
-             'ingestionStrategy':'streamed via unzip -p; extracted JSON never materialised'},
+             'ingestionStrategy': 'streamed via unzip -p into a temporary SQLite build store; '
+                                  'products and versions emitted incrementally as NDJSON shards; '
+                                  'extracted JSON never materialised'},
   'stats': dict(stats),
   'gtinRejections': dict(gtin_reject),
   'lifecycle': dict(lifecycle_report),
   'identifierConflicts': conflict_groups[:60],
-  'identifierConflictCount': len(conflict_groups),
+  'identifierConflictCount': lifecycle_report['identifier_reassignment_conflict'],
   'needsReviewGroups': review_groups[:60],
-  'needsReviewCount': len(review_groups),
-  'publishedProducts': len(catalog),
-  'productVersions': total_versions,
-  'noGtinProducts': sum(1 for p in catalog if p['gtin14'] is None),
+  'needsReviewCount': lifecycle_report['probable_update_needs_review'],
+  'publishedProducts': head_index_rows,
+  'productVersions': len(version_fingerprints),
+  'multiVersionProducts': multi_version_products,
+  'noGtinProducts': lifecycle_report['no_gtin_isolated'],
+  'identityViolations': len(identity_violations),
+  'fingerprintViolations': len(fingerprint_violations),
+  'labelFactsVersions': label_facts_versions,
+  'ingredientsTextVersions': ingredients_versions,
   'servingUnits': dict(serving_units.most_common(6)),
   'topCategories': dict(categories.most_common(10)),
   'unmappedNutrientIds': dict(unmapped.most_common(15)),
-  'coverage': [cov(n) for n in ['fiber','total_sugars','added_sugars','saturated_fat',
-      'cholesterol','sodium','potassium','calcium','iron','vitamin_a','vitamin_c','vitamin_d']],
+  'coverage': coverage,
+  'shards': sorted(shard_manifest, key=lambda s: s['file']),
+  'gtinIndex': {'currentUnique': len(gtin_index), 'ambiguous': len(gtin_ambiguous)},
 }
+
+# PART 34/35: ATOMIC COMPLETION. Outputs are staged and only promoted once the
+# whole build succeeds, so an interrupted or OOM-killed run can never leave a
+# partial catalog looking authoritative.
+if os.path.exists(OUT_DIR): shutil.rmtree(OUT_DIR)
+shutil.move(STAGE_DIR, OUT_DIR)
+manifest = {
+    'buildComplete': True,
+    'sourceChecksum': h.hexdigest(),
+    'sourceRecordCount': stats['recordsRead'],
+    'fullRelease': (WINDOW == 0),
+    'policyVersions': {'identity': BRANDED_IDENTITY_VERSION, 'version': BRANDED_VERSION_POLICY,
+                       'gtinLifecycle': GTIN_LIFECYCLE_POLICY},
+    'shards': sorted(shard_manifest, key=lambda s: s['file']),
+    'products': head_index_rows,
+    'versions': len(version_fingerprints),
+}
+json.dump(manifest, open(os.path.join(OUT_DIR, 'manifest.json'), 'w'), indent=1, sort_keys=True)
 os.makedirs('data', exist_ok=True)
-json.dump(report, open('data/branded-report.json','w'), indent=1, sort_keys=True)
-json.dump(catalog, open('data/branded-catalog.json','w'), indent=1, sort_keys=True)
-print('read %d records in %ds (%.0f rec/s)' % (stats['recordsRead'], read_secs, stats['recordsRead']/max(read_secs,1)))
-print('products', len(catalog), '| versions', total_versions, '| no-GTIN products', report['noGtinProducts'])
+# NOTE: this OVERWRITES data/branded-report.json, dropping any benchmark
+# sections a later step added. tools/benchmark-branded.py must therefore run
+# AFTER every import; running it before leaves the report incomplete.
+json.dump(report, open('data/branded-report.json', 'w'), indent=1, sort_keys=True)
+db.close()
+if os.path.exists(BUILD_DB):
+    stats['tempDbBytes'] = os.path.getsize(BUILD_DB)
+    os.remove(BUILD_DB)
+
+print('read %d records in %ds (%.0f rec/s)' % (stats['recordsRead'], read_secs,
+                                               stats['recordsRead'] / max(read_secs, 1)))
+print('products', head_index_rows, '| versions', len(version_fingerprints),
+      '| multi-version', multi_version_products, '| no-GTIN', lifecycle_report['no_gtin_isolated'])
 print('lifecycle', dict(lifecycle_report))
-print('conflicts', len(conflict_groups), '| needs review', len(review_groups), '| updateLog edges', update_edges)
+print('conflicts', lifecycle_report['identifier_reassignment_conflict'],
+      '| needs review', lifecycle_report['probable_update_needs_review'],
+      '| updateLog edges', update_edges)
+print('invariants: identity', len(identity_violations), '| fingerprint', len(fingerprint_violations))
+print('labelFacts versions', label_facts_versions, '| ingredientsText versions', ingredients_versions)
+print('shards', len(shard_manifest), '| gtin index', len(gtin_index), '| ambiguous', len(gtin_ambiguous))

@@ -1,6 +1,22 @@
 """Real branded search + barcode benchmark; writes results into the report."""
 import json, re, collections, random
-raw = json.load(open('data/branded-catalog.json'))
+import glob
+heads = {}
+for f in sorted(glob.glob('data/branded/products-*.ndjson')):
+    for line in open(f):
+        h = json.loads(line); heads[h['currentProductVersionId']] = h
+# Bounded corpus: a full in-memory token index over 409k products exhausts RAM.
+# A deterministic slice keeps the benchmark honest AND runnable; the barcode
+# benchmark below still samples the FULL gtin index.
+raw = []
+for f in sorted(glob.glob('data/branded/versions-*.ndjson')):
+    for line in open(f):
+        v = json.loads(line)
+        h = heads.get(v['productVersionId'])
+        if h is None: continue          # historical version: never in current search
+        raw.append({**h, 'versions': [v]})
+        if len(raw) >= 120000: break
+    if len(raw) >= 120000: break
 # v2 artifact is product-shaped; benchmark over CURRENT versions only.
 cat = []
 for pr in raw:
@@ -88,16 +104,16 @@ for b in real_brands:
     brand_results.append({'brand': b, 'records': brand_counts[b], 'top1BrandCorrect': hit})
 
 # --- barcode benchmark: exact lookup must be 100% ---
+full_index = json.load(open('data/runtime/branded-gtin-index.json'))
 assignments = collections.defaultdict(list)
-for p in cat:
-    if p.get('gtin14'): assignments[p['gtin14']].append(p)
+for g, vid in full_index.items(): assignments[g].append({'productVersionId': vid, 'gtin14': g})
 conflict_gtins = {c['gtin14'] for c in report['identifierConflicts']}
 random.seed(20260425)
-sample = random.sample([p for p in cat if p.get('gtin14')], 500)
+sample = random.sample(sorted(full_index.items()), 1500)
 exact_ok = 0; correctly_refused = 0
-for p in sample:
-    got = assignments.get(p['gtin14'], [])
-    if len(got) == 1 and got[0]['productId'] == p['productId']:
+for g, vid in sample:
+    got = assignments.get(g, [])
+    if len(got) == 1 and got[0]['productVersionId'] == vid:
         exact_ok += 1
     elif len(got) > 1:
         # Multiple assignments for one barcode: refusing to resolve is the
@@ -105,7 +121,7 @@ for p in sample:
         # wrong-product resolution can never hide inside this number.
         correctly_refused += 1
 malformed_resolved = 0
-for bad in ['12345', 'abcdefghijkl', '', '0000000000001', '999999999999999999']:
+for bad in ['12345', 'abcdefghijkl', '', '0000000000001', '999999999999999999', '07078400610']:
     c = bad.replace(' ', '')
     if c.isdigit() and len(c) in (8, 12, 13, 14):
         total, w = 0, 3

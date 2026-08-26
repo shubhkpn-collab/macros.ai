@@ -1,85 +1,85 @@
 {
  "barcode": {
-  "conflictedIdentifiers": 3,
-  "correctlyRefusedAmbiguous": 1,
-  "exactLookupCorrect": 499,
+  "conflictedIdentifiers": 60,
+  "correctlyRefusedAmbiguous": 0,
+  "exactLookupCorrect": 1500,
   "exactLookupPercent": 100.0,
   "malformedResolved": 0,
-  "sampled": 500,
+  "sampled": 1500,
   "wrongProductResolved": 0
  },
  "coverage": [
   {
-   "known": 80495,
+   "known": 366832,
    "nutrientId": "fiber",
-   "percent": 82.0,
-   "total": 98199
+   "percent": 84.4,
+   "total": 434714
   },
   {
-   "known": 92355,
+   "known": 410935,
    "nutrientId": "total_sugars",
-   "percent": 94.0,
-   "total": 98199
+   "percent": 94.5,
+   "total": 434714
   },
   {
-   "known": 12629,
+   "known": 143640,
    "nutrientId": "added_sugars",
-   "percent": 12.9,
-   "total": 98199
+   "percent": 33.0,
+   "total": 434714
   },
   {
-   "known": 83930,
+   "known": 379271,
    "nutrientId": "saturated_fat",
-   "percent": 85.5,
-   "total": 98199
+   "percent": 87.2,
+   "total": 434714
   },
   {
-   "known": 82045,
+   "known": 371378,
    "nutrientId": "cholesterol",
-   "percent": 83.5,
-   "total": 98199
+   "percent": 85.4,
+   "total": 434714
   },
   {
-   "known": 97823,
+   "known": 433292,
    "nutrientId": "sodium",
-   "percent": 99.6,
-   "total": 98199
+   "percent": 99.7,
+   "total": 434714
   },
   {
-   "known": 26998,
+   "known": 214368,
    "nutrientId": "potassium",
-   "percent": 27.5,
-   "total": 98199
+   "percent": 49.3,
+   "total": 434714
   },
   {
-   "known": 79246,
+   "known": 361359,
    "nutrientId": "calcium",
-   "percent": 80.7,
-   "total": 98199
+   "percent": 83.1,
+   "total": 434714
   },
   {
-   "known": 79814,
+   "known": 362092,
    "nutrientId": "iron",
-   "percent": 81.3,
-   "total": 98199
+   "percent": 83.3,
+   "total": 434714
   },
   {
-   "known": 0,
+   "known": 26028,
    "nutrientId": "vitamin_a",
-   "percent": 0.0,
-   "total": 98199
+   "percent": 6.0,
+   "total": 434714
   },
   {
-   "known": 66285,
+   "known": 195094,
    "nutrientId": "vitamin_c",
-   "percent": 67.5,
-   "total": 98199
+   "percent": 44.9,
+   "total": 434714
   },
   {
-   "known": 1,
+   "known": 67861,
    "nutrientId": "vitamin_d",
-   "percent": 0.0,
-   "total": 98199
+   "percent": 15.6,
+   "total": 434714
   }
  ],
  "fieldClassification": {
@@ -109,79 +109,1573 @@
    "priorSourceRecordIds"
   ]
  },
+ "fingerprintViolations": 0,
+ "gtinIndex": {
+  "ambiguous": 0,
+  "currentUnique": 397737
+ },
  "gtinLifecyclePolicy": "branded-gtin-lifecycle@1.0.0",
  "gtinRejections": {
-  "bad_check_digit": 1043,
+  "bad_check_digit": 2039,
   "non_digit": 10,
-  "unsupported_length": 1518
+  "unsupported_length": 9998
  },
- "identifierConflictCount": 3,
+ "identifierConflictCount": 10779,
  "identifierConflicts": [
   {
    "brands": [
-    "mondelez",
-    "trident"
+    "ahold",
+    "maola"
    ],
    "descriptions": [
-    "TRIDENT GUM ORIGINAL SUGAR FREE1X18 PC",
-    "ORIGINAL FLAVOR SUGAR FREE GUM WITH XYLITOL, ORIGINAL"
+    "ORGANIC BLUE CORN TORTILLA CHIPS",
+    "Maola Milk, Whole, Chocolate, Extra Rich"
    ],
-   "gtin14": "00012546612296",
+   "gtin14": "00000000000000",
    "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "1458374",
-    "1047043"
+    "555505",
+    "2755471"
    ],
    "updateLogLinked": false,
    "verdict": "identifier_reassignment_conflict"
   },
   {
    "brands": [
-    "bigdrum",
-    "wonka"
+    "americanpowerproducts",
+    "lidl"
    ],
    "descriptions": [
-    "WONKA, POPPIN' POPS!, FRUITY BLAST ICE POPS, STRAWBERRY, ORANGE & LEMO",
-    "SLTEST_DISCONTINUED_USI_NESTLE POPPIN' POPS"
+    "ORIGINAL APPLE SAUCE, ORIGINAL",
+    "ORIGINAL ORGANIC APPLESAUCE, ORIGINAL"
    ],
-   "gtin14": "00072554267116",
+   "gtin14": "00000020867157",
    "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "1911373",
-    "584329"
+    "2156991",
+    "2626388"
    ],
    "updateLogLinked": false,
    "verdict": "identifier_reassignment_conflict"
   },
   {
    "brands": [
-    "conagra",
-    "conagrapackaged"
+    "moyerspotatochips",
+    "teisseire"
    ],
    "descriptions": [
-    "MEDIUM SLOW-BRAISED PORK CHILE VERDE WITH ROASTED POBLANOS, ONIONS, JA",
-    "MEDIUM SLOW-BRAISED PORK CHILE VERDE WITH ROASTED POBLANOS, ONIONS, JA"
+    "NATURALLY FLAVORED BEVERAGE ENHANCER WITH OTHER NATURAL FLAVORS, APPLE",
+    "GOURMET DROPS"
    ],
-   "gtin14": "00604183160522",
+   "gtin14": "00000050413201",
    "semanticallyCompatible": false,
    "sourceRecordIds": [
-    "722910",
-    "1728515"
+    "2381361",
+    "414732"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "athenaimports"
+   ],
+   "descriptions": [
+    "FANCY FRUIT COCKTAIL IN LIGHT SYRUP, FANCY FRUIT COCKTAIL",
+    "FANCY IN LIGHT SYRUP FRUIT COCKTAIL"
+   ],
+   "gtin14": "00008127000491",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2307765",
+    "2559896"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "athenaimports"
+   ],
+   "descriptions": [
+    "FANCY PEACH SLICES IN LIGHT SYRUP",
+    "FANCY IN LIGHT SYRUP PEACH SLICES"
+   ],
+   "gtin14": "00008127000507",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1994875",
+    "2559897"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "athenaimports"
+   ],
+   "descriptions": [
+    "FANCY PEACH SLICES IN 100% GRAPE JUICE, GRAPE JUICE",
+    "FANCY IN 100% GRAPE JUICE PEACH SLICES"
+   ],
+   "gtin14": "00008127000514",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2182020",
+    "2559898"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "reeds"
+   ],
+   "descriptions": [
+    "REED'S, GINGER ALE, PREMIUM BREW, PREMIUM BREW",
+    "PREMIUM GINGER BREW ALL NATURAL JAMAICAN STYLE GINGER ALE"
+   ],
+   "gtin14": "00008274333336",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1886549",
+    "2559900"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ksfacquisitionoration"
+   ],
+   "descriptions": [
+    "STRAWBERRIES & CREAM ADVANCED NUTRITION MEAL REPLACEMENT SHAKE, STRAWB",
+    "STRAWBERRIES & CREAM MEAL REPLACEMENT SHAKE, STRAWBERRIES; CREAM"
+   ],
+   "gtin14": "00008346740123",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2327582",
+    "2614294"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ksfacquisitionoration",
+    "slimfast"
+   ],
+   "descriptions": [
+    "ORIGINAL FRENCH VANILLA MEAL REPLACEMENT SHAKE",
+    "FRENCH VANILLA ORIGINAL MEAL REPLACEMENT SHAKE, FRENCH VANILLA"
+   ],
+   "gtin14": "00008346780020",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2614296",
+    "2631761"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ksfacquisitionoration",
+    "slimfast"
+   ],
+   "descriptions": [
+    "MEAL REPLACEMENT SHAKES, STRAWBERRIES & CREAM",
+    "ORIGINAL STRAWBERRIES & CREAM MEAL REPLACEMENT SHAKE"
+   ],
+   "gtin14": "00008346780068",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2489157",
+    "2614297"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ksfacquisitionoration"
+   ],
+   "descriptions": [
+    "RICH CHOCOLATE MEAL REPLACEMENT SHAKE, RICH CHOCOLATE",
+    "RICH CHOCOLATE MEAL REPLACEMENT SHAKE, RICH CHOCOLATE"
+   ],
+   "gtin14": "00008346780525",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1981487",
+    "2614299"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ksfacquisitionoration"
+   ],
+   "descriptions": [
+    "CREAMY CHOCOLATE MEAL REPLACEMENT SMOOTHIE MIX, CREAMY CHOCOLATE",
+    "ADVANCED NUTRITION CREAMY CHOCOLATE MEAL REPLACEMENT SMOOTHIE MIX, CHO"
+   ],
+   "gtin14": "00008346790012",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2337908",
+    "2614300"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ksfacquisitionoration"
+   ],
+   "descriptions": [
+    "STRAWBERRY TOPPED CHEESECAKE FLAVORED KETO FAT BOMB SNACK BARS MINIS, ",
+    "FAT BOMB STRAWBERRY TOPPED CHEESECAKE SNACK BAR MINIS, STRAWBERRY; CHE"
+   ],
+   "gtin14": "00008346874750",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2386839",
+    "2614302"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "beigelandbeigelmazon1985"
+   ],
+   "descriptions": [
+    "PRETZELS",
+    "THIN STICKS PRETZELS"
+   ],
+   "gtin14": "00008982000797",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2122018",
+    "2594270"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "eve"
+   ],
+   "descriptions": [
+    "HOT JAMAICAN JERK CURRY SEASONING, HOT",
+    "HOT JAMAICAN JERK CURRY SEASONING"
+   ],
+   "gtin14": "00009349003550",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2014608",
+    "2559964"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "ASSORTED CHOCOLATE TRUFFLES, MILK CHOCOLATE, DARK CHOCOLATE, WHITE CHO",
+    "ASSORTED CHOCOLATE TRUFFLES, DARK CHOCOLATE; WHITE CHOCOLATE; 60% EXTR"
+   ],
+   "gtin14": "00009542015190",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1874113",
+    "2559971"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE",
+    "MILK CHOCOLATE TRUFFLES"
+   ],
+   "gtin14": "00009542015206",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1858752",
+    "2559972"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "LINDT, LINDOR CARAMEL",
+    "CARAMEL MILK CHOCOLATE TRUFFLES, CARAMEL"
+   ],
+   "gtin14": "00009542016159",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2042428",
+    "2559974"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "LINDT, LINDOR, WHITE CHOCOLATE TRUFFLES",
+    "WHITE CHOCOLATE TRUFFLES, WHITE CHOCOLATE"
+   ],
+   "gtin14": "00009542016197",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2041143",
+    "2559975"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "CARAMEL MILK CHOCOLATE TRUFFLE BAR, CARAMEL MILK CHOCOLATE",
+    "CARAMEL MILK CHOCOLATE TRUFFLE BAR, CARAMEL"
+   ],
+   "gtin14": "00009542016432",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2467295",
+    "2674548"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "MILK WITH WHITE MILK CHOCOLATE TRUFFLES, MILK WITH WHITE",
+    "MILK WITH WHITE MILK CHOCOLATE TRUFFLES"
+   ],
+   "gtin14": "00009542019860",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1876267",
+    "2559978"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "ASSORTED CHOCOLATE TRUFFLES, MILK CHOCOLATE, DARK CHOCOLATE, WHITE CHO",
+    "ASSORTED CHOCOLATE TRUFFLES, MILK CHOCOLATE; DARK CHOCOLATE; WHITE CHO"
+   ],
+   "gtin14": "00009542021085",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1874116",
+    "2559979"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "LINDT, LINDOR CHOCOLATE TRUFFLES, ASSORTED, ASSORTED",
+    "ASSORTED CHOCOLATE TRUFFLES, DARK CARAMEL SEA SALT; MILK SEA SALT; MIL"
+   ],
+   "gtin14": "00009542025434",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1880651",
+    "2614307"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "ASSORTED DARK CHOCOLATE TRUFFLES, ASSORTED DARK CHOCOLATE",
+    "ASSORTED DARK CHOCOLATE TRUFFLES"
+   ],
+   "gtin14": "00009542039813",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1978992",
+    "2559986"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE",
+    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE"
+   ],
+   "gtin14": "00009542043650",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1966386",
+    "2559991"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE",
+    "MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE"
+   ],
+   "gtin14": "00009542044824",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2149457",
+    "2559993"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "ASSORTED MINI PRALINES, DARK CHOCOLATE WITH CARAMEL, CREAM & ALMOND PI",
+    "ASSORTED MINI PRALINS EXQUISITE CHOCOLATES"
+   ],
+   "gtin14": "00009542425838",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2460033",
+    "2559995"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "EXTRA DARK CHOCOLATE TRUFFLES, EXTRA DARK CHOCOLATE",
+    "EXTRA DARK CHOCOLATE TRUFFLES"
+   ],
+   "gtin14": "00009542425944",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2167441",
+    "2559996"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE TRUFFLES, MILK",
+    "DULCE DE LECHE MILK CHOCOLATE TRUFFLES"
+   ],
+   "gtin14": "00009542427887",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2161518",
+    "2560001"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "ALMOND BUTTER MILK CHOCOLATE TRUFFLES, ALMOND BUTTER MILK CHOCOLATE",
+    "ALMOND BUTTER MILK CHOCOLATE TRUFFLES, ALMOND BUTTER"
+   ],
+   "gtin14": "00009542433734",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2301527",
+    "2560012"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "ASSORTED MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE, DOUBLE CHOCOLATE, FU",
+    "IRRESISTIBLY SMOOTH ASSORTED MILK CHOCOLATE TRUFFLES, MILK CHOCOLATE; "
+   ],
+   "gtin14": "00009542436025",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2182206",
+    "2560019"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "lindt",
+    "lindtsprunglischweizag"
+   ],
+   "descriptions": [
+    "MAPLE MILK CHOCOLATE TRUFFLES",
+    "MAPLE MILK CHOCOLATE TRUFFLES, MAPLE MILK CHOCOLATE"
+   ],
+   "gtin14": "00009542441029",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2526338",
+    "2571711"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "CANDY CANE FLAVORED MINTS, CANDY CANE",
+    "FRESH BREATH MINTS NAUGHTY OR NICE CANDY CANE HARD CANDY MINTS"
+   ],
+   "gtin14": "00009800005604",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1739912",
+    "2560035"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "TIC TAC, FLAVORED MINTS, FRUIT ADVENTURE, FRUIT ADVENTURE",
+    "FRUIT ADVENTURE MINTS"
+   ],
+   "gtin14": "00009800006304",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1862338",
+    "2560036"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "TIC TAC, FLAVORED MINTS, WINTERGREEN, WINTERGREEN",
+    "WINTERGREEN MINTS"
+   ],
+   "gtin14": "00009800007370",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1872961",
+    "2560039"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "TIC TAC, FLAVORED MINTS, WINTERGREEN, WINTERGREEN",
+    "WINTERGREEN MINTS, WINTERGREEN"
+   ],
+   "gtin14": "00009800007677",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1869855",
+    "2560040"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferrerocollection",
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "FERRERO COLLECTION, FINE ASSORTED CONFECTIONS",
+    "FINE ASSORTED CONFECTIONS"
+   ],
+   "gtin14": "00009800200467",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2069363",
+    "2674565"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "SUGAR FREE GUM, FRESHMINT",
+    "FRESHMINT GUM, FRESHMINT"
+   ],
+   "gtin14": "00009800306060",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2132412",
+    "2594276"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "SPEARMINT GUM, SPEARMINT",
+    "SPEARMINT GUM, SPEARMINT"
+   ],
+   "gtin14": "00009800306077",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2132400",
+    "2594277"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated",
+    "kinder"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE FIGURE WITH CREAMY MILK LAYER INSIDE WRAPPED FIGURES, M",
+    "CREAMY MILK LAYER INSIDE MILK CHOCOLATE FIGURE"
+   ],
+   "gtin14": "00009800520060",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2214246",
+    "2674578"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE ORNAMENTS FIGURE WITH CREAMY MILK LAYER INSIDE, MILK CH",
+    "MINI T15GX3X26 HOLIDAY HOLLOW FIGURE"
+   ],
+   "gtin14": "00009800520121",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2191486",
+    "2560058"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE WITH CREAMY MILK FILLING, MILK CHOCOLATE",
+    "CREAMY MILK FILLING MILK CHOCOLATE"
+   ],
+   "gtin14": "00009800520152",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1995385",
+    "2560059"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "CRISPY WAFER WITH CREAMY NUT FILLING IN MILK CHOCOLATE CRISPY CREAMY C",
+    "CRISPY CREAMY CHOCOLATE BAR, CHOCOLATE"
+   ],
+   "gtin14": "00009800552122",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2168023",
+    "2560060"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "CRISPY AND CREAMY BUENO MINI CHOCOLATE BITE, CRISPY AND CREAMY",
+    "MINI CRISPY CREAMY CHOCOLATE BITE"
+   ],
+   "gtin14": "00009800556021",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2172890",
+    "2560062"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "SWEET CREAM TOPPED WITH COCOA WAFER BITES, SWEET CREAM",
+    "TREAT + TOY SWEET CREAM TOPPED WITH COCOA WAFER BITES"
+   ],
+   "gtin14": "00009800570072",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2310587",
+    "2560065"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "HAZELNUT SPREAD + BREADSTICKS",
+    "FERRERO NUTELLA & GO! HAZELNUT SPREAD + BREADSTICKS, 1.8 OZ, 4 COUNT"
+   ],
+   "gtin14": "00009800800049",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2022120",
+    "2560068"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ferreroorporated"
+   ],
+   "descriptions": [
+    "MULTIGRAIN STICKS WITH OAT & BLUEBERRIES, OAT & BLUEBERRIES",
+    "OAT & BLUEBERRIES HAZELNUT SPREAD + MULTIGRAIN STICKS"
+   ],
+   "gtin14": "00009800800285",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2215024",
+    "2560071"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "wilkinsrogers"
+   ],
+   "descriptions": [
+    "ENRICHED STONE GROUND SELF-RISING WHITE CORN MEAL MIX",
+    "ENRICHED STONE GROUND SELF-RISING WHITE CORN MEAL MIX"
+   ],
+   "gtin14": "00010200227206",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2013384",
+    "2560074"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "snyderslance"
+   ],
+   "descriptions": [
+    "WHOLE ALMONDS 100 CALORIE PACKS, WHOLE ALMONDS",
+    "Emerald Nuts, Natural Almonds, 100 Calorie Packs, 10 Ct, 6.2 Oz"
+   ],
+   "gtin14": "00010300894360",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2387458",
+    "2650566"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "snyderslance"
+   ],
+   "descriptions": [
+    "SALT & PEPPER CASHEWS, SALT & PEPPER",
+    "Emerald Nuts Salt and Pepper Cashews, Single-Serve 1.25 Oz"
+   ],
+   "gtin14": "00010300938194",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2387833",
+    "2695176"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "leaf"
+   ],
+   "descriptions": [
+    "MALTED MILK BALLS COVERED IN VANILLA FLAVORED CREME SNOWBALLS, MALTED ",
+    "SNOWBALLS COVERED IN VANILLA FLAVORED CREME MALTED MILK BALLS, VANILLA"
+   ],
+   "gtin14": "00010700022981",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2195918",
+    "2560088"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "leaf"
+   ],
+   "descriptions": [
+    "THE ORIGINAL MALTED MILK BALLS, ORIGINAL",
+    "THE ORIGINAL MALTED MILK BALLS, MILK"
+   ],
+   "gtin14": "00010700024404",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2111379",
+    "2560089"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "ajinomotonorthamerica"
+   ],
+   "descriptions": [
+    "CHICKEN & VEGETABLE MICROWAVABLE MINI POTSTICKERS, CHICKEN & VEGETABLE",
+    "MICROWAVEABLE CHICKEN & VEGETABLE MINI POTSTICKERS, CHICKEN; VEGETABLE"
+   ],
+   "gtin14": "00010878996206",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2329677",
+    "2651541"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "krogerorate",
+    "thekroger"
+   ],
+   "descriptions": [
+    "SEEDLESS RAISINS",
+    "Kroger Seedless Raisins 32oz Reclosable Zipper Bag"
+   ],
+   "gtin14": "00011110024596",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2071177",
+    "2758202"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "simpletruth",
+    "thekroger"
+   ],
+   "descriptions": [
+    "CREAMY & RICH COCONUTMILK, CREAMY & RICH",
+    "Simple Truth Organic Coconut Milk -- 33.18 fl oz"
+   ],
+   "gtin14": "00011110030702",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2423867",
+    "2756166"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "simpletruth",
+    "thekroger"
+   ],
+   "descriptions": [
+    "STRAWBERRY BANANA, VANILLA LOWFAT YOGURT TUBES, STRAWBERRY BANANA, VAN",
+    "Simple Truth Organic Strawberry Banana & Vanilla Kids Low Fat Yogurt T"
+   ],
+   "gtin14": "00011110038180",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "1974437",
+    "2755583"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "simpletruth",
+    "thekroger"
+   ],
+   "descriptions": [
+    "ORIGINAL OATMILK NON-DAIRY OAT BEVERAGE, ORIGINAL",
+    "Simple Truth Oatmilk Non- Dairy Oat Beverage Original -- 32 fl oz"
+   ],
+   "gtin14": "00011110038500",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2465892",
+    "2756180"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "krogerorate",
+    "thekroger"
+   ],
+   "descriptions": [
+    "SEEDLESS RAISINS",
+    "Simple Truth Organic Seedless Raisins 6-Count/1oz Cartons"
+   ],
+   "gtin14": "00011110049865",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2390505",
+    "2758203"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "kroger",
+    "thekroger"
+   ],
+   "descriptions": [
+    "WHIPPED COTTAGE CHEESE SPREADABLE 4% MILKFAT MINIMUM, WHIPPED COTTAGE ",
+    "Kroger 4% Whipped Cottage Cheese"
+   ],
+   "gtin14": "00011110097699",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2421114",
+    "2755578"
+   ],
+   "updateLogLinked": false,
+   "verdict": "identifier_reassignment_conflict"
+  },
+  {
+   "brands": [
+    "kroger",
+    "thekroger"
+   ],
+   "descriptions": [
+    "PLAIN WHOLE MILK YOGURT, PLAIN",
+    "Kroger Whole Milk Plain Yogurt"
+   ],
+   "gtin14": "00011110107565",
+   "semanticallyCompatible": false,
+   "sourceRecordIds": [
+    "2480400",
+    "2756623"
    ],
    "updateLogLinked": false,
    "verdict": "identifier_reassignment_conflict"
   }
  ],
  "identityVersion": "branded-identity@2.0.0",
+ "identityViolations": 0,
+ "ingredientsTextVersions": 441233,
+ "labelFactsVersions": 443571,
  "lifecycle": {
-  "confirmed_update": 10,
-  "identifier_reassignment_conflict": 3,
-  "no_gtin_isolated": 2528,
-  "probable_update_needs_review": 7,
-  "single_record": 95641
+  "confirmed_update": 8857,
+  "identifier_reassignment_conflict": 10779,
+  "no_gtin_isolated": 11818,
+  "probable_update_needs_review": 709,
+  "single_record": 390488
  },
- "needsReviewCount": 7,
+ "multiVersionProducts": 8851,
+ "needsReviewCount": 709,
  "needsReviewGroups": [
+  {
+   "brands": [
+    "reeses",
+    "thehershey"
+   ],
+   "descriptions": [
+    "REESE'S MILK CHOCOLATE & PEANUT BUTTER CUPS, 2 COUNT, 1.5 OZ",
+    "MILK CHOCOLATE & PEANUT BUTTER CUPS, MILK CHOCOLATE & PEANUT BUTTER"
+   ],
+   "gtin14": "00000003444009",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526242",
+    "2632468"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "learninghorizons",
+    "lidl"
+   ],
+   "descriptions": [
+    "ORIGINAL COCKTAIL SAUCE, ORIGINAL COCKTAIL",
+    "ORIGINAL COCKTAIL SAUCE, ORIGINAL"
+   ],
+   "gtin14": "00000020733322",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2156980",
+    "1079905"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "ferreroorporated",
+    "kinder"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATE WITH CREAMY MILK FILLING CHOCOLATE, MILK CHOCOLATE",
+    "CREAMY MILK FILLING MILK CHOCOLATE"
+   ],
+   "gtin14": "00009800520046",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2546339",
+    "2674579"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "ferreroorporated",
+    "kinder"
+   ],
+   "descriptions": [
+    "MILK CHOCOLATES WITH CREAMY MILK FILLING COUNTDOWN CALENDAR, MILK CHOC",
+    "COUNTDOWN CALENDAR WITH CREAMY MILK FILLING MILK CHOCOLATE"
+   ],
+   "gtin14": "00009800520190",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2215459",
+    "2674577"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "diamond",
+    "snyderslance"
+   ],
+   "descriptions": [
+    "ALMONDS",
+    "DIAMOND OF CALIFORNIA ALMONDS, 16 OZ"
+   ],
+   "gtin14": "00010300000259",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1584182",
+    "2614312"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "tatatea",
+    "tetley"
+   ],
+   "descriptions": [
+    "BLACK LOOSE TEA, BLACK",
+    "LOOSE BLACK TEA"
+   ],
+   "gtin14": "00011156059958",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2493410",
+    "2546936"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starbucks"
+   ],
+   "descriptions": [
+    "MOCHA CHILLED COFFEE DRINK",
+    "MOCHA CHILLED COFFEE DRINK, MOCHA"
+   ],
+   "gtin14": "00012000100925",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "540576",
+    "2560207"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starbucks"
+   ],
+   "descriptions": [
+    "VANILLA CHILLED COFFEE DRINK",
+    "VANILLA CHILLED COFFEE DRINK, VANILLA"
+   ],
+   "gtin14": "00012000101144",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "540577",
+    "2560208"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starbucks"
+   ],
+   "descriptions": [
+    "CARAMEL CHILLED COFFEE DRINK, CARAMEL",
+    "CARAMEL CHILLED COFFEE DRINK, CARAMEL"
+   ],
+   "gtin14": "00012000103681",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "540574",
+    "2560211"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starbucks"
+   ],
+   "descriptions": [
+    "PEPPERMINT MOCHA ICED ESPRESSO BEVERAGE, PEPPERMINT MOCHA",
+    "PEPPERMINT MOCHA ICED ESPRESSO BEVERAGE, PEPPERMINT"
+   ],
+   "gtin14": "00012000170171",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "668292",
+    "2560220"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsi",
+    "pepsicolanorthamerica"
+   ],
+   "descriptions": [
+    "MINI FLAVOR MIX - COLA, SODA, ORANGE, ROOT BEER",
+    "MINI FLAVOR MIX SODA"
+   ],
+   "gtin14": "00012000201202",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2494190",
+    "2526477"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "brisk",
+    "pepsicolanorthamerica"
+   ],
+   "descriptions": [
+    "LEMON ICED TEA, LEMON",
+    "LEMON ICED TEA"
+   ],
+   "gtin14": "00012000202360",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2494194",
+    "2526479"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "ZERO SUGAR LEMON LIME FLAVORED SODA",
+    "LEMON LIME SODA, LEMON LIME"
+   ],
+   "gtin14": "00012000221484",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551361",
+    "2599393"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "LEMON LIME FLAVORED SODA",
+    "LEMON LIME CAFFEINE FREE SODA, LEMON LIME"
+   ],
+   "gtin14": "00012000221552",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526504",
+    "2599394"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "ZERO SUGAR LEMON LIME FLAVORED SODA",
+    "LEMON LIME JUICE, LEMON LIME"
+   ],
+   "gtin14": "00012000221583",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551362",
+    "2617262"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "LEMON LIME FLAVORED SODA",
+    "LEMON LIME CAFFEINE FREE SODA, LEMON LIME"
+   ],
+   "gtin14": "00012000221613",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526505",
+    "2617263"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "LEMON LIME FLAVORED  SODA",
+    "LEMON LIME, LEMON"
+   ],
+   "gtin14": "00012000221668",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526506",
+    "2599395"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "ZERO SUGAR LEMON LIME FLAVORED SODA",
+    "LEMON LIME FLAVORED SODA, LEMON LIME"
+   ],
+   "gtin14": "00012000221682",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551364",
+    "2599396"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "pepsicolanorthamerica",
+    "starry"
+   ],
+   "descriptions": [
+    "ZERO SUGAR MINI LEMON LIME FLAVORED SODA",
+    "LEMON LIME ZERO SUGAR SODA MINI, LEMON LIME"
+   ],
+   "gtin14": "00012000222405",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551367",
+    "2599397"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "parks",
+    "parksfamousflavor"
+   ],
+   "descriptions": [
+    "BROWN'N SERVE BEEF SAUSAGE LINKS",
+    "SAUSAGE LINKS"
+   ],
+   "gtin14": "00012400002577",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526519",
+    "2571945"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heinz",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "REAL MAYONNAISE",
+    "REAL MAYONNAISE"
+   ],
+   "gtin14": "00013000000451",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1650523",
+    "2614344"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heinz",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "YELLOW MUSTARD",
+    "YELLOW  MUSTARD"
+   ],
+   "gtin14": "00013000002127",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1650514",
+    "2594360"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heinz",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "SWEET RELISH",
+    "SWEET RELISH"
+   ],
+   "gtin14": "00013000005890",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2117602",
+    "2560351"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heinz",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "MUSTARD",
+    "100% NATURAL HONEY MUSTARD, HONEY"
+   ],
+   "gtin14": "00013000011068",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1660499",
+    "2560360"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heinz",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "HOMESTYLE GRAVY",
+    "SAVORY BEEF  GRAVY"
+   ],
+   "gtin14": "00013000797702",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1648677",
+    "2594366"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "cargillorporatedsaltbusinessunit",
+    "diamondcrystal"
+   ],
+   "descriptions": [
+    "PURE AND NATURAL KOSHER SALT",
+    "KOSHER SALT, KOSHER"
+   ],
+   "gtin14": "00013600020019",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526597",
+    "2571981"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "nestlefrozenfooddivision",
+    "stouffers"
+   ],
+   "descriptions": [
+    "PEPPERONI FRENCH BREAD PIZZAS",
+    "PEPPERONI FRENCH BREAD PIZZAS, PEPPERONI"
+   ],
+   "gtin14": "00013800502230",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526631",
+    "2572000"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "hersheys"
+   ],
+   "descriptions": [
+    "COOKIES 'N' CREME FILLOWS CRME FILLED CEREAL",
+    "COOKIES 'N' CREME FILLED CEREAL FILLOWS, COOKIES 'N' CREME"
+   ],
+   "gtin14": "00016000145795",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526740",
+    "2599485"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
   {
    "brands": [
     "bettylous",
@@ -202,164 +1696,614 @@
   },
   {
    "brands": [
-    "notabrandeditem",
-    "publixsupermarkets"
+    "sweetearth",
+    "sweetearthnatural"
    ],
    "descriptions": [
-    "MEDIUM SHRIMP PLATTER WITH TANGY COCKTAIL SAUCE, TANGY COCKTAIL SAUCE",
-    "MEDIUM SHRIMP PLATTER WITH TANGY COCKTAIL SAUCE, TANGY COCKTAIL SAUCE"
+    "PIZZA, ROSEMARY HERB",
+    "ROSEMARY HERB MOZZARELLA, FONTINA, ASIAGO, ROMANO & PARMESAN CHEESE WI"
    ],
-   "gtin14": "00041415037458",
+   "gtin14": "00016741000674",
    "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "1047109",
-    "1973851"
+    "719270",
+    "2403956"
    ],
    "updateLogLinked": false,
    "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "bakery",
-    "publixsupermarkets"
+    "sweetearth",
+    "sweetearthnatural"
    ],
    "descriptions": [
-    "CRANBERRY PISTACHIO FLAVORED BISCOTTI, CRANBERRY PISTACHIO",
-    "CRANBERRY PISTACHIO FLAVORED BISCOTTI, CRANBERRY PISTACHIO"
+    "TRUFFLE LOVER'S PIZZA, WHOLE WHEAT & PSYLLIUM",
+    "TRUFFLE LOVER'S GRUYERE, ROMANO, MOZZARELLA, EARTHY MUSHROOMS & SPINAC"
    ],
-   "gtin14": "00041415330917",
+   "gtin14": "00016741000698",
    "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "1045043",
-    "1974408"
+    "718702",
+    "2472136"
    ],
    "updateLogLinked": false,
    "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "publix",
-    "publixsupermarkets"
+    "hjheinz",
+    "kraftheinz"
    ],
    "descriptions": [
-    "PANKO BUTTERFLY CRISPY SEASONED SHRIMP, PANKO BUTTERFLY",
-    "PANKO BUTTERFLY CRISPY SEASONED SHRIMP, PANKO BUTTERFLY"
+    "BEEF TAQUITOS",
+    "SALSA ROJA BEEF TAQUITOS"
    ],
-   "gtin14": "00041415416451",
+   "gtin14": "00017696000092",
    "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "1043633",
-    "1718442"
+    "1648567",
+    "2614536"
    ],
    "updateLogLinked": false,
    "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "hummus",
-    "ithaca"
+    "camillebloch",
+    "chocolatscamillebloch"
    ],
    "descriptions": [
-    "SMOKED CHIPOTLE HUMMUS, SMOKED CHIPOTLE",
-    "SMOKED CHIPOTLE HUMMUS, SMOKED CHIPOTLE"
+    "SWISS DARK CHOCOLATE WITH CHOCOLATE MOUSSE FILLING, CHOCOLATE MOUSSE F",
+    "SWISS WITH CHOCOLATE MOUSSE FILLING DARK CHOCOLATE"
    ],
-   "gtin14": "00853883006054",
+   "gtin14": "00018176783207",
    "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "718666",
-    "1975508"
+    "2123257",
+    "2547021"
    ],
    "updateLogLinked": false,
    "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "hummus",
-    "ithacacoldcrafted"
+    "kashiinternationaloration",
+    "kellogg"
    ],
    "descriptions": [
-    "FRESH LEMON BEET",
-    "LEMON BEET HUMMUS, LEMON BEET"
+    "GRAIN FREE PEANUT BUTTER CHOCOLATE CHEWY GRANOLA BARS, PEANUT BUTTER C",
+    "PEANUT BUTTER CHOCOLATE NUT & SEED BARS, PEANUT BUTTER; CHOCOLATE"
    ],
-   "gtin14": "00853883006078",
+   "gtin14": "00018627110606",
    "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "719296",
-    "1975507"
+    "1726794",
+    "2614542"
    ],
    "updateLogLinked": false,
    "verdict": "probable_update_needs_review"
   },
   {
    "brands": [
-    "bantambagels",
-    "tmarzetti"
+    "kashiinternationaloration",
+    "kellogg"
    ],
    "descriptions": [
-    "MINI STUFFED BAGELS",
-    "EVERYBODY'S FAVORITE EVERYTHING BAGEL STUFFED WITH VEGGIE CREAM CHEESE"
+    "LAYERED GRANOLA BARS, DARK CHOCOLATE COCONUT",
+    "DARK CHOCOLATE COCONUT LAYERED GRANOLA BARS, DARK CHOCOLATE; COCONUT"
    ],
-   "gtin14": "00856617005170",
+   "gtin14": "00018627431640",
    "semanticallyCompatible": true,
    "sourceRecordIds": [
-    "719216",
-    "1977031"
+    "1628645",
+    "2594642"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "campbellsoup",
+    "gardenfreshgourmet"
+   ],
+   "descriptions": [
+    "TOMATO SOUP",
+    "TOMATO WITH PARMESAN SOUP"
+   ],
+   "gtin14": "00019001233706",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1603481",
+    "2526943"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "campbellsoup",
+    "gardenfreshgourmet"
+   ],
+   "descriptions": [
+    "TORTILLA SOUP WITH ROASTED CHILES",
+    "CHICKEN TORTILLA WITH ROASTED CHILES SOUP"
+   ],
+   "gtin14": "00019001233713",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1603482",
+    "2526944"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "paleopowder",
+    "southernstylespices"
+   ],
+   "descriptions": [
+    "ALL PURPOSE SEASONING HIMALAYAN PINK SALT, PINK",
+    "PINK ALL PURPOSE SEASONING, PINK"
+   ],
+   "gtin14": "00019622043241",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "718268",
+    "2452902"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "paleopowderherbed",
+    "southernstylespices"
+   ],
+   "descriptions": [
+    "ALL PURPOSE SEASONING FLAVORED WITH HERBS",
+    "HERBED SALT FREE ALL PURPOSE SEASONING, HERBED"
+   ],
+   "gtin14": "00019622043487",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "775978",
+    "2421772"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "greengiant"
+   ],
+   "descriptions": [
+    "WHOLE KERNEL SWEET CORN",
+    "SWEET WHOLE KERNEL CORN, SWEET"
+   ],
+   "gtin14": "00020000103907",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526958",
+    "2599599"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "greengiant"
+   ],
+   "descriptions": [
+    "SWEET PEAS",
+    "SWEET PEAS, SWEET"
+   ],
+   "gtin14": "00020000103976",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526959",
+    "2572350"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "greengiant"
+   ],
+   "descriptions": [
+    "NIBLETS WHOLE KERNEL SWEET CORN",
+    "NIBLETS WHOLE KERNEL SWEET CORN VACUUM PACKED CRISP, NIBLETS"
+   ],
+   "gtin14": "00020000105079",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526960",
+    "2599601"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "greengiant"
+   ],
+   "descriptions": [
+    "CREAM STYLE SWEET CORN",
+    "CREAM STYLE SWEET CORN, CREAM STYLE SWEET"
+   ],
+   "gtin14": "00020000105918",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526961",
+    "2572355"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "greengiant"
+   ],
+   "descriptions": [
+    "CUT GREEN BEANS",
+    "CUT GREEN BEANS"
+   ],
+   "gtin14": "00020000110318",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551441",
+    "2631923"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "generalmills",
+    "greengiant"
+   ],
+   "descriptions": [
+    "GREEN GIANT WHITE SHOEPEG CORN, 7 OZ",
+    "WHITE SHOEPEG VACUUM PACKED WHOLE KERNEL CORN, WHITE SHOEPEG"
+   ],
+   "gtin14": "00020000113821",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2526964",
+    "2599604"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "crackerbarrel",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "JALAPENO CHEDDAR CRACKER CUTS CHEESE, JALAPENO CHEDDAR",
+    "JALAPENO CHEDDAR CRACKER CUTS CHEESE WITH JALAPENO PEPPERS, JALAPENO C"
+   ],
+   "gtin14": "00021000007172",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2547034",
+    "2572419"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "kraftheinz",
+    "kraftheinzsaucesfrozen"
+   ],
+   "descriptions": [
+    "RIGATONI PASTA, WHITE MEAT CHICKEN AND BROCCOLI IN A CREAMY BASIL PARM",
+    "MAIN STREET KITCHEN CREAMY RIGATONI WITH CHICKEN & BROCCOLI, 9 OZ, CHI"
+   ],
+   "gtin14": "00021000071784",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "687694",
+    "2594735"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "crackerbarrel",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "MARBLED SHARP CHEDDAR CHEESE CRACKER CUTS, MARBLED SHARP",
+    "MARBLED SHARP CHEDDAR CHEESE CRACKER CUTS, MARBLED SHARP"
+   ],
+   "gtin14": "00021000071852",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2547039",
+    "2599790"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "kraft",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "FOUR CHEESE HOMESTYLE MAC & CHEESE",
+    "FOUR CHEESE DELUXE PASTA & CHEESE SAUCE, FOUR CHEESE"
+   ],
+   "gtin14": "00021000081578",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551442",
+    "2572623"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "kraft",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "ORIGINAL CHEDDAR HOMESTYLE MAC & CHEESE",
+    "ORIGINAL CHEDDAR DELUXE PASTA & CHEESE SAUCE, ORIGINAL CHEDDAR"
+   ],
+   "gtin14": "00021000081585",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2551443",
+    "2572624"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "mariecallenders",
+    "mariecallendersretail"
+   ],
+   "descriptions": [
+    "CREAMY VERMONT MAC & CHEESE BOWL",
+    "CREAMY VERMONT MAC & CHEESE PASTA SMOTHERED IN A SMOOTH & CREAMY VERMO"
+   ],
+   "gtin14": "00021131905545",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2547064",
+    "2675203"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "ciatopochico",
+    "thecocacola"
+   ],
+   "descriptions": [
+    "TOPO CHICO, SPARKLING WATER, LIME",
+    "TWIST OF LIME MINERAL WATER, LIME"
+   ],
+   "gtin14": "00021136120448",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1526642",
+    "2561565"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "mars",
+    "wmwrigleyjr"
+   ],
+   "descriptions": [
+    "SPEARMINT SUGAR FREE GUM, SPEARMINT",
+    "EXTRA SPEARMINT SUGAR FREE CHEWING GUM MULTIPACK"
+   ],
+   "gtin14": "00022000116918",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2141445",
+    "2631438"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "gracekennedyusa",
+    "lafe"
+   ],
+   "descriptions": [
+    "FRENCH CUT GREEN BEANS",
+    "FRENCH CUT GREEN BEANS"
+   ],
+   "gtin14": "00023545041086",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2452987",
+    "2631492"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "gracekennedyusa",
+    "lafe"
+   ],
+   "descriptions": [
+    "STIR FRY VEGETABLES",
+    "LA FE STIR FRY VEGETABLES, 16 OZ"
+   ],
+   "gtin14": "00023545102466",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2412549",
+    "2547070"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heartland",
+    "mckeeoration"
+   ],
+   "descriptions": [
+    "HEARTLAND, GRANOLA, ORIGINAL, ORIGINAL",
+    "ORIGINAL GRANOLA"
+   ],
+   "gtin14": "00024300090011",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1928730",
+    "2527276"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "shorelunch",
+    "southeasternmills"
+   ],
+   "descriptions": [
+    "OVEN STYLE BREADING MIX, OVEN STYLE",
+    "OVEN STYLE BREADING & BATTER MIX"
+   ],
+   "gtin14": "00024739120006",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2367139",
+    "2547072"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "shorelunch",
+    "southeasternmills"
+   ],
+   "descriptions": [
+    "SPICY BUFFALO STYLE BREADING MIX, SPICY BUFFALO STYLE",
+    "SPICY BUFFALO STYLE BREADING & BATTER MIX"
+   ],
+   "gtin14": "00024739150027",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2367140",
+    "2631493"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "buitonifood",
+    "nestleprepareddivision"
+   ],
+   "descriptions": [
+    "MIXED CHEESE TORTELLINI WITH RICOTTA, PARMESAN & ROMANO CHEESES, MIXED",
+    "MIXED CHEESE TORTELLINI PASTA, CHEESE"
+   ],
+   "gtin14": "00024842076504",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "2397295",
+    "2595027"
+   ],
+   "updateLogLinked": false,
+   "verdict": "probable_update_needs_review"
+  },
+  {
+   "brands": [
+    "heinzfrozenfood",
+    "kraftheinz"
+   ],
+   "descriptions": [
+    "LOADED POTATOES WITH ANGUS BEEF & BACON, ANGUS BEEF & BACON",
+    "DEVOUR LOADED CHEESY POTATOES WITH ANGUS BEEF & BACON, 9 OZ"
+   ],
+   "gtin14": "00025155000361",
+   "semanticallyCompatible": true,
+   "sourceRecordIds": [
+    "1658331",
+    "2561994"
    ],
    "updateLogLinked": false,
    "verdict": "probable_update_needs_review"
   }
  ],
- "noGtinProducts": 2528,
- "productVersions": 98206,
- "publishedProducts": 98199,
+ "noGtinProducts": 11818,
+ "productVersions": 443571,
+ "publishedProducts": 434714,
  "search": {
   "brandQueries": {
    "detail": [
     {
-     "brand": "Ahold USA, Inc.",
-     "records": 2271,
-     "top1BrandCorrect": true
-    },
-    {
-     "brand": "Kraft Heinz Foods Company",
-     "records": 1904,
-     "top1BrandCorrect": true
-    },
-    {
-     "brand": "Wegmans Food Markets, Inc.",
-     "records": 1330,
-     "top1BrandCorrect": true
-    },
-    {
-     "brand": "Pepsico Inc.",
-     "records": 1306,
-     "top1BrandCorrect": true
-    },
-    {
      "brand": "The Kroger Co.",
-     "records": 1289,
+     "records": 5668,
      "top1BrandCorrect": true
     },
     {
-     "brand": "Beaver Street Fisheries Inc.",
-     "records": 1276,
+     "brand": "Safeway, Inc.",
+     "records": 5100,
      "top1BrandCorrect": true
     },
     {
-     "brand": "Wal-Mart Stores, Inc.",
-     "records": 1246,
+     "brand": "Supervalu, Inc.",
+     "records": 3584,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Wakefern Food Corporation",
+     "records": 3526,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "GENERAL MILLS SALES INC.",
+     "records": 3330,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Giant Eagle, Inc.",
+     "records": 2620,
+     "top1BrandCorrect": true
+    },
+    {
+     "brand": "Schnuck Markets, Inc.",
+     "records": 2342,
      "top1BrandCorrect": true
     },
     {
      "brand": "Frito-Lay Company",
-     "records": 1231,
+     "records": 2234,
      "top1BrandCorrect": true
     }
    ],
    "top1BrandCorrect": 8,
    "total": 8
   },
-  "corpusSize": 97813,
+  "corpusSize": 119388,
   "falsePositives": 0,
   "misses": [],
   "mrr": 0.981,
@@ -375,59 +2319,289 @@
   }
  },
  "servingUnits": {
-  "g": 84713,
-  "ml": 13496
+  "g": 272207,
+  "grm": 107063,
+  "iu": 1815,
+  "mg": 3695,
+  "ml": 41890,
+  "mlt": 16708
  },
+ "shards": [
+  {
+   "bytes": 7856300,
+   "file": "products-0000.ndjson",
+   "records": 25000,
+   "sha256": "1a19558e2f26782047b8bef8c887cb42277f274fa303aae9584c5ff68b2a03dd"
+  },
+  {
+   "bytes": 7869450,
+   "file": "products-0001.ndjson",
+   "records": 25000,
+   "sha256": "7987c7c22482cbc90b99a6e14c730c25313ba0f2f62f36bbc48b26de47d48662"
+  },
+  {
+   "bytes": 7883989,
+   "file": "products-0002.ndjson",
+   "records": 25000,
+   "sha256": "1fca178a015f1ffce9566fb948c0bed705ce2495d23c6180eedc308e9cb86e55"
+  },
+  {
+   "bytes": 7871387,
+   "file": "products-0003.ndjson",
+   "records": 25000,
+   "sha256": "a374b88c21333530a66bd98f9dbb402ea705fc0501a96255315b2945d9f37b0b"
+  },
+  {
+   "bytes": 7833494,
+   "file": "products-0004.ndjson",
+   "records": 25000,
+   "sha256": "cb9f43a795f4ec62e3836700f67e540fe0ae73c92023346fd6e9960b484d6712"
+  },
+  {
+   "bytes": 7874742,
+   "file": "products-0005.ndjson",
+   "records": 25000,
+   "sha256": "f7a897b05440458583722e4cf4253ee0e833258e8893d6b47c8048080679bf79"
+  },
+  {
+   "bytes": 7860444,
+   "file": "products-0006.ndjson",
+   "records": 25000,
+   "sha256": "c9c558cfadb40037c009fe064559535feb826253e5173ad548c97ffe1526c522"
+  },
+  {
+   "bytes": 7873300,
+   "file": "products-0007.ndjson",
+   "records": 25000,
+   "sha256": "9db1b07fa842da68114e5b96aa76189eda25583258843f524e4728a51bb01457"
+  },
+  {
+   "bytes": 7851754,
+   "file": "products-0008.ndjson",
+   "records": 25000,
+   "sha256": "8aa40f282d407c922703add325b9ad9c9cf05954ad22b4caac4c5062a43debed"
+  },
+  {
+   "bytes": 7833477,
+   "file": "products-0009.ndjson",
+   "records": 25000,
+   "sha256": "c4e189c3c777a4b07ec6cd1db6773633ef96fbbc5c79077771a818c9ac94a404"
+  },
+  {
+   "bytes": 7823412,
+   "file": "products-0010.ndjson",
+   "records": 25000,
+   "sha256": "6db2804868b3adfdb2a1402425a07e1a4082d0f7ab579d8f1a460286c9f9d03f"
+  },
+  {
+   "bytes": 7829629,
+   "file": "products-0011.ndjson",
+   "records": 25000,
+   "sha256": "95f30bbee263df4e54f61f1c36c5d21ec8709426bdbae95dc58c9a5e47754d3c"
+  },
+  {
+   "bytes": 7834218,
+   "file": "products-0012.ndjson",
+   "records": 25000,
+   "sha256": "cf21359e7e1b297dab1f94ed88c449cc9462b66f6fee3ec4d7aebd36154d8eae"
+  },
+  {
+   "bytes": 7833925,
+   "file": "products-0013.ndjson",
+   "records": 25000,
+   "sha256": "bf96014e8bdd4a7a0bb72ac40ae8ceda6c8dd5717f27e4ce1aaba725b7b99a42"
+  },
+  {
+   "bytes": 7844241,
+   "file": "products-0014.ndjson",
+   "records": 25000,
+   "sha256": "cfcfe07012d86e15c8da3c9ab86adb1f926cbc7095fc2db2427cf1931e5250da"
+  },
+  {
+   "bytes": 7839370,
+   "file": "products-0015.ndjson",
+   "records": 25000,
+   "sha256": "da44ede5a63ca29be34de479facd63d278e9fe03959b42484307e996b7a02680"
+  },
+  {
+   "bytes": 7784007,
+   "file": "products-0016.ndjson",
+   "records": 25000,
+   "sha256": "185b9120aa3fb692e25930d28c1c26f8e3ebe100f428e8dae2c19d5114f80f8f"
+  },
+  {
+   "bytes": 2865514,
+   "file": "products-0017.ndjson",
+   "records": 9714,
+   "sha256": "f16ec4ef65bc0c37cbd98b0e645041b170dcc7a15df134c5a9659e3684faf036"
+  },
+  {
+   "bytes": 53386810,
+   "file": "versions-0000.ndjson",
+   "records": 25000,
+   "sha256": "e79b6137eb0d25d3d90be79e190a3c1fba60b4b7cf860d81563fb3f0b6de8245"
+  },
+  {
+   "bytes": 55722174,
+   "file": "versions-0001.ndjson",
+   "records": 25000,
+   "sha256": "be197b6c3461be43ef5335d69ee0118e36ab18593f88a043551724bcea3de677"
+  },
+  {
+   "bytes": 57082729,
+   "file": "versions-0002.ndjson",
+   "records": 25000,
+   "sha256": "9b84c9de1149b6ae0506809fad3b0454a964864cd3d4a7b5ebdb929a73518753"
+  },
+  {
+   "bytes": 55879939,
+   "file": "versions-0003.ndjson",
+   "records": 25000,
+   "sha256": "ec2d6345a2e8531ce6dfb871fbf0342868d875813f2994a32e25ad6dd8c290e0"
+  },
+  {
+   "bytes": 53212972,
+   "file": "versions-0004.ndjson",
+   "records": 25000,
+   "sha256": "0036131f401f005cc4e21ce71df5698f3d9b05e71d4ff731279eea038cfe3d33"
+  },
+  {
+   "bytes": 54667437,
+   "file": "versions-0005.ndjson",
+   "records": 25000,
+   "sha256": "794c0217d68d59c43ac8a83246d2ddde9171b4154295e78daa98b6c8b7f96b2c"
+  },
+  {
+   "bytes": 53765761,
+   "file": "versions-0006.ndjson",
+   "records": 25000,
+   "sha256": "7450909358d7372078356c4158515b870862e9756ddf5ac41187f5e8d0530b8a"
+  },
+  {
+   "bytes": 54576940,
+   "file": "versions-0007.ndjson",
+   "records": 25000,
+   "sha256": "801d036225731ced42f2326777d83cbe8500a6eca65d332d7ec3ca0c40c741dc"
+  },
+  {
+   "bytes": 53105886,
+   "file": "versions-0008.ndjson",
+   "records": 25000,
+   "sha256": "74d4ff84f4c09ad34e3e9fe538edc0bff13d2307b24cf9d8888f4d25e2779684"
+  },
+  {
+   "bytes": 55397154,
+   "file": "versions-0009.ndjson",
+   "records": 25000,
+   "sha256": "57955714ef0d63f58f9bdac76c08580f25097d2f07bedde12d22590cea9731f7"
+  },
+  {
+   "bytes": 54662332,
+   "file": "versions-0010.ndjson",
+   "records": 25000,
+   "sha256": "68aaf411d8bfd77c07835c40fdfa66a1a232ad1e43f01f47e0152b7aa82d0fd7"
+  },
+  {
+   "bytes": 54180447,
+   "file": "versions-0011.ndjson",
+   "records": 25000,
+   "sha256": "16a18e0a2b9a959d179aeb3c20b99ea442c43252e39d26200521ede05820404a"
+  },
+  {
+   "bytes": 54221839,
+   "file": "versions-0012.ndjson",
+   "records": 25000,
+   "sha256": "3426e517c33806315b49d878babc77fc1bf726b4cfce39f08035ec5f391b533a"
+  },
+  {
+   "bytes": 53590668,
+   "file": "versions-0013.ndjson",
+   "records": 25000,
+   "sha256": "64b444fee30d6158480a84fceda39c7eacd43c2dfc1f0411705fcb253fdc5887"
+  },
+  {
+   "bytes": 53876084,
+   "file": "versions-0014.ndjson",
+   "records": 25000,
+   "sha256": "3f8fc2e09537d7890c047231feb6fd176bf98c175e485d2a3de15b8c90f1baaf"
+  },
+  {
+   "bytes": 53302733,
+   "file": "versions-0015.ndjson",
+   "records": 25000,
+   "sha256": "05bdedeb80f1d7c46262111e18b8afc69b2300477a6dcff0381ae99148484992"
+  },
+  {
+   "bytes": 52799740,
+   "file": "versions-0016.ndjson",
+   "records": 25000,
+   "sha256": "642f352bc6a8aca851aefe20c50dff863d87f55002280675925d46debb44e5f8"
+  },
+  {
+   "bytes": 38863854,
+   "file": "versions-0017.ndjson",
+   "records": 18571,
+   "sha256": "144cb12611cff9ed708903719927fae9066e1ddc3b31ca8b50aa5e25c93696b0"
+  }
+ ],
  "source": {
   "archiveBytes": 203831000,
   "archiveSha256": "71e15ee6cbf2c1de2ff4879fc4a00516d4bab81b91334ec2863661e55bd828fc",
   "dataType": "Branded",
-  "ingestionStrategy": "streamed via unzip -p; extracted JSON never materialised",
+  "fullRelease": true,
+  "ingestionStrategy": "streamed via unzip -p into a temporary SQLite build store; products and versions emitted incrementally as NDJSON shards; extracted JSON never materialised",
   "provider": "USDA FoodData Central",
   "release": "April 2026",
-  "windowRecords": 100000
+  "totalRecords": 455458,
+  "windowRecords": null
  },
  "stats": {
-  "discontinued": 387,
-  "distinctGtin": 95661,
-  "duplicateGtinGroups": 20,
-  "ingredientsPresent": 95952,
-  "invalidGtin": 2571,
-  "recordsRead": 100000,
-  "rejectedMissingCore": 1791,
-  "servingGramsAvailable": 84713,
-  "servingVolumeOnly": 13496,
-  "updateLogEdges": 249287,
-  "validGtin": 97429
+  "brokenUpdateEdges": 1311288,
+  "discontinued": 1816,
+  "distinctGtin": 410833,
+  "duplicateGtinGroups": 20345,
+  "ingredientsPresent": 441239,
+  "invalidGtin": 12047,
+  "productVersions": 443571,
+  "publishedProducts": 434714,
+  "recordsRead": 455458,
+  "rejectedMissingCore": 11881,
+  "resolvedUpdateEdges": 0,
+  "servingGramsAvailable": 272205,
+  "servingUnavailable": 112774,
+  "servingVolumeOnly": 58598,
+  "updateCycles": 0,
+  "updateLogEdges": 1311288,
+  "validGtin": 443411
  },
  "topCategories": {
-  "Cakes, Cupcakes, Snack Cakes": 2277,
-  "Candy": 5300,
-  "Cheese": 3085,
-  "Chips, Pretzels & Snacks": 3389,
-  "Chocolate": 2527,
-  "Cookies & Biscuits": 3401,
-  "Fruit & Vegetable Juice, Nectars & Fruit Drinks": 2286,
-  "Ice Cream & Frozen Yogurt": 3559,
-  "Popcorn, Peanuts, Seeds & Related Snacks": 4712,
-  "Snack, Energy & Granola Bars": 2173
+  "Breads & Buns": 10209,
+  "Candy": 22351,
+  "Cheese": 17704,
+  "Chips, Pretzels & Snacks": 12369,
+  "Chocolate": 10614,
+  "Cookies & Biscuits": 13072,
+  "Fruit & Vegetable Juice, Nectars & Fruit Drinks": 8930,
+  "Ice Cream & Frozen Yogurt": 13053,
+  "Pickles, Olives, Peppers & Relishes": 10111,
+  "Popcorn, Peanuts, Seeds & Related Snacks": 21422
  },
  "unmappedNutrientIds": {
-  "1007": 880,
-  "1051": 918,
-  "1072": 324,
-  "1082": 1422,
-  "1084": 1185,
-  "1086": 800,
-  "1098": 904,
-  "1100": 321,
-  "1101": 892,
-  "1103": 635,
-  "1124": 1742,
-  "1158": 97,
-  "1170": 786,
-  "1185": 496,
-  "1186": 1315
+  "1007": 1038,
+  "1082": 4411,
+  "1084": 3763,
+  "1086": 5253,
+  "1098": 4755,
+  "1100": 1931,
+  "1101": 4876,
+  "1103": 3211,
+  "1124": 1827,
+  "1158": 1265,
+  "1170": 6233,
+  "1176": 1324,
+  "1185": 2938,
+  "1186": 10535,
+  "2068": 2055
  },
  "versionPolicy": "branded-version-fingerprint@1.0.0"
 }
