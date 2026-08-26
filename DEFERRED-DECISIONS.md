@@ -218,6 +218,29 @@ gram basis; no density conversion was invented.
 | BR-3 | **Retailer brandOwner ambiguity** — bare "Wal-Mart" matches thousands of products. | Needs brand-vs-retailer modelling. | Branded search polish |
 | BR-4 | **labelNutrients per-serving facts** captured in source but not yet surfaced as label facts on the card. | Card work, not ingestion. | Branded UX |
 
+## From BRANDED FULL-RELEASE CLOSURE (2026-08-25)
+
+**B-1 RESOLVED** — full April 2026 release ingested: 455,458 records →
+434,714 products, 443,571 immutable ProductVersions.
+**B-3 RESOLVED** — GTIN lifecycle validated over 1,311,288 real update edges.
+**B-6 RESOLVED as an ENGINEERING BASELINE** — explicitly not user-validated.
+**BR-1 RESOLVED** — full release, no window.
+**BR-2 REPLACED** — the old 82-conflict figure was a brand-string artifact; the
+adjudicated counts are 8,857 confirmed updates, 10,779 reassignment conflicts,
+709 needs-review.
+**BR-3 RESOLVED** — brandName / subbrandName / brandOwner modelled separately,
+with consumer brand ranked above corporate owner.
+**BR-4 RESOLVED** — labelFacts retained on all 443,571 versions and surfaced
+through the ProductCard contract.
+
+| # | Item | Why deferred | Revisit at |
+|---|---|---|---|
+| BR-5 | **Branded search corpus depth.** 26 scored queries over a bounded 119,388-product slice; a full in-memory token index OOMs. | Needs a disk-backed search index to benchmark the whole catalog. | Search scale milestone |
+| BR-6 | **11,488 conflict / needs-review groups** await human adjudication. None resolves via barcode. | Requires curation tooling and human judgement. | Curation tooling |
+| B-2 | **Volume→gram density.** 31,508+ volume-only servings still have no defensible gram basis. | No approved density source. | Density policy |
+| B-4 | **Package images.** Nothing scraped. | Licensing. | Image sourcing |
+| RC-5 | Recommendation quality — engineering evaluation only. | Needs real users. | Post-pilot |
+
 ## ROADMAP GATE — persistence runtime validation
 
 > **Before any external or user pilot with production-like persistence:**
