@@ -18,7 +18,8 @@ import {
 } from '@macros/persistence';
 import { mintSubjectForTests } from '@macros/domain-auth';
 import {
-  applyResult, dueForSubmission, recoverInFlight, type OutboxEntry,
+  applyResult, dueForSubmission, recoverInFlight,
+  type OutboxEntry, type SubmissionResult,
 } from '@macros/domain-offline-sync';
 import {
   centimetres, grams, instant, kilograms, validateUserProfile, years,
@@ -347,31 +348,35 @@ async function main(): Promise<void> {
     };
     entry = { ...entry, state: 'in_flight' };
 
-    // 1-6. Real HTTP submission with a real Bearer credential.
-    const first = await post(url, started.tokenA, { foodLog: payload });
-    first.status === 200 && first.body['outcome'] === 'appended'
-      ? ok('HTTP submission committed through the real server path')
-      : fail('HTTP submit', `${first.status} ${JSON.stringify(first.body).slice(0, 90)}`);
+    // 1-6. The OUTBOX ENTRY drives the send — not a parallel payload variable.
+    const first = decodeAcceptedFoodLogResponse(
+      await post(url, started.tokenA, { foodLog: entry.payload }), entry.logId);
+    if (first.kind !== 'accepted' || first.outcome !== 'appended') {
+      throw new Error(`first submission returned ${JSON.stringify(first)}`);
+    }
+    ok('HTTP submission committed through the real server path');
 
-    // 7-8. Crash BEFORE applyResult: the entry is still in_flight.
+    // 7-8. CRASH before the ACK: applyResult is deliberately NOT called.
     const recovered = recoverInFlight([entry]);
-    recovered[0]!.state === 'pending'
-      ? ok('crash before ACK recovers to pending')
-      : fail('crash recovery', recovered[0]!.state);
+    if (recovered[0]!.state !== 'pending') {
+      throw new Error(`crash recovery left state ${recovered[0]!.state}`);
+    }
+    ok('crash before ACK recovers to pending');
 
     const due = dueForSubmission(recovered, Date.now(), []);
-    due.length === 1
-      ? ok('exactly one entry is due for resubmission')
-      : fail('dueForSubmission', `${due.length} entries due`);
+    if (due.length !== 1) throw new Error(`${due.length} entries due, expected 1`);
+    ok('exactly one entry is due for resubmission');
 
-    // 9-12. Resend the same entry over HTTP.
-    const retry = await post(url, started.tokenA, { foodLog: payload });
-    retry.body['outcome'] === 'replayed_existing'
-      ? ok('HTTP retry returns replayed_existing')
-      : fail('HTTP retry', String(retry.body['outcome']));
+    // 9-12. Retry from the ACTUAL due entry.
+    const retryEntry = due[0]!;
+    const retry = decodeAcceptedFoodLogResponse(
+      await post(url, started.tokenA, { foodLog: retryEntry.payload }), retryEntry.logId);
+    if (retry.kind !== 'accepted' || retry.outcome !== 'replayed_existing') {
+      throw new Error(`retry returned ${JSON.stringify(retry)}`);
+    }
+    ok('HTTP retry returns replayed_existing');
 
-    const settled = applyResult(recovered[0]!,
-      { kind: 'accepted', outcome: retry.body['outcome'] as never }, Date.now());
+    const settled = applyResult(retryEntry, retry, Date.now());
     settled.state === 'acked' ? ok('outbox settles ACKED via HTTP') : fail('settlement', settled.state);
 
     // 13. Exactly one row.
@@ -382,13 +387,32 @@ async function main(): Promise<void> {
     });
     rows === 1 ? ok('exactly 1 row after HTTP crash + retry') : fail('duplicate via HTTP', String(rows));
 
-    // Conflict over HTTP.
-    const conflict = await post(url, started.tokenA, { foodLog: logFor(USER_A, httpLog, 101) });
-    const conflicted = applyResult(settled,
-      { kind: 'accepted', outcome: conflict.body['outcome'] as never }, Date.now());
-    conflict.body['outcome'] === 'idempotency_conflict' && conflicted.state === 'conflict'
-      ? ok('HTTP conflict settles as conflict, nothing overwritten')
-      : fail('HTTP conflict', `${String(conflict.body['outcome'])}/${conflicted.state}`);
+    // --- Conflict: a SECOND entry carrying the DIFFERENT payload -----------
+    // The response must settle the entry that actually carries that payload;
+    // applying it to the already-ACKED 250-kcal entry proved nothing.
+    const conflictPayload = logFor(USER_A, httpLog, 101);
+    const conflictEntry: OutboxEntry = {
+      userId: conflictPayload.userId, logId: conflictPayload.logId,
+      payload: conflictPayload, state: 'in_flight', attempts: 0, sequence: 2,
+    };
+    const conflict = decodeAcceptedFoodLogResponse(
+      await post(url, started.tokenA, { foodLog: conflictEntry.payload }), conflictEntry.logId);
+    if (conflict.kind !== 'accepted' || conflict.outcome !== 'idempotency_conflict') {
+      throw new Error(`conflict returned ${JSON.stringify(conflict)}`);
+    }
+    const conflicted = applyResult(conflictEntry, conflict, Date.now());
+    conflicted.state === 'conflict'
+      ? ok('conflicting payload settles as conflict on its OWN entry')
+      : fail('conflict settlement', conflicted.state);
+
+    const canonical = await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql) => {
+      const r = await sql.query<{ kcal: string }>(
+        'SELECT kcal::text AS kcal FROM food_logs WHERE log_id = $1', [httpLog]);
+      return Number(r[0]!.kcal);
+    });
+    canonical === 250
+      ? ok('canonical row remains 250 kcal, not 101')
+      : fail('canonical row overwritten', String(canonical));
 
     // --- HTTP authorization adversarial cases ---------------------------
     section('HTTP AUTHORIZATION');
@@ -412,7 +436,7 @@ async function main(): Promise<void> {
       ? ok('malformed payload -> 400, no persistence')
       : fail('malformed payload', String(malformed.status));
 
-    const leak = JSON.stringify(malformed.body) + JSON.stringify(forged.body);
+    const leak = JSON.stringify(malformed.body ?? {}) + JSON.stringify(forged.body ?? {});
     /postgres:\/\/|password|at Object\.|SELECT |pg_/.test(leak)
       ? fail('error leaked SQL, stack or credentials')
       : ok('errors leak no SQL, stack, URL or credential');
@@ -456,6 +480,49 @@ void main();
 // ---------------------------------------------------------------------------
 // Minimal IO helpers. No business logic.
 // ---------------------------------------------------------------------------
+
+/**
+ * STRICT ACCEPTED-RESPONSE DECODER.
+ *
+ * The harness previously did `retry.body['outcome'] as never`, which defeated
+ * the SubmissionResult contract: an `undefined` outcome flowed into
+ * applyResult() and settled as ACKED. applyResult is not defective — it was
+ * handed an impossible typed value.
+ *
+ * A malformed or non-success response is an INTEGRATION FAILURE, never a domain
+ * state. It throws rather than inventing one.
+ */
+function decodeAcceptedFoodLogResponse(
+  response: { status: number; body: unknown },
+  expectedLogId: string,
+): SubmissionResult {
+  if (response.status !== 200) {
+    throw new Error(`unexpected HTTP status ${response.status}`);
+  }
+  const body = response.body;
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+    throw new Error('malformed response body: expected a JSON object');
+  }
+  const record = body as Record<string, unknown>;
+
+  const outcome = record['outcome'];
+  if (typeof outcome !== 'string') throw new Error('missing outcome in response');
+  if (outcome !== 'appended' && outcome !== 'replayed_existing'
+      && outcome !== 'idempotency_conflict') {
+    throw new Error(`unknown outcome "${outcome}"`);
+  }
+
+  const logId = record['logId'];
+  if (typeof logId !== 'string') throw new Error('missing logId in response');
+  // An ACK is only justified for the SAME (userId, logId) being settled — a
+  // valid outcome for another log must never settle this entry.
+  if (logId !== expectedLogId) {
+    throw new Error(`wrong logId: expected ${expectedLogId}, received ${logId}`);
+  }
+
+  // Ordinary narrowing: no cast.
+  return { kind: 'accepted', outcome };
+}
 
 /** Start the REAL MacrosApi with the REAL food-log route on an ephemeral port. */
 async function startApi(pool: PgPoolLike): Promise<{
@@ -520,7 +587,7 @@ async function startApi(pool: PgPoolLike): Promise<{
 
 async function post(
   url: string, token: string | null, body: unknown,
-): Promise<{ status: number; body: Record<string, unknown> }> {
+): Promise<{ status: number; body: unknown }> {
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -529,7 +596,9 @@ async function post(
     },
     body: JSON.stringify(body),
   });
-  let parsed: Record<string, unknown> = {};
-  try { parsed = (await res.json()) as Record<string, unknown>; } catch { /* empty */ }
+  // Parsing JSON produces `unknown`. Claiming Record<string, unknown> here is
+  // how an undefined outcome became an ACK.
+  let parsed: unknown = undefined;
+  try { parsed = await res.json(); } catch { /* body may be empty */ }
   return { status: res.status, body: parsed };
 }

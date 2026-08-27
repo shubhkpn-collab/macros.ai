@@ -61,7 +61,12 @@ export interface FoodLogRow {
   logged_at: string;
   event_timezone: string;
   event_utc_offset_minutes: number;
-  local_date: string;
+  /**
+   * PostgreSQL DATE. The `pg` driver returns it as a JavaScript `Date`, while
+   * fixtures and the domain use the canonical `YYYY-MM-DD` string — so the row
+   * type must admit both and normalize at the boundary.
+   */
+  local_date: string | Date;
   meal_id: string | null;
   /** Correction lineage. Absent on legacy rows written before migration 0004. */
   entry_kind?: string | null;
@@ -127,6 +132,30 @@ export function foodLogToRow(item: FoodLogItem): FoodLogRow {
   };
 }
 
+/**
+ * Normalize a PostgreSQL DATE into the canonical `YYYY-MM-DD` calendar string.
+ *
+ * A DATE has NO timezone. `toISOString().slice(0, 10)` would convert through
+ * UTC first, so a `Date` built from local calendar components can land on the
+ * previous or next day depending on the machine's offset — silently moving a
+ * food log to the wrong day. The local components are read directly instead.
+ *
+ * A string passes through UNCHANGED: `validateFoodLogItem` remains the single
+ * authority on whether a calendar string is well formed, and this must not
+ * become a second local-date policy.
+ */
+export function calendarDateOf(value: string | Date, path: string): string {
+  if (typeof value === 'string') return value;
+
+  if (!(value instanceof Date) || !Number.isFinite(value.getTime())) {
+    throw new Error(`${path}: expected a calendar date, received an invalid Date`);
+  }
+  const year = String(value.getFullYear()).padStart(4, '0');
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const day = String(value.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function rowToFoodLog(row: FoodLogRow): FoodLogItem {
   const capture = obj(row.weight_capture, 'weight_capture') as unknown as WeightCapture;
   const snapshot = obj(row.nutrition_snapshot, 'nutrition_snapshot') as unknown as NutritionSnapshot;
@@ -148,7 +177,7 @@ export function rowToFoodLog(row: FoodLogRow): FoodLogItem {
     loggedAt: instant(isoOf(row.logged_at, 'logged_at')),
     eventTimezone: row.event_timezone,
     eventUtcOffsetMinutes: row.event_utc_offset_minutes,
-    localDate: row.local_date,
+    localDate: calendarDateOf(row.local_date, 'local_date'),
     nutritionCalcVersion: row.nutrition_calc_version,
     status: 'active' as const,
     ...(row.meal_id !== null ? { mealId: row.meal_id } : {}),

@@ -714,3 +714,67 @@ describe('COLUMN SCALE — float artifacts must survive PostgreSQL numeric round
     assert.match(sql, /round\(\(weight_capture ->> 'grams'\)::numeric, 3\)/);
   });
 });
+
+describe('REAL pg DATE boundary — local_date', () => {
+  // The real run failed every FoodLog path with "localDate: must be an ISO
+  // calendar date": the pg driver returns DATE as a JavaScript Date, and the
+  // codec passed it straight through to the domain.
+  const validItem = () => createFoodLogItem({
+    logId: 'date-1', userId: USER_A, productVersion: chicken,
+    weightCapture: capture(200), loggedAt: AT, timezone: TZ,
+  });
+  const baseRow = (): FoodLogRow => foodLogToRow(validItem());
+
+  test('a canonical string passes through unchanged', () => {
+    const row = { ...baseRow(), local_date: '2026-08-26' };
+    assert.equal(rowToFoodLog(row).localDate, '2026-08-26');
+  });
+
+  test('a pg Date is normalized to the LOCAL calendar day', () => {
+    // Built from local components on purpose: toISOString() would convert via
+    // UTC and could move the day, silently relocating a food log.
+    const row = { ...baseRow(), local_date: new Date(2026, 7, 26) };
+    assert.equal(rowToFoodLog(row).localDate, '2026-08-26');
+  });
+
+  test('the local day is preserved regardless of clock time', () => {
+    for (const [h, m] of [[0, 0], [12, 30], [23, 59]] as const) {
+      const row = { ...baseRow(), local_date: new Date(2026, 0, 1, h, m) };
+      assert.equal(rowToFoodLog(row).localDate, '2026-01-01', `${h}:${m}`);
+    }
+  });
+
+  test('month and day are zero-padded', () => {
+    const row = { ...baseRow(), local_date: new Date(2026, 0, 5) };
+    assert.equal(rowToFoodLog(row).localDate, '2026-01-05');
+  });
+
+  test('an invalid Date is rejected LOUDLY, never coerced', () => {
+    const row = { ...baseRow(), local_date: new Date(NaN) };
+    assert.throws(() => rowToFoodLog(row), /local_date/);
+  });
+
+  test('calendarDateOf never routes through UTC', () => {
+    const src = readFileSync('packages/persistence/src/row-codec.ts', 'utf8');
+    const helper = src.slice(src.indexOf('export function calendarDateOf'),
+                             src.indexOf('export function rowToFoodLog'));
+    assert.equal(/toISOString/.test(helper), false,
+      'a DATE has no timezone; UTC conversion can move the calendar day');
+    assert.match(helper, /getFullYear\(\)/);
+    assert.match(helper, /getMonth\(\) \+ 1/);
+    assert.match(helper, /getDate\(\)/);
+  });
+
+  test('a malformed calendar STRING is still rejected downstream', () => {
+    // calendarDateOf deliberately does not judge strings; rowToFoodLog runs the
+    // canonical validator, so validateFoodLogItem stays the single authority on
+    // calendar-string shape and no second local-date policy exists.
+    const row = { ...baseRow(), local_date: '2026-08-26T00:00:00Z' };
+    assert.throws(() => rowToFoodLog(row), /must be an ISO calendar date/);
+  });
+
+  test('the WRITE path still emits the canonical string', () => {
+    assert.equal(typeof foodLogToRow(validItem()).local_date, 'string');
+    assert.match(foodLogToRow(validItem()).local_date as string, /^\d{4}-\d{2}-\d{2}$/);
+  });
+});

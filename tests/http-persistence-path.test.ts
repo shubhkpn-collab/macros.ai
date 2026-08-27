@@ -248,6 +248,10 @@ describe('GAP 2 — RT-8 settles through the REAL HTTP path', () => {
     assert.match(rt8, /replayed_existing/);
     assert.match(rt8, /settled\.state === 'acked'/);
     assert.match(rt8, /exactly 1 row after HTTP crash \+ retry/);
+    // The OUTBOX ENTRY drives every send, not a parallel payload variable.
+    assert.match(rt8, /foodLog: entry\.payload/);
+    assert.match(rt8, /const retryEntry = due\[0\]!/);
+    assert.match(rt8, /foodLog: retryEntry\.payload/);
   });
 
   test('authentication machinery is real even though the provider is fake', () => {
@@ -279,6 +283,49 @@ describe('GAP 2 — RT-8 settles through the REAL HTTP path', () => {
                          'errors leak no SQL, stack, URL or credential']) {
       assert.ok(runner.includes(probe), `missing HTTP probe: ${probe}`);
     }
+  });
+
+  test('no unsafe cast turns an HTTP outcome into a SubmissionResult', () => {
+    // The comment explaining the old defect must not trip the check.
+    const code = runner.replace(/^\s*(\/\/|\*|\/\*).*$/gm, '');
+    assert.equal(/body\['outcome'\] as never/.test(code), false,
+      'an undefined outcome must never be castable into a SubmissionResult');
+    assert.match(runner, /function decodeAcceptedFoodLogResponse/);
+    assert.match(runner, /return \{ kind: 'accepted', outcome \};/,
+      'built by narrowing, not by cast');
+  });
+
+  test('the decoder binds the response to the expected logId', () => {
+    const dec = runner.slice(runner.indexOf('function decodeAcceptedFoodLogResponse'),
+                             runner.indexOf('/** Start the REAL MacrosApi'));
+    assert.match(dec, /response\.status !== 200/);
+    assert.match(dec, /Array\.isArray\(body\)/);
+    assert.match(dec, /unknown outcome/);
+    assert.match(dec, /logId !== expectedLogId/);
+    for (const thrown of ['unexpected HTTP status', 'missing outcome', 'missing logId']) {
+      assert.ok(dec.includes(thrown), `decoder must reject: ${thrown}`);
+    }
+  });
+
+  test('a failed HTTP response cannot continue to ACK', () => {
+    const rt8 = runner.slice(runner.indexOf("section('RT-8"),
+                             runner.indexOf('HTTP AUTHORIZATION'));
+    // Each stage throws on an unexpected outcome rather than falling through.
+    for (const guard of ['first submission returned', 'retry returned', 'conflict returned']) {
+      assert.ok(rt8.includes(guard), `missing fail-fast guard: ${guard}`);
+    }
+  });
+
+  test('the conflict response settles its OWN entry', () => {
+    const rt8 = runner.slice(runner.indexOf("section('RT-8"));
+    assert.match(rt8, /const conflictEntry: OutboxEntry = \{/);
+    assert.match(rt8, /sequence: 2/);
+    assert.match(rt8, /applyResult\(conflictEntry, conflict/);
+    assert.match(rt8, /canonical === 250/);
+  });
+
+  test('post() does not claim an unvalidated body shape', () => {
+    assert.match(runner, /Promise<\{ status: number; body: unknown \}>/);
   });
 
   test('the 32-session repository concurrency proof is retained', () => {
