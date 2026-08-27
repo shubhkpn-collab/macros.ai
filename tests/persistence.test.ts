@@ -20,7 +20,7 @@ import {
   type PersistedLoopRepositories,
   type SqlExecutor,
 } from '@macros/persistence';
-import { createFoodLogItem } from '@macros/domain-food-log';
+import { appendFoodLog, createFoodLogItem, foodLogFingerprint } from '@macros/domain-food-log';
 import {
   grams,
   instant,
@@ -776,5 +776,48 @@ describe('REAL pg DATE boundary — local_date', () => {
   test('the WRITE path still emits the canonical string', () => {
     assert.equal(typeof foodLogToRow(validItem()).local_date, 'string');
     assert.match(foodLogToRow(validItem()).local_date as string, /^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('JSONB ROUND-TRIP — reordered totals must still replay', () => {
+  // The closest deterministic reproduction of what real PostgreSQL exposed:
+  // nutrition_snapshot is JSONB, which makes no promise about key order, so a
+  // read-back returns the same facts with keys in a different order.
+  const item = () => createFoodLogItem({
+    logId: 'jsonb-1', userId: USER_A, productVersion: chicken,
+    weightCapture: capture(200), loggedAt: AT, timezone: TZ,
+  });
+
+  /** Simulates JSONB returning the SAME totals with a different key order. */
+  const reorderSnapshotTotals = (row: FoodLogRow): FoodLogRow => {
+    const snapshot = row.nutrition_snapshot as unknown as Record<string, unknown>;
+    const totals = snapshot['totals'] as Record<string, unknown>;
+    const reordered: Record<string, unknown> = {};
+    for (const k of Object.keys(totals).reverse()) reordered[k] = totals[k];
+    return {
+      ...row,
+      nutrition_snapshot: { ...snapshot, totals: reordered },
+    } as unknown as FoodLogRow;
+  };
+
+  test('a reordered JSONB snapshot fingerprints identically', () => {
+    const original = item();
+    const row = foodLogToRow(original);
+    const roundTripped = rowToFoodLog(reorderSnapshotTotals(row));
+
+    assert.notEqual(
+      JSON.stringify((row.nutrition_snapshot as Record<string, unknown>)['totals']),
+      JSON.stringify(
+        (reorderSnapshotTotals(row).nutrition_snapshot as Record<string, unknown>)['totals']),
+      'the simulation must actually reorder keys',
+    );
+    assert.equal(foodLogFingerprint(original), foodLogFingerprint(roundTripped));
+  });
+
+  test('the round-tripped item REPLAYS rather than conflicting', () => {
+    const original = item();
+    const roundTripped = rowToFoodLog(reorderSnapshotTotals(foodLogToRow(original)));
+    assert.equal(appendFoodLog([original], roundTripped).outcome, 'replayed_existing',
+      'this is exactly the 31 false conflicts the real run produced');
   });
 });

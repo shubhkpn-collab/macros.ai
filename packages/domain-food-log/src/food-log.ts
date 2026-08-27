@@ -109,6 +109,37 @@ export interface AppendResult {
 }
 
 /** The immutable facts that define a log's identity payload. */
+/**
+ * Canonical, ORDER-INDEPENDENT encoding of nutrition totals.
+ *
+ * `JSON.stringify` preserves JavaScript property iteration order, but the
+ * snapshot is persisted as PostgreSQL JSONB, which makes no such promise. A
+ * real round-trip therefore returned the SAME nutrition facts with a different
+ * key order, and an exact replay fingerprinted differently — producing
+ * `idempotency_conflict` where `replayed_existing` was correct.
+ *
+ * Reading explicit scalars into a fixed-position array removes the dependency
+ * entirely: the encoding is derived from the VALUES, never from the object.
+ *
+ * MISSING IS NOT ZERO. An absent optional nutrient encodes as `null` and a
+ * measured zero as `0`, so "we have no fiber figure" never collapses into
+ * "this food contains no fiber" — the same distinction the nutrition domain
+ * enforces everywhere else.
+ */
+function canonicalNutritionTotals(totals: NutritionTotals): readonly (number | null)[] {
+  return [
+    totals.kcal,
+    totals.proteinG,
+    totals.carbohydrateG,
+    totals.fatG,
+    totals.fiberG ?? null,
+    totals.sugarG ?? null,
+    totals.sodiumMg ?? null,
+    totals.saturatedFatG ?? null,
+    totals.alcoholG ?? null,
+  ];
+}
+
 export function foodLogFingerprint(item: FoodLogItem): string {
   return JSON.stringify({
     userId: item.userId,
@@ -120,7 +151,7 @@ export function foodLogFingerprint(item: FoodLogItem): string {
     eventTimezone: item.eventTimezone,
     eventUtcOffsetMinutes: item.eventUtcOffsetMinutes,
     nutritionCalcVersion: item.nutritionCalcVersion,
-    totals: item.nutritionSnapshot.totals,
+    totals: canonicalNutritionTotals(item.nutritionSnapshot.totals),
     weightSource: item.weightCapture.source,
     weightGrams: item.weightCapture.grams,
   });

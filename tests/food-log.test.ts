@@ -4,6 +4,7 @@ import {
   aggregateDailyIntake,
   appendFoodLog,
   createFoodLogItem,
+  foodLogFingerprint,
   localDayOf,
   utcOffsetMinutes,
 } from '@macros/domain-food-log';
@@ -428,5 +429,122 @@ describe('GOLDEN — the complete deterministic vertical slice', () => {
     assert.equal(r.localDate, '2026-08-11');
     assert.equal(r.item.eventTimezone, TZ);
     assert.equal(r.item.eventUtcOffsetMinutes, -300);
+  });
+});
+
+describe('FOOD-LOG FINGERPRINT — canonical and order-independent', () => {
+  // The real PostgreSQL run exposed this: the snapshot is stored as JSONB,
+  // which makes no promise about key order, so an EXACT replay came back with
+  // reordered totals and fingerprinted differently — 31 false
+  // idempotency_conflicts where replayed_existing was correct.
+  const base = (): FoodLogItem => createFoodLogItem({
+    logId: 'fp-1', userId: USER_A, productVersion: CHICKEN_BREAST_COOKED_V1,
+    weightCapture: manualCapture(200, instant('2026-08-26T12:00:00.000Z')),
+    loggedAt: instant('2026-08-26T12:00:00.000Z'), timezone: 'America/Chicago',
+  });
+
+  /** Rebuilds totals with a deliberately different property order. */
+  const reorderTotals = (item: FoodLogItem, keys: readonly string[]): FoodLogItem => {
+    const totals = item.nutritionSnapshot.totals as unknown as Record<string, unknown>;
+    const shuffled: Record<string, unknown> = {};
+    for (const k of keys) if (k in totals) shuffled[k] = totals[k];
+    for (const k of Object.keys(totals)) if (!(k in shuffled)) shuffled[k] = totals[k];
+    return {
+      ...item,
+      nutritionSnapshot: { ...item.nutritionSnapshot, totals: shuffled },
+    } as unknown as FoodLogItem;
+  };
+
+  test('REGRESSION 1: reordered core totals fingerprint identically', () => {
+    const a = base();
+    const b = reorderTotals(a, ['fatG', 'carbohydrateG', 'proteinG', 'kcal']);
+
+    // The objects really do differ in key order...
+    assert.notEqual(
+      JSON.stringify(a.nutritionSnapshot.totals),
+      JSON.stringify(b.nutritionSnapshot.totals),
+      'the fixture must actually reorder keys, or the test proves nothing',
+    );
+    // ...but they are the same nutrition facts.
+    assert.equal(foodLogFingerprint(a), foodLogFingerprint(b));
+  });
+
+  test('REGRESSION 1: an exact replay with reordered totals is REPLAYED, not conflict', () => {
+    const a = base();
+    const b = reorderTotals(a, ['fatG', 'carbohydrateG', 'proteinG', 'kcal']);
+    assert.equal(appendFoodLog([a], b).outcome, 'replayed_existing');
+  });
+
+  test('REGRESSION 3: a REAL nutrition change still conflicts', () => {
+    const a = base();
+    const changed = {
+      ...a,
+      nutritionSnapshot: {
+        ...a.nutritionSnapshot,
+        totals: { ...a.nutritionSnapshot.totals, kcal: a.nutritionSnapshot.totals.kcal + 1 },
+      },
+    } as unknown as FoodLogItem;
+
+    assert.notEqual(foodLogFingerprint(a), foodLogFingerprint(changed));
+    assert.equal(appendFoodLog([a], changed).outcome, 'idempotency_conflict',
+      'canonicalisation must not weaken conflict detection');
+  });
+
+  test('REGRESSION 4: optional nutrient ORDER cannot affect equality', () => {
+    const withOptional = (order: readonly string[]): FoodLogItem => {
+      const a = base();
+      const totals: Record<string, unknown> = {};
+      const source: Record<string, unknown> = {
+        ...(a.nutritionSnapshot.totals as unknown as Record<string, unknown>),
+        fiberG: 3, sugarG: 1, sodiumMg: 90, saturatedFatG: 0.8, alcoholG: 0,
+      };
+      for (const k of order) if (k in source) totals[k] = source[k];
+      for (const k of Object.keys(source)) if (!(k in totals)) totals[k] = source[k];
+      return { ...a, nutritionSnapshot: { ...a.nutritionSnapshot, totals } } as unknown as FoodLogItem;
+    };
+
+    const one = withOptional(['alcoholG', 'sodiumMg', 'fiberG', 'kcal', 'sugarG']);
+    const two = withOptional(['kcal', 'fiberG', 'saturatedFatG', 'sugarG', 'sodiumMg']);
+    assert.notEqual(
+      JSON.stringify(one.nutritionSnapshot.totals),
+      JSON.stringify(two.nutritionSnapshot.totals),
+    );
+    assert.equal(foodLogFingerprint(one), foodLogFingerprint(two));
+    assert.equal(appendFoodLog([one], two).outcome, 'replayed_existing');
+  });
+
+  test('REGRESSION 4: MISSING is not ZERO', () => {
+    const a = base();
+    const absent = a;  // createFoodLogItem omits fiber for this product
+    const zero = {
+      ...a,
+      nutritionSnapshot: {
+        ...a.nutritionSnapshot,
+        totals: { ...a.nutritionSnapshot.totals, fiberG: 0 },
+      },
+    } as unknown as FoodLogItem;
+
+    assert.equal('fiberG' in (absent.nutritionSnapshot.totals as object), false,
+      'the fixture must genuinely omit fiber');
+    assert.notEqual(foodLogFingerprint(absent), foodLogFingerprint(zero),
+      '"no figure" must never collapse into "contains none"');
+    assert.equal(appendFoodLog([absent], zero).outcome, 'idempotency_conflict');
+  });
+
+  test('all nine NutritionTotals fields participate', () => {
+    const a = base();
+    const fields = ['kcal', 'proteinG', 'carbohydrateG', 'fatG',
+                    'fiberG', 'sugarG', 'sodiumMg', 'saturatedFatG', 'alcoholG'] as const;
+    for (const field of fields) {
+      const totals = {
+        ...(a.nutritionSnapshot.totals as unknown as Record<string, unknown>),
+      };
+      totals[field] = typeof totals[field] === 'number' ? (totals[field] as number) + 1 : 1;
+      const mutated = {
+        ...a, nutritionSnapshot: { ...a.nutritionSnapshot, totals },
+      } as unknown as FoodLogItem;
+      assert.notEqual(foodLogFingerprint(a), foodLogFingerprint(mutated),
+        `${field} must affect the fingerprint`);
+    }
   });
 });
