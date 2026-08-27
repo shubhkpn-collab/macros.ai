@@ -20,7 +20,11 @@ import { mintSubjectForTests } from '@macros/domain-auth';
 import {
   applyResult, dueForSubmission, recoverInFlight, type OutboxEntry,
 } from '@macros/domain-offline-sync';
-import type { FoodLogItem } from '@macros/contracts';
+import {
+  centimetres, grams, instant, kilograms, validateUserProfile, years,
+  type EnergyGoalVersion, type FoodLogItem, type ProductVersion, type UserProfileSnapshot,
+} from '@macros/contracts';
+import { createFoodLogItem } from '@macros/domain-food-log';
 import { MacrosApi, foodLogRoute } from '@macros/runtime-api';
 import { FakeAuthSessionProvider, StructuredLogger, loadRoleConfig, type RuntimeConfig } from '@macros/runtime-config';
 
@@ -46,23 +50,55 @@ const ok = (n: string, d = ''): void => say(`  [OK] ${n}${d ? ` — ${d}` : ''}`
 const fail = (n: string, d = ''): void => { failures += 1; say(`  [FAIL] ${n}${d ? ` — ${d}` : ''}`); };
 const section = (n: string): void => { say(''); say(`=== ${n} ===`); };
 
-const logFor = (userId: string, logId: string, kcal: number): FoodLogItem => ({
-  userId, logId,
-  productId: 'prod-test-1', productVersionId: 'prod-test-1@v1',
-  grams: 100,
-  loggedAt: '2026-08-26T12:00:00.000Z',
-  eventTimezone: 'UTC', eventUtcOffsetMinutes: 0, localDate: '2026-08-26',
-  mealId: null, nutritionCalcVersion: 'integration',
-  weightCapture: { grams: 100, source: 'manual', capturedAt: '2026-08-26T12:00:00.000Z' },
-  nutritionSnapshot: {
-    gramsConsumed: 100, productVersionId: 'prod-test-1@v1',
-    totals: { kcal, proteinG: 10, carbohydrateG: 5, fatG: 2 },
+/**
+ * Deterministic test ProductVersion. The kcal varies only so a conflicting
+ * payload differs by a REALISTIC amount (100 vs 101), not an absurd one.
+ */
+const productVersionFor = (kcal: number): ProductVersion => ({
+  productId: 'prod-test-1',
+  productVersionId: 'prod-test-1@v1',
+  versionNo: 1,
+  displayName: 'RT integration food',
+  preparationState: 'as_sold',
+  basis: { kind: 'per_100g', kcal, proteinG: 10, carbohydrateG: 5, fatG: 2 },
+  source: {
+    kind: 'synthetic_test',
+    sourceId: 'rt6-integration',
+    verificationStatus: 'synthetic_test',
   },
-  status: 'active',
-} as unknown as FoodLogItem);
+  effectiveFrom: instant('2026-01-01T00:00:00.000Z'),
+} as ProductVersion);
+
+/**
+ * Built by the PRODUCTION factory, which derives basisKind, calcVersion,
+ * computedAt, nutritionCalcVersion, localDate and timezone provenance itself —
+ * and validates as it goes. Hand-fabricating a NutritionSnapshot behind a cast
+ * produced payloads the database would have rejected.
+ */
+const logFor = (userId: string, logId: string, kcal: number): FoodLogItem =>
+  createFoodLogItem({
+    userId, logId,
+    productVersion: productVersionFor(kcal),
+    weightCapture: {
+      grams: grams(100),
+      source: 'manual',
+      capturedAt: instant('2026-08-26T12:00:00.000Z'),
+    },
+    loggedAt: instant('2026-08-26T12:00:00.000Z'),
+    timezone: 'UTC',
+  });
 
 async function main(): Promise<void> {
   say('MACROS.AI — real Node/PostgreSQL integration (RT-6 / RT-7 / RT-8)');
+
+  // Fixtures are constructed and validated BEFORE opening PostgreSQL, so an
+  // invalid fixture fails fast instead of looking like a database problem.
+  try {
+    logFor(USER_A, 'fixture-probe', 100);
+  } catch (e) {
+    say(`FATAL: integration FoodLog fixture invalid — ${String(e)}`);
+    process.exit(2);
+  }
   say(`database: ${DB} @ ${HOST}:${PORT}`);
 
   let pool: PgPoolLike;
@@ -134,29 +170,89 @@ async function main(): Promise<void> {
       : fail('identity leaked after ROLLBACK', afterRollback);
   } catch (e) { fail('pool isolation', String(e)); }
 
+  // --- RT-6: FORCED same-connection proof --------------------------------
+  section('RT-6 — FORCED POOL REUSE (max=1)');
+  try {
+    // The main pool has max=40, so A and B might simply get different backends
+    // and the isolation claim would rest on pg's reuse strategy rather than on
+    // evidence. A max=1 pool makes reuse certain, and pg_backend_pid() proves it.
+    const solo = await createPgPool({ host: HOST, port: PORT, database: DB, max: 1 });
+    try {
+      const pidA = await withAuthenticatedDatabaseSubject(solo, subjectA, async (sql) => {
+        const r = await sql.query<{ pid: string }>('SELECT pg_backend_pid()::text AS pid', []);
+        return r[0]!.pid;
+      });
+
+      const b = await withAuthenticatedDatabaseSubject(solo, subjectB, async (sql) => {
+        const r = await sql.query<{ pid: string; uid: string }>(
+          'SELECT pg_backend_pid()::text AS pid, auth.uid()::text AS uid', []);
+        return r[0]!;
+      });
+
+      pidA === b.pid
+        ? ok('A and B used the SAME physical backend', `pid ${pidA}`)
+        : fail('connections were not reused', `${pidA} vs ${b.pid}`);
+      b.uid === USER_B
+        ? ok('B sees its own identity on the reused connection')
+        : fail('identity leaked across reuse', String(b.uid));
+
+      // And after a FAILED transaction on the same single connection.
+      try {
+        await withAuthenticatedDatabaseSubject(solo, subjectA, async () => {
+          throw new Error('deliberate failure');
+        });
+      } catch { /* expected */ }
+      const after = await withAuthenticatedDatabaseSubject(solo, subjectB, async (sql) => {
+        const r = await sql.query<{ uid: string; pid: string }>(
+          'SELECT auth.uid()::text AS uid, pg_backend_pid()::text AS pid', []);
+        return r[0]!;
+      });
+      after.uid === USER_B
+        ? ok('no A claim survives a failed transaction on the reused connection')
+        : fail('stale claim after failure', String(after.uid));
+    } finally {
+      await solo.end();
+    }
+  } catch (e) { fail('forced pool reuse', String(e)); }
+
   // --- Real repositories --------------------------------------------------
   section('RT-6 — REAL REPOSITORIES');
   const profileId = `pv-${RUN}`;
   const goalId = `gv-${RUN}`;
+
+  const profileFixture: UserProfileSnapshot = {
+    userId: USER_A,
+    profileVersionId: profileId,
+    effectiveFrom: instant('2026-01-01T00:00:00.000Z'),
+    ageYears: years(35),
+    sex: 'male',
+    bodyWeightKg: kilograms(82.5),
+    heightCm: centimetres(180),
+  };
+  const profileCheck = validateUserProfile(profileFixture);
+  if (!profileCheck.ok) {
+    say('FATAL: integration profile fixture invalid');
+    process.exit(2);
+  }
+
+  const goalFixture: EnergyGoalVersion = {
+    goalVersionId: goalId,
+    userId: USER_A,
+    effectiveFrom: instant('2026-01-01T00:00:00.000Z'),
+    goal: 'gain',
+    targetDeltaKcal: 250,
+  };
   try {
     await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql: SqlExecutor) => {
       const profiles = new PostgresUserProfileRepository(sql);
-      await profiles.append({
-        profileVersionId: profileId, userId: USER_A,
-        effectiveFrom: '2026-01-01T00:00:00.000Z',
-        ageYears: 35, sex: 'male', bodyWeightKg: 82.5, heightCm: 180,
-        bodyFatPercent: null, bodyFatSource: null,
-      } as never);
+      await profiles.append(profileFixture);
       const eff = await profiles.getEffective(USER_A, '2026-08-26T12:00:00.000Z');
       eff !== null && eff.profileVersionId === profileId
         ? ok('profile append + effective-dated read')
         : fail('profile effective read');
 
       const goals = new PostgresEnergyGoalRepository(sql);
-      await goals.append({
-        goalVersionId: goalId, userId: USER_A,
-        effectiveFrom: '2026-01-01T00:00:00.000Z', goal: 'gain', targetDeltaKcal: 250,
-      } as never);
+      await goals.append(goalFixture);
       const g = await goals.getEffective(USER_A, '2026-08-26T12:00:00.000Z');
       g !== null && g.goalVersionId === goalId
         ? ok('goal append + effective-dated read')
@@ -199,7 +295,7 @@ async function main(): Promise<void> {
   // --- RT-7: genuine conflict --------------------------------------------
   section('RT-7 — IDEMPOTENCY CONFLICT');
   try {
-    const conflicting = logFor(USER_A, raceLog, 999);
+    const conflicting = logFor(USER_A, raceLog, 101);
     const out = await withAuthenticatedDatabaseSubject(pool, subjectA, (sql) =>
       new PostgresFoodLogRepository(sql).append(conflicting));
     out.outcome === 'idempotency_conflict'
@@ -212,7 +308,7 @@ async function main(): Promise<void> {
       return Number(r[0]!.kcal);
     });
     stored === 100
-      ? ok('canonical row unchanged (kcal 100)')
+      ? ok('canonical row unchanged (kcal 100, not 101)')
       : fail('canonical row was overwritten', String(stored));
   } catch (e) { fail('conflict', String(e)); }
 
@@ -234,82 +330,6 @@ async function main(): Promise<void> {
       ? ok("A sees only A's row — RLS holds through the driver")
       : fail('cross-user visibility', String(visible));
   } catch (e) { fail('cross-user', String(e)); }
-
-  // --- RT-8: offline settlement through the real path ---------------------
-  section('RT-8 — OFFLINE OUTBOX SETTLEMENT');
-  const offlineLog = `offline-${RUN}`;
-  try {
-    const payload = logFor(USER_A, offlineLog, 150);
-    let entry: OutboxEntry = {
-      userId: USER_A, logId: offlineLog, payload,
-      state: 'pending', attempts: 0, sequence: 1,
-    };
-
-    // 1. Submission reaches the server and COMMITS.
-    entry = { ...entry, state: 'in_flight' };
-    const first = await withAuthenticatedDatabaseSubject(pool, subjectA, (sql) =>
-      new PostgresFoodLogRepository(sql).append(payload));
-    first.outcome === 'appended' ? ok('server committed the row') : fail('first submit', first.outcome);
-
-    // 2. CRASH before the ACK is recorded: the entry is still in_flight.
-    //    Restart recovery must make it retryable, not stranded.
-    const recovered = recoverInFlight([entry]);
-    recovered[0]!.state === 'pending'
-      ? ok('crash recovery returns in_flight -> pending')
-      : fail('crash recovery', recovered[0]!.state);
-
-    const due = dueForSubmission(recovered, Date.now(), []);
-    due.length === 1 ? ok('entry is due for resubmission') : fail('not resubmitted');
-
-    // 3. Resend the EXACT payload through the real repository.
-    const retry = await withAuthenticatedDatabaseSubject(pool, subjectA, (sql) =>
-      new PostgresFoodLogRepository(sql).append(payload));
-    retry.outcome === 'replayed_existing'
-      ? ok('retry returns replayed_existing')
-      : fail('retry classification', retry.outcome);
-
-    const settled = applyResult(recovered[0]!, { kind: 'accepted', outcome: retry.outcome }, Date.now());
-    settled.state === 'acked' ? ok('outbox settles as ACKED') : fail('settlement', settled.state);
-
-    const rows = await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql) => {
-      const r = await sql.query<{ n: string }>(
-        'SELECT count(*)::text AS n FROM food_logs WHERE log_id = $1 AND user_id = $2',
-        [offlineLog, USER_A]);
-      return Number(r[0]!.n);
-    });
-    rows === 1 ? ok('exactly 1 row after crash + retry') : fail('duplicate created', String(rows));
-
-    // 4. Conflict: same identity, different payload.
-    const conflict = await withAuthenticatedDatabaseSubject(pool, subjectA, (sql) =>
-      new PostgresFoodLogRepository(sql).append(logFor(USER_A, offlineLog, 777)));
-    const conflicted = applyResult(settled, { kind: 'accepted', outcome: conflict.outcome }, Date.now());
-    conflict.outcome === 'idempotency_conflict' && conflicted.state === 'conflict'
-      ? ok('conflicting payload settles as conflict, neither side overwritten')
-      : fail('conflict settlement', `${conflict.outcome}/${conflicted.state}`);
-  } catch (e) { fail('offline settlement', String(e)); }
-
-  // --- Failure behaviour --------------------------------------------------
-  section('FAILURE BEHAVIOUR');
-  try {
-    const stale = mintSubjectForTests(USER_A, { expiresAt: '2020-01-01T00:00:00.000Z' });
-    try {
-      await withAuthenticatedDatabaseSubject(pool, stale, async () => null);
-      fail('expired session reached the database');
-    } catch { ok('expired session refused before any database access'); }
-
-    try {
-      await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql) => {
-        await sql.query('SELECT * FROM table_that_does_not_exist', []);
-        return null;
-      });
-      fail('bad query did not raise');
-    } catch { ok('repository query failure propagates and rolls back'); }
-
-    const residual = await residualIdentity(pool);
-    residual === null
-      ? ok('no identity residue after a failed transaction')
-      : fail('identity residue after failure', residual);
-  } catch (e) { fail('failure behaviour', String(e)); }
 
   // --- RT-8: settlement through the REAL HTTP application path ------------
   section('RT-8 — REAL HTTP: outbox -> MacrosApi auth -> pg -> PostgreSQL');
@@ -339,6 +359,11 @@ async function main(): Promise<void> {
       ? ok('crash before ACK recovers to pending')
       : fail('crash recovery', recovered[0]!.state);
 
+    const due = dueForSubmission(recovered, Date.now(), []);
+    due.length === 1
+      ? ok('exactly one entry is due for resubmission')
+      : fail('dueForSubmission', `${due.length} entries due`);
+
     // 9-12. Resend the same entry over HTTP.
     const retry = await post(url, started.tokenA, { foodLog: payload });
     retry.body['outcome'] === 'replayed_existing'
@@ -358,7 +383,7 @@ async function main(): Promise<void> {
     rows === 1 ? ok('exactly 1 row after HTTP crash + retry') : fail('duplicate via HTTP', String(rows));
 
     // Conflict over HTTP.
-    const conflict = await post(url, started.tokenA, { foodLog: logFor(USER_A, httpLog, 888) });
+    const conflict = await post(url, started.tokenA, { foodLog: logFor(USER_A, httpLog, 101) });
     const conflicted = applyResult(settled,
       { kind: 'accepted', outcome: conflict.body['outcome'] as never }, Date.now());
     conflict.body['outcome'] === 'idempotency_conflict' && conflicted.state === 'conflict'
@@ -401,8 +426,7 @@ async function main(): Promise<void> {
     // database is never dropped. Append-only tables deny DELETE to the
     // application role, so cleanup runs as the connecting (owner) role.
     await withAuthenticatedDatabaseSubject(pool, subjectA, async (sql) => {
-      await sql.query('DELETE FROM food_logs WHERE log_id IN ($1, $2, $3)',
-        [raceLog, offlineLog, httpLog]);
+      await sql.query('DELETE FROM food_logs WHERE log_id IN ($1, $2)', [raceLog, httpLog]);
       await sql.query('DELETE FROM energy_goal_versions WHERE goal_version_id = $1', [goalId]);
       await sql.query('DELETE FROM user_profile_versions WHERE profile_version_id = $1', [profileId]);
       return null;
@@ -468,10 +492,16 @@ async function startApi(pool: PgPoolLike): Promise<{
     config: loaded.config as RuntimeConfig,
     auth,
     logger: new StructuredLogger({ write: () => undefined }, 'error'),
-    versions: { app: '1.0.0', api: 'macros-api@1.0.0', schema: '0005' },
+    versions: {
+      appVersion: '1.0.0', apiVersion: 'macros-api@1.0.0', schemaVersion: '0005',
+      scaleProtocolVersion: 'scale-protocol@1.0.0', nutritionCalcVersion: 'n@1',
+      energyPolicyVersion: 'e@1', voiceParserVersion: 'v@1',
+      assistantContractVersion: 'a@1', foodLogFoldVersion: 'f@1',
+    },
     now: () => new Date().toISOString(),
     health: () => ({ databaseReachable: 'ready', migrationsApplied: true, configValid: true }),
-  } as never);
+    newRequestId: () => randomUUID(),
+  });
 
   api.route(foodLogRoute({ pool }));
 

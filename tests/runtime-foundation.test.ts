@@ -422,6 +422,16 @@ describe('B14 — real HTTP boundary (executed against a live server)', () => {
       schema: { query: { type: 'string', required: true, maxLength: 120 }, userId: { type: 'uuid' } },
       handler: (ctx) => Promise.resolve({ user: ctx.userId, query: ctx.body['query'] }),
     });
+    // Decode-only route: no schema. Before the parse fix this handler received
+    // `{}` and never saw the submitted payload.
+    api.route({
+      method: 'POST', path: '/decode-only',
+      decode: (body) => ({ echoed: body['value'] }),
+      handler: (ctx) => Promise.resolve({
+        decoded: (ctx.body as { decoded?: { echoed?: unknown } }).decoded?.echoed ?? null,
+        sawValue: ctx.body['value'] ?? null,
+      }),
+    });
     api.route({
       method: 'POST', path: '/boom',
       schema: {},
@@ -437,6 +447,52 @@ describe('B14 — real HTTP boundary (executed against a live server)', () => {
       await new Promise<void>((r) => server.close(() => r()));
     }
   }
+
+  describe('decode-only routes receive the parsed body', () => {
+    const post = async (base: string, path: string, raw: string) =>
+      fetch(`${base}${path}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: 'Bearer good-token' },
+        body: raw,
+      });
+
+    test('a decode-only route sees the submitted object', async () => {
+      await withServer(async (base) => {
+        const res = await post(base, '/decode-only', JSON.stringify({ value: 'submitted' }));
+        assert.equal(res.status, 200);
+        const body = (await res.json()) as Record<string, unknown>;
+        assert.equal(body['sawValue'], 'submitted', 'the raw body reached the handler');
+        assert.equal(body['decoded'], 'submitted', 'the decoder received it too');
+      });
+    });
+
+    test('malformed JSON is a 400', async () => {
+      await withServer(async (base) => {
+        const res = await post(base, '/decode-only', '{not json');
+        assert.equal(res.status, 400);
+      });
+    });
+
+    for (const [label, raw] of [
+      ['array', '[1,2,3]'], ['string', '"hello"'], ['number', '42'], ['boolean', 'true'],
+    ] as const) {
+      test(`a JSON ${label} body is a 400`, async () => {
+        await withServer(async (base) => {
+          const res = await post(base, '/decode-only', raw);
+          assert.equal(res.status, 400, `${label} must not be accepted as a body`);
+        });
+      });
+    }
+
+    test('schema routes are unaffected', async () => {
+      await withServer(async (base) => {
+        const res = await post(base, '/food/search', JSON.stringify({ query: 'oats' }));
+        assert.equal(res.status, 200);
+        const body = (await res.json()) as Record<string, unknown>;
+        assert.equal(body['query'], 'oats');
+      });
+    });
+  });
 
   const post = (base: string, path: string, body: unknown, token?: string) =>
     fetch(`${base}${path}`, {
@@ -679,4 +735,7 @@ describe('A6 — migration checksums are SHA-256', () => {
       assert.match(checksumOf(readFileSync(join(dir, name), 'utf8')), /^[0-9a-f]{64}$/, name);
     }
   });
+
+
 });
+

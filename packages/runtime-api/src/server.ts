@@ -117,12 +117,26 @@ export class MacrosApi {
       if (isAppError(raw)) { this.fail(res, raw, requestId); return; }
 
       let body: Record<string, unknown> = {};
-      if (route.schema !== undefined) {
+      // Parse ONCE for either gate. Keying only on `schema` meant a
+      // decode-only route received `{}` and never saw the submitted payload.
+      if (route.schema !== undefined || route.decode !== undefined) {
         const parsed = this.parseJson(raw);
         if (isAppError(parsed)) { this.fail(res, parsed, requestId); return; }
-        const validated = validateBody(parsed, route.schema);
-        if (!validated.ok) { this.fail(res, validated.error, requestId); return; }
-        body = validated.value;
+
+        // A JSON array, string, number or boolean is not a request body.
+        if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+          this.fail(res, appError('validation', 'invalid_body',
+            'Request body must be a JSON object.'), requestId);
+          return;
+        }
+
+        if (route.schema !== undefined) {
+          const validated = validateBody(parsed, route.schema);
+          if (!validated.ok) { this.fail(res, validated.error, requestId); return; }
+          body = validated.value;
+        } else {
+          body = parsed as Record<string, unknown>;
+        }
       }
 
       let userId = '';

@@ -244,6 +244,7 @@ describe('GAP 2 — RT-8 settles through the REAL HTTP path', () => {
   test('RT-8 submits over HTTP, not straight into the repository', () => {
     const rt8 = runner.slice(runner.indexOf('RT-8 — REAL HTTP'));
     assert.match(rt8, /await post\(url, started\.tokenA/);
+    assert.match(rt8, /dueForSubmission\(recovered/, 'the outbox state machine must be exercised');
     assert.match(rt8, /replayed_existing/);
     assert.match(rt8, /settled\.state === 'acked'/);
     assert.match(rt8, /exactly 1 row after HTTP crash \+ retry/);
@@ -284,5 +285,53 @@ describe('GAP 2 — RT-8 settles through the REAL HTTP path', () => {
     assert.match(runner, /counts\['appended'\] === 1/);
     assert.match(runner, /counts\['replayed_existing'\] === 31/);
     assert.match(runner, /PostgresFoodLogRepository\(sql\)\.append\(item\)/);
+  });
+});
+
+describe('FIX 5 — RT-8 evidence is single and complete', () => {
+  const runner = readFileSync(
+    repoPath('tools', 'postgres-integration', 'run-integration.ts'), 'utf8');
+
+  test('the repository-only RT-8 block is gone', () => {
+    // The HTTP path supersedes it; duplicate evidence invites divergence.
+    assert.equal(runner.includes('OFFLINE OUTBOX SETTLEMENT'), false);
+    assert.equal((runner.match(/section\('RT-8/g) ?? []).length, 1,
+      'exactly one RT-8 section');
+  });
+
+  test('RT-8 exercises the full outbox state machine', () => {
+    const rt8 = runner.slice(runner.indexOf("section('RT-8"));
+    for (const step of ['recoverInFlight', 'dueForSubmission', 'applyResult',
+                        "settled.state === 'acked'"]) {
+      assert.ok(rt8.includes(step), `missing state-machine step: ${step}`);
+    }
+  });
+
+  test('pool reuse is FORCED, not assumed', () => {
+    // With max=40 the isolation claim would rest on pg's reuse strategy.
+    assert.match(runner, /max: 1 \}\)/);
+    assert.match(runner, /pg_backend_pid/);
+    assert.match(runner, /pidA === b\.pid/);
+  });
+
+  test('fixtures use the production factory, not hand-built snapshots', () => {
+    assert.match(runner, /createFoodLogItem\(\{/);
+    assert.equal(runner.includes('as unknown as FoodLogItem'), false);
+    assert.equal(/nutritionSnapshot: \{/.test(runner), false,
+      'no hand-fabricated NutritionSnapshot');
+    assert.equal(/mealId: null/.test(runner), false, 'mealId must not be supplied');
+    assert.match(runner, /validateUserProfile\(profileFixture\)/);
+  });
+
+  test('conflicting payloads differ realistically', () => {
+    assert.match(runner, /logFor\(USER_A, raceLog, 101\)/);
+    assert.equal(/, 777\)|, 888\)|, 999\)/.test(runner), false);
+  });
+
+  test('MacrosApi is constructed against the real type', () => {
+    assert.match(runner, /newRequestId: \(\) => randomUUID\(\)/);
+    const construction = runner.slice(runner.indexOf('new MacrosApi('),
+                                      runner.indexOf('api.route('));
+    assert.equal(construction.includes('as never'), false);
   });
 });
