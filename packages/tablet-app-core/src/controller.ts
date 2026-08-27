@@ -489,8 +489,21 @@ export class TabletAppController {
    * Switching users abandons everything uncommitted. User A's selection and
    * weight may never be logged under user B.
    */
-  async switchActiveUser(subject: AppSubject, activity: ActiveEnergyResolution): Promise<void> {
+  async switchActiveUser(
+    subject: AppSubject,
+    activity: ActiveEnergyResolution,
+    activeSession: { readonly userId: string; readonly sessionGeneration: number },
+  ): Promise<void> {
     assertSubjectBinding(subject);
+    // An authorized session is REQUIRED. The optional parameter and the
+    // `+ 1` fallback let the controller mint a generation of its own, which
+    // meant the single-writer rule held only when a caller opted in.
+    if (activeSession === undefined || activeSession === null) {
+      throw new Error('switchActiveUser: an authorized ActiveUserSession is required');
+    }
+    if (activeSession.userId !== subject.userId) {
+      throw new Error('switchActiveUser: authorized session does not match the subject');
+    }
     this.cancelOutstandingCaptureIntent();
     this.flowCounter += 1;
 
@@ -503,7 +516,9 @@ export class TabletAppController {
     this.patch({
       subject,
       activity,
-      sessionGeneration: this.state.sessionGeneration + 1,
+      // ALWAYS adopted. Household activation is the sole generation authority;
+      // the switch machine adopts it, and so does this controller.
+      sessionGeneration: activeSession.sessionGeneration,
       dashboard: null,
       addFood: { ...IDLE_ADD_FOOD, flowId: `flow-${this.flowCounter}` },
       requiresScaleClearForCurrentSubject: platformLoaded,

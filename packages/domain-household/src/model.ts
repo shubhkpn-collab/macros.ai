@@ -73,6 +73,8 @@ export interface ActiveUserSession {
   readonly sessionGeneration: number;
   readonly startedAt: string;
   readonly lastActivityAt: string;
+  /** Recorded for observability. Never consulted for authorization. */
+  readonly assuranceLevel?: string;
 }
 
 export const activeMemberships = (

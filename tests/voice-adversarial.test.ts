@@ -21,6 +21,15 @@ import {
 } from '@macros/testkit';
 
 const ROOT = new URL('..', import.meta.url).pathname;
+
+
+/**
+ * Stands in for household activation, which is the ONLY generation authority.
+ * The controller no longer mints one, so tests must supply an authorized
+ * session exactly as production does.
+ */
+let generationCounter = 1;
+const nextGeneration = (): number => { generationCounter += 1; return generationCounter; };
 const TZ = 'America/Chicago';
 const START = '2026-08-19T16:50:00.000Z';
 const POLICIES: LoopPolicies = { tefPolicy: { status: 'available', policy: TEST_TEF_POLICY } };
@@ -301,7 +310,7 @@ describe('USER ISOLATION', () => {
     await say(h, `option ${o[0]!.optionLabel}`);
     await say(h, '150 grams');
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     assert.equal(h.app.getState().addFood.selected, null);
 
     const r = await say(h, 'log it', USER_B);
@@ -313,7 +322,7 @@ describe('USER ISOLATION', () => {
   test("A's voice option context does not survive into B's session", async () => {
     const h = await harness();
     await say(h, 'add chicken breast');
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     const r = await say(h, 'option A', USER_B);
     assert.equal(r.kind, 'clarification', 'no options carried over');
   });
@@ -326,7 +335,7 @@ describe('USER ISOLATION', () => {
     await say(h, '200 grams');
     await say(h, 'log it');
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     const answer = await say(h, 'how many calories have I eaten today', USER_B);
     assert.equal(answer.kind, 'informational');
     if (answer.kind !== 'informational') return;
@@ -405,7 +414,7 @@ describe('V-2 — completed-duplicate replay (mandatory delivery ids)', () => {
   test('delivery memory does not cross users', async () => {
     const h = await harness();
     await deliver(h, 'add chicken breast', 'stt-x', 1);
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     const r = await h.voice.handle({
       transcript: 'add chicken breast',

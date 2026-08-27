@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   PRIVATE_RESOURCES, activateMembership, activateUser, canActivateAnotherMember,
-  canAdminister, confirmSwitch, decideAccess, dissolveHousehold, isExpired,
+  canAdminister, decideAccess, dissolveHousehold, isExpired,
   memberSelector, neutralState, rebindDevice, removeMembership, resolveSwitchRequest,
   transferOwnership,
   type ActiveUserSession, type AgeEligibilityAttestation, type DeviceBinding,
@@ -12,6 +12,7 @@ import {
 import { reconcileDay, type OutboxEntry } from '@macros/domain-offline-sync';
 import { createFoodLogItem } from '@macros/domain-food-log';
 import { manualCapture } from '@macros/domain-weight';
+import { mintSubjectForTests } from '@macros/domain-auth';
 import { instant } from '@macros/contracts';
 import { SYNTHETIC_PRODUCTS, USER_A, USER_B } from '@macros/testkit';
 
@@ -185,8 +186,10 @@ describe('B4/B6/B7/B8 — lifecycle', () => {
 });
 
 describe('B12/B13 — activation guards and neutral state', () => {
+  // Activation now takes the SUBJECT CAPABILITY: there is no longer a pair of
+  // identity strings a caller can simply supply.
   const req = (userId: string, over: Record<string, unknown> = {}) => ({
-    deviceId: DEV, userId, authenticatedSubjectId: userId, nowIso: NOW, ...over,
+    deviceId: DEV, subject: mintSubjectForTests(userId), nowIso: NOW, ...over,
   });
   const ctx = (over: Record<string, unknown> = {}) => ({
     binding: BINDING, memberships: MEMBERS, seat: SEAT,
@@ -201,10 +204,29 @@ describe('B12/B13 — activation guards and neutral state', () => {
     assert.equal(r.session.sessionGeneration, 1);
   });
 
-  test('B12: knowing a userId is NOT enough — identity comes from auth', () => {
-    const r = activateUser(req(MEMBER, { authenticatedSubjectId: OWNER }), ctx());
+  test('B12: knowing a userId is NOT enough — identity is a capability', () => {
+    // The old shape accepted userId and authenticatedSubjectId as independent
+    // strings; that pairing no longer exists. The only way to name a user is to
+    // hold a subject that was genuinely minted.
+    const r = activateUser(
+      { deviceId: DEV, subject: mintSubjectForTests(OWNER), nowIso: NOW }, ctx());
+    // OWNER is a real member, so this succeeds AS OWNER — never as MEMBER.
+    assert.equal(r.ok, true);
+    if (r.ok) assert.equal(r.session.userId, OWNER, 'the subject decides who activates');
+  });
+
+  test('an EXACT device mismatch blocks activation', () => {
+    const r = activateUser({ ...req(MEMBER), deviceId: 'other-device' }, ctx());
     assert.equal(r.ok, false);
-    if (!r.ok) assert.equal(r.reason, 'not_authorized_on_this_device');
+    if (!r.ok) assert.equal(r.reason, 'wrong_device');
+  });
+
+  test('a seat from ANOTHER household does not authorize', () => {
+    const r = activateUser(req(MEMBER), ctx({
+      seat: { householdId: 'hh-other', capacity: 4, state: 'active' },
+    }));
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'seat_household_mismatch');
   });
 
   test('a removed member cannot activate', () => {
@@ -256,6 +278,7 @@ describe('B27/B28 — offline membership snapshot', () => {
   const snap = (over: Partial<MembershipSnapshot> = {}): MembershipSnapshot => ({
     householdId: HH, deviceId: DEV, capturedAt: '2026-08-27T00:00:00.000Z',
     expiresAt: '2026-08-28T00:00:00.000Z', snapshotVersion: 1,
+    bindingGeneration: BINDING.bindingGeneration,
     authorizedUserIds: [OWNER, MEMBER], ...over,
   });
   const offlineCtx = (over: Record<string, unknown> = {}) => ({
@@ -263,7 +286,7 @@ describe('B27/B28 — offline membership snapshot', () => {
     offline: true, snapshot: snap(), ...over,
   }) as Parameters<typeof activateUser>[1];
   const req = (userId: string) => ({
-    deviceId: DEV, userId, authenticatedSubjectId: userId, nowIso: NOW,
+    deviceId: DEV, subject: mintSubjectForTests(userId), nowIso: NOW,
   });
 
   test('a previously authorised member activates offline', () => {
@@ -315,33 +338,14 @@ describe('B18/B19/B20 — voice switching', () => {
     assert.equal(r.kind, 'not_found');
   });
 
-  test('B18: a switch requires EXPLICIT confirmation', () => {
-    const pending = {
-      requestedByUserId: OWNER, targetUserId: MEMBER, targetDisplayName: 'Sam',
-      requestedAt: NOW, sessionGeneration: 1,
-    };
-    assert.equal(confirmSwitch(null, MEMBER, 1).ok, false, 'nothing switches without a request');
-    assert.equal(confirmSwitch(pending, MEMBER, 1).ok, true);
-  });
-
-  test('a confirmation for a DIFFERENT target is refused', () => {
-    const pending = {
-      requestedByUserId: OWNER, targetUserId: MEMBER, targetDisplayName: 'Sam',
-      requestedAt: NOW, sessionGeneration: 1,
-    };
-    const r = confirmSwitch(pending, THIRD, 1);
-    assert.equal(r.ok, false);
-    if (!r.ok) assert.equal(r.reason, 'target_mismatch');
-  });
-
-  test('a STALE confirmation from an old session is refused', () => {
-    const pending = {
-      requestedByUserId: OWNER, targetUserId: MEMBER, targetDisplayName: 'Sam',
-      requestedAt: NOW, sessionGeneration: 1,
-    };
-    const r = confirmSwitch(pending, MEMBER, 2);
-    assert.equal(r.ok, false);
-    if (!r.ok) assert.equal(r.reason, 'stale_session');
+  test('B18: the canonical machine is the ONLY confirmation authority', () => {
+    // voice-switch previously carried its own PendingUserSwitch/confirmSwitch
+    // state, so two authorities could each believe a switch was confirmed.
+    // Resolution now yields a candidate and nothing more.
+    const r = resolveSwitchRequest('Sam', HH, MEMBERS, NAMES);
+    assert.equal(r.kind, 'resolved');
+    assert.equal('confirmed' in (r as object), false);
+    assert.equal('sessionGeneration' in (r as object), false);
   });
 
   test('B19: "I am John" is a REQUEST, not authentication', () => {
@@ -352,7 +356,7 @@ describe('B18/B19/B20 — voice switching', () => {
   });
 
   test('B19: no biometric or speaker-recognition surface exists', () => {
-    const api = Object.keys({ resolveSwitchRequest, confirmSwitch }).join(' ').toLowerCase();
+    const api = Object.keys({ resolveSwitchRequest }).join(' ').toLowerCase();
     for (const banned of ['voiceprint', 'speaker', 'biometric', 'face']) {
       assert.equal(api.includes(banned), false);
     }
@@ -475,5 +479,100 @@ describe('PART A REFREEZE — transfer atomicity vs the unique owner index', () 
     // Target is not an active member, so no valid single-owner state exists.
     const r = transferOwnership([m(OWNER, 'owner')], HH, OWNER, THIRD);
     assert.equal(r.ok, false);
+  });
+});
+
+describe('FIX B — offline snapshot binding continuity and validation', () => {
+  const BOUND: DeviceBinding = {
+    deviceId: DEV, householdId: HH, status: 'bound',
+    boundAt: '2026-01-01T00:00:00.000Z', bindingGeneration: 3,
+  };
+  const snap = (over: Record<string, unknown> = {}): MembershipSnapshot => ({
+    householdId: HH, deviceId: DEV,
+    capturedAt: '2026-08-27T00:00:00.000Z', expiresAt: '2026-08-28T00:00:00.000Z',
+    snapshotVersion: 1, bindingGeneration: 3,
+    authorizedUserIds: [OWNER, MEMBER], ...over,
+  }) as MembershipSnapshot;
+  const offline = (over: Record<string, unknown> = {}) => ({
+    binding: BOUND, memberships: MEMBERS, seat: SEAT, currentSession: null,
+    offline: true, snapshot: snap(), ...over,
+  }) as Parameters<typeof activateUser>[1];
+  const req = () => ({ deviceId: DEV, subject: mintSubjectForTests(MEMBER), nowIso: NOW });
+
+  test('a snapshot matching the current binding activates', () => {
+    assert.equal(activateUser(req(), offline()).ok, true);
+  });
+
+  test('a snapshot from an EARLIER binding is superseded', () => {
+    // Rebinding is exactly the event that should invalidate cached household
+    // authorization: the device may now belong to a different household.
+    const r = activateUser(req(), offline({ snapshot: snap({ bindingGeneration: 2 }) }));
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'membership_snapshot_superseded');
+  });
+
+  test('a rebind DURING the offline window invalidates the cache', () => {
+    const rebound = { ...BOUND, householdId: 'hh-other', bindingGeneration: 4 };
+    const r = activateUser(req(), offline({ binding: rebound }));
+    assert.equal(r.ok, false, 'stale cache must not authorize under a new binding');
+  });
+
+  for (const [label, broken] of [
+    ['missing authorizedUserIds', { authorizedUserIds: undefined }],
+    ['non-array authorizedUserIds', { authorizedUserIds: 'everyone' }],
+    ['non-string member id', { authorizedUserIds: [MEMBER, 42] }],
+    ['unparseable expiry', { expiresAt: 'soon' }],
+    ['captured after expiry', { capturedAt: '2026-09-01T00:00:00.000Z' }],
+    ['non-numeric snapshotVersion', { snapshotVersion: 'one' }],
+    ['non-numeric bindingGeneration', { bindingGeneration: 'three' }],
+  ] as const) {
+    test(`a corrupt snapshot (${label}) fails CLOSED`, () => {
+      const r = activateUser(req(), offline({ snapshot: snap(broken as never) }));
+      assert.equal(r.ok, false, label);
+      if (!r.ok) {
+        assert.ok(
+          r.reason === 'membership_snapshot_invalid'
+          || r.reason === 'membership_snapshot_superseded'
+          || r.reason === 'membership_snapshot_expired',
+          `${label} produced ${r.reason}`);
+      }
+    });
+  }
+});
+
+describe('FIX D — seat CAPACITY is enforced at activation', () => {
+  const BOUND: DeviceBinding = {
+    deviceId: DEV, householdId: HH, status: 'bound',
+    boundAt: '2026-01-01T00:00:00.000Z', bindingGeneration: 1,
+  };
+  const ctxWith = (capacity: number, members: HouseholdMembership[]) => ({
+    binding: BOUND, memberships: members, currentSession: null, offline: false,
+    seat: { householdId: HH, capacity, state: 'active' as const },
+  }) as Parameters<typeof activateUser>[1];
+
+  test('within capacity, activation succeeds', () => {
+    const r = activateUser(
+      { deviceId: DEV, subject: mintSubjectForTests(MEMBER), nowIso: NOW },
+      ctxWith(4, [m(OWNER, 'owner'), m(MEMBER)]));
+    assert.equal(r.ok, true);
+  });
+
+  test('OVER capacity, activation is refused', () => {
+    // Previously only seat.state was checked, so a household whose seats were
+    // reduced after the fact could still activate every member.
+    const r = activateUser(
+      { deviceId: DEV, subject: mintSubjectForTests(MEMBER), nowIso: NOW },
+      ctxWith(1, [m(OWNER, 'owner'), m(MEMBER), m(THIRD)]));
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'seat_capacity_exceeded');
+  });
+
+  test('a suspended seat is still refused', () => {
+    const r = activateUser(
+      { deviceId: DEV, subject: mintSubjectForTests(MEMBER), nowIso: NOW },
+      { ...ctxWith(4, MEMBERS as HouseholdMembership[]),
+        seat: { householdId: HH, capacity: 4, state: 'suspended' } } as never);
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'seat_suspended');
   });
 });

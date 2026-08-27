@@ -48,41 +48,10 @@ export function resolveSwitchRequest(
 }
 
 /**
- * A pending switch awaiting EXPLICIT confirmation.
+ * There is deliberately NO PendingUserSwitch / confirmSwitch here any more.
  *
- * Nothing changes until `confirm_user_switch` arrives: recognising the request
- * never mutates the active user.
+ * Voice had its own confirmation state machine, which meant two authorities
+ * could believe a switch was confirmed. The canonical lifecycle lives in
+ * `switch-machine.ts`; voice resolves a NAME to a candidate and hands that to
+ * `requestSwitch`. Resolution never authenticates and never confirms.
  */
-export interface PendingUserSwitch {
-  readonly requestedByUserId: string;
-  readonly targetUserId: string;
-  readonly targetDisplayName: string;
-  readonly requestedAt: string;
-  readonly sessionGeneration: number;
-}
-
-export type SwitchConfirmation =
-  | { readonly ok: true; readonly targetUserId: string }
-  | { readonly ok: false; readonly reason: 'no_pending_switch' | 'stale_session' | 'target_mismatch' };
-
-/**
- * Confirm a pending switch.
- *
- * The confirmation must name the same target and belong to the same session
- * generation the request was made in — otherwise a stale confirmation could
- * activate the wrong person.
- */
-export function confirmSwitch(
-  pending: PendingUserSwitch | null,
-  confirmedTargetUserId: string,
-  currentSessionGeneration: number,
-): SwitchConfirmation {
-  if (pending === null) return { ok: false, reason: 'no_pending_switch' };
-  if (pending.sessionGeneration !== currentSessionGeneration) {
-    return { ok: false, reason: 'stale_session' };
-  }
-  if (pending.targetUserId !== confirmedTargetUserId) {
-    return { ok: false, reason: 'target_mismatch' };
-  }
-  return { ok: true, targetUserId: pending.targetUserId };
-}

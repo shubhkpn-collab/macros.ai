@@ -18,10 +18,22 @@ export interface AuthSession {
   readonly subjectId: string;
   readonly issuedAt: string;
   readonly expiresAt: string;
-  /** Provider session handle, when the provider supplies one. */
-  readonly sessionId?: string;
+  /**
+   * The provider's real session identifier. REQUIRED: a user identity and a
+   * login session are different things, and falling back to the subject id
+   * would silently conflate them.
+   */
+  readonly sessionId: string;
   readonly displayName?: string;
-  readonly householdId?: string | null;
+  /**
+   * Authenticator Assurance Level from the provider (`aal1` / `aal2`).
+   *
+   * AUTHENTICATION METADATA ONLY. Nothing in this product gates on it today,
+   * and it must NOT become a silent authorization input. It is surfaced so a
+   * downgrade — an aal2-capable account presenting an aal1 token — is at least
+   * observable, and so a future step-up policy has something to read.
+   */
+  readonly assuranceLevel?: string | null;
 }
 
 export interface AuthSessionProvider {
@@ -63,11 +75,22 @@ export function subjectFromSession(
   // ONE derivation path. Previously this returned its own subject-shaped
   // literal, which was a second place identity could be constructed; it now
   // mints through the same branded routine everything else uses.
+  // No hard-coded authorization booleans. This path establishes AUTHENTICATED
+  // IDENTITY only; whether that person may activate on a particular kitchen
+  // device is decided later by household activation, which has the facts.
   const minted = mintSubject(
-    { subjectId: session.subjectId, sessionId: session.sessionId ?? session.subjectId,
-      issuedAt: session.issuedAt, expiresAt: session.expiresAt },
-    { displayName: session.displayName ?? 'Member', householdId: session.householdId ?? null,
-      nowIso, authorized: true, deviceBound: true },
+    {
+      subjectId: session.subjectId,
+      sessionId: session.sessionId,
+      issuedAt: session.issuedAt,
+      expiresAt: session.expiresAt,
+    },
+    {
+      displayName: session.displayName ?? 'Member',
+      nowIso,
+      ...(session.assuranceLevel !== undefined && session.assuranceLevel !== null
+        ? { assuranceLevel: session.assuranceLevel } : {}),
+    },
   );
   if (!minted.ok) {
     return appError('authentication', minted.reason, 'Your session could not be verified.');

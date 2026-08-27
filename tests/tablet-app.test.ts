@@ -33,6 +33,15 @@ import {
   USER_B,
 } from '@macros/testkit';
 
+
+/**
+ * Stands in for household activation, which is the ONLY generation authority.
+ * The controller no longer mints one, so tests must supply an authorized
+ * session exactly as production does.
+ */
+let generationCounter = 1;
+const nextGeneration = (): number => { generationCounter += 1; return generationCounter; };
+
 const TZ = 'America/Chicago';
 const START = '2026-08-11T16:50:00.000Z';
 const POLICIES: LoopPolicies = { tefPolicy: { status: 'available', policy: TEST_TEF_POLICY } };
@@ -363,7 +372,7 @@ describe('USER SWITCH SAFETY', () => {
     h.app.requestStableWeight();
     assert.equal(h.app.getState().addFood.phase, 'reviewing');
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     const flow = h.app.getState().addFood;
     assert.equal(flow.phase, 'idle');
@@ -384,7 +393,7 @@ describe('USER SWITCH SAFETY', () => {
     feed(h, h.scale.connect());
     feed(h, h.scale.placeUnsettled(200));
     h.app.requestStableWeight();
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     assert.equal(h.app.getCaptureState().pendingCaptureRequest, null);
   });
 
@@ -395,7 +404,7 @@ describe('USER SWITCH SAFETY', () => {
     await h.app.confirmFoodLog();
     assert.ok(h.app.getState().dashboard!.intake.kcal > 0);
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     assert.equal(h.app.getState().dashboard!.intake.kcal, 0, "B sees B's day, not A's");
   });
 });
@@ -416,7 +425,7 @@ describe('STALE ASYNC RESULTS', () => {
     h.app.enterManualWeight(200);
 
     const pending = h.app.confirmFoodLog();
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     await pending;
 
     assert.equal(h.app.getState().subject.userId, USER_B);
@@ -828,7 +837,7 @@ describe('PART A — user switch does not inherit a placement (A4)', () => {
     feed(h, h.scale.placeAndSettle(200));
     assert.equal(h.app.getCaptureState().phase, 'stable');
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     assert.equal(h.app.getState().requiresScaleClearForCurrentSubject, true);
 
     await selectCookedChicken(h);
@@ -850,7 +859,7 @@ describe('PART A — user switch does not inherit a placement (A4)', () => {
     const h = await harness();
     feed(h, h.scale.connect());
     feed(h, h.scale.placeAndSettle(200));
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     assert.equal(h.app.getState().requiresScaleClearForCurrentSubject, true);
 
     await selectCookedChicken(h);
@@ -861,7 +870,7 @@ describe('PART A — user switch does not inherit a placement (A4)', () => {
   test('an empty platform at switch time sets no gate', async () => {
     const h = await harness();
     feed(h, h.scale.connect());
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     assert.equal(h.app.getState().requiresScaleClearForCurrentSubject, false);
   });
 });
@@ -885,7 +894,7 @@ describe('PART A — stale async protection (A5, A6)', () => {
     const cooked = h.app.getState().addFood.results[0]!;
 
     const pending = h.app.selectProduct(cooked.productVersion.productVersionId);
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     await pending;
 
     assert.equal(h.app.getState().addFood.selected, null);
@@ -940,7 +949,7 @@ describe('PART A — recent history ranking (T-5 closed)', () => {
     h.app.enterManualWeight(200);
     await h.app.confirmFoodLog();
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     await h.app.searchFood('chicken breast');
     assert.notEqual(
       h.app.getState().addFood.results[0]!.productVersion.productVersionId,

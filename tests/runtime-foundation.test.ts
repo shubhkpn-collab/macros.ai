@@ -152,9 +152,7 @@ describe('B7 — secrets never surface', () => {
 });
 
 describe('B12 — auth binding', () => {
-  const session = (over: Record<string, unknown> = {}) => ({
-    subjectId: USER,
-    issuedAt: '2026-08-22T10:00:00.000Z',
+  const session = (over: Record<string, unknown> = {}) => ({ subjectId: USER, sessionId: 'sess-fixture-0000', issuedAt: '2026-08-22T10:00:00.000Z',
     expiresAt: '2026-08-22T18:00:00.000Z',
     ...over,
   });
@@ -407,8 +405,8 @@ describe('B14 — real HTTP boundary (executed against a live server)', () => {
     const api = new MacrosApi({
       config: okConfig({ environment: 'development', ...over }),
       auth: new FakeAuthSessionProvider({
-        'good-token': { subjectId: USER, issuedAt: '2026-08-22T10:00:00.000Z', expiresAt: '2026-08-22T18:00:00.000Z' },
-        'expired-token': { subjectId: USER, issuedAt: '2026-08-21T10:00:00.000Z', expiresAt: '2026-08-21T11:00:00.000Z' },
+        'good-token': { subjectId: USER, sessionId: 'sess-fixture-0000', issuedAt: '2026-08-22T10:00:00.000Z', expiresAt: '2026-08-22T18:00:00.000Z' },
+        'expired-token': { subjectId: USER, sessionId: 'sess-fixture-0000', issuedAt: '2026-08-21T10:00:00.000Z', expiresAt: '2026-08-21T11:00:00.000Z' },
       }),
       logger: new StructuredLogger(sink, 'info'),
       versions,

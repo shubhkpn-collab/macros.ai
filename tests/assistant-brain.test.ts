@@ -25,6 +25,15 @@ import {
 } from '@macros/testkit';
 
 const ROOT = new URL('..', import.meta.url).pathname;
+
+
+/**
+ * Stands in for household activation, which is the ONLY generation authority.
+ * The controller no longer mints one, so tests must supply an authorized
+ * session exactly as production does.
+ */
+let generationCounter = 1;
+const nextGeneration = (): number => { generationCounter += 1; return generationCounter; };
 const TZ = 'America/Chicago';
 const START = '2026-08-21T16:50:00.000Z';
 const POLICIES: LoopPolicies = { tefPolicy: { status: 'available', policy: TEST_TEF_POLICY } };
@@ -362,7 +371,7 @@ describe('B19 — privacy of the interpreter context', () => {
     await speak(h, `option ${cooked.optionLabel}`);
     await speak(h, '200 grams');
     await speak(h, 'log it');
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     await speak(h, 'zzz mystery phrasing', USER_B);
     const seen = JSON.stringify(fake.lastInput);

@@ -23,16 +23,27 @@ export interface AuthenticatedSubject {
   readonly sessionId: string;
   readonly issuedAt: string;
   readonly expiresAt: string;
-  /** Household context is bound at mint time, never supplied by a caller. */
-  readonly householdId: string | null;
+  /**
+   * Provider assurance level. AUTHENTICATION METADATA — never an authorization
+   * input. No code path may branch on it without an explicit, reviewed policy.
+   */
+  readonly assuranceLevel?: string;
 }
 
+/**
+ * AUTHENTICATION failures only.
+ *
+ * `device_not_bound` and `no_active_membership` are gone: they are
+ * AUTHORIZATION questions and belong to household activation. Requiring them to
+ * mint a subject made the generic HTTP path dishonest — it had to pass
+ * `authorized: true` it had never proven.
+ */
 export type SubjectMintFailure =
   | 'invalid_credential'
   | 'session_expired'
   | 'invalid_subject_id'
-  | 'device_not_bound'
-  | 'no_active_membership';
+  | 'invalid_session_id'
+  | 'invalid_session_times';
 
 export type SubjectMintResult =
   | { readonly ok: true; readonly subject: AuthenticatedSubject }
@@ -51,13 +62,14 @@ export interface VerifiedSession {
   readonly expiresAt: string;
 }
 
+/**
+ * Trusted inputs to minting. Presentation metadata only — nothing here decides
+ * whether the person may use a particular device.
+ */
 export interface MintContext {
   readonly displayName: string;
-  readonly householdId: string | null;
   readonly nowIso: string;
-  /** Result of the trusted household/device authorisation check. */
-  readonly authorized: boolean;
-  readonly deviceBound: boolean;
+  readonly assuranceLevel?: string;
 }
 
 /**
@@ -73,13 +85,19 @@ export function mintSubject(
   if (!UUID.test(session.subjectId)) {
     return { ok: false, reason: 'invalid_subject_id' };
   }
-  const now = Date.parse(context.nowIso);
-  const expires = Date.parse(session.expiresAt);
-  if (!Number.isFinite(now) || !Number.isFinite(expires) || now >= expires) {
-    return { ok: false, reason: 'session_expired' };
+  // A login session is a different identity from the person. Supabase supplies
+  // `session_id`; falling back to the subject id would conflate the two.
+  if (typeof session.sessionId !== 'string' || session.sessionId.length === 0) {
+    return { ok: false, reason: 'invalid_session_id' };
   }
-  if (!context.deviceBound) return { ok: false, reason: 'device_not_bound' };
-  if (!context.authorized) return { ok: false, reason: 'no_active_membership' };
+  const now = Date.parse(context.nowIso);
+  const issued = Date.parse(session.issuedAt);
+  const expires = Date.parse(session.expiresAt);
+  if (!Number.isFinite(now) || !Number.isFinite(expires) || !Number.isFinite(issued)) {
+    return { ok: false, reason: 'invalid_session_times' };
+  }
+  if (issued > expires) return { ok: false, reason: 'invalid_session_times' };
+  if (now >= expires) return { ok: false, reason: 'session_expired' };
 
   return {
     ok: true,
@@ -89,7 +107,8 @@ export function mintSubject(
       sessionId: session.sessionId,
       issuedAt: session.issuedAt,
       expiresAt: session.expiresAt,
-      householdId: context.householdId,
+      ...(context.assuranceLevel !== undefined
+        ? { assuranceLevel: context.assuranceLevel } : {}),
     } as AuthenticatedSubject,
   };
 }
@@ -117,6 +136,5 @@ export function mintSubjectForTests(
     sessionId: over.sessionId ?? `test-session-${userId}`,
     issuedAt: over.issuedAt ?? '2026-01-01T00:00:00.000Z',
     expiresAt: over.expiresAt ?? '2099-01-01T00:00:00.000Z',
-    householdId: over.householdId ?? null,
   } as AuthenticatedSubject;
 }

@@ -80,6 +80,8 @@ const PRODUCTION = [
   'packages/offline-adapters',
   // The pg driver edge: IO by definition, never a pure domain.
   'packages/postgres-driver',
+  // Supabase JWT/JWKS verification: IO edge by definition.
+  'packages/auth-supabase',
 ];
 
 /** Transport and hardware libraries must not reach the pure capture logic. */

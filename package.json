@@ -12,7 +12,8 @@
     "docs:generate": "node --import tsx tools/gen-catalog-doc.ts",
     "check:toolchain": "node --import tsx tools/check-toolchain.ts",
     "postgres:validate": "bash tools/postgres-validation/run.sh",
-    "postgres:integration": "node --import tsx tools/postgres-integration/run-integration.ts"
+    "postgres:integration": "node --import tsx tools/postgres-integration/run-integration.ts",
+    "auth:live-gate": "node --import tsx tools/supabase-gate/run-live-gate.ts"
   },
   "engines": {
     "node": ">=22.0.0",

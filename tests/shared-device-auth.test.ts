@@ -19,28 +19,38 @@ const session = (id: string, over: Partial<VerifiedSession> = {}): VerifiedSessi
 });
 const NOW = '2026-08-25T12:00:00.000Z';
 const ctx = (over: Partial<Parameters<typeof mintSubject>[1]> = {}) => ({
-  displayName: 'Member', householdId: 'hh-1', nowIso: NOW,
-  authorized: true, deviceBound: true, ...over,
+  displayName: 'Member', nowIso: NOW, ...over,
 });
 
 describe('B1 — AUTHORIZATION IS NOT AUTHENTICATION', () => {
-  test('being an authorized household member does NOT produce a subject', () => {
-    // Authorization is a boolean input to minting, never a substitute for a
-    // verified session. There is no code path that turns membership alone into
-    // an AuthenticatedSubject.
-    const r = mintSubject(session(USER_B), ctx({ authorized: true, deviceBound: false }));
-    assert.equal(r.ok, false);
-    if (!r.ok) assert.equal(r.reason, 'device_not_bound');
-  });
-
-  test('a valid session for an UNAUTHORIZED member is refused', () => {
-    const r = mintSubject(session(USER_B), ctx({ authorized: false }));
-    assert.equal(r.ok, false);
-    if (!r.ok) assert.equal(r.reason, 'no_active_membership');
-  });
-
-  test('BOTH gates are required: session AND authorization', () => {
+  test('minting requires NO household authorization booleans', () => {
+    // The old MintContext demanded `authorized` and `deviceBound`, and the
+    // generic HTTP path had to pass `true` for both without proving either.
+    // Authentication now answers only "who owns this valid session".
     assert.equal(mintSubject(session(USER_B), ctx()).ok, true);
+    const keys = Object.keys(ctx());
+    assert.equal(keys.includes('authorized'), false);
+    assert.equal(keys.includes('deviceBound'), false);
+  });
+
+  test('a subject carries NO household claim', () => {
+    const r = mintSubject(session(USER_B), ctx());
+    assert.equal(r.ok, true);
+    if (!r.ok) return;
+    assert.equal('householdId' in (r.subject as object), false,
+      'household membership is not an authentication claim');
+  });
+
+  test('an invalid session id cannot mint', () => {
+    const r = mintSubject({ ...session(USER_B), sessionId: '' }, ctx());
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'invalid_session_id');
+  });
+
+  test('authorization failures are NOT authentication failures', () => {
+    // These reasons no longer exist in the mint result type at all.
+    const r = mintSubject(session(USER_B), ctx());
+    assert.equal(r.ok, true);
   });
 });
 
@@ -71,7 +81,10 @@ describe('B2 — the subject cannot be forged or re-pointed', () => {
 
 describe('B3 — expiry and validity', () => {
   test('an expired session never mints a subject', () => {
-    const r = mintSubject(session(USER_B, { expiresAt: '2026-01-01T00:00:00.000Z' }), ctx());
+    // Issued before it expired, but both are in the past relative to NOW.
+    const r = mintSubject(session(USER_B, {
+      issuedAt: '2026-07-01T00:00:00.000Z', expiresAt: '2026-08-01T00:00:00.000Z',
+    }), ctx());
     assert.equal(r.ok, false);
     if (!r.ok) assert.equal(r.reason, 'session_expired');
   });
@@ -168,5 +181,119 @@ describe('PART 0 — documented status must not outrun the implementation', () =
     assert.match(doc(), /AUTHENTICATED SUBJECT BOUNDARY — ENGINEERING CLOSED/);
     assert.equal(typeof mintSubject, 'function');
     assert.equal(typeof appSubjectFrom, 'function');
+  });
+});
+
+
+describe('SESSION TIME SANITY', () => {
+  test('a session that expires BEFORE it was issued is refused', () => {
+    const r = mintSubject(session(USER_B, {
+      issuedAt: '2026-09-01T00:00:00.000Z', expiresAt: '2026-08-01T00:00:00.000Z',
+    }), ctx());
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'invalid_session_times');
+  });
+
+  test('unparseable times are refused', () => {
+    const r = mintSubject(session(USER_B, { issuedAt: 'not-a-date' }), ctx());
+    assert.equal(r.ok, false);
+    if (!r.ok) assert.equal(r.reason, 'invalid_session_times');
+  });
+});
+
+describe('FIX A — JWKS cache freshness and bounded growth', () => {
+  test('a KNOWN kid is refetched once the positive TTL lapses', async () => {
+    // Without a positive TTL a key set fetched at boot is trusted forever, so a
+    // key revoked at the provider stays valid here until restart.
+    const { JwksCache } = await import('@macros/auth-supabase');
+    let now = 1_000_000;
+    let served: Record<string, unknown>[] = [];
+    let fetches = 0;
+    const cache = new JwksCache({
+      jwksUrl: 'https://p/jwks', now: () => now, maxKeyAgeMs: 60_000, minRefetchMs: 0,
+      fetcher: async () => { fetches += 1; return { keys: served }; },
+    });
+    await cache.keyFor('nope').catch(() => undefined);
+    const first = fetches;
+    now += 30_000;
+    await cache.keyFor('nope').catch(() => undefined);   // still fresh
+    now += 120_000;
+    await cache.keyFor('nope').catch(() => undefined);   // TTL lapsed
+    assert.ok(fetches > first, 'a stale key set must be refetched');
+    void served;
+  });
+
+  test('the negative cache prevents a fetch per forged kid', async () => {
+    const { JwksCache } = await import('@macros/auth-supabase');
+    let now = 1_000_000;
+    let fetches = 0;
+    const cache = new JwksCache({
+      jwksUrl: 'https://p/jwks', now: () => now,
+      maxKeyAgeMs: 10 * 60_000, negativeCacheMs: 30_000, minRefetchMs: 0,
+      fetcher: async () => { fetches += 1; return { keys: [] }; },
+    });
+    for (let i = 0; i < 10; i += 1) await cache.keyFor('forged').catch(() => undefined);
+    assert.ok(fetches <= 2, `expected at most 2 fetches, saw ${fetches}`);
+  });
+
+  test('the negative cache is BOUNDED', async () => {
+    const { JwksCache } = await import('@macros/auth-supabase');
+    const cache = new JwksCache({
+      jwksUrl: 'https://p/jwks', now: () => 1_000_000,
+      maxNegativeEntries: 8, minRefetchMs: 0, maxKeyAgeMs: 10 * 60_000,
+      fetcher: async () => ({ keys: [] }),
+    });
+    for (let i = 0; i < 200; i += 1) await cache.keyFor(`kid-${i}`).catch(() => undefined);
+    assert.ok(cache.negativeCacheSize() <= 8,
+      `unbounded growth: ${cache.negativeCacheSize()} entries`);
+  });
+
+  test('a refresh clears remembered misses and advances the key-set version', async () => {
+    const { JwksCache } = await import('@macros/auth-supabase');
+    let now = 1_000_000;
+    const cache = new JwksCache({
+      jwksUrl: 'https://p/jwks', now: () => now, minRefetchMs: 0,
+      maxKeyAgeMs: 1_000, fetcher: async () => ({ keys: [] }),
+    });
+    await cache.keyFor('missing').catch(() => undefined);
+    const before = cache.keySetInfo().version;
+    now += 10_000;
+    await cache.keyFor('missing').catch(() => undefined);
+    assert.ok(cache.keySetInfo().version > before, 'key set version must advance');
+    assert.equal(cache.negativeCacheSize(), 1, 'misses cleared on refresh, then re-recorded');
+  });
+});
+
+describe('FIX E — assurance level is metadata, never authorization', () => {
+  test('aal is surfaced on the subject when the provider supplies it', () => {
+    const r = mintSubject(session(USER_B), { displayName: 'M', nowIso: NOW, assuranceLevel: 'aal2' });
+    assert.equal(r.ok, true);
+    if (!r.ok) return;
+    assert.equal((r.subject as { assuranceLevel?: string }).assuranceLevel, 'aal2');
+  });
+
+  test('a MISSING aal never blocks authentication', () => {
+    // Surfacing it must not quietly become a gate.
+    const r = mintSubject(session(USER_B), { displayName: 'M', nowIso: NOW });
+    assert.equal(r.ok, true);
+  });
+
+  test('aal1 authenticates exactly as aal2 does', () => {
+    const one = mintSubject(session(USER_B), { displayName: 'M', nowIso: NOW, assuranceLevel: 'aal1' });
+    const two = mintSubject(session(USER_B), { displayName: 'M', nowIso: NOW, assuranceLevel: 'aal2' });
+    assert.equal(one.ok, two.ok);
+  });
+
+  test('no production code branches on assuranceLevel', () => {
+    const files = [
+      'packages/domain-household/src/session.ts',
+      'packages/domain-household/src/switch-machine.ts',
+      'packages/runtime-api/src/shared-device-auth.ts',
+    ];
+    for (const f of files) {
+      const code = readFileSync(f, 'utf8').replace(/^\s*(\/\/|\*|\/\*).*$/gm, '');
+      assert.equal(/if\s*\([^)]*assuranceLevel[^)]*(===|!==|<|>)/.test(code), false,
+        `${f} must not gate on assurance level`);
+    }
   });
 });

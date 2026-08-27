@@ -535,6 +535,7 @@ async function startApi(pool: PgPoolLike): Promise<{
   const auth = new FakeAuthSessionProvider({
     'token-a': {
       subjectId: USER_A,
+      sessionId: 'sess-fixture-0000',
       issuedAt: '2026-01-01T00:00:00.000Z',
       expiresAt: '2099-01-01T00:00:00.000Z',
     },

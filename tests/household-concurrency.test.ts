@@ -20,6 +20,15 @@ import {
   TEST_TEF_POLICY, USER_A, USER_B, activeEnergy,
 } from '@macros/testkit';
 
+
+/**
+ * Stands in for household activation, which is the ONLY generation authority.
+ * The controller no longer mints one, so tests must supply an authorized
+ * session exactly as production does.
+ */
+let generationCounter = 1;
+const nextGeneration = (): number => { generationCounter += 1; return generationCounter; };
+
 const TZ = 'America/Chicago';
 const START = '2026-08-27T16:50:00.000Z';
 const POLICIES: LoopPolicies = { tefPolicy: { status: 'available', policy: TEST_TEF_POLICY } };
@@ -113,7 +122,7 @@ describe('B15 — an unfinished flow never crosses a user switch', () => {
     await deliver(h, '180 grams', 3);
     assert.equal(h.app.getState().addFood.phase, 'reviewing');
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     const flow = h.app.getState().addFood;
     assert.equal(flow.selected, null, "A's selection was cancelled");
@@ -132,7 +141,7 @@ describe('B43 — a slow voice turn cannot execute after a switch', () => {
     const inFlight = deliver(h, 'that chicken thing again', 5);
     await barrier.entered;
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     const before = JSON.stringify(h.app.getState().addFood);
 
     barrier.open();
@@ -151,8 +160,8 @@ describe('B43 — a slow voice turn cannot execute after a switch', () => {
     const inFlight = deliver(h, 'that chicken thing again', 5);
     await barrier.entered;
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300));
-    await h.app.switchActiveUser(subjectFor(USER_A, 'Alex'), activeEnergy(500));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
+    await h.app.switchActiveUser(subjectFor(USER_A, 'Alex'), activeEnergy(500), { userId: USER_A, sessionGeneration: nextGeneration() });
     // Same userId again — but a THIRD generation, so the old work is still stale.
     assert.notEqual(h.app.getState().sessionGeneration, firstGeneration);
 
@@ -171,7 +180,7 @@ describe('B44 — a pending scale capture cannot land in another user', () => {
     for (const e of h.scale.connect()) h.app.applyScaleEvent(e as never);
     h.app.requestStableWeight();
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     // A's scale settles AFTER the switch.
     for (const e of h.scale.placeAndSettle(200)) h.app.applyScaleEvent(e as never);
@@ -189,7 +198,7 @@ describe('B45 — stale options cannot be selected after a switch', () => {
     const oldFlow = h.app.getState().addFood.flowId;
     assert.ok(h.app.getState().addFood.results.length > 1);
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     const r = await deliver(h, 'option B', 2, { userId: USER_B, flowIdAtCapture: oldFlow });
     assert.equal(r.kind, 'error');
@@ -208,7 +217,7 @@ describe('B46 — no active user leaks nothing', () => {
     await deliver(h, 'log it', 4);
     assert.equal((await logsOf(h, USER_A)).length, 1);
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Sam'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
 
     const answer = await deliver(h, 'how many calories have I eaten today', 5, { userId: USER_B });
     assert.equal(answer.kind, 'informational');

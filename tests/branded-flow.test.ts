@@ -35,6 +35,15 @@ import {
   approx,
 } from '@macros/testkit';
 
+
+/**
+ * Stands in for household activation, which is the ONLY generation authority.
+ * The controller no longer mints one, so tests must supply an authorized
+ * session exactly as production does.
+ */
+let generationCounter = 1;
+const nextGeneration = (): number => { generationCounter += 1; return generationCounter; };
+
 const TZ = 'America/Chicago';
 const START = '2026-08-18T16:50:00.000Z';
 const POLICIES: LoopPolicies = { tefPolicy: { status: 'available', policy: TEST_TEF_POLICY } };
@@ -265,7 +274,7 @@ describe('BRANDED HISTORY RANKING', () => {
     assert.equal(aOrder[0], 'synb-yogurt-nonfat@v1', "A's own history reorders A's results");
     assert.notDeepEqual(aOrder, noHistoryOrder, 'so the history signal is genuinely active');
 
-    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300));
+    await h.app.switchActiveUser(subjectFor(USER_B, 'Dev User B'), activeEnergy(300), { userId: USER_B, sessionGeneration: nextGeneration() });
     await h.app.searchFood('yogurt');
     const bOrder = h.app.getState().addFood.results.map((r) => r.productVersion.productVersionId);
     assert.deepEqual(bOrder, noHistoryOrder, "B sees the no-history order — A's history did not leak");
