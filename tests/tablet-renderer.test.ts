@@ -612,9 +612,9 @@ describe('NATIVE BUILD READINESS — the bundle can actually resolve and load', 
     // The stale manual-copy instruction must be gone.
     assert.equal(/copy its `android\/` Gradle files/.test(doc), false);
     // The count must match reality, checked against the suite itself below.
-    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611/.test(doc), false,
+    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611|expect 1620/.test(doc), false,
       'stale test count in owner instructions');
-    assert.match(doc, /expect 1620 tests/);
+    assert.match(doc, /expect 1633 tests/);
   });
 
   test('FIX 4: hydration pins the package manager', () => {
@@ -720,6 +720,157 @@ describe('REAL TYPECHECK FIXES — proven by the owner\'s Mac compile', () => {
         assert.equal(/from\s+['"]node:/.test(code), false,
           `${pkg} reaches a Node built-in and is in the RN graph: ${f}`);
       }
+    }
+  });
+});
+
+describe('REAL ANDROID RUNTIME FIXES — observed in the emulator', () => {
+  const read = (...p: string[]): string => readFileSync(repoPath('apps', 'tablet', ...p), 'utf8');
+  const base = () => appState() as unknown as { addFood: Record<string, unknown> };
+  const searching = (over: Record<string, unknown> = {}) => appState({
+    addFood: { ...base().addFood, phase: 'searching', ...over },
+  });
+
+  test('GAP 1: the tracked manifest declares INTERNET', () => {
+    // Without it the device logs EPERM and RN cannot reach Metro at all.
+    const manifest = read('android', 'app', 'src', 'main', 'AndroidManifest.xml');
+    assert.match(manifest, /<uses-permission android:name="android\.permission\.INTERNET" \/>/);
+    // No unrelated permissions crept in.
+    const perms = [...manifest.matchAll(/uses-permission android:name="([^"]+)"/g)].map((m) => m[1]);
+    assert.deepEqual(perms, ['android.permission.INTERNET']);
+  });
+
+  test('GAP 2: the Metro fallback is relative-.js only and workspace-scoped', () => {
+    const metro = read('metro.config.js');
+    assert.match(metro, /resolveRequest/);
+    // Metro's own resolver runs first and always wins when it succeeds.
+    assert.match(metro, /return context\.resolveRequest\(context, moduleName, platform\)/);
+    assert.match(metro, /moduleName\.startsWith\('\.\/'\)/);
+    assert.match(metro, /moduleName\.endsWith\('\.js'\)/);
+    assert.match(metro, /isWithinWorkspace\(context\.originModulePath\)/);
+    // node_modules is excluded: a .js specifier there is a real path.
+    assert.match(metro, /includes\('node_modules'\)/);
+    // A genuine miss still reports the specifier the author wrote.
+    assert.match(metro, /throw originalError/);
+  });
+
+  test('GAP 2: the fallback keeps the existing monorepo resolution', () => {
+    const metro = read('metro.config.js');
+    assert.match(metro, /enableGlobalPackages: true/);
+    assert.match(metro, /watchFolders: \[workspaceRoot\]/);
+  });
+
+  test('GAP 3: DEV_GOAL exists and the host seeds profile AND goal', () => {
+    const fixtures = read('src', 'development-fixtures.ts');
+    assert.match(fixtures, /export const DEV_GOAL: EnergyGoalVersion/);
+    assert.match(fixtures, /goal: 'maintain'/);
+    assert.match(fixtures, /targetDeltaKcal: 0/);
+
+    const host = read('src', 'development-host.ts');
+    const seedProfile = host.indexOf('profiles.append(DEV_PROFILE)');
+    const seedGoal = host.indexOf('goals.append(DEV_GOAL)');
+    // Anchor on the CALL, not the comment above it that mentions the name.
+    const refresh = host.indexOf('controller.refreshDashboard()');
+    assert.ok(seedProfile > 0 && seedGoal > 0, 'both fixtures must be seeded');
+    assert.ok(seedGoal < refresh,
+      'the goal must be seeded BEFORE refreshDashboard, or the dashboard is goal_missing');
+  });
+
+  test('GAP 4: a fresh Add food projects to food_search, never Home', () => {
+    // Previously an empty result set sent the flow straight back to Home, so
+    // the button looked like a no-op.
+    const vm = buildViewModel(input({ app: searching({ results: [], query: '' }) }));
+    assert.equal(vm.screen, 'food_search');
+  });
+
+  test('GAP 4: results project to food_options', () => {
+    const vm = buildViewModel(input({
+      app: searching({
+        results: [{
+          optionLabel: 'A', score: 1, matchKind: 'exact', preparationStateDisambiguates: false,
+          productVersion: {
+            productVersionId: 'p@v1', displayName: 'Chicken', preparationState: 'cooked',
+          },
+        }],
+        query: 'chicken',
+      }),
+    }));
+    assert.equal(vm.screen, 'food_options');
+    assert.equal(vm.voice, 'needs_choice', 'options require a choice, and should say so');
+  });
+
+  test('GAP 4: voice does not claim "Thinking" on an empty search box', () => {
+    const empty = buildViewModel(input({ app: searching({ results: [], query: '' }) }));
+    assert.equal(empty.voice, 'idle', 'nothing is happening yet');
+
+    const typed = buildViewModel(input({ app: searching({ results: [], query: 'chicken' }) }));
+    assert.equal(typed.voice, 'interpreting', 'a submitted query IS being interpreted');
+  });
+
+  test('GAP 4: a no-result search stays on food_search with the trusted error', () => {
+    const vm = buildViewModel(input({
+      app: searching({
+        results: [], query: 'zzzz',
+        error: { code: 'no_results', message: 'No matches found.', recoverable: true },
+      }),
+    }));
+    assert.equal(vm.screen, 'food_search');
+    assert.equal(vm.error?.message, 'No matches found.', 'the controller owns the wording');
+  });
+
+  test('GAP 4: onSearchFood maps ONLY to controller.searchFood', () => {
+    const adapter = read('src', 'actions.ts');
+    assert.match(adapter, /onSearchFood: \(query\) => \{ after\(controller\.searchFood\(query\)\); \}/);
+    const screen = read('src', 'components', 'screens.tsx');
+    assert.match(screen, /FoodSearchScreen/);
+    assert.match(screen, /onSubmitEditing=\{submit\}/, 'keyboard submit must also search');
+    assert.match(screen, /accessibilityLabel="Food name"/);
+  });
+
+  test('GAP 5: manual weight maps ONLY to controller.enterManualWeight', () => {
+    const adapter = read('src', 'actions.ts');
+    assert.match(adapter, /controller\.enterManualWeight\(grams\)/);
+    assert.match(adapter, /MANUAL provenance/i,
+      'the fallback must not fabricate device provenance');
+  });
+
+  test('GAP 5: the manual fallback appears only when no scale is connected', () => {
+    const screen = read('src', 'components', 'screens.tsx');
+    assert.match(screen, /!vm\.scale\.connected && !showManual/);
+    assert.match(screen, /Enter weight manually/);
+    // The real-scale path stays primary.
+    assert.match(screen, /label="Use this weight"/);
+    assert.match(screen, /disabled=\{!vm\.scale\.canCommitWeight\}/);
+  });
+
+  test('GAP 5: the renderer parses only to enable a button, never to compute', () => {
+    const screen = read('src', 'components', 'screens.tsx');
+    assert.match(screen, /Number\.isFinite\(parsed\) && parsed > 0/);
+    // Nothing is derived FROM the weight in the UI.
+    assert.equal(/parsed\s*[*/]/.test(screen), false);
+  });
+
+  test('the full core loop is representable end to end', () => {
+    const steps: readonly [string, Record<string, unknown>, string][] = [
+      ['idle', { phase: 'idle' }, 'home'],
+      ['search opened', { phase: 'searching', results: [], query: '' }, 'food_search'],
+      ['results', {
+        phase: 'searching', query: 'chicken',
+        results: [{
+          optionLabel: 'A', score: 1, matchKind: 'exact', preparationStateDisambiguates: false,
+          productVersion: {
+            productVersionId: 'p@v1', displayName: 'Chicken', preparationState: 'cooked',
+          },
+        }],
+      }, 'food_options'],
+      ['weighing', { phase: 'waiting_for_weight' }, 'weighing'],
+      ['review', { phase: 'reviewing' }, 'review'],
+      ['completed', { phase: 'completed' }, 'logged'],
+      ['back home', { phase: 'idle' }, 'home'],
+    ];
+    for (const [label, over, expected] of steps) {
+      const vm = buildViewModel(input({ app: appState({ addFood: { ...base().addFood, ...over } }) }));
+      assert.equal(vm.screen, expected, `${label} should project to ${expected}`);
     }
   });
 });

@@ -1,7 +1,7 @@
-import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { ScrollView, Text, TextInput, View } from 'react-native';
 import {
-  color, space, type, type TabletViewModel,
+  color, radius, space, touch, type, type TabletViewModel,
 } from '@macros/tablet-view-model';
 import { PrimaryAction, SecondaryAction, Surface } from './primitives.js';
 import { EnergyBalanceHero } from './EnergyBalanceHero.js';
@@ -13,6 +13,8 @@ import { OfflineStatus, RecentFoodRow, TopIdentityBar } from './status.js';
 
 export interface ScreenActions {
   readonly onAddFood: () => void;
+  readonly onSearchFood: (query: string) => void;
+  readonly onEnterManualWeight: (grams: number) => void;
   readonly onSelectOption: (productVersionId: string) => void;
   readonly onUseWeight: () => void;
   readonly onLog: () => void;
@@ -84,6 +86,67 @@ export function HomeScreen(
   );
 }
 
+/**
+ * TOUCH FALLBACK SEARCH.
+ *
+ * Voice is the primary interaction, but the mic is a future milestone and touch
+ * is the required secondary path — without this, "Add food" had nowhere to go.
+ */
+export function FoodSearchScreen(
+  { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
+): React.JSX.Element {
+  const [query, setQuery] = useState(vm.searchQuery);
+  const canSearch = query.trim().length > 0;
+  const submit = (): void => { if (canSearch) actions.onSearchFood(query.trim()); };
+
+  return (
+    <View style={{ flex: 1, padding: space.xl, justifyContent: 'space-between' }}>
+      <View>
+        <Text style={{ color: color.textPrimary, fontSize: type.display.size, fontWeight: '600' }}>
+          What are you adding?
+        </Text>
+
+        <TextInput
+          accessibilityLabel="Food name"
+          value={query}
+          onChangeText={setQuery}
+          onSubmitEditing={submit}
+          returnKeyType="search"
+          autoFocus
+          placeholder="Chicken breast…"
+          placeholderTextColor={color.textMuted}
+          style={{
+            marginTop: space.xl,
+            minHeight: touch.primaryHeight,
+            borderRadius: radius.md,
+            backgroundColor: color.surfaceRaised,
+            color: color.textPrimary,
+            fontSize: type.title.size,
+            paddingHorizontal: space.lg,
+          }}
+        />
+
+        {vm.error !== null ? (
+          // The trusted error from the controller — never reworded here.
+          <Text style={{ color: color.danger, fontSize: type.body.size, marginTop: space.lg }}>
+            {vm.error.message}
+          </Text>
+        ) : null}
+      </View>
+
+      <View style={{ gap: space.md }}>
+        <PrimaryAction
+          label="Search"
+          accessibilityLabel="Search for this food"
+          disabled={!canSearch}
+          onPress={submit}
+        />
+        <SecondaryAction label="Cancel" accessibilityLabel="Cancel adding food" onPress={actions.onCancel} />
+      </View>
+    </View>
+  );
+}
+
 export function FoodOptionsScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
@@ -104,9 +167,19 @@ export function WeighingScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
   const name = vm.review?.displayName ?? 'Selected food';
+  const [manual, setManual] = useState('');
+  const [showManual, setShowManual] = useState(false);
+
+  // Parsing here decides only whether the button is enabled. The controller
+  // still validates the value, and the capture keeps MANUAL provenance — the
+  // renderer must never fabricate scale stability or device provenance.
+  const parsed = Number.parseFloat(manual);
+  const manualUsable = Number.isFinite(parsed) && parsed > 0;
+
   return (
     <View style={{ flex: 1, padding: space.xl, justifyContent: 'space-between' }}>
       <ScaleWeightDisplay scale={vm.scale} foodName={name} />
+
       <View style={{ gap: space.md }}>
         <PrimaryAction
           label="Use this weight"
@@ -115,6 +188,42 @@ export function WeighingScreen(
           disabled={!vm.scale.canCommitWeight}
           onPress={actions.onUseWeight}
         />
+
+        {!vm.scale.connected && !showManual ? (
+          <SecondaryAction
+            label="Enter weight manually"
+            accessibilityLabel="Enter weight manually instead of using the scale"
+            onPress={() => setShowManual(true)}
+          />
+        ) : null}
+
+        {showManual ? (
+          <View style={{ gap: space.md }}>
+            <TextInput
+              accessibilityLabel="Weight in grams"
+              value={manual}
+              onChangeText={setManual}
+              keyboardType="numeric"
+              placeholder="Grams"
+              placeholderTextColor={color.textMuted}
+              style={{
+                minHeight: touch.primaryHeight,
+                borderRadius: radius.md,
+                backgroundColor: color.surfaceRaised,
+                color: color.textPrimary,
+                fontSize: type.title.size,
+                paddingHorizontal: space.lg,
+              }}
+            />
+            <PrimaryAction
+              label="Continue"
+              accessibilityLabel="Continue with the manually entered weight"
+              disabled={!manualUsable}
+              onPress={() => actions.onEnterManualWeight(parsed)}
+            />
+          </View>
+        ) : null}
+
         <SecondaryAction label="Change food" accessibilityLabel="Change food" onPress={actions.onChangeFood} />
       </View>
     </View>
@@ -237,6 +346,7 @@ export function TabletShell(
 
       <View style={{ flex: 1 }}>
         {vm.screen === 'home' ? <HomeScreen vm={vm} actions={actions} /> : null}
+        {vm.screen === 'food_search' ? <FoodSearchScreen vm={vm} actions={actions} /> : null}
         {vm.screen === 'food_options' ? <FoodOptionsScreen vm={vm} actions={actions} /> : null}
         {vm.screen === 'weighing' ? <WeighingScreen vm={vm} actions={actions} /> : null}
         {vm.screen === 'review' ? <ReviewScreen vm={vm} actions={actions} /> : null}

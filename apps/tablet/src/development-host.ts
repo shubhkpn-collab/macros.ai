@@ -9,7 +9,7 @@ import {
   InMemoryProductVersionRepository, InMemoryUserProfileRepository,
 } from '@macros/persistence';
 import {
-  DEV_CATALOG_HEADS, DEV_PRODUCTS, DEV_PROFILE, DEV_STABILITY_POLICY,
+  DEV_CATALOG_HEADS, DEV_GOAL, DEV_PRODUCTS, DEV_PROFILE, DEV_STABILITY_POLICY,
   DEV_TEF_POLICY, DEV_USER_ID, devActiveEnergy,
 } from './development-fixtures.js';
 import type { AuthHostPort } from './actions.js';
@@ -56,7 +56,10 @@ export async function createDevelopmentHost(
     profiles: new InMemoryUserProfileRepository(),
     goals: new InMemoryEnergyGoalRepository(),
   };
+  // BOTH are required before refreshDashboard(): a profile alone yields
+  // goal_missing and a blank Home.
   await repositories.profiles.append(DEV_PROFILE);
+  await repositories.goals.append(DEV_GOAL);
 
   const controller = new TabletAppController(
     {

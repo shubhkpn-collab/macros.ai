@@ -1,7 +1,7 @@
 import {
   centimetres, instant, kcal, kilograms, years,
-  type ActiveEnergyResolution, type ProductCatalogHead, type ProductVersion,
-  type TefPolicy, type UserProfileSnapshot,
+  type ActiveEnergyResolution, type EnergyGoalVersion, type ProductCatalogHead,
+  type ProductVersion, type TefPolicy, type UserProfileSnapshot,
 } from '@macros/contracts';
 // WeightStabilityPolicy belongs to the scale protocol, not to contracts —
 // stability is a property of the weighing device, not of nutrition data.
@@ -42,6 +42,23 @@ export const DEV_PROFILE: UserProfileSnapshot = {
   sex: 'male',
   bodyWeightKg: kilograms(80),
   heightCm: centimetres(180),
+};
+
+/**
+ * A goal is REQUIRED for a dashboard to exist.
+ *
+ * Without one `refreshDashboard()` cannot resolve an effective goal, writes a
+ * `goal_missing` error and Home renders with no energy hero and no macros —
+ * which is exactly what the first real Android launch showed. 'maintain' with a
+ * zero delta is the most neutral development choice: it demonstrates the
+ * north-star Home without asserting any target for a real person.
+ */
+export const DEV_GOAL: EnergyGoalVersion = {
+  goalVersionId: 'dev-goal-v1',
+  userId: DEV_USER_ID,
+  effectiveFrom: EFFECTIVE_FROM,
+  goal: 'maintain',
+  targetDeltaKcal: 0,
 };
 
 /** A handful of foods so the search and option screens have something real. */

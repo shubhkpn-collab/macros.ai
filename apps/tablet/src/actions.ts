@@ -59,6 +59,8 @@ export interface ActionDeps {
 
 export interface TabletActions {
   onAddFood(): void;
+  onSearchFood(query: string): void;
+  onEnterManualWeight(grams: number): void;
   onSelectOption(productVersionId: string): void;
   onUseWeight(): void;
   onLog(): void;
@@ -76,7 +78,20 @@ export function createActions(deps: ActionDeps): TabletActions {
   return {
     onAddFood: () => { controller.beginAddFood(); onChanged(); },
 
+    // Straight to the controller: its stale-search protection and error
+    // handling are the authority, and duplicating search logic in RN would give
+    // us two answers to the same question.
+    onSearchFood: (query) => { after(controller.searchFood(query)); },
+
     onSelectOption: (productVersionId) => { after(controller.selectProduct(productVersionId)); },
+
+    /**
+     * Manual weight fallback, used when no scale is connected.
+     *
+     * The controller validates the value and records MANUAL provenance; the
+     * renderer neither fabricates stability nor claims a device reading.
+     */
+    onEnterManualWeight: (grams) => { controller.enterManualWeight(grams); onChanged(); },
 
     onUseWeight: () => { controller.requestStableWeight(); onChanged(); },
 

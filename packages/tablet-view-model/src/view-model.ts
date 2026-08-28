@@ -14,7 +14,9 @@ import type { SwitchState } from '@macros/domain-household';
  */
 export const VIEW_MODEL_VERSION = 'tablet-view-model@1.0.0';
 
-export type Screen = 'locked' | 'home' | 'food_options' | 'weighing' | 'review' | 'logged';
+export type Screen =
+  | 'locked' | 'home' | 'food_search' | 'food_options'
+  | 'weighing' | 'review' | 'logged';
 
 /** Voice presence, mapped from application state — never invented by the UI. */
 export type VoicePresence =
@@ -93,6 +95,8 @@ export interface OfflineView {
 
 export interface TabletViewModel {
   readonly screen: Screen;
+  /** Echoed so the search field can show what was actually searched for. */
+  readonly searchQuery: string;
   readonly identity: IdentityView | null;
   readonly voice: VoicePresence;
   readonly energy: EnergyBalanceView | null;
@@ -134,6 +138,7 @@ const LOCKED_OFFLINE: OfflineView = {
 export function lockedViewModel(): TabletViewModel {
   return {
     screen: 'locked',
+    searchQuery: '',
     identity: null,
     voice: 'idle',
     energy: null,
@@ -171,7 +176,12 @@ function voicePresenceOf(app: AppState, offline: boolean): VoicePresence {
   if (offline) return 'offline';
   if (app.addFood.error !== null) return 'refused';
   switch (app.addFood.phase) {
-    case 'searching': return 'interpreting';
+    case 'searching':
+      // A freshly-opened, empty search box is NOT the assistant thinking.
+      // Claiming otherwise made the first real launch look broken: the screen
+      // said "Thinking" while nothing was happening and nothing could be typed.
+      if (app.addFood.results.length > 0) return 'needs_choice';
+      return app.addFood.query.length > 0 ? 'interpreting' : 'idle';
     case 'product_selected': return app.addFood.results.length > 1 ? 'needs_choice' : 'waiting_for_weight';
     case 'waiting_for_weight': return 'waiting_for_weight';
     case 'weight_captured':
@@ -184,7 +194,10 @@ function voicePresenceOf(app: AppState, offline: boolean): VoicePresence {
 
 function screenOf(app: AppState): Screen {
   switch (app.addFood.phase) {
-    case 'searching': return app.addFood.results.length > 0 ? 'food_options' : 'home';
+    case 'searching':
+      // Previously this sent a fresh flow straight back to Home, so "Add food"
+      // looked like a no-op: the phase changed but the screen did not.
+      return app.addFood.results.length > 0 ? 'food_options' : 'food_search';
     case 'product_selected': return app.addFood.results.length > 1 ? 'food_options' : 'weighing';
     case 'waiting_for_weight': return 'weighing';
     case 'weight_captured':
@@ -287,6 +300,7 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
   const attempt = switchState.attempt;
   return {
     screen: screenOf(app),
+    searchQuery: app.addFood.query,
     identity: {
       displayName: app.subject.displayName,
       userId: app.subject.userId,
