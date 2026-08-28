@@ -103,7 +103,7 @@ hydration script does that from the official template.
 # 1. Root workspace
 cd ~/macros-local
 npm ci
-npm run verify                        # expect 1611 tests, 0 failures
+npm run verify                        # expect 1620 tests, 0 failures
 
 # 2. Generate the native Android shell (requires network)
 node tools/hydrate-android-shell.mjs

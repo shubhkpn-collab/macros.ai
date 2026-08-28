@@ -88,7 +88,7 @@ export async function createDevelopmentHost(
 
   const composition: TabletComposition = {
     controller,
-    coordinator: { getState: () => activeSwitchState(DEV_USER_ID, 1) } as never,
+    coordinator: { getState: () => activeSwitchState(DEV_USER_ID, 1) },
     ports,
     capabilities: () => deriveCapabilities({
       backendReachable: ports.connectivity.backendReachable,

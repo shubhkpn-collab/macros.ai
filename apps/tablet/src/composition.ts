@@ -1,6 +1,6 @@
 import type { TabletAppController } from '@macros/tablet-app-core';
 import type { OfflineCapabilities } from '@macros/domain-offline-sync';
-import type { SharedDeviceAuthCoordinator } from '@macros/runtime-api';
+import type { SwitchState } from '@macros/domain-household';
 import {
   buildViewModel, lockedViewModel, type TabletViewModel,
 } from '@macros/tablet-view-model';
@@ -38,9 +38,27 @@ export interface TabletPorts {
   };
 }
 
+/**
+ * The ONLY thing the renderer needs from the auth coordinator.
+ *
+ * Importing the concrete `SharedDeviceAuthCoordinator` pulled
+ * `@macros/runtime-api`'s barrel into the RN type graph, which export-stars
+ * `server.ts` (`node:http`, `Buffer`) and reaches `@macros/runtime-config`,
+ * which export-stars `migrations.ts` (`node:crypto`). Six of the owner's eleven
+ * compile errors came from that one type-only import.
+ *
+ * The fix is structural typing, not `@types/node` or a Buffer polyfill: a
+ * kitchen tablet has no business depending on a Node server package. The real
+ * coordinator satisfies this interface as-is, so the production host wires it
+ * unchanged.
+ */
+export interface SwitchStateReader {
+  getState(): SwitchState;
+}
+
 export interface TabletComposition {
   readonly controller: TabletAppController;
-  readonly coordinator: SharedDeviceAuthCoordinator;
+  readonly coordinator: SwitchStateReader;
   readonly ports: TabletPorts;
   /** Capabilities derived by the offline domain — never inferred in the UI. */
   capabilities(): OfflineCapabilities;

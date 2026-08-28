@@ -612,9 +612,9 @@ describe('NATIVE BUILD READINESS — the bundle can actually resolve and load', 
     // The stale manual-copy instruction must be gone.
     assert.equal(/copy its `android\/` Gradle files/.test(doc), false);
     // The count must match reality, checked against the suite itself below.
-    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606/.test(doc), false,
+    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611/.test(doc), false,
       'stale test count in owner instructions');
-    assert.match(doc, /expect 1611 tests/);
+    assert.match(doc, /expect 1620 tests/);
   });
 
   test('FIX 4: hydration pins the package manager', () => {
@@ -623,5 +623,103 @@ describe('NATIVE BUILD READINESS — the bundle can actually resolve and load', 
       'template generation must not depend on the installed package manager');
     assert.match(script, /'--skip-install'/);
     assert.match(script, /'--install-pods', 'false'/);
+  });
+});
+
+describe('REAL TYPECHECK FIXES — proven by the owner\'s Mac compile', () => {
+  const read = (...p: string[]): string => readFileSync(repoPath('apps', 'tablet', ...p), 'utf8');
+  const fixtures = (): string => read('src', 'development-fixtures.ts');
+
+  test('WeightStabilityPolicy is imported from scale-protocol, not contracts', () => {
+    // Stability is a property of the weighing device, not of nutrition data.
+    const f = fixtures();
+    assert.match(f, /import type \{ WeightStabilityPolicy \} from '@macros\/scale-protocol'/);
+    const contractsImport = f.slice(f.indexOf("from '@macros/contracts'") - 400,
+                                    f.indexOf("from '@macros/contracts'"));
+    assert.equal(contractsImport.includes('WeightStabilityPolicy'), false);
+  });
+
+  test('DEV_TEF_POLICY uses individualAdjustmentModel and needs no cast', () => {
+    const f = fixtures();
+    assert.match(f, /individualAdjustmentModel:/);
+    assert.equal(/individualAdjustments:/.test(f), false, 'the stale field name is gone');
+    assert.equal(/\} as TefPolicy/.test(f), false, 'an unsafe cast would hide the next drift');
+    assert.match(f, /provenance: 'SYNTHETIC_TEST'/);
+    assert.match(f, /reviewStatus: 'PENDING_EXTERNAL_REVIEW'/);
+  });
+
+  test('DEV_CATALOG_HEADS is an array of ProductCatalogHead', () => {
+    const f = fixtures();
+    assert.match(f, /DEV_CATALOG_HEADS: readonly ProductCatalogHead\[\]/);
+    assert.match(f, /currentProductVersionId:/);
+    assert.match(f, /isActive: true/);
+    assert.match(f, /updatedAt: EFFECTIVE_FROM/);
+    assert.equal(/DEV_CATALOG_HEADS: Readonly<Record/.test(f), false);
+  });
+
+  test('devActiveEnergy returns an AVAILABLE ActiveEnergyResolution', () => {
+    const f = fixtures();
+    assert.match(f, /devActiveEnergy = \(soFar: number\): ActiveEnergyResolution/);
+    assert.match(f, /status: 'available'/);
+    // The full estimate contract, not a partial object behind a cast.
+    for (const field of ['source:', 'quality:', 'qualityReasons:', 'completeness:',
+                         'completenessGaps:', 'unresolvedIntervals:', 'unresolvedMinutes:',
+                         'projectionPolicyVersion:', 'gapFillPolicyVersion:']) {
+      assert.ok(f.includes(field), `estimate is missing ${field}`);
+    }
+    assert.equal(/as ActiveEnergyEstimate/.test(f), false);
+  });
+
+  test('the RN graph imports NO @macros/runtime-api', () => {
+    // Its barrel export-stars server.ts and drags node:http and Buffer in.
+    for (const f of ['src/composition.ts', 'src/actions.ts', 'src/App.tsx',
+                     'src/bootstrap.ts', 'src/development-host.ts', 'index.js']) {
+      const code = read(...f.split('/'))
+        .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+      assert.equal(code.includes('@macros/runtime-api'), false, `${f} imports runtime-api`);
+    }
+  });
+
+  test('the RN graph imports NO @macros/runtime-config', () => {
+    // Its barrel export-stars migrations.ts and drags node:crypto in.
+    for (const f of ['src/composition.ts', 'src/actions.ts', 'src/App.tsx',
+                     'src/bootstrap.ts', 'src/development-host.ts', 'index.js']) {
+      const code = read(...f.split('/'))
+        .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+      assert.equal(code.includes('@macros/runtime-config'), false, `${f} imports runtime-config`);
+    }
+  });
+
+  test('the coordinator is consumed structurally, not as the server class', () => {
+    const composition = read('src', 'composition.ts');
+    assert.match(composition, /interface SwitchStateReader/);
+    assert.match(composition, /getState\(\): SwitchState/);
+    assert.match(composition, /readonly coordinator: SwitchStateReader/);
+  });
+
+  test('the tablet tsconfig has no baseUrl override', () => {
+    const raw = read('tsconfig.json');
+    assert.equal(/"baseUrl"/.test(raw), false, 'TypeScript 6 rejects it, and the root config owns paths');
+    assert.equal(/ignoreDeprecations/.test(raw), false);
+  });
+
+  test('every package in the RN graph is free of Node built-ins', () => {
+    const graph = ['contracts', 'domain-auth', 'domain-household', 'domain-offline-sync',
+                   'persistence', 'scale-protocol', 'tablet-app-core', 'tablet-view-model'];
+    const walk = (d: string, out: string[] = []): string[] => {
+      for (const e of readdirSync(d)) {
+        const p = join(d, e);
+        if (statSync(p).isDirectory()) walk(p, out); else if (p.endsWith('.ts')) out.push(p);
+      }
+      return out;
+    };
+    for (const pkg of graph) {
+      for (const f of walk(repoPath('packages', pkg, 'src'))) {
+        const code = readFileSync(f, 'utf8')
+          .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+        assert.equal(/from\s+['"]node:/.test(code), false,
+          `${pkg} reaches a Node built-in and is in the RN graph: ${f}`);
+      }
+    }
   });
 });

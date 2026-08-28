@@ -1,8 +1,11 @@
 import {
   centimetres, instant, kcal, kilograms, years,
-  type ActiveEnergyEstimate, type ProductVersion, type TefPolicy,
-  type UserProfileSnapshot, type WeightStabilityPolicy,
+  type ActiveEnergyResolution, type ProductCatalogHead, type ProductVersion,
+  type TefPolicy, type UserProfileSnapshot,
 } from '@macros/contracts';
+// WeightStabilityPolicy belongs to the scale protocol, not to contracts —
+// stability is a property of the weighing device, not of nutrition data.
+import type { WeightStabilityPolicy } from '@macros/scale-protocol';
 
 /**
  * DEVELOPMENT-ONLY FIXTURES — RN-SAFE.
@@ -75,10 +78,22 @@ export const DEV_PRODUCTS: readonly ProductVersion[] = [
   },
 ] as readonly ProductVersion[];
 
-export const DEV_CATALOG_HEADS: Readonly<Record<string, string>> = {
-  'dev-chicken-breast': 'dev-chicken-breast@cooked-v1',
-  'dev-rolled-oats': 'dev-rolled-oats@dry-v1',
-};
+/** Heads for the searchable products. Cooked chicken is the head; raw is a
+ *  sibling version, which is what makes the preparation disambiguation real. */
+export const DEV_CATALOG_HEADS: readonly ProductCatalogHead[] = [
+  {
+    productId: 'dev-chicken-breast',
+    currentProductVersionId: 'dev-chicken-breast@cooked-v1',
+    isActive: true,
+    updatedAt: EFFECTIVE_FROM,
+  },
+  {
+    productId: 'dev-rolled-oats',
+    currentProductVersionId: 'dev-rolled-oats@dry-v1',
+    isActive: true,
+    updatedAt: EFFECTIVE_FROM,
+  },
+];
 
 /** SYNTHETIC — proves the mathematics, not physiologically approved. */
 export const DEV_TEF_POLICY: TefPolicy = {
@@ -86,14 +101,16 @@ export const DEV_TEF_POLICY: TefPolicy = {
   provenance: 'SYNTHETIC_TEST',
   reviewStatus: 'PENDING_EXTERNAL_REVIEW',
   macroCoefficients: { protein: 0.25, carbohydrate: 0.075, fat: 0.02, alcohol: 0.15 },
-  individualAdjustments: {
+  // Neutral: every individual adjustment is 'none', so the synthetic policy
+  // exercises the mathematics without asserting any physiological claim.
+  individualAdjustmentModel: {
     age: { kind: 'none' }, sex: { kind: 'none' },
     fatFreeMass: { kind: 'none' }, bodyFatPercent: { kind: 'none' },
   },
   composition: 'additive_kcal',
   adjustmentBoundFraction: 0.25,
   personalCalibrationEnabled: false,
-} as TefPolicy;
+};
 
 /** SYNTHETIC — pending real hardware validation. */
 export const DEV_STABILITY_POLICY: WeightStabilityPolicy = {
@@ -111,9 +128,28 @@ export const DEV_STABILITY_POLICY: WeightStabilityPolicy = {
   representativeMethod: 'median',
   resolutionQuantization: 'nearest_resolution',
   maxStableCandidateAgeMs: 5000,
-} as WeightStabilityPolicy;
+};
 
-export const devActiveEnergy = (soFar: number): ActiveEnergyEstimate => ({
-  activeKcalSoFar: kcal(soFar),
-  projectedRemainingActiveKcal: kcal(0),
-} as ActiveEnergyEstimate);
+/**
+ * The controller consumes an ActiveEnergyResolution, not a bare estimate — the
+ * distinction matters because "we have no activity data" is a real state the
+ * energy engine must be able to represent rather than fake with a zero.
+ */
+export const devActiveEnergy = (soFar: number): ActiveEnergyResolution => ({
+  status: 'available',
+  estimate: {
+    activeKcalSoFar: kcal(soFar),
+    projectedRemainingActiveKcal: kcal(0),
+    source: 'simulated',
+    quality: 'observed',
+    qualityReasons: [],
+    completeness: 'complete',
+    completenessGaps: [],
+    unresolvedIntervals: [],
+    unresolvedMinutes: 0,
+    confidence: 1,
+    providerId: 'development-host',
+    projectionPolicyVersion: 'activity-projection@0.0.0-SYNTHETIC-DEVELOPMENT',
+    gapFillPolicyVersion: 'activity-gap-fill@0.0.0-SYNTHETIC-DEVELOPMENT',
+  },
+});

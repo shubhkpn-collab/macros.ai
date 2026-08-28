@@ -5,8 +5,7 @@
     "jsx": "react-jsx",
     "types": ["react", "react-native"],
     "noEmit": true,
-    "rootDir": "../..",
-    "baseUrl": "."
+    "rootDir": "../.."
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "index.js"],
   "exclude": ["node_modules", "android", "ios"]
