@@ -6,14 +6,15 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "check:purity": "node --import tsx tools/check-purity.ts",
-    "verify": "npm run check:toolchain && npm run check:purity && npm run check:portability && npm run check:auth && npm run typecheck && npm run test",
+    "verify": "npm run check:toolchain && npm run check:purity && npm run check:portability && npm run check:renderer && npm run check:auth && npm run typecheck && npm run test",
     "check:portability": "node --import tsx tools/check-portability.ts",
     "check:auth": "node --import tsx tools/check-auth-boundary.ts",
     "docs:generate": "node --import tsx tools/gen-catalog-doc.ts",
     "check:toolchain": "node --import tsx tools/check-toolchain.ts",
     "postgres:validate": "bash tools/postgres-validation/run.sh",
     "postgres:integration": "node --import tsx tools/postgres-integration/run-integration.ts",
-    "auth:live-gate": "node --import tsx tools/supabase-gate/run-live-gate.ts"
+    "auth:live-gate": "node --import tsx tools/supabase-gate/run-live-gate.ts",
+    "check:renderer": "node --import tsx tools/check-renderer-purity.ts"
   },
   "engines": {
     "node": ">=22.0.0",

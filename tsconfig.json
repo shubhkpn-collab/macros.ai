@@ -55,6 +55,7 @@
       "@macros/domain-food-search": [
         "./packages/domain-food-search/src/index.ts"
       ],
+      "@macros/tablet-view-model": ["./packages/tablet-view-model/src/index.ts"],
       "@macros/tablet-app-core": [
         "./packages/tablet-app-core/src/index.ts"
       ],
