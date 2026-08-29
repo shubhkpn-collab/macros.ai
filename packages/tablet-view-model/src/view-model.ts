@@ -386,9 +386,93 @@ export interface FoodCardView {
   readonly productVersionId: string;
   readonly displayName: string;
   readonly brandLine: string;
+  readonly preparationLine: string;
   readonly servingLine: string;
   readonly nutritionLine: string;
+  readonly macroLine: string;
+  /**
+   * IMAGE-READY. A real URL renders; null renders the deterministic
+   * placeholder. Coverage is currently 0% — sourcing is a separate decision —
+   * but the product no longer needs a code change once images exist.
+   */
+  readonly imageUrl: string | null;
   readonly imageInitials: string;
+  /** Shown beside a real image. Licence terms differ per source. */
+  readonly imageAttribution: string | null;
   readonly displayable: boolean;
+  /** Why this record is not offerable, in plain words. Null when it is fine. */
+  readonly dataWarning: string | null;
   readonly accessibilityLabel: string;
+}
+
+/**
+ * Project a catalog FoodCard into its display form.
+ *
+ * Formatting happens here, as everywhere else: a missing value says "unknown"
+ * rather than rendering as blank, so a data gap is visible instead of looking
+ * like a design choice.
+ */
+export function toFoodCardView(card: {
+  readonly productVersionId: string;
+  readonly displayName: string;
+  readonly brand: { readonly present: boolean; readonly value: string | null };
+  readonly preparationState: string;
+  readonly serving: {
+    readonly grams: number | null; readonly householdText: string | null;
+    readonly weighable: boolean;
+  };
+  readonly kcal: { readonly present: boolean; readonly value: number | null };
+  readonly proteinG: { readonly present: boolean; readonly value: number | null };
+  readonly carbohydrateG: { readonly present: boolean; readonly value: number | null };
+  readonly fatG: { readonly present: boolean; readonly value: number | null };
+  readonly image: {
+    readonly url: string | null; readonly attribution: string | null;
+    readonly status: string;
+  };
+  readonly displayable: boolean;
+}, initials: string): FoodCardView {
+  const brandLine = card.brand.present && card.brand.value !== null
+    ? card.brand.value : 'No brand';
+
+  const servingLine = card.serving.grams !== null
+    ? `${formatGramsWithUnit(card.serving.grams)}${
+      card.serving.householdText !== null ? ` · ${card.serving.householdText}` : ''}`
+    : card.serving.householdText !== null
+      ? `${card.serving.householdText} · no gram weight`
+      : 'No serving information';
+
+  const nutritionLine = card.kcal.present && card.kcal.value !== null
+    ? `${formatKcal(card.kcal.value)} kcal / 100 g`
+    : 'Energy unknown';
+
+  const macroPart = (label: string, v: { present: boolean; value: number | null }): string =>
+    v.present && v.value !== null ? `${label} ${formatGrams(v.value)}` : `${label} —`;
+  const macroLine = [
+    macroPart('P', card.proteinG),
+    macroPart('C', card.carbohydrateG),
+    macroPart('F', card.fatG),
+  ].join(' · ');
+
+  const dataWarning = card.displayable
+    ? (card.serving.weighable ? null : 'No gram weight — needs manual weighing')
+    : 'Not offerable: missing or implausible nutrition';
+
+  return {
+    productVersionId: card.productVersionId,
+    displayName: card.displayName,
+    brandLine,
+    preparationLine: card.preparationState,
+    servingLine,
+    nutritionLine,
+    macroLine,
+    imageUrl: card.image.status === 'available' ? card.image.url : null,
+    imageInitials: initials,
+    imageAttribution: card.image.attribution,
+    displayable: card.displayable,
+    dataWarning,
+    accessibilityLabel:
+      `${card.displayName}. ${brandLine}. ${card.preparationState}. `
+      + `${servingLine}. ${nutritionLine}. ${macroLine}`
+      + `${dataWarning !== null ? `. ${dataWarning}` : ''}`,
+  };
 }

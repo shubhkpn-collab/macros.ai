@@ -179,10 +179,11 @@ describe('DATA-1 AUDIT ARTIFACTS — measured, not asserted', () => {
 
   test('the search benchmark records real weaknesses', () => {
     const b = JSON.parse(readFileSync(repoPath('data', 'search-benchmark.json'), 'utf8'));
-    assert.ok(b.corpusSize >= 30);
     assert.ok(b.searchableRecords > 400000);
-    // The spelling category is genuinely weak; the number must not be massaged.
-    assert.ok(b.byCategory.spelling.top3 < b.byCategory.spelling.n,
+    // SEARCH-1 expanded the corpus and renamed the category; misspellings
+    // improved but remain the weakest area, and that must stay visible.
+    assert.ok(b.corpusSize >= 250);
+    assert.ok(b.byCategory.misspelling.top1 < b.byCategory.misspelling.n,
       'misspelling handling is a known gap and must stay visible');
   });
 });

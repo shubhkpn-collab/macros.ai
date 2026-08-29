@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, View } from 'react-native';
+import { Image, ScrollView, Text, TextInput, View } from 'react-native';
 import { color, radius, space, touch, type } from '@macros/tablet-view-model';
 import type { FoodCardView } from '@macros/tablet-view-model';
 import { PrimaryAction, SecondaryAction, SectionLabel } from './primitives.js';
@@ -57,16 +57,29 @@ export function DevFoodCardBrowser(
               padding: space.md, marginBottom: space.sm,
             }}
           >
-            {/* Deterministic placeholder when the catalog has no image. */}
-            <View style={{
-              width: 84, height: 84, borderRadius: radius.md,
-              backgroundColor: color.surfaceMuted,
-              alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Text style={{ color: color.textMuted, fontSize: 26, fontWeight: '700' }}>
-                {c.imageInitials}
-              </Text>
-            </View>
+            {/*
+              IMAGE-READY. A real URL renders; otherwise the deterministic
+              placeholder. Coverage is 0% today, so in practice every tile is a
+              placeholder — but no code change is needed once images exist.
+            */}
+            {c.imageUrl !== null ? (
+              <Image
+                accessibilityIgnoresInvertColors
+                source={{ uri: c.imageUrl }}
+                style={{ width: 84, height: 84, borderRadius: radius.md,
+                  backgroundColor: color.surfaceMuted }}
+              />
+            ) : (
+              <View style={{
+                width: 84, height: 84, borderRadius: radius.md,
+                backgroundColor: color.surfaceMuted,
+                alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Text style={{ color: color.textMuted, fontSize: 26, fontWeight: '700' }}>
+                  {c.imageInitials}
+                </Text>
+              </View>
+            )}
 
             <View style={{ flex: 1 }}>
               <Text numberOfLines={2} style={{ color: color.textPrimary, fontSize: type.body.size }}>
@@ -76,7 +89,7 @@ export function DevFoodCardBrowser(
                 {c.brandLine}
               </Text>
               <Text style={{ color: color.textMuted, fontSize: type.caption.size }}>
-                {c.servingLine}
+                {c.preparationLine} · {c.servingLine}
               </Text>
               <Text style={{
                 color: c.displayable ? color.accent : color.warning,
@@ -84,6 +97,21 @@ export function DevFoodCardBrowser(
               }}>
                 {c.nutritionLine}
               </Text>
+              <Text style={{ color: color.textSecondary, fontSize: type.caption.size }}>
+                {c.macroLine}
+              </Text>
+              {c.dataWarning !== null ? (
+                // Gaps are shown, not hidden: that is the point of a QA surface.
+                <Text style={{ color: color.warning, fontSize: type.caption.size,
+                  marginTop: space.xxs }}>
+                  {c.dataWarning}
+                </Text>
+              ) : null}
+              {c.imageAttribution !== null ? (
+                <Text style={{ color: color.textMuted, fontSize: 13 }}>
+                  {c.imageAttribution}
+                </Text>
+              ) : null}
             </View>
           </View>
         ))}

@@ -30,6 +30,13 @@ export interface TabletHost {
    * banner, so a fixture build can never be mistaken for a real one.
    */
   readonly developmentNotice: string | null;
+  /**
+   * Catalog QA browser. Present ONLY on a development host — a production host
+   * returns null, so the surface cannot appear in a shipped configuration.
+   */
+  readonly catalogBrowser: {
+    search(query: string): Promise<readonly unknown[]>;
+  } | null;
 }
 
 /**

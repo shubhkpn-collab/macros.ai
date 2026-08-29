@@ -1,969 +1,7416 @@
 {
-  "benchmarkVersion": "search-quality@1.0.0",
-  "corpusSize": 32,
+  "benchmarkVersion": "search-quality@2.0.0",
+  "corpusSize": 255,
   "searchableRecords": 416429,
-  "top1RelevancePercent": 90.6,
-  "top3RelevancePercent": 90.6,
-  "noResultPercent": 3.1,
+  "vocabularyTerms": 37090,
+  "top1RelevancePercent": 94.7,
+  "top3RelevancePercent": 95.1,
+  "noResultPercent": 3.5,
+  "unsafeWrongResultPercent": 0.0,
+  "ambiguityPercent": 75.3,
+  "didYouMeanPercent": 9.4,
+  "confidencePercent": 11.4,
   "byCategory": {
-    "common": {
-      "n": 8,
-      "top1": 8,
-      "top3": 8,
-      "none": 0
+    "protein": {
+      "n": 32,
+      "top1": 31,
+      "top3": 31,
+      "none": 0,
+      "unsafe": 0
     },
-    "preparation": {
-      "n": 5,
-      "top1": 5,
-      "top3": 5,
-      "none": 0
+    "grain": {
+      "n": 28,
+      "top1": 24,
+      "top3": 24,
+      "none": 0,
+      "unsafe": 0
+    },
+    "dairy": {
+      "n": 18,
+      "top1": 18,
+      "top3": 18,
+      "none": 0,
+      "unsafe": 0
+    },
+    "produce": {
+      "n": 28,
+      "top1": 28,
+      "top3": 28,
+      "none": 0,
+      "unsafe": 0
+    },
+    "fats_condiments": {
+      "n": 19,
+      "top1": 19,
+      "top3": 19,
+      "none": 0,
+      "unsafe": 0
     },
     "branded": {
-      "n": 4,
-      "top1": 4,
-      "top3": 4,
-      "none": 0
+      "n": 18,
+      "top1": 18,
+      "top3": 18,
+      "none": 0,
+      "unsafe": 0
     },
-    "morphology": {
-      "n": 3,
-      "top1": 3,
-      "top3": 3,
-      "none": 0
-    },
-    "spelling": {
-      "n": 3,
-      "top1": 1,
-      "top3": 1,
-      "none": 1
+    "misspelling": {
+      "n": 25,
+      "top1": 17,
+      "top3": 18,
+      "none": 1,
+      "unsafe": 0
     },
     "abbreviation": {
-      "n": 2,
-      "top1": 1,
-      "top3": 1,
-      "none": 0
+      "n": 11,
+      "top1": 11,
+      "top3": 11,
+      "none": 0,
+      "unsafe": 0
+    },
+    "morphology": {
+      "n": 10,
+      "top1": 10,
+      "top3": 10,
+      "none": 0,
+      "unsafe": 0
     },
     "natural_language": {
-      "n": 3,
-      "top1": 3,
-      "top3": 3,
-      "none": 0
+      "n": 12,
+      "top1": 12,
+      "top3": 12,
+      "none": 0,
+      "unsafe": 0
+    },
+    "preparation": {
+      "n": 12,
+      "top1": 12,
+      "top3": 12,
+      "none": 0,
+      "unsafe": 0
     },
     "cuisine": {
-      "n": 4,
-      "top1": 4,
-      "top3": 4,
-      "none": 0
+      "n": 18,
+      "top1": 18,
+      "top3": 18,
+      "none": 0,
+      "unsafe": 0
+    },
+    "ambiguous": {
+      "n": 16,
+      "top1": 16,
+      "top3": 16,
+      "none": 0,
+      "unsafe": 0
+    },
+    "absent": {
+      "n": 8,
+      "top1": 0,
+      "top3": 0,
+      "none": 8,
+      "unsafe": 0
     }
   },
   "queries": [
     {
-      "query": "banana",
-      "category": "common",
-      "note": "",
-      "resultCount": 3046,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "Banana chips snacks",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
-        },
-        {
-          "name": "Banana pepper, raw",
-          "brand": null,
-          "prep": "raw",
-          "kind": "generic"
-        },
-        {
-          "name": "BANANA CHIPS",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "eggs",
-      "category": "common",
-      "note": "plural of a staple",
-      "resultCount": 1563,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "EGGS",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "EGGS",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "EGGS",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "whole milk",
-      "category": "common",
-      "note": "",
-      "resultCount": 25958,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "WHOLE MILK",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "WHOLE MILK",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "Ricotta cheese, whole milk",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
-        }
-      ]
-    },
-    {
-      "query": "peanut butter",
-      "category": "common",
-      "note": "",
-      "resultCount": 13685,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "PEANUT BUTTER",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "PEANUT BUTTER",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "PEANUT BUTTER",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "white rice",
-      "category": "common",
-      "note": "",
-      "resultCount": 17624,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "Rice flour, white, unenriched",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
-        },
-        {
-          "name": "White rice flour, unenriched",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
-        },
-        {
-          "name": "COOKED WHITE RICE",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "cheddar cheese",
-      "category": "common",
-      "note": "",
-      "resultCount": 31426,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "CHEDDAR CHEESE",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "American cheddar cheese, imitation",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
-        },
-        {
-          "name": "CHEDDAR CHEESE",
-          "brand": "WEIS",
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "olive oil",
-      "category": "common",
-      "note": "",
-      "resultCount": 7029,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "OLIVE OIL",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "OLIVE OIL",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "OLIVE OIL",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "almonds",
-      "category": "common",
-      "note": "",
-      "resultCount": 5201,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "ALMONDS",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "ALMONDS",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "Almonds nuts",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
-        }
-      ]
-    },
-    {
       "query": "chicken breast",
-      "category": "preparation",
-      "note": "ambiguous by design",
+      "category": "protein",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
       "resultCount": 14644,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "CHICKEN BREAST",
           "brand": "FAREWAY",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
           "name": "CHICKEN BREAST",
           "brand": "SHOPRITE",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
           "name": "CHICKEN BREAST",
           "brand": "TYSON",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "cooked chicken breast",
-      "category": "preparation",
-      "note": "must favour cooked",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "confident",
       "resultCount": 19060,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "Breaded chicken breast tenders, cooked, microwaved",
           "brand": null,
-          "prep": "cooked",
-          "kind": "generic"
+          "prep": "cooked"
         },
         {
-          "name": "Fully Cooked Breaded Chicken Breast Tenderloins",
-          "brand": "Tyson",
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "Chicken bratwurst, cooked",
+          "name": "Chicken, broilers or fryers, breast, meat only, cooked, fried",
           "brand": null,
-          "prep": "cooked",
-          "kind": "generic"
+          "prep": "cooked"
+        },
+        {
+          "name": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+          "brand": null,
+          "prep": "cooked"
         }
       ]
     },
     {
       "query": "raw chicken breast",
-      "category": "preparation",
-      "note": "must favour raw",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "confident",
       "resultCount": 18810,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
-        {
-          "name": "RAW STUFFED CHICKEN BREAST",
-          "brand": "HANNFORD",
-          "prep": "as_sold",
-          "kind": "branded"
-        },
         {
           "name": "Breast chicken, boneless, skinless, raw",
           "brand": null,
-          "prep": "raw",
-          "kind": "generic"
+          "prep": "raw"
+        },
+        {
+          "name": "Chicken, broilers or fryers, breast, meat and skin, raw",
+          "brand": null,
+          "prep": "raw"
         },
         {
           "name": "Ground chicken, raw",
           "brand": null,
-          "prep": "raw",
-          "kind": "generic"
+          "prep": "raw"
         }
       ]
     },
     {
-      "query": "white rice cooked",
-      "category": "preparation",
-      "note": "",
-      "resultCount": 22559,
+      "query": "grilled chicken",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 13876,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "COOKED WHITE RICE",
+          "name": "McDONALD'S, Bacon Ranch Salad with Grilled Chicken",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "cooked"
         },
         {
-          "name": "ORGANIC COOKED WHITE RICE",
+          "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, grilled",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "cooked"
         },
         {
-          "name": "ORGANIC COOKED WHITE RICE",
-          "brand": "MINSLEY",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "Fast Foods, grilled chicken filet sandwich, with lettuce, tomato and spread",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "chicken thigh",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 13273,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Thigh chicken, boneless, skinless, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "CHICKEN THIGH",
+          "brand": "CALIFORNIA GOLD",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN THIGH MARSALA",
+          "brand": "AHOLD",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ground beef",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 10243,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GROUND BEEF",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GROUND BEEF",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GROUND BEEF",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "lean ground beef",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 11268,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "LEAN GROUND BEEF",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "LEAN GROUND BEEF",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "LEAN GROUND BEEF",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "steak",
+      "category": "protein",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 2122,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "JUST STEAK",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "STEAK SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "STEAK SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pork chop",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 4660,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Loin pork, boneless, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BONELESS PORK CHOP",
+          "brand": "NICOLOSI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PORK CHOP MEAL, PORK",
+          "brand": "SCHNUCKS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bacon",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 4283,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Meatless bacon",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Meatless bacon bits",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Turkey bacon, microwaved",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "turkey breast",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 6196,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "TURKEY BREAST",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Sliced turkey breast, prepackaged",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BUTTERBALL, TURKEY BREAST",
+          "brand": "BUTTERBALL",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ground turkey",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 6105,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Ground turkey, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Ground turkey, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "GROUND TURKEY",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "salmon",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1615,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Salmon fish oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PINK SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "grilled salmon",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2840,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GRILLED SALMON",
+          "brand": "AHOLD",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GRILLED SALMON",
+          "brand": "FRESH TAKE",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GRILLED SALMON",
+          "brand": "UKROP'S",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "canned tuna",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1974,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CANNED LIGHT TUNA IN SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Tuna fish, light, canned in oil, drained solids",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Tuna fish, light, canned in water, drained solids",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tuna",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1370,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "TUNA",
+          "brand": "WICKED TUNA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "TUNA PORTIONS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "TUNA SALAD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "shrimp",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2590,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SHRIMP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SHRIMP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SHRIMP",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cod",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 443,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "COD FILLET",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COD FILLETS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SKINLESS COD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tilapia",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 288,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Tilapia fish, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "TILAPIA FILLET",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "TILAPIA FILLETS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "lamb",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 393,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Ground lamb, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BAR, LAMB",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "LAMB",
+          "brand": "SWIFT",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ham",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2376,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Chopped ham, canned",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Sliced ham, restaurant",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COUNTRY HAM",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "sausage",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5903,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Meatless sausage",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SAUSAGE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ITALIAN SAUSAGE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "eggs",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1563,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "egg",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2678,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Egg bagels",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Egg bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Dinner rolls, egg",
+          "brand": null,
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "boiled egg",
-      "category": "preparation",
-      "note": "",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "confident",
       "resultCount": 3129,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "Whole egg, cooked, hard-boiled",
           "brand": null,
-          "prep": "cooked",
-          "kind": "generic"
+          "prep": "cooked"
         },
         {
-          "name": "HARD-BOILED EGG WITH CASHEWS & GOUDA CHEESE",
-          "brand": "CRYSTAL FARMS",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "Breadfruit seeds, boiled",
+          "brand": null,
+          "prep": "cooked"
         },
         {
-          "name": "HARD-BOILED EGG WITH CASHEWS & GOUDA CHEESE",
-          "brand": "CRYSTAL FARMS",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "Egg bread, toasted",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "scrambled eggs",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1596,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Scrambled eggs, frozen mixture",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Whole egg, cooked, scrambled",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "COOKED SCRAMBLED EGGS WITH SAUSAGE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "egg white",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 13522,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "White egg, dried",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "EGG WHITE OMELETTINI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "White egg, raw, fresh",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "tofu",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 339,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Fried tofu",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Tofu yogurt",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SALAD",
+          "brand": "TOFU",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "firm tofu",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 349,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "EXTRA FIRM TOFU",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "FIRM TOFU",
+          "brand": "VITASOY",
+          "prep": "as_sold"
+        },
+        {
+          "name": "FIRM TOFU, FIRM",
+          "brand": "WEGMANS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tempeh",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 29,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Tempeh",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Tempeh, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "FLAX TEMPEH, FLAX",
+          "brand": "LIGHTLIFE",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "whey protein",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 6107,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "WHEY PROTEIN",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Beverages, Protein powder whey based",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Beverages, Whey protein powder isolate",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "protein powder",
+      "category": "protein",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 7389,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PROTEIN POWDER",
+          "brand": "EAS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PROTEIN POWDER",
+          "brand": "BOOST",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PROTEIN POWDER",
+          "brand": "PURE PROTEIN",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "white rice",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 17624,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Rice flour, white, unenriched",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "White rice flour, unenriched",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COOKED WHITE RICE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "brown rice",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 9760,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Brown rice flour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Rice flour, brown",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BROWN RICE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "white rice cooked",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 22559,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "White rice, glutinous, unenriched, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "White rice, medium-grain, cooked, unenriched",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "White rice, medium-grain, enriched, cooked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "basmati rice",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 7522,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BASMATI RICE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BASMATI RICE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BASMATI RICE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "jasmine rice",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 7600,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "JASMINE RICE",
+          "brand": "JASMINE",
+          "prep": "as_sold"
+        },
+        {
+          "name": "JASMINE RICE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "JASMINE BROWN RICE, JASMINE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pasta",
+      "category": "grain",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 6147,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PASTA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Dry pasta, enriched",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Dry pasta, unenriched",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "spaghetti",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1151,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SPAGHETTI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SPAGHETTI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SPAGHETTI",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "penne",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 783,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PENNE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PENNE",
+          "brand": "SEVIROLI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PENNE",
+          "brand": "HARMONS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bread",
+      "category": "grain",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 6258,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Cheese bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Cinnamon bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Egg bread",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "white bread",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 16503,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "White wheat bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "WHITE BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Pita bread, white, enriched",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "whole wheat bread",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 20284,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Pita bread, whole-wheat",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "WHOLE WHEAT BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "100% WHOLE WHEAT BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "sourdough",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 600,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SOURDOUGH BAGUETTE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SOURDOUGH BAGUETTE, SOURDOUGH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SOURDOUGH BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bagel",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 444,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BAGEL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BAGEL CRUNCH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BAGEL THINS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tortilla",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2891,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BIG TORTILLA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "FLOUR TORTILLA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "JICAMA TORTILLA",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "oats",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1801,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "OATS",
+          "brand": "ROLLINI' OATS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "OVERNIGHT OATS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "POST, OATS",
+          "brand": "POST",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "rolled oats",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2110,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "ROLLED OATS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ROLLED OATS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "LARGE ROLLED OATS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "oatmeal",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2102,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Oatmeal bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "OATMEAL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Oatmeal bread, toasted",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "quinoa",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1363,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Quinoa flour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Quinoa, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Uncooked quinoa",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "couscous",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 213,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Couscous, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Dry couscous",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COUSCOUS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "barley",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 278,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Barley flour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Hulled barley",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Barley malt flour",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cereal",
+      "category": "grain",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 5129,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CEREAL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CEREAL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CEREAL",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "potato",
+      "category": "grain",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7577,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Potato bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Potato flour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Potato flour",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "baked potato",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 11106,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Baked potatoes, flesh, with salt",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Baked potatoes, flesh, without salt",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Baked potatoes, skin, without salt",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "sweet potato",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 17351,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SWEET POTATO",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BRUCE SWEET POTATO",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "RICED SWEET POTATO",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "mashed potatoes",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2882,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "MASHED POTATOES",
+          "brand": "TOPS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MASHED POTATOES",
+          "brand": "CEDARLANE",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MASHED POTATOES",
+          "brand": "MEIJER",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "french fries",
+      "category": "grain",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3336,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "FRENCH FRIES",
+          "brand": "PSST",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CASCADIAN FARM, FRENCH FRIES",
+          "brand": "CASCADIAN FARM",
+          "prep": "as_sold"
+        },
+        {
+          "name": "SHOESTRING FRENCH FRIES",
+          "brand": "PSST",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "corn",
+      "category": "grain",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7339,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Corn tostada shells",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Corn, dried (Navajo)",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Crude corn bran",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "noodles",
+      "category": "grain",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 1180,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Dry rice noodles",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Rice noodles, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "INSTANT NOODLES",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "whole milk",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 25958,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "WHOLE MILK",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "WHOLE MILK",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Buttermilk milk, fluid, whole",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "skim milk",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 15347,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SKIM MILK",
+          "brand": "KLEINPETER",
+          "prep": "as_sold"
+        },
+        {
+          "name": "SKIM MILK",
+          "brand": "KLEINPETER",
+          "prep": "as_sold"
+        },
+        {
+          "name": "SKIM MILK",
+          "brand": "KRAFT",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "milk",
+      "category": "dairy",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 14520,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Milk crackers",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Buttermilk milk, dried",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Milk chocolate candies",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "almond milk",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 18481,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Unsweetened almond milk, plain, refrigerated",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ALMOND MILK, ORIGINAL",
+          "brand": "JUBALI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "ALMOND VANILLA MILK, ALMOND VANILLA",
+          "brand": "WEGMANS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "oat milk",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 16049,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Unsweetened oat milk, plain, refrigerated",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHOCOLATE OAT MILK, CHOCOLATE",
+          "brand": "OATLY",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHOCOLATE OAT MILK, CHOCOLATE",
+          "brand": "MALK",
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "greek yogurt",
-      "category": "branded",
-      "note": "",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
       "resultCount": 8168,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "GREEK YOGURT",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
           "name": "GREEK YOGURT",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
           "name": "GREEK YOGURT",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "yogurt",
+      "category": "dairy",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7519,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Tofu yogurt",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "YOGURT",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "FINEST YOGURT",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "plain yogurt",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 8346,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Plain yogurt, nonfat",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SILK Plain soy yogurt",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PLAIN YOGURT",
+          "brand": "CARAVAN",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cheddar cheese",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 31426,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Cheddar cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHEDDAR CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHEDDAR CHEESE, CHEDDAR",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "mozzarella",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3319,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "MOZZARELLA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Mozzarella cheese substitute",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Mozzarella cheese, nonfat",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "parmesan",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2560,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Parmesan cheese, grated",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Parmesan cheese, hard",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Parmesan cheese, shredded",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cottage cheese",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 28387,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "COTTAGE CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COTTAGE CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Cottage cheese, with vegetables",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cream cheese",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 42352,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Cream cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CREAM CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Cream cheese base cheese spread",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "butter",
+      "category": "dairy",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 12253,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Butter croissants",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Salted butter",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "heavy cream",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 16272,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Heavy cream",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HEAVY CREAM",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Fluid cream, heavy whipping",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "sour cream",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 18049,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Light sour cream",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Sour cream, cultured",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SOUR CREAM",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "feta",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 783,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Feta cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "FETA CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "FETA CHEESE, FETA",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "swiss cheese",
+      "category": "dairy",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 28819,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Swiss cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SWISS CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SWISS CHEESE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "banana",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3046,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Banana chips snacks",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Banana pepper, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Bananas, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "apple",
+      "category": "produce",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 8350,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Apple croissants",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Apple strudel",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "APPLE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "orange",
+      "category": "produce",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 6771,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Orange peel, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "JUICE, ORANGE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ORANGE CHICKEN",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "strawberries",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 1064,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Strawberries, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "CHOCOLATE STRAWBERRIES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "STRAWBERRIES",
+          "brand": "AHOLD",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "blueberries",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 868,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Blueberries, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BLUEBERRIES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Dried blueberries, sweetened",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "grapes",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 164,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Muscadine grapes, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "GREEN GRAPES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Green grapes, seedless, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "avocado",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 751,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Avocado oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "AVOCADO CHUNKS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHUNKY AVOCADO",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "broccoli",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1951,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Broccoli, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BROCCOLI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Broccoli raab, cooked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "spinach",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2334,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Baby spinach",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Mature spinach",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Spinach souffle",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "kale",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1189,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Kale, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "KALE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Frozen kale, unprepared",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "carrot",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 963,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Dehydrated carrot",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Canned carrot juice",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Carrots, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "tomato",
+      "category": "produce",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 5202,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Roma tomato",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Tomato powder",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Puree tomato, canned",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cucumber",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 504,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Cucumber pickles, sour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PICKLED CUCUMBER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Peeled cucumber, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "lettuce",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 721,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Iceberg lettuce, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BUTTER LETTUCE, BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "LETTUCE WRAPS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "onion",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2978,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Onion powder spices",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MINCED ONION",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ONION POWDER",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "garlic",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 6110,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Garlic, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Frozen garlic bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Garlic powder spices",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bell pepper",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5832,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Bell peppers, green, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Bell peppers, orange, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Bell peppers, red, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "mushrooms",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1101,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Shiitake mushrooms",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MUSHROOMS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Chanterelle mushrooms, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "green beans",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 13672,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GREEN BEANS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GREEN BEANS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Snap beans, green, microwaved",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "peas",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1982,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Green peas, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BLACKEYE PEAS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MASALA PEAS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cauliflower",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1304,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Cauliflower, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Frozen cauliflower, unprepared",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Green cauliflower, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "zucchini",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 391,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SPIRAL ZUCCHINI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ZUCCHINI STICKS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Zucchini squash, baby, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "asparagus",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 388,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Asparagus, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Frozen asparagus, unprepared",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Green asparagus, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "mango",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3937,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Canned mango nectar",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Dried mango, sweetened",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHILI MANGO",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pineapple",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3528,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Pineapple, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "PINEAPPLE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ORGANIC PINEAPPLE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "watermelon",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 1931,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Watermelon, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "WATERMELON",
+          "brand": "NOOSH",
+          "prep": "as_sold"
+        },
+        {
+          "name": "WATERMELON",
+          "brand": "NOOSH",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "peach",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 2970,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Peach pie",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COBBLER, PEACH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEACH",
+          "brand": "RAURENI",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pear",
+      "category": "produce",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 885,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PEAR JUICE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "DRINK, PEAR",
+          "brand": "FRUCTAL",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GOYA, NECTAR, PEAR",
+          "brand": "GOYA",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "peanut butter",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 13685,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "almond butter",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 15697,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Creamy almond butter",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ALMOND BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ALMOND BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "almonds",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5201,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Almonds nuts",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ALMONDS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ALMONDS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "walnuts",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 897,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "WALNUTS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Walnuts nuts, english",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Walnuts nuts, glazed",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cashews",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2528,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CASHEWS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CASHEWS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BAZZINI, CASHEWS",
+          "brand": "BAZZINI",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "olive oil",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 7029,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "coconut oil",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 11644,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Coconut oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COCONUT OIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COCONUT OIL",
+          "brand": "AHOLD",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "mayonnaise",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 692,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "MAYONNAISE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MAYONNAISE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MAYONNAISE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ketchup",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 803,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Restaurant ketchup",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "KETCHUP",
+          "brand": "FODY",
+          "prep": "as_sold"
+        },
+        {
+          "name": "KETCHUP",
+          "brand": "BRANDLESS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "mustard",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2003,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Mustard oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MUSTARD",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Mustard cabbage, salted",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "soy sauce",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 19566,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SOY SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SOY SAUCE, SOY",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ASSI, SOY SAUCE",
+          "brand": "ASSI",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "hot sauce",
+      "category": "fats_condiments",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 24952,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "HOT SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HOT SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HOT SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "honey",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 7563,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Honey",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HONEY",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HONEY",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "maple syrup",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5256,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Maple syrup, Canadian",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MAPLE SYRUP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MAPLE SYRUP",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "hummus",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1323,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Commercial hummus",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HUMMUS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "HUMMUS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "guacamole",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 505,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GUACAMOLE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "AUTHENTIC GUACAMOLE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHUNKY GUACAMOLE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "salsa",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3562,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SALSA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SALSA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SALSA",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "chia seeds",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2781,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Chia seeds, dried",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHIA SEEDS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHIA SEEDS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "peanuts",
+      "category": "fats_condiments",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3804,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PEANUTS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUTS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUTS",
+          "brand": null,
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "quaker oats",
       "category": "branded",
-      "note": "",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
       "resultCount": 2471,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "GROUND OATS",
           "brand": "QUAKER",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
           "name": "QUAKER cereals, Quick Oats, Dry",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
         },
         {
-          "name": "ROLLED OVERNIGHT OATS",
+          "name": "CINNAMON INSTANT OATS, CINNAMON",
           "brand": "QUAKER",
-          "prep": "as_sold",
-          "kind": "branded"
-        }
-      ]
-    },
-    {
-      "query": "coca cola",
-      "category": "branded",
-      "note": "",
-      "resultCount": 1258,
-      "noResult": false,
-      "top1Relevant": true,
-      "top3Relevant": true,
-      "top3": [
-        {
-          "name": "COLA",
-          "brand": "COCA-COLA",
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "COLA",
-          "brand": "COCA-COLA",
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "COLA",
-          "brand": "COCA-COLA",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "cheerios",
       "category": "branded",
-      "note": "",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
       "resultCount": 198,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "Cheerios Cereal",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "Cheerios Cereal",
-          "brand": "Cheerios",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
           "name": "Cheerios Cereal",
           "brand": "Cheerios",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
+        },
+        {
+          "name": "Cheerios Cereal",
+          "brand": "Cheerios",
+          "prep": "as_sold"
         }
       ]
     },
     {
-      "query": "egg",
-      "category": "morphology",
-      "note": "",
-      "resultCount": 2678,
+      "query": "coca cola",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1258,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "Egg bagels",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "COCA-COLA, COLA",
+          "brand": "COCA-COLA",
+          "prep": "as_sold"
         },
         {
-          "name": "Egg bread",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "COLA",
+          "brand": "COCA-COLA",
+          "prep": "as_sold"
         },
         {
-          "name": "Dinner rolls, egg",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "COLA",
+          "brand": "COCA-COLA",
+          "prep": "as_sold"
         }
       ]
     },
     {
-      "query": "bananas",
-      "category": "morphology",
-      "note": "",
-      "resultCount": 219,
+      "query": "pepsi",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 344,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "Bananas, raw",
-          "brand": null,
-          "prep": "raw",
-          "kind": "generic"
+          "name": "COLA",
+          "brand": "PEPSI",
+          "prep": "as_sold"
         },
         {
-          "name": "BANANAMILK",
-          "brand": "SIR BANANAS",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "COLA",
+          "brand": "PEPSI",
+          "prep": "as_sold"
         },
         {
-          "name": "BANANAMILK",
-          "brand": "SIR BANANAS",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "COLA",
+          "brand": "PEPSI",
+          "prep": "as_sold"
         }
       ]
     },
     {
-      "query": "almond",
-      "category": "morphology",
-      "note": "",
-      "resultCount": 4307,
+      "query": "oreo",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 379,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "Almond flour",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "CHURROS",
+          "brand": "OREO",
+          "prep": "as_sold"
         },
         {
-          "name": "Almond oil",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "WAFERS",
+          "brand": "OREO",
+          "prep": "as_sold"
         },
         {
-          "name": "Creamy almond butter",
+          "name": "CREME DIP, CREME",
+          "brand": "OREO",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "nutella",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 25,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "HAZELNUT SPREAD + BREADSTICKS, HAZELNUT",
+          "brand": "NUTELLA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "NUTELLA FERRERO WITH BREADSTICKS",
+          "brand": "NUTELLA FERRERO",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BON APPE, NUTELLA, SWIRL COOKIES",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "kind bar",
+      "category": "branded",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7124,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "KIND, FRUIT & NUT BAR",
+          "brand": "KIND",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER BAR, PEANUT BUTTER",
+          "brand": "KIND",
+          "prep": "as_sold"
+        },
+        {
+          "name": "APPLE CINNAMON SPICE BAR, APPLE CINNAMON SPICE",
+          "brand": "KIND",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "clif bar",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 7031,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHOCOLATE PROTEIN BAR, CHOCOLATE",
+          "brand": "CLIF",
+          "prep": "as_sold"
+        },
+        {
+          "name": "TRAIL MIX BAR",
+          "brand": "CLIF",
+          "prep": "as_sold"
+        },
+        {
+          "name": "APRICOT ENERGY BARS, APRICOT",
+          "brand": "CLIF BAR",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "gatorade",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 599,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GATORADE  LIME   28Z",
+          "brand": "Gatorade",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GATORADE  ORANGE   24Z",
+          "brand": "Gatorade",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHOCOLATE NUTRITION SHAKE, CHOCOLATE",
+          "brand": "GATORADE",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "doritos",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 359,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHIPS",
+          "brand": "DORITOS",
+          "prep": "as_sold"
+        },
+        {
+          "name": ".75OZ DORITOS NACHO",
+          "brand": "Doritos",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CORN CHIPS",
+          "brand": "DORITOS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pringles",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 245,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BACONATOR POTATO CRISPS",
+          "brand": "PRINGLES",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHEDDAR POTATO CRISPS, CHEDDAR",
+          "brand": "PRINGLES",
+          "prep": "as_sold"
+        },
+        {
+          "name": "HABANERAS POTATO CRISPS, HABANERAS",
+          "brand": "PRINGLES",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ben and jerrys",
+      "category": "branded",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 330,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "VANILLA ICE CREAM, VANILLA",
+          "brand": "BEN & JERRY'S",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BEN & JERRY'S, ICE CREAM, CHERRY GARCIA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHEESECAKE BROWNIE CHEESECAKE ICE CREAM, CHEESECAKE BROWNIE",
+          "brand": "BEN & JERRY'S",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "chobani",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 336,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GREEK YOGURT",
+          "brand": "CHOBANI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": "CHOBANI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": "CHOBANI",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "kelloggs corn flakes",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 9157,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CEREAL",
+          "brand": "KELLOGG'S CORN FLAKES",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CEREAL",
+          "brand": "KELLOGG'S CORN FLAKES",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CEREAL",
+          "brand": "KELLOGG'S CORN FLAKES",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "heinz ketchup",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 984,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "HEINZ, TOMATO KETCHUP",
+          "brand": "HEINZ",
+          "prep": "as_sold"
+        },
+        {
+          "name": "TOMATO KETCHUP",
+          "brand": "HEINZ",
+          "prep": "as_sold"
+        },
+        {
+          "name": "TOMATO KETCHUP",
+          "brand": "HEINZ",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "campbells soup",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5025,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CAMPBELL'S SOUP DISCONTINUED",
+          "brand": "CAMPBELL'S",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CAMPBELL'S SOUP LENTIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CAMPBELL'S SOUP STEAK",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "lays chips",
+      "category": "branded",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 11271,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Lays Sour Cream and Onion Potato Chips 1.125 Ounces",
+          "brand": "Lay's",
+          "prep": "as_sold"
+        },
+        {
+          "name": "LAYS, KETTLE COOKED LATTICE CUT POTATO CHIPS, ROASTED GARLIC & SEA SALT, ROASTED GARLIC & SEA SALT",
+          "brand": "LAY'S",
+          "prep": "as_sold"
+        },
+        {
+          "name": "Banana chips snacks",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "starbucks coffee",
+      "category": "branded",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3785,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CARAMEL COFFEE CREAMER, CARAMEL",
+          "brand": "STARBUCKS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHILLED COFFEE DRINK",
+          "brand": "STARBUCKS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CLASSIC SYRUP",
+          "brand": "STARBUCKS COFFEE",
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "chiken breast",
-      "category": "spelling",
-      "note": "common typo",
-      "resultCount": 3251,
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 14644,
       "noResult": false,
-      "top1Relevant": false,
-      "top3Relevant": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "chiken",
+          "chicken"
+        ]
+      ],
       "top3": [
         {
-          "name": "TURKEY BREAST",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "CHICKEN BREAST",
+          "brand": "FAREWAY",
+          "prep": "as_sold"
         },
         {
-          "name": "Sliced turkey breast, prepackaged",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "CHICKEN BREAST",
+          "brand": "SHOPRITE",
+          "prep": "as_sold"
         },
         {
-          "name": "BREAST NUGGETS",
+          "name": "CHICKEN BREAST",
           "brand": "TYSON",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "brocoli",
-      "category": "spelling",
-      "note": "common typo",
-      "resultCount": 0,
-      "noResult": true,
-      "top1Relevant": false,
-      "top3Relevant": false,
-      "top3": []
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 1951,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "brocoli",
+          "broccoli"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Broccoli, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BROCCOLI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Broccoli raab, cooked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "bannana",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 3046,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "bannana",
+          "banana"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Banana chips snacks",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Banana pepper, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Bananas, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
     },
     {
       "query": "yoghurt",
-      "category": "spelling",
-      "note": "British spelling",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
       "resultCount": 134,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "FINEST YOGHURT",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
-          "name": "YOGHURT, PLAIN",
-          "brand": "NOOSA",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "Plain yogurt, nonfat",
+          "brand": null,
+          "prep": "as_sold"
         },
         {
           "name": "COCONUT YOGHURT, COCONUT",
           "brand": "NOOSA",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "avacado",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 4,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "EVOLUTION FRESH, ORGANIC AVOCADO GREENS, AVACADO, AVACADO",
+          "brand": "EVOLUTION FRESH",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GREEK FETA DIP, AVACADO JALAPENO CILANTRO",
+          "brand": "FRESKOS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "ORGANIC HUMMUS, AVACADO & CILANTRO",
+          "brand": "BABA SMALL BATCH",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "brocolli",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 3,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CALIFORNIA BLEND, BROCOLLI, CAULIFLOWER, CARROTS",
+          "brand": "PUBLIZ",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHINESE CHIK'N WITH BLACK BEAN SAUCE MADE WITH ORGANIC ASPARAGUS, BROCOLLI & BROWN RICE, CHINESE CHIK'N WITH BLACK BEAN SAUCE",
+          "brand": "SWEET EARTH",
+          "prep": "as_sold"
+        },
+        {
+          "name": "KALE PECAN CRANBERRY KALE, BROCOLLI STALKS, RED CABBAGE, CARROTS, RADICCHIO, DRIED CRANBERRIES, PECANS, HERB CROUTONS AND DIJON MUSTARD DRESSING CHOPPED SALAD KIT, KALE PECAN CRANBERRY",
+          "brand": "MARKETSIDE",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tomatoe",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 5202,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "tomatoe",
+          "tomato"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Roma tomato",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Tomato powder",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Puree tomato, canned",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "spinnach",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 2334,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "spinnach",
+          "spinach"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Baby spinach",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Mature spinach",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Spinach souffle",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "chedar cheese",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "unresolved",
+      "resultCount": 28312,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Blue cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Brick cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Brie cheese",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "peanutbutter",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 2,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PEANUTBUTTER MOUNTAIN MIX,, PEANUTBUTTER",
+          "brand": "LUNDS & BYERLYS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER KISSES MADE WITH REAL PEANUTBUTTER",
+          "brand": "NECCO",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "salmoon",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 1615,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "salmoon",
+          "salmon"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Salmon fish oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PINK SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "potatoe",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "cucumbr",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 504,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "cucumbr",
+          "cucumber"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Cucumber pickles, sour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PICKLED CUCUMBER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Peeled cucumber, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "strawbery",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "STRAWBERY RHUBARB PIE, STRAWBERY RHUBARB",
+          "brand": "PRICE CHOPPER",
+          "prep": "as_sold"
+        },
+        {
+          "name": "TOASTER PASTRIES, STRAWBERY",
+          "brand": "FAMILY GOURMET",
+          "prep": "as_sold"
+        },
+        {
+          "name": "JACKIE'S JAMS, JAM, STRAWBERY RHUBARB, STRAWBERY RHUBARB",
+          "brand": "JACKIE'S JAMS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "mozarella",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 15,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BELGIOIOSO, FRESH MOZARELLA CHEESE",
+          "brand": "BELGIOIOSO",
+          "prep": "as_sold"
+        },
+        {
+          "name": "SHREDDED MOZARELLA CHEESE",
+          "brand": "KRAFT",
+          "prep": "as_sold"
+        },
+        {
+          "name": "SHREDDED MOZARELLA CHEESE",
+          "brand": "KRAFT",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cauliflour",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 1304,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "cauliflour",
+          "cauliflower"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Cauliflower, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Frozen cauliflower, unprepared",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Green cauliflower, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "asparagas",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 388,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "asparagas",
+          "asparagus"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Asparagus, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Frozen asparagus, unprepared",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Green asparagus, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "quinao",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 1,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SUN-DRIED TOMATO QUINAO",
+          "brand": "ROLAND",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bluberries",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 8,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BLUBERRIES",
+          "brand": "TJ FARMS SELECT",
+          "prep": "as_sold"
+        },
+        {
+          "name": "DRIED BLUBERRIES",
+          "brand": "SHORELINE FRUIT",
+          "prep": "as_sold"
+        },
+        {
+          "name": "FREEZE-DRIED BLUBERRIES",
+          "brand": "CRUNCHIES",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "sandwhich",
+      "category": "misspelling",
+      "expectation": "ambiguous",
+      "confidence": "did_you_mean",
+      "resultCount": 3166,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "sandwhich",
+          "sandwich"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "SANDWICH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SANDWICH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Ice cream sandwich",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "brocolli rabe",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 18,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BROCCOLI RABE",
+          "brand": "WOODSTOCK",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BROCCOLI RABE",
+          "brand": "365 EVERYDAY VALUE",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BROCCOLI RABE & SMOKED PROVOLONE",
+          "brand": "GIANT",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "chikpeas",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 324,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "chikpeas",
+          "chickpea"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "Chickpea flour (besan)",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKPEA",
+          "brand": "PEREG",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKPEA FLOUR",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "lentels",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 459,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "lentels",
+          "lentil"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "SCHNUCKS, LENTIL",
+          "brand": "SCHNUCKS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BAKED LENTIL CHIPS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CLASSIC LENTIL SOUP, CLASSIC",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pinapple",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 4,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHIPOTLE PINAPPLE",
+          "brand": "NUTTY & FRUITY",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PINAPPLE COCONUT ZERO SUGAR ENERGY DRINK, PINEAPPLE COCONUT",
+          "brand": "ZOA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "TROPICAL VIBE STARFRUIT PINAPPLE SPARKLING ENERGY DRINK, TROPICAL VIBE",
+          "brand": "CELSIUS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "zuchini",
+      "category": "misspelling",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 391,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [
+        [
+          "zuchini",
+          "zucchini"
+        ]
+      ],
+      "top3": [
+        {
+          "name": "SPIRAL ZUCCHINI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ZUCCHINI STICKS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Zucchini squash, baby, raw",
+          "brand": null,
+          "prep": "raw"
         }
       ]
     },
     {
       "query": "pb",
       "category": "abbreviation",
-      "note": "peanut butter",
-      "resultCount": 144,
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 13685,
       "noResult": false,
-      "top1Relevant": false,
-      "top3Relevant": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "PB & J BAR",
-          "brand": "MARKETSIDE",
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "PB &J GRANOLA",
-          "brand": "WASATCH",
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "AUSTIN CRACKERS PB & J 11OZ",
+          "name": "PEANUT BUTTER",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pb and j",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 14171,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PB & J GRAPE JELLY & PEANUT BUTTER, PB & J",
+          "brand": "ALGOOD",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PB & J STRAWBERRY JELLY & PEANUT BUTTER, PB & J",
+          "brand": "ALGOOD",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PEANUT BUTTER FILLED PRETZEL NUGGETS, PEANUT BUTTER",
+          "brand": "J. HIGGS",
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "og chicken",
       "category": "abbreviation",
-      "note": "",
-      "resultCount": 13266,
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 34824,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "Chicken fat",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "name": "CHICKEN",
+          "brand": "PURELY ORGANIC",
+          "prep": "as_sold"
         },
         {
-          "name": "Meatless chicken",
+          "name": "ORGANIC CHICKEN BROTH",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
         },
         {
-          "name": "Chicken bratwurst, cooked",
+          "name": "ORGANIC TANDOORI CHICKEN",
           "brand": null,
-          "prep": "cooked",
-          "kind": "generic"
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bbq sauce",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 19656,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Barbecue sauce",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BARBECUE SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BARBECUE SAUCE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "choc milk",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 40323,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Milk chocolate candies",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MILK CHOCOLATE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MILK CHOCOLATE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ww bread",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 20284,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Pita bread, whole-wheat",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "WHOLE WHEAT BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "100% WHOLE WHEAT BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "veg soup",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 7706,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SOUP, VEGETABLE LENTIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "VEGETABLE SOUP MIX",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "VEGETABLE SOUP, VEGETABLE",
+          "brand": "TABATCHNICK",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "gf bread",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 14275,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "EGG FREE GLUTEN-FREE BREAD, EGG FREE",
+          "brand": "KATZ",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GLUTEN FREE BREAD FLOUR",
+          "brand": "JOVIAL",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GLUTEN FREE OMEGA FLAX BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "evoo",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 7029,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "choc chip cookie",
+      "category": "abbreviation",
+      "expectation": "resolve",
+      "confidence": "did_you_mean",
+      "resultCount": 37825,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHOCOLATE CHIP COOKIE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHOCOLATE CHIP COOKIE",
+          "brand": "CRAVERIGHT",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHOCOLATE CHIP COOKIE CAKE, CHOCOLATE CHIP",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "veg stir fry",
+      "category": "abbreviation",
+      "expectation": "ambiguous",
+      "confidence": "did_you_mean",
+      "resultCount": 4099,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "VEGETABLE STIR FRY",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "VEGETABLE STIR FRY",
+          "brand": "WESTPAC",
+          "prep": "as_sold"
+        },
+        {
+          "name": "VEGETABLE STIR FRY",
+          "brand": "SIGNATURE KITCHENS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bananas",
+      "category": "morphology",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 219,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Bananas, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Overripe bananas, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "BANANAMILK",
+          "brand": "SIR BANANAS",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "apples",
+      "category": "morphology",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 863,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "APPLES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "APPLES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "APPLES",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "carrots",
+      "category": "morphology",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1994,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Carrots, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "CARROTS",
+          "brand": "WEGMANS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CARROTS",
+          "brand": "CRISPAK",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tomatoes",
+      "category": "morphology",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 2898,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHOPPED TOMATOES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CRUSHED TOMATOES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CRUSHED TOMATOES",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "potatoes",
+      "category": "morphology",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 2791,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "POTATOES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "POTATOES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "POTATOES",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "almond",
+      "category": "morphology",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 4307,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Almond flour",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Almond oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Creamy almond butter",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "egg",
+      "category": "morphology",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2678,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Egg bagels",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Egg bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Dinner rolls, egg",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "berries",
+      "category": "morphology",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 553,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Dried goji berries",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GOJI BERRIES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GOLDEN BERRIES",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "cherries",
+      "category": "morphology",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1069,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Sweet cherries, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "CHERRIES",
+          "brand": "MARIANI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHOCOLATE CHERRIES",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "sandwiches",
+      "category": "morphology",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 1211,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CRACKER SANDWICHES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BROWNIE SANDWICHES",
+          "brand": "ESSENTI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "FLATBREAD SANDWICHES",
+          "brand": "KROGER",
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "a cup of white rice",
       "category": "natural_language",
-      "note": "",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
       "resultCount": 17624,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "Rice flour, white, unenriched",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
         },
         {
           "name": "White rice flour, unenriched",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
         },
         {
           "name": "COOKED WHITE RICE",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "two scrambled eggs",
       "category": "natural_language",
-      "note": "",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
       "resultCount": 1596,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
           "name": "Scrambled eggs, frozen mixture",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
+        },
+        {
+          "name": "Whole egg, cooked, scrambled",
+          "brand": null,
+          "prep": "cooked"
         },
         {
           "name": "COOKED SCRAMBLED EGGS WITH SAUSAGE",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
-        },
-        {
-          "name": "SCRAMBLED EGGS",
-          "brand": "EGGLAND'S BEST",
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         }
       ]
     },
     {
       "query": "some grilled chicken",
       "category": "natural_language",
-      "note": "",
+      "expectation": "resolve",
+      "confidence": "confident",
       "resultCount": 13876,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "GRILLED CHICKEN STRIPS",
+          "name": "McDONALD'S, Bacon Ranch Salad with Grilled Chicken",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "cooked"
         },
         {
-          "name": "FAJITA GRILLED CHICKEN STRIPS",
+          "name": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, grilled",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "cooked"
         },
         {
-          "name": "GRILLED CHICKEN BREAST",
-          "brand": "AHOLD",
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "Fast Foods, grilled chicken filet sandwich, with lettuce, tomato and spread",
+          "brand": null,
+          "prep": "cooked"
         }
       ]
     },
     {
-      "query": "hummus",
-      "category": "cuisine",
-      "note": "",
-      "resultCount": 1323,
+      "query": "i had a banana",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3046,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "Commercial hummus",
+          "name": "Banana chips snacks",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "as_sold"
         },
         {
-          "name": "HUMMUS",
+          "name": "Banana pepper, raw",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "raw"
         },
         {
-          "name": "HUMMUS",
+          "name": "Bananas, raw",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "raw"
         }
       ]
     },
     {
-      "query": "tofu",
-      "category": "cuisine",
-      "note": "",
-      "resultCount": 339,
+      "query": "half an avocado",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 751,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
+        {
+          "name": "Avocado oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "AVOCADO CHUNKS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHUNKY AVOCADO",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "a slice of whole wheat bread",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 20284,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Pita bread, whole-wheat",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "WHOLE WHEAT BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "100% WHOLE WHEAT BREAD",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bowl of oatmeal",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2102,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Oatmeal bread",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "OATMEAL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Oatmeal bread, toasted",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "glass of whole milk",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 25958,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "WHOLE MILK",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "WHOLE MILK",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Buttermilk milk, fluid, whole",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "add greek yogurt",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 8168,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GREEK YOGURT",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "log two eggs",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1563,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "100 grams of chicken",
+      "category": "natural_language",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 13253,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Chicken fat",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Meatless chicken",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Chicken bratwurst, cooked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "a piece of salmon",
+      "category": "natural_language",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1615,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Salmon fish oil",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PINK SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "raw broccoli",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 6240,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Broccoli, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Broccoli raab, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Chinese broccoli, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "steamed broccoli",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 2065,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Broccoli raab, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Chinese broccoli, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "TAI PEI, BEEF & BROCCOLI WITH STEAMED RICE",
+          "brand": "TAI PEI",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "boiled potato",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 8061,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Sweet potato, cooked, boiled, without skin",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Boiled potatoes, cooked in skin, skin, with salt",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Boiled potatoes, cooked in skin, skin, without salt",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "fried egg",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 4041,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Whole egg, cooked, fried",
+          "brand": null,
+          "prep": "cooked"
+        },
         {
           "name": "Fried tofu",
           "brand": null,
-          "prep": "cooked",
-          "kind": "generic"
+          "prep": "cooked"
         },
         {
-          "name": "Tofu yogurt",
+          "name": "Egg bread, toasted",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "generic"
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "roasted vegetables",
+      "category": "preparation",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 11199,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SMARTMADE, ROASTED TURKEY & VEGETABLES",
+          "brand": "SMARTMADE",
+          "prep": "as_sold"
+        },
+        {
+          "name": "RED QUINOA AND ROASTED VEGETABLES",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ROASTED RATATOUILLE VEGETABLES",
+          "brand": "RALEY'S",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "baked salmon",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5331,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BAKED SALMON SALAD",
+          "brand": "GOLDEN TASTE",
+          "prep": "as_sold"
+        },
+        {
+          "name": "Baked taco shells",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Yellow plantains, baked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "raw spinach",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 6639,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Spinach, raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "Mustard spinach, (tendergreen), raw",
+          "brand": null,
+          "prep": "raw"
+        },
+        {
+          "name": "New Zealand spinach, raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "cooked quinoa",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 6519,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Quinoa, cooked",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "Gluten-free pasta, corn flour and quinoa flour, cooked, ANCIENT HARVEST",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "ORGANIC COOKED QUINOA",
+          "brand": "MINSLEY",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "dried apricots",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 3372,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "DRIED APRICOTS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "DRIED APRICOTS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "DRIED APRICOTS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "frozen berries",
+      "category": "preparation",
+      "expectation": "ambiguous",
+      "confidence": "confident",
+      "resultCount": 4626,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "FROZEN MIXED BERRIES",
+          "brand": "LOWES FOODS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MIXED BERRIES FROZEN STRAWBERRY, BLACKBERRY, RASPBERRY AND BLUEBERRY, MIXED BERRIES",
+          "brand": "NATURE PRIME",
+          "prep": "as_sold"
+        },
+        {
+          "name": "Frozen loganberries",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "canned beans",
+      "category": "preparation",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7928,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Canned chili with beans",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Canned refried beans, vegetarian",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Baked beans, canned, with beef",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "smoked salmon",
+      "category": "preparation",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 6529,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SMOKED SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SMOKED SALMON",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Salmon fish, chinook, smoked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "sushi",
+      "category": "cuisine",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 279,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "INARI SUSHI",
+          "brand": "PADA SUSHI",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MIZKAN, SUSHI SEASONING",
+          "brand": "MIZKAN",
+          "prep": "as_sold"
+        },
+        {
+          "name": "NIGIRI SUSHI",
+          "brand": "SNOWFOX",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pad thai",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 1042,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHICKEN PAD THAI KIT",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN PAD THAI, CHICKEN",
+          "brand": "SISTER SISTER",
+          "prep": "as_sold"
+        },
+        {
+          "name": "KANOKWAN, PAD THAI PASTE",
+          "brand": "KANOKWAN",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "burrito",
+      "category": "cuisine",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 642,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BURRITO",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BURRITO",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BURRITO",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "taco",
+      "category": "cuisine",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 1212,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Baked taco shells",
+          "brand": null,
+          "prep": "cooked"
+        },
+        {
+          "name": "TACO SAUCE, TACO",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "TACO SEASONING",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pizza",
+      "category": "cuisine",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 5113,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PIZZA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "PIZZA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHEESE PIZZA",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "lasagna",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 553,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "LASAGNA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "LASAGNA",
+          "brand": "IGA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "LASAGNA DINNER",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "falafel",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 112,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "FALAFEL",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Home-prepared falafel",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "FALAFEL",
+          "brand": "PHOENICIAN",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "naan",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 143,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "NAAN",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "NAAN",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "MINI NAAN",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "kimchi",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 134,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Kimchi cabbage",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "KIMCHI",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "KIMCHI",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "miso soup",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 5003,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "MISO SOUP",
+          "brand": "MISHIMA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MISO SOUP",
+          "brand": "MISHIMA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MISO SOUP",
+          "brand": "KIKKA",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "ramen",
+      "category": "cuisine",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 403,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "KIMCHI RAMEN, KIMCHI",
+          "brand": "PALDO",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MISO RAMEN, MISO",
+          "brand": "AJINOMOTO",
+          "prep": "as_sold"
+        },
+        {
+          "name": "MISO RAMEN, MISO",
+          "brand": "MEIJER",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "curry",
+      "category": "cuisine",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 890,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Curry powder spices",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CURRY POWDER",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN CURRY",
+          "brand": "AHOLD",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "paella",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 21,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BLACK PAELLA",
+          "brand": "GOYA",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PAELLA",
+          "brand": "PALACIO REAL",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PAELLA VALENCIANA",
+          "brand": "IBERIA",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "gyro",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 23,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "GYRO PUFF",
+          "brand": "ILTACO",
+          "prep": "as_sold"
+        },
+        {
+          "name": "GYRO BREAD LOAVES, GYRO",
+          "brand": "KONTOS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN GYRO TRIANGLES, CHICKEN GYRO",
+          "brand": "PRIVATE SELECTION",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "pho",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 59,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "CHICKEN PHO SOUP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN PHO NOODLES",
+          "brand": "AJINOMOTO",
+          "prep": "as_sold"
+        },
+        {
+          "name": "PHO - CHICKEN COOKED, PHO - CHICKEN",
+          "brand": "SUSHIC",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "empanada",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 36,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "TRADITIONAL BEEF CORN EMPANADA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BEEF PICADILLO EMPANADA, BEEF",
+          "brand": "CIRCLE K",
+          "prep": "as_sold"
+        },
+        {
+          "name": "DOUGH FOR PASTRIES",
+          "brand": "EMPANADA KING",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "dumplings",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "ambiguous",
+      "resultCount": 179,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "PRAWN DUMPLINGS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BREAD DUMPLINGS",
+          "brand": "CHATEAU",
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN & DUMPLINGS",
+          "brand": "SWANSON",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "couscous salad",
+      "category": "cuisine",
+      "expectation": "resolve",
+      "confidence": "confident",
+      "resultCount": 4564,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "COUSCOUS SALAD, COUSCOUS",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "ISRAELI COUSCOUS SALAD",
+          "brand": "UNBRANDED",
+          "prep": "as_sold"
+        },
+        {
+          "name": "VEGETABLE COUSCOUS SALAD",
+          "brand": "CEDARLANE",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "chicken",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 13253,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Chicken fat",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Meatless chicken",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Chicken bratwurst, cooked",
+          "brand": null,
+          "prep": "cooked"
+        }
+      ]
+    },
+    {
+      "query": "cheese",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 28312,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Blue cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Brick cheese",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Brie cheese",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "bar",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 6771,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "BAR",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BAR",
+          "brand": "ANDES",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BAR, BAR",
+          "brand": "CAVEMAN",
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "juice",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 9138,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "JUICE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "JUICE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "JUICE",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "soup",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 4790,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SOUP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SOUP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SOUP",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "salad",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 4368,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SALAD",
+          "brand": null,
+          "prep": "as_sold"
         },
         {
           "name": "SALAD",
-          "brand": "TOFU",
-          "prep": "as_sold",
-          "kind": "branded"
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Coleslaw salad dressing",
+          "brand": null,
+          "prep": "as_sold"
         }
       ]
     },
     {
-      "query": "basmati rice",
-      "category": "cuisine",
-      "note": "",
-      "resultCount": 7522,
+      "query": "smoothie",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 1166,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "BASMATI RICE",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "ODWALLA, SMOOTHIE",
+          "brand": "ODWALLA",
+          "prep": "as_sold"
         },
         {
-          "name": "BASMATI RICE",
+          "name": "SMOOTHIE FIXINS'",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
-          "name": "BASMATI RICE",
+          "name": "100% FRUIT SMOOTHIE",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         }
       ]
     },
     {
-      "query": "salsa",
-      "category": "cuisine",
-      "note": "",
-      "resultCount": 3562,
+      "query": "shake",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 1222,
       "noResult": false,
       "top1Relevant": true,
       "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
       "top3": [
         {
-          "name": "SALSA",
+          "name": "NUTRITIONAL SHAKE",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
-          "name": "SALSA",
+          "name": "PROTEIN SHAKE",
           "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "prep": "as_sold"
         },
         {
-          "name": "SALSA",
-          "brand": null,
-          "prep": "as_sold",
-          "kind": "branded"
+          "name": "SHAKE",
+          "brand": "EAS",
+          "prep": "as_sold"
         }
       ]
+    },
+    {
+      "query": "wrap",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 365,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SPINACH WRAP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN CAESAR WRAP",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CHICKEN CAESAR WRAP",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "sandwich",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 3166,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "SANDWICH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "SANDWICH",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Ice cream sandwich",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "water",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7853,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Bottled water, generic",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Water biscuits crackers",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Water convolvulus,raw",
+          "brand": null,
+          "prep": "raw"
+        }
+      ]
+    },
+    {
+      "query": "coffee",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 3631,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "COFFEE",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Soymilk silk coffee",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "COFFEE BEAN",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "tea",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 4922,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "TEA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "TEA",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "TEA",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "beans",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 7384,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Cannellini beans, dry",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "BEANS",
+          "brand": "TEXAS",
+          "prep": "as_sold"
+        },
+        {
+          "name": "BLACK BEANS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "nuts",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 2415,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Almonds nuts",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Pecans nuts",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Acorns nuts, dried",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "crackers",
+      "category": "ambiguous",
+      "expectation": "ambiguous",
+      "confidence": "ambiguous",
+      "resultCount": 3809,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": [
+        {
+          "name": "Milk crackers",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "Multigrain crackers",
+          "brand": null,
+          "prep": "as_sold"
+        },
+        {
+          "name": "CRACKERS",
+          "brand": null,
+          "prep": "as_sold"
+        }
+      ]
+    },
+    {
+      "query": "xyzzy",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "qwertyfood",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "asdfghjkl",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "zzzzzzzz",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "flurbleberry",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "nonexistentfood",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "blorptato",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
+    },
+    {
+      "query": "grumbleflax",
+      "category": "absent",
+      "expectation": "absent",
+      "confidence": "unresolved",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "unsafeWrong": false,
+      "corrections": [],
+      "top3": []
     }
   ]
 }

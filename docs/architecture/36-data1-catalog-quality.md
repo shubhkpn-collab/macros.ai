@@ -31,7 +31,17 @@ coverage by roughly 77%.
 | Has preparation state | 100% | 100% (all `as_sold`) |
 | Recommendable (generic) | 6,630 of 6,877 | — |
 
-Generic preparation split: {"as_sold": 3203, "cooked": 2194, "raw": 1480}.
+Generic preparation split:
+
+| State | Foods |
+|---|---|
+| `as_sold` | 3,203 |
+| `cooked` | 2,194 |
+| `raw` | 1,480 |
+
+The raw/cooked split is what makes weighing meaningful: 3,674 generic foods
+carry an explicit preparation state, so "chicken breast" can be resolved to the
+form actually on the scale.
 
 This is the catalog's strength: essentially every record can produce a calorie
 and macro figure.
@@ -77,7 +87,18 @@ still edible — so it is excluded from the displayable calculation.
 
 ## 5. Identity and duplicates
 
-Identifier states: {"conflicted": 22133, "current": 399345, "needs_review": 1418, "unknown": 11818}
+Identifier states:
+
+| State | Products |
+|---|---|
+| `current` | 399,345 |
+| `conflicted` | 22,133 |
+| `unknown` | 11,818 |
+| `needs_review` | 1,418 |
+
+`conflicted` and `needs_review` (23,551 combined, 5.4%) are products whose GTIN
+evidence disagrees. They remain in the catalog with their conflict recorded
+rather than being silently resolved to one interpretation.
 
 Collision candidates: **28,333 name+brand pairs** covering
 71,644 records. These are candidates, not confirmed duplicates —

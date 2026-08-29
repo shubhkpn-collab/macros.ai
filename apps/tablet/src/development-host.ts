@@ -15,6 +15,8 @@ import {
 import type { AuthHostPort } from './actions.js';
 import type { TabletHost } from './bootstrap.js';
 import type { TabletComposition, TabletPorts } from './composition.js';
+import { toFoodCard, fallbackInitials } from '@macros/domain-catalog';
+import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 
 /**
  * DEVELOPMENT HOST — NOT PRODUCTION.
@@ -102,10 +104,38 @@ export async function createDevelopmentHost(
     currentActivity: () => devActiveEnergy(420) as never,
   };
 
+  /**
+   * Catalog QA browser — DEVELOPMENT ONLY.
+   *
+   * Searches the same repository the application uses, then projects each hit
+   * through the real FoodCard pipeline, so what the owner inspects on Android
+   * is exactly what production logic would produce. A production host returns
+   * `catalogBrowser: null` and the surface never renders.
+   */
+  const catalogBrowser = {
+    async search(query: string): Promise<readonly FoodCardView[]> {
+      // `listSearchable` is the same set the application searches: versions
+      // reachable through an ACTIVE head. De-listed products stay resolvable by
+      // id but never surface here, exactly as in production.
+      const searchable = await repositories.products.listSearchable();
+      const terms = query.toLowerCase().split(/[^a-z0-9]+/i).filter((t) => t.length > 0);
+      const matches = terms.length === 0 ? searchable : searchable.filter((v) => {
+        const hay = `${v.displayName} ${
+          (v as unknown as { brandName?: string }).brandName ?? ''}`.toLowerCase();
+        return terms.every((t) => hay.includes(t));
+      });
+      return matches.slice(0, 25).map((v) => {
+        const card = toFoodCard(v);
+        return toFoodCardView(card as never, fallbackInitials(card.displayName));
+      });
+    },
+  };
+
   return {
     composition,
     auth,
     hasActiveSession: true,
     developmentNotice: DEVELOPMENT_NOTICE,
+    catalogBrowser,
   };
 }
