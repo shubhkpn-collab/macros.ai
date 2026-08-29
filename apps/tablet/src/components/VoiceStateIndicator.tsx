@@ -1,12 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, Text, View } from 'react-native';
-import { color, motion, radius, space, type, type VoicePresence } from '@macros/tablet-view-model';
+import {
+  color, motion, radius, space, type, type VoicePresence,
+} from '@macros/tablet-view-model';
 
 /**
- * A restrained voice "aura" rather than a chat transcript.
+ * Calm voice presence — an aura, not a chat transcript.
  *
  * The product is a calculator with a personality, not a chatbot: a scrolling
  * conversation would dominate a screen whose job is to show one number clearly.
+ * The UI should feel ready for "Hey Macros" without pretending the mic exists
+ * yet.
  */
 const COPY: Record<VoicePresence, string> = {
   idle: 'Say "Hey Macros"',
@@ -27,13 +31,17 @@ export function VoiceStateIndicator({ presence }: { presence: VoicePresence }): 
 
   useEffect(() => {
     let cancelled = false;
-    // Respect reduced motion: a pulsing element is exactly what that setting is
-    // for, so the state is carried by text regardless.
+    // Reduced motion is exactly what a pulsing element is for, so state is
+    // always carried by text regardless.
     void AccessibilityInfo.isReduceMotionEnabled().then((reduced) => {
       if (cancelled || reduced || !active) { pulse.setValue(0); return; }
       Animated.loop(Animated.sequence([
-        Animated.timing(pulse, { toValue: 1, duration: motion.voicePulse / 2, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0, duration: motion.voicePulse / 2, useNativeDriver: true }),
+        Animated.timing(pulse, {
+          toValue: 1, duration: motion.voicePulse / 2, useNativeDriver: true,
+        }),
+        Animated.timing(pulse, {
+          toValue: 0, duration: motion.voicePulse / 2, useNativeDriver: true,
+        }),
       ])).start();
     });
     return () => { cancelled = true; };
@@ -48,13 +56,19 @@ export function VoiceStateIndicator({ presence }: { presence: VoicePresence }): 
       accessible
       accessibilityLiveRegion="polite"
       accessibilityLabel={`Voice: ${COPY[presence]}`}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}
+      style={{
+        flexDirection: 'row', alignItems: 'center', gap: space.sm,
+        paddingHorizontal: space.md, paddingVertical: space.xs,
+        borderRadius: radius.pill,
+        backgroundColor: color.surface,
+        borderWidth: 1, borderColor: color.border,
+      }}
     >
       <Animated.View style={{
-        width: 16, height: 16, borderRadius: radius.pill, backgroundColor: dot,
-        opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.45, 1] }),
+        width: 14, height: 14, borderRadius: radius.pill, backgroundColor: dot,
+        opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }),
       }} />
-      <Text style={{ color: color.textSecondary, fontSize: type.label.size }}>
+      <Text style={{ color: color.textSecondary, fontSize: type.caption.size }}>
         {COPY[presence]}
       </Text>
     </View>

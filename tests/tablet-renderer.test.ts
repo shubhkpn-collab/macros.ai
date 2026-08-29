@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  buildViewModel, describeBalance, lockedViewModel, touch, type ViewModelInput,
+  buildViewModel, describeBalanceCopy, lockedViewModel, touch, type ViewModelInput,
 } from '@macros/tablet-view-model';
 import { deriveCapabilities } from '@macros/domain-offline-sync';
 import { activeSwitchState, requestSwitch, type SwitchState } from '@macros/domain-household';
@@ -90,10 +90,10 @@ describe('ACTIVE HOME renders the active user read model', () => {
   });
 
   test('the semantic phrasing is a deficit statement, not "remaining"', () => {
-    assert.equal(describeBalance(-327), '327 kcal deficit right now');
-    assert.equal(describeBalance(150), '150 kcal surplus right now');
-    assert.equal(describeBalance(0), 'Even right now');
-    assert.equal(/remaining/i.test(describeBalance(-327)), false);
+    assert.equal(describeBalanceCopy(-327), '327 kcal deficit right now');
+    assert.equal(describeBalanceCopy(150), '150 kcal surplus right now');
+    assert.equal(describeBalanceCopy(0), 'At maintenance right now');
+    assert.equal(/remaining/i.test(describeBalanceCopy(-327)), false);
   });
 
   test('macro figures are COPIED from the macro domain', () => {
@@ -612,9 +612,9 @@ describe('NATIVE BUILD READINESS — the bundle can actually resolve and load', 
     // The stale manual-copy instruction must be gone.
     assert.equal(/copy its `android\/` Gradle files/.test(doc), false);
     // The count must match reality, checked against the suite itself below.
-    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611|expect 1620/.test(doc), false,
+    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611|expect 1620|expect 1633/.test(doc), false,
       'stale test count in owner instructions');
-    assert.match(doc, /expect 1633 tests/);
+    assert.match(doc, /expect 1660 tests/);
   });
 
   test('FIX 4: hydration pins the package manager', () => {

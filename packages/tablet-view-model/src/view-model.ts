@@ -1,6 +1,10 @@
 import type { AppState } from '@macros/tablet-app-core';
 import type { OfflineCapabilities } from '@macros/domain-offline-sync';
 import type { SwitchState } from '@macros/domain-household';
+import {
+  describeBalanceCopy, formatGrams, formatGramsWithUnit, formatKcal,
+  formatProjection, progressFraction,
+} from './format.js';
 
 /**
  * TABLET VIEW MODEL.
@@ -35,10 +39,12 @@ export interface IdentityView {
 export interface EnergyBalanceView {
   /** Negative = deficit, positive = surplus. Copied, never computed. */
   readonly balanceKcal: number;
-  /** "327 kcal deficit right now" — semantic, not "calories remaining". */
+  /** DISPLAY-READY: "-1,505". Whole kcal, grouped, signed. */
+  readonly displayValue: string;
+  /** "1,505 kcal deficit right now" — semantic, not "calories remaining". */
   readonly semantic: string;
   readonly direction: 'deficit' | 'surplus' | 'even';
-  /** Visually subordinate projection, when the energy engine supplies one. */
+  /** Visually subordinate projection, already formatted. */
   readonly projectionNote: string | null;
   /** True when any input is missing; the number must not look authoritative. */
   readonly incomplete: boolean;
@@ -50,6 +56,10 @@ export interface MacroView {
   readonly consumedG: number;
   readonly goalG: number;
   readonly remainingG: number;
+  /** DISPLAY-READY grams — no floating-point artifacts reach the screen. */
+  readonly displayConsumed: string;
+  readonly displayGoal: string;
+  readonly displayRemaining: string;
   /** 0..1, clamped for layout only. Null when no goal exists. */
   readonly fraction: number | null;
 }
@@ -69,9 +79,24 @@ export interface ScaleView {
   readonly connected: boolean;
   readonly phase: string;
   readonly displayGrams: number | null;
+  /** DISPLAY-READY weight, or null when nothing is on the scale. */
+  readonly displayWeight: string | null;
   readonly message: string;
   /** ONLY a settled candidate may be committed. Unstable never qualifies. */
   readonly canCommitWeight: boolean;
+}
+
+/**
+ * The chosen food, available from selection onward.
+ *
+ * The weighing screen needs identity BEFORE a weight exists — deriving it from
+ * `review` meant the screen said "Selected food —" for the whole of weighing,
+ * which is precisely when knowing what you are weighing matters most.
+ */
+export interface SelectedFoodView {
+  readonly displayName: string;
+  readonly brand: string | null;
+  readonly preparationState: string;
 }
 
 export interface ReviewView {
@@ -83,6 +108,12 @@ export interface ReviewView {
   readonly proteinG: number;
   readonly carbohydrateG: number;
   readonly fatG: number;
+  /** DISPLAY-READY. Same values, formatted — never recalculated. */
+  readonly displayGrams: string;
+  readonly displayKcal: string;
+  readonly displayProtein: string;
+  readonly displayCarbs: string;
+  readonly displayFat: string;
 }
 
 export interface OfflineView {
@@ -101,9 +132,12 @@ export interface TabletViewModel {
   readonly voice: VoicePresence;
   readonly energy: EnergyBalanceView | null;
   readonly macros: readonly MacroView[];
-  readonly recent: readonly { readonly displayName: string; readonly kcal: number }[];
+  readonly recent: readonly {
+    readonly displayName: string; readonly kcal: number; readonly displayKcal: string;
+  }[];
   readonly options: readonly FoodOptionView[];
   readonly scale: ScaleView;
+  readonly selectedFood: SelectedFoodView | null;
   readonly review: ReviewView | null;
   readonly offline: OfflineView;
   readonly error: { readonly message: string; readonly recoverable: boolean } | null;
@@ -120,7 +154,7 @@ export interface ViewModelInput {
 }
 
 const EMPTY_SCALE: ScaleView = {
-  connected: false, phase: 'idle', displayGrams: null,
+  connected: false, phase: 'idle', displayGrams: null, displayWeight: null,
   message: 'Scale not connected', canCommitWeight: false,
 };
 
@@ -146,6 +180,7 @@ export function lockedViewModel(): TabletViewModel {
     recent: [],
     options: [],
     scale: EMPTY_SCALE,
+    selectedFood: null,
     review: null,
     offline: LOCKED_OFFLINE,
     error: null,
@@ -169,7 +204,10 @@ const macroOf = (
   consumedG,
   goalG,
   remainingG,
-  fraction: goalG <= 0 ? null : Math.min(1, Math.max(0, consumedG / goalG)),
+  displayConsumed: formatGrams(consumedG),
+  displayGoal: formatGrams(goalG),
+  displayRemaining: formatGrams(remainingG),
+  fraction: progressFraction(consumedG, goalG),
 });
 
 function voicePresenceOf(app: AppState, offline: boolean): VoicePresence {
@@ -226,12 +264,13 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
   const energy: EnergyBalanceView | null = dash === null ? null : {
     // COPIED from the energy domain. No arithmetic here.
     balanceKcal: dash.energy.currentBalanceKcal,
-    semantic: describeBalance(dash.energy.currentBalanceKcal),
+    displayValue: formatKcal(dash.energy.currentBalanceKcal, { sign: true }),
+    semantic: describeBalanceCopy(dash.energy.currentBalanceKcal),
     direction: dash.energy.currentBalanceKcal < 0
       ? 'deficit' : dash.energy.currentBalanceKcal > 0 ? 'surplus' : 'even',
     // Subordinate projection, copied from the engine. `ifNoMoreFood` is the
     // honest phrasing: it is a projection, not a plan.
-    projectionNote: `If no more food: ${dash.energy.ifNoMoreFoodBalanceKcal} kcal`,
+    projectionNote: formatProjection(dash.energy.ifNoMoreFoodBalanceKcal),
     incomplete: dash.energyIncomplete,
     gaps: dash.energyGaps,
   };
@@ -269,6 +308,11 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
         proteinG: preview.proteinG,
         carbohydrateG: preview.carbohydrateG,
         fatG: preview.fatG,
+        displayGrams: formatGramsWithUnit(capture.grams as unknown as number),
+        displayKcal: formatKcal(preview.kcal),
+        displayProtein: formatGramsWithUnit(preview.proteinG),
+        displayCarbs: formatGramsWithUnit(preview.carbohydrateG),
+        displayFat: formatGramsWithUnit(preview.fatG),
       }
     : null;
 
@@ -276,6 +320,8 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
     connected: app.scale.connected,
     phase: app.scale.phase,
     displayGrams: app.scale.displayGrams,
+    displayWeight: app.scale.displayGrams === null
+      ? null : formatGramsWithUnit(app.scale.displayGrams),
     message: app.scale.message,
     // A settled candidate is the ONLY thing that may be committed, and a
     // pending clear after a user switch blocks it too.
@@ -311,9 +357,14 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
     voice: voicePresenceOf(app, offline),
     energy,
     macros,
-    recent: input.recent,
+    recent: input.recent.map((r) => ({ ...r, displayKcal: formatKcal(r.kcal) })),
     options,
     scale,
+    selectedFood: selected === null ? null : {
+      displayName: selected.displayName,
+      brand: (selected as { brandName?: string | null }).brandName ?? null,
+      preparationState: selected.preparationState,
+    },
     review,
     offline: offlineView,
     error: app.addFood.error === null
@@ -322,18 +373,4 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
     flowId: app.addFood.flowId,
     sessionGeneration: app.sessionGeneration,
   };
-}
-
-/**
- * Phrase the balance the way a person would say it.
- *
- * Formatting only: `Math.abs` chooses a word, and the magnitude shown is the
- * domain's own number.
- */
-export function describeBalance(balanceKcal: number): string {
-  if (balanceKcal === 0) return 'Even right now';
-  const magnitude = Math.abs(balanceKcal);
-  return balanceKcal < 0
-    ? `${magnitude} kcal deficit right now`
-    : `${magnitude} kcal surplus right now`;
 }

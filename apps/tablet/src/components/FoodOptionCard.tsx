@@ -7,8 +7,11 @@ import {
 /**
  * One candidate food.
  *
- * `optionLabel` comes straight from orchestration, so the "B" a person says
- * and the "B" they see are the same B by construction.
+ * `optionLabel` comes straight from orchestration, so the "B" a person says and
+ * the "B" they see are the same B by construction. Preparation state is given
+ * real prominence: raw and cooked chicken differ by roughly a third in energy,
+ * and quietly picking the wrong one is the single most damaging mistake this
+ * screen could make.
  */
 export function FoodOptionCard(
   { option, onSelect }: { option: FoodOptionView; onSelect: (id: string) => void },
@@ -17,14 +20,18 @@ export function FoodOptionCard(
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={
-        `Option ${option.optionLabel}. ${option.displayName}. ${option.preparationState}`
+        `Option ${option.optionLabel}. ${option.displayName}. `
+        + `${option.brand !== null ? `${option.brand}. ` : ''}${option.preparationState}`
       }
       onPress={() => onSelect(option.productVersionId)}
       style={({ pressed }) => ({
         minHeight: touch.cardMinHeight,
         borderRadius: radius.lg,
-        backgroundColor: pressed ? color.surfaceOverlay : color.surfaceRaised,
-        padding: space.lg,
+        backgroundColor: pressed ? color.surfaceActive : color.surface,
+        borderWidth: 1,
+        borderColor: pressed ? color.accent : color.border,
+        paddingVertical: space.lg,
+        paddingHorizontal: space.lg,
         marginBottom: space.md,
         flexDirection: 'row',
         alignItems: 'center',
@@ -33,30 +40,46 @@ export function FoodOptionCard(
     >
       <View style={{
         width: touch.minTarget, height: touch.minTarget, borderRadius: radius.md,
-        backgroundColor: color.surfaceOverlay, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: color.surfaceMuted, borderWidth: 1, borderColor: color.border,
+        alignItems: 'center', justifyContent: 'center',
       }}>
-        <Text style={{ color: color.accent, fontSize: type.title.size, fontWeight: '700' }}>
+        <Text style={{
+          color: color.accent, fontSize: type.metric.size, fontWeight: '700',
+        }}>
           {option.optionLabel}
         </Text>
       </View>
 
       <View style={{ flex: 1 }}>
-        <Text style={{ color: color.textPrimary, fontSize: type.title.size }} numberOfLines={2}>
+        <Text
+          numberOfLines={2}
+          style={{ color: color.textPrimary, fontSize: type.metric.size, fontWeight: '600' }}
+        >
           {option.displayName}
         </Text>
+
         {option.brand !== null ? (
-          <Text style={{ color: color.textSecondary, fontSize: type.body.size }}>
+          <Text style={{ color: color.textSecondary, fontSize: type.body.size, marginTop: space.xxs }}>
             {option.brand}
           </Text>
         ) : null}
-        <Text style={{
-          // When preparation is what separates two candidates, say so loudly:
-          // raw and cooked differ enough to matter.
-          color: option.preparationMatters ? color.warning : color.textMuted,
-          fontSize: type.caption.size, marginTop: space.xs,
+
+        <View style={{
+          alignSelf: 'flex-start', marginTop: space.sm,
+          paddingHorizontal: space.md, paddingVertical: space.xxs,
+          borderRadius: radius.pill,
+          backgroundColor: option.preparationMatters ? 'transparent' : color.surfaceMuted,
+          borderWidth: 1,
+          borderColor: option.preparationMatters ? color.warning : color.border,
         }}>
-          {option.preparationState}{option.preparationMatters ? ' · check preparation' : ''}
-        </Text>
+          <Text style={{
+            color: option.preparationMatters ? color.warning : color.textSecondary,
+            fontSize: type.caption.size,
+          }}>
+            {option.preparationState}
+            {option.preparationMatters ? ' · check preparation' : ''}
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
