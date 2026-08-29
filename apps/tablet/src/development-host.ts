@@ -16,6 +16,7 @@ import type { AuthHostPort } from './actions.js';
 import type { TabletHost } from './bootstrap.js';
 import type { TabletComposition, TabletPorts } from './composition.js';
 import { toFoodCard, fallbackInitials } from '@macros/domain-catalog';
+import { buildVocabulary, resilientSearch } from '@macros/domain-food-search';
 import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 
 /**
@@ -114,18 +115,15 @@ export async function createDevelopmentHost(
    */
   const catalogBrowser = {
     async search(query: string): Promise<readonly FoodCardView[]> {
-      // `listSearchable` is the same set the application searches: versions
-      // reachable through an ACTIVE head. De-listed products stay resolvable by
-      // id but never surface here, exactly as in production.
+      // THE SAME AUTHORITATIVE PIPELINE the tablet controller uses. The private
+      // substring filter that lived here was a second search implementation:
+      // QA would have been inspecting behaviour the product does not have,
+      // which is worse than having no QA surface.
       const searchable = await repositories.products.listSearchable();
-      const terms = query.toLowerCase().split(/[^a-z0-9]+/i).filter((t) => t.length > 0);
-      const matches = terms.length === 0 ? searchable : searchable.filter((v) => {
-        const hay = `${v.displayName} ${
-          (v as unknown as { brandName?: string }).brandName ?? ''}`.toLowerCase();
-        return terms.every((t) => hay.includes(t));
-      });
-      return matches.slice(0, 25).map((v) => {
-        const card = toFoodCard(v);
+      const vocabulary = buildVocabulary(searchable);
+      const response = resilientSearch(searchable, vocabulary, { text: query, limit: 25 });
+      return response.results.map((r) => {
+        const card = toFoodCard(r.productVersion);
         return toFoodCardView(card as never, fallbackInitials(card.displayName));
       });
     },

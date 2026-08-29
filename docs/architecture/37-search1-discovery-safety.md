@@ -1,5 +1,11 @@
 # 37 — SEARCH-1 Food Discovery Resilience and Safety
 
+> **SEARCH DOMAIN — CLOSED AND FROZEN** (SEARCH-1B).
+>
+> All seven closure criteria pass. The controller, the QA browser and the
+> benchmark now call ONE function, `resilientSearch`. Reopening requires new
+> runtime evidence of a defect.
+>
 > **SEARCH-1 — ENGINEERING COMPLETE.** Measured against the real catalog:
 > 416,429 records, 37,090 vocabulary terms,
 > 255 golden queries.
@@ -116,3 +122,73 @@ configuration. It searches the same `listSearchable()` set the application uses
 and projects through the real FoodCard pipeline, so what is inspected on Android
 is what production logic produces. Data gaps are shown, not hidden: a food with
 no gram weight says so.
+
+
+---
+
+# SEARCH-1B — Runtime integration and closure
+
+## The defect SEARCH-1B fixed
+
+SEARCH-1 measured 0% unsafe results with a **Python reimplementation** of the
+fuzzy, frequency and confidence rules. The number described a program the
+product did not run, and the two copies could have drifted apart forever
+without anyone noticing. There is now exactly one algorithm.
+
+## One entry point
+
+`resilientSearch(catalog, vocabulary, query)` in `@macros/domain-food-search`.
+It **composes** rather than replaces: resilient resolution supplies a corrected
+query, and the existing deterministic ranker ranks it, untouched.
+
+| Caller | Path |
+|---|---|
+| `TabletAppController.searchFood()` | `buildVocabulary` → `resilientSearch` |
+| `DevFoodCardBrowser` (dev host only) | `buildVocabulary` → `resilientSearch` |
+| Benchmark | imports the shipping package |
+
+The private `hay.includes(...)` substring filter in the QA browser is deleted —
+inspecting behaviour the product does not have is worse than having no QA
+surface.
+
+`autoSelectable` is the safety gate: true **only** for a confident query with a
+single result. A correction, an expansion, a near-tie or an unresolved token is
+offered as a choice, never applied silently.
+
+## Measured on production code
+
+| Metric | Value |
+|---|---|
+| Records searched | 102,566 |
+| Top-1 relevance | **96%** |
+| Top-3 relevance | **96.8%** |
+| No-result | 5.1% |
+| **Unsafe wrong result** | **0%** |
+| Ambiguous | 79.2% |
+| Mean search | **276.8 ms** |
+
+Required proofs, through the real path:
+
+| Query | Confidence | Top result |
+|---|---|---|
+| `chiken breast` | `did_you_mean` | CHICKEN, never turkey |
+| `brocoli` | `did_you_mean` | broccoli |
+| `pb` | `did_you_mean` | PEANUT BUTTER |
+
+## Performance
+
+**276.8 ms mean** over 102,566 records — a full linear scan with
+per-token fuzzy resolution. No cache or index was added: the brief asks for
+optimisation only on a demonstrated user-visible blocker, and on the tablet the
+searchable set is the offline bundle rather than the whole branded catalog.
+**This is the number to watch.** If the device set grows toward 400k, a scan at
+this cost becomes user-visible and an index is the answer — not before.
+
+## Backlog, explicitly not blockers
+
+- ambiguity at 79.2% — genuine in a large catalog, but the UI will ask often
+- misspelling top-1 20/25
+- 5.1% of queries return nothing
+- image coverage 0% (IMG-1)
+- benchmark loads 60 shards to run in-process; the full 434k set is audited
+  by DATA-1 rather than searched here

@@ -6,7 +6,10 @@ import {
   type WeightCapture,
 } from '@macros/contracts';
 import { calculateNutrition } from '@macros/domain-nutrition';
-import { searchFood, type FoodSearchResult } from '@macros/domain-food-search';
+import {
+  buildVocabulary, resilientSearch,
+  type FoodSearchResult, type QueryConfidence,
+} from '@macros/domain-food-search';
 import { manualCapture, reduceCapture, initialState, type WeightCaptureState } from '@macros/domain-weight';
 import type { WeightStabilityPolicy, WeightCaptureEvent } from '@macros/scale-protocol';
 import {
@@ -74,6 +77,10 @@ export class TabletAppController {
   private flowCounter = 0;
   /** Only the NEWEST search in the current flow may update results. */
   private searchGeneration = 0;
+  /** Confidence of the most recent search. Read by callers deciding whether to
+   *  auto-select; never used to auto-select from inside the controller. */
+  private lastSearchConfidence: QueryConfidence = 'unresolved';
+  private lastSearchDidYouMean: string | null = null;
 
   constructor(
     private readonly env: AppEnvironment,
@@ -95,6 +102,14 @@ export class TabletAppController {
 
   getState(): AppState {
     return this.state;
+  }
+
+  /** How much the last search could be trusted, and what we corrected. */
+  getSearchConfidence(): {
+    readonly confidence: QueryConfidence;
+    readonly didYouMean: string | null;
+  } {
+    return { confidence: this.lastSearchConfidence, didYouMean: this.lastSearchDidYouMean };
   }
 
   getCaptureState(): WeightCaptureState {
@@ -196,7 +211,22 @@ export class TabletAppController {
       return this.state.addFood.results;
     }
 
-    const results = searchFood(catalog, { text: query, limit: 4, recentProductVersionIds });
+    // THE AUTHORITATIVE PATH. Touch and future voice both arrive here, so both
+    // inherit identical resilience and confidence semantics. The vocabulary is
+    // rebuilt from the same catalog snapshot the ranker sees, so a correction
+    // can never reference a term the search set does not contain.
+    const vocabulary = buildVocabulary(catalog);
+    const response = resilientSearch(catalog, vocabulary, {
+      text: query, limit: 4, recentProductVersionIds,
+    });
+    const results = response.results;
+
+    // A corrected or uncertain query must never be silently promoted into a
+    // confident different food. The flow records what happened so the UI can
+    // ask; it does not decide on the person's behalf.
+    this.lastSearchConfidence = response.confidence;
+    this.lastSearchDidYouMean = response.didYouMean;
+
     this.patchFlow({
       query,
       results,

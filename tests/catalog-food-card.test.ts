@@ -179,7 +179,12 @@ describe('DATA-1 AUDIT ARTIFACTS — measured, not asserted', () => {
 
   test('the search benchmark records real weaknesses', () => {
     const b = JSON.parse(readFileSync(repoPath('data', 'search-benchmark.json'), 'utf8'));
-    assert.ok(b.searchableRecords > 400000);
+    // SEARCH-1B runs the RUNTIME search in-process, so the benchmark loads a
+    // bounded slice of the catalog (default 60 shards, ~102k records) that fits
+    // in heap. The full 434k set is covered by the DATA-1 audit above; running
+    // production code was judged more valuable than a larger in-memory corpus.
+    assert.ok(b.searchableRecords > 90000);
+    assert.equal(b.runsProductionCode, true);
     // SEARCH-1 expanded the corpus and renamed the category; misspellings
     // improved but remain the weakest area, and that must stay visible.
     assert.ok(b.corpusSize >= 250);

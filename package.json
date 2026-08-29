@@ -14,7 +14,8 @@
     "postgres:validate": "bash tools/postgres-validation/run.sh",
     "postgres:integration": "node --import tsx tools/postgres-integration/run-integration.ts",
     "auth:live-gate": "node --import tsx tools/supabase-gate/run-live-gate.ts",
-    "check:renderer": "node --import tsx tools/check-renderer-purity.ts"
+    "check:renderer": "node --import tsx tools/check-renderer-purity.ts",
+    "benchmark:search": "node --import tsx tools/benchmark-search-quality.ts"
   },
   "engines": {
     "node": ">=22.0.0",
