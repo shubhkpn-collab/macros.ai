@@ -319,3 +319,68 @@ describe('UX-1 DESIGN SYSTEM — one presentation authority', () => {
     }
   });
 });
+
+describe('TOKEN REFERENCE INTEGRITY', () => {
+  /**
+   * The renderer is excluded from root typecheck (react-native is not
+   * installable here), so a stale token name compiles cleanly in the sandbox and
+   * only fails on the owner's Mac. `color.surfaceBase` survived a token rename
+   * that way. This guard closes the gap: every token a component names is
+   * checked against the real exported object, here, on every run.
+   */
+  const sourceFiles = (): string[] => {
+    const out: string[] = [];
+    const walk = (d: string): void => {
+      for (const e of readdirSync(d)) {
+        const p = join(d, e);
+        if (statSync(p).isDirectory()) walk(p);
+        else if (/\.(ts|tsx)$/.test(p)) out.push(p);
+      }
+    };
+    walk(repoPath('apps', 'tablet', 'src'));
+    return out;
+  };
+
+  const referenced = (moduleName: string): { file: string; key: string }[] => {
+    const found: { file: string; key: string }[] = [];
+    for (const file of sourceFiles()) {
+      const code = readFileSync(file, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+      for (const m of code.matchAll(new RegExp(`\\b${moduleName}\\.([A-Za-z][A-Za-z0-9_]*)`, 'g'))) {
+        found.push({ file, key: m[1]! });
+      }
+    }
+    return found;
+  };
+
+  test('every color.* token referenced under apps/tablet/src exists', async () => {
+    const { color } = await import('@macros/tablet-view-model');
+    const uses = referenced('color');
+    assert.ok(uses.length > 0, 'the scan must actually find references');
+    for (const { file, key } of uses) {
+      assert.ok(key in color,
+        `${file} references color.${key}, which tokens.ts does not export`);
+    }
+  });
+
+  test('every space, radius, type and touch token referenced exists', async () => {
+    const tokens = await import('@macros/tablet-view-model');
+    const groups = {
+      space: tokens.space, radius: tokens.radius,
+      type: tokens.type, touch: tokens.touch, motion: tokens.motion,
+    } as const;
+    for (const [name, group] of Object.entries(groups)) {
+      for (const { file, key } of referenced(name)) {
+        assert.ok(key in (group as Record<string, unknown>),
+          `${file} references ${name}.${key}, which tokens.ts does not export`);
+      }
+    }
+  });
+
+  test('the renamed root background token is used, not the removed one', () => {
+    const app = readFileSync(repoPath('apps', 'tablet', 'src', 'App.tsx'), 'utf8');
+    assert.equal(app.includes('color.surfaceBase'), false,
+      'surfaceBase was removed by the UX-1 token rename');
+    assert.match(app, /backgroundColor: color\.canvas/);
+  });
+});

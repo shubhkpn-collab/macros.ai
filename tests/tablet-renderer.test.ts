@@ -612,9 +612,9 @@ describe('NATIVE BUILD READINESS — the bundle can actually resolve and load', 
     // The stale manual-copy instruction must be gone.
     assert.equal(/copy its `android\/` Gradle files/.test(doc), false);
     // The count must match reality, checked against the suite itself below.
-    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611|expect 1620|expect 1633/.test(doc), false,
+    assert.equal(/1,585 tests|expect 1585|expect 1602|expect 1606|expect 1611|expect 1620|expect 1633|expect 1660/.test(doc), false,
       'stale test count in owner instructions');
-    assert.match(doc, /expect 1660 tests/);
+    assert.match(doc, /expect 1663 tests/);
   });
 
   test('FIX 4: hydration pins the package manager', () => {

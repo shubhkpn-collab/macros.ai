@@ -36,8 +36,8 @@ export function App(
   }), [composition, auth, refresh]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: color.surfaceBase }}>
-      <StatusBar barStyle="light-content" backgroundColor={color.surfaceBase} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>
+      <StatusBar barStyle="light-content" backgroundColor={color.canvas} />
       <TabletShell vm={vm} actions={actions} developmentNotice={developmentNotice} />
     </SafeAreaView>
   );
