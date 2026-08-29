@@ -1,0 +1,969 @@
+{
+  "benchmarkVersion": "search-quality@1.0.0",
+  "corpusSize": 32,
+  "searchableRecords": 416429,
+  "top1RelevancePercent": 90.6,
+  "top3RelevancePercent": 90.6,
+  "noResultPercent": 3.1,
+  "byCategory": {
+    "common": {
+      "n": 8,
+      "top1": 8,
+      "top3": 8,
+      "none": 0
+    },
+    "preparation": {
+      "n": 5,
+      "top1": 5,
+      "top3": 5,
+      "none": 0
+    },
+    "branded": {
+      "n": 4,
+      "top1": 4,
+      "top3": 4,
+      "none": 0
+    },
+    "morphology": {
+      "n": 3,
+      "top1": 3,
+      "top3": 3,
+      "none": 0
+    },
+    "spelling": {
+      "n": 3,
+      "top1": 1,
+      "top3": 1,
+      "none": 1
+    },
+    "abbreviation": {
+      "n": 2,
+      "top1": 1,
+      "top3": 1,
+      "none": 0
+    },
+    "natural_language": {
+      "n": 3,
+      "top1": 3,
+      "top3": 3,
+      "none": 0
+    },
+    "cuisine": {
+      "n": 4,
+      "top1": 4,
+      "top3": 4,
+      "none": 0
+    }
+  },
+  "queries": [
+    {
+      "query": "banana",
+      "category": "common",
+      "note": "",
+      "resultCount": 3046,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Banana chips snacks",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Banana pepper, raw",
+          "brand": null,
+          "prep": "raw",
+          "kind": "generic"
+        },
+        {
+          "name": "BANANA CHIPS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "eggs",
+      "category": "common",
+      "note": "plural of a staple",
+      "resultCount": 1563,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "EGGS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "whole milk",
+      "category": "common",
+      "note": "",
+      "resultCount": 25958,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "WHOLE MILK",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "WHOLE MILK",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Ricotta cheese, whole milk",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "peanut butter",
+      "category": "common",
+      "note": "",
+      "resultCount": 13685,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "PEANUT BUTTER",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "white rice",
+      "category": "common",
+      "note": "",
+      "resultCount": 17624,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Rice flour, white, unenriched",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "White rice flour, unenriched",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "COOKED WHITE RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "cheddar cheese",
+      "category": "common",
+      "note": "",
+      "resultCount": 31426,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "CHEDDAR CHEESE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "American cheddar cheese, imitation",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "CHEDDAR CHEESE",
+          "brand": "WEIS",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "olive oil",
+      "category": "common",
+      "note": "",
+      "resultCount": 7029,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "OLIVE OIL",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "almonds",
+      "category": "common",
+      "note": "",
+      "resultCount": 5201,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "ALMONDS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "ALMONDS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Almonds nuts",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "chicken breast",
+      "category": "preparation",
+      "note": "ambiguous by design",
+      "resultCount": 14644,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "CHICKEN BREAST",
+          "brand": "FAREWAY",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "CHICKEN BREAST",
+          "brand": "SHOPRITE",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "CHICKEN BREAST",
+          "brand": "TYSON",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "cooked chicken breast",
+      "category": "preparation",
+      "note": "must favour cooked",
+      "resultCount": 19060,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Breaded chicken breast tenders, cooked, microwaved",
+          "brand": null,
+          "prep": "cooked",
+          "kind": "generic"
+        },
+        {
+          "name": "Fully Cooked Breaded Chicken Breast Tenderloins",
+          "brand": "Tyson",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Chicken bratwurst, cooked",
+          "brand": null,
+          "prep": "cooked",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "raw chicken breast",
+      "category": "preparation",
+      "note": "must favour raw",
+      "resultCount": 18810,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "RAW STUFFED CHICKEN BREAST",
+          "brand": "HANNFORD",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Breast chicken, boneless, skinless, raw",
+          "brand": null,
+          "prep": "raw",
+          "kind": "generic"
+        },
+        {
+          "name": "Ground chicken, raw",
+          "brand": null,
+          "prep": "raw",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "white rice cooked",
+      "category": "preparation",
+      "note": "",
+      "resultCount": 22559,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "COOKED WHITE RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "ORGANIC COOKED WHITE RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "ORGANIC COOKED WHITE RICE",
+          "brand": "MINSLEY",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "boiled egg",
+      "category": "preparation",
+      "note": "",
+      "resultCount": 3129,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Whole egg, cooked, hard-boiled",
+          "brand": null,
+          "prep": "cooked",
+          "kind": "generic"
+        },
+        {
+          "name": "HARD-BOILED EGG WITH CASHEWS & GOUDA CHEESE",
+          "brand": "CRYSTAL FARMS",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "HARD-BOILED EGG WITH CASHEWS & GOUDA CHEESE",
+          "brand": "CRYSTAL FARMS",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "greek yogurt",
+      "category": "branded",
+      "note": "",
+      "resultCount": 8168,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "GREEK YOGURT",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "quaker oats",
+      "category": "branded",
+      "note": "",
+      "resultCount": 2471,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "GROUND OATS",
+          "brand": "QUAKER",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "QUAKER cereals, Quick Oats, Dry",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "ROLLED OVERNIGHT OATS",
+          "brand": "QUAKER",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "coca cola",
+      "category": "branded",
+      "note": "",
+      "resultCount": 1258,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "COLA",
+          "brand": "COCA-COLA",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "COLA",
+          "brand": "COCA-COLA",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "COLA",
+          "brand": "COCA-COLA",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "cheerios",
+      "category": "branded",
+      "note": "",
+      "resultCount": 198,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Cheerios Cereal",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Cheerios Cereal",
+          "brand": "Cheerios",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Cheerios Cereal",
+          "brand": "Cheerios",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "egg",
+      "category": "morphology",
+      "note": "",
+      "resultCount": 2678,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Egg bagels",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Egg bread",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Dinner rolls, egg",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "bananas",
+      "category": "morphology",
+      "note": "",
+      "resultCount": 219,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Bananas, raw",
+          "brand": null,
+          "prep": "raw",
+          "kind": "generic"
+        },
+        {
+          "name": "BANANAMILK",
+          "brand": "SIR BANANAS",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "BANANAMILK",
+          "brand": "SIR BANANAS",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "almond",
+      "category": "morphology",
+      "note": "",
+      "resultCount": 4307,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Almond flour",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Almond oil",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Creamy almond butter",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "chiken breast",
+      "category": "spelling",
+      "note": "common typo",
+      "resultCount": 3251,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "top3": [
+        {
+          "name": "TURKEY BREAST",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "Sliced turkey breast, prepackaged",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "BREAST NUGGETS",
+          "brand": "TYSON",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "brocoli",
+      "category": "spelling",
+      "note": "common typo",
+      "resultCount": 0,
+      "noResult": true,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "top3": []
+    },
+    {
+      "query": "yoghurt",
+      "category": "spelling",
+      "note": "British spelling",
+      "resultCount": 134,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "FINEST YOGHURT",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "YOGHURT, PLAIN",
+          "brand": "NOOSA",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "COCONUT YOGHURT, COCONUT",
+          "brand": "NOOSA",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "pb",
+      "category": "abbreviation",
+      "note": "peanut butter",
+      "resultCount": 144,
+      "noResult": false,
+      "top1Relevant": false,
+      "top3Relevant": false,
+      "top3": [
+        {
+          "name": "PB & J BAR",
+          "brand": "MARKETSIDE",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "PB &J GRANOLA",
+          "brand": "WASATCH",
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "AUSTIN CRACKERS PB & J 11OZ",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "og chicken",
+      "category": "abbreviation",
+      "note": "",
+      "resultCount": 13266,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Chicken fat",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Meatless chicken",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "Chicken bratwurst, cooked",
+          "brand": null,
+          "prep": "cooked",
+          "kind": "generic"
+        }
+      ]
+    },
+    {
+      "query": "a cup of white rice",
+      "category": "natural_language",
+      "note": "",
+      "resultCount": 17624,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Rice flour, white, unenriched",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "White rice flour, unenriched",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "COOKED WHITE RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "two scrambled eggs",
+      "category": "natural_language",
+      "note": "",
+      "resultCount": 1596,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Scrambled eggs, frozen mixture",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "COOKED SCRAMBLED EGGS WITH SAUSAGE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "SCRAMBLED EGGS",
+          "brand": "EGGLAND'S BEST",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "some grilled chicken",
+      "category": "natural_language",
+      "note": "",
+      "resultCount": 13876,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "GRILLED CHICKEN STRIPS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "FAJITA GRILLED CHICKEN STRIPS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "GRILLED CHICKEN BREAST",
+          "brand": "AHOLD",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "hummus",
+      "category": "cuisine",
+      "note": "",
+      "resultCount": 1323,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Commercial hummus",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "HUMMUS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "HUMMUS",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "tofu",
+      "category": "cuisine",
+      "note": "",
+      "resultCount": 339,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "Fried tofu",
+          "brand": null,
+          "prep": "cooked",
+          "kind": "generic"
+        },
+        {
+          "name": "Tofu yogurt",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "generic"
+        },
+        {
+          "name": "SALAD",
+          "brand": "TOFU",
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "basmati rice",
+      "category": "cuisine",
+      "note": "",
+      "resultCount": 7522,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "BASMATI RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "BASMATI RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "BASMATI RICE",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    },
+    {
+      "query": "salsa",
+      "category": "cuisine",
+      "note": "",
+      "resultCount": 3562,
+      "noResult": false,
+      "top1Relevant": true,
+      "top3Relevant": true,
+      "top3": [
+        {
+          "name": "SALSA",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "SALSA",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        },
+        {
+          "name": "SALSA",
+          "brand": null,
+          "prep": "as_sold",
+          "kind": "branded"
+        }
+      ]
+    }
+  ]
+}

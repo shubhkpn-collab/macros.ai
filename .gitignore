@@ -62,3 +62,4 @@ data/sources/*
 # generated against a reachable registry (see docs/architecture/PORTABILITY.md).
 node_modules/
 artifacts/
+tools/__pycache__/

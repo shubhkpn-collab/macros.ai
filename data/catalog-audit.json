@@ -1,0 +1,124 @@
+{
+  "auditVersion": "catalog-audit@1.0.0",
+  "branded": {
+    "collisionPairs": 28333,
+    "collisionRecords": 71644,
+    "currentVersions": 409552,
+    "discontinuedCurrent": 0,
+    "displayable": 401611,
+    "distinctBrands": 33479,
+    "historicalVersions": 8857,
+    "identifierStates": {
+      "conflicted": 22133,
+      "current": 399345,
+      "needs_review": 1418,
+      "unknown": 11818
+    },
+    "identityBases": {
+      "isolated_source_record": 11818,
+      "validated_gtin": 422896
+    },
+    "percentDisplayable": 98.06,
+    "percentWithFullMacros": 100.0,
+    "percentWithKcal": 100.0,
+    "percentWithServingGrams": 62.86,
+    "preparationStates": {
+      "as_sold": 409552
+    },
+    "problems": {
+      "carbohydrate_out_of_range": 1139,
+      "energy_macro_disagreement": 6532,
+      "energy_out_of_range": 697,
+      "fat_out_of_range": 159,
+      "no_brand": 17974,
+      "protein_out_of_range": 116
+    },
+    "products": 434714,
+    "topBrands": [
+      [
+        "MEIJER",
+        5548
+      ],
+      [
+        "WEGMANS",
+        4711
+      ],
+      [
+        "GREAT VALUE",
+        4613
+      ],
+      [
+        "SHOPRITE",
+        3311
+      ],
+      [
+        "HY-VEE",
+        3236
+      ],
+      [
+        "SIGNATURE SELECT",
+        3157
+      ],
+      [
+        "KROGER",
+        2992
+      ],
+      [
+        "GIANT EAGLE",
+        2809
+      ],
+      [
+        "AHOLD",
+        2808
+      ],
+      [
+        "GOOD & GATHER",
+        2502
+      ],
+      [
+        "HARRIS TEETER",
+        2443
+      ],
+      [
+        "MARKET PANTRY",
+        2386
+      ],
+      [
+        "SCHNUCKS",
+        2381
+      ],
+      [
+        "ESSENTIAL EVERYDAY",
+        2347
+      ],
+      [
+        "TOPS",
+        2318
+      ]
+    ],
+    "versionIdsTotal": 443571,
+    "withBrand": 391578,
+    "withFullMacros": 409552,
+    "withIngredients": 0,
+    "withKcal": 409552,
+    "withServingGrams": 257431,
+    "withServingGramsAndText": 257339,
+    "withServingTextOnly": 143367,
+    "withoutAnyServing": 8754
+  },
+  "generic": {
+    "percentWithFullMacros": 100.0,
+    "percentWithKcal": 100.0,
+    "preparationStates": {
+      "as_sold": 3203,
+      "cooked": 2194,
+      "raw": 1480
+    },
+    "recommendable": 6630,
+    "total": 6877,
+    "with_full_macros": 6877,
+    "with_kcal": 6877,
+    "with_preparation": 6877,
+    "with_serving": 6877
+  }
+}

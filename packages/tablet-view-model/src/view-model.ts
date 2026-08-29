@@ -374,3 +374,21 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
     sessionGeneration: app.sessionGeneration,
   };
 }
+
+/**
+ * FOOD CARD VIEW — the QA browser's display projection.
+ *
+ * Formatting happens here for the same reason it does everywhere else: the
+ * renderer must not decide how a number reads, and a missing value must say
+ * "unknown" rather than silently render as nothing.
+ */
+export interface FoodCardView {
+  readonly productVersionId: string;
+  readonly displayName: string;
+  readonly brandLine: string;
+  readonly servingLine: string;
+  readonly nutritionLine: string;
+  readonly imageInitials: string;
+  readonly displayable: boolean;
+  readonly accessibilityLabel: string;
+}

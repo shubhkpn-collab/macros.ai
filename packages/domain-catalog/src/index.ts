@@ -8,3 +8,4 @@ export * from './search-projection.js';
 export * from './identifiers.js';
 export * from './branded.js';
 export * from './product-card.js';
+export * from './food-card.js';
