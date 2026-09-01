@@ -1,0 +1,643 @@
+/**
+ * INT-1 — ADVERSARIAL EVALUATION OF THE RECOMMENDATION ENGINE.
+ *
+ * This MEASURES the existing engine. It does not correct it, and no failure
+ * here is fixed in this milestone: the point is to establish what the engine
+ * actually does before anyone decides what to change.
+ *
+ * Rules that shape the design:
+ *   - the REAL `recommendFoods` is exercised; there is no second algorithm;
+ *   - candidate foods come from the trusted catalog with real nutrition;
+ *   - only user STATE is synthetic;
+ *   - correctness is judged by deterministic nutrition arithmetic, never by
+ *     asserting that one named food must beat another.
+ */
+import { readFileSync, writeFileSync } from 'node:fs';
+import {
+  DEFAULT_RECOMMENDATION_POLICY, recommendFoods,
+  type RecommendationCandidate, type RecommendationInput, type RecommendationSet,
+} from '@macros/domain-recommendation';
+import { repoPath } from './repo-paths.js';
+
+const GENERIC = repoPath('data', 'usda-seed.json');
+const OUT = repoPath('data', 'recommendation-evaluation.json');
+
+const NOW = '2026-08-29T18:00:00.000Z';
+const LOCAL_DATE = '2026-08-29';
+const USER = '11111111-1111-4111-8111-111111111111';
+
+// ---------------------------------------------------------------------------
+// REAL catalog candidates. Nutrition is never fabricated.
+// ---------------------------------------------------------------------------
+
+interface Seed {
+  productId: string;
+  displayName: string;
+  preparationState: string;
+  per100g?: Record<string, { amount?: number }>;
+  recommendable?: boolean;
+  category?: string;
+}
+
+const amount = (s: Seed, key: string): number | null => {
+  const node = s.per100g?.[key];
+  return typeof node?.amount === 'number' ? node.amount : null;
+};
+
+function loadCandidates(): RecommendationCandidate[] {
+  const seeds = JSON.parse(readFileSync(GENERIC, 'utf8')) as Seed[];
+  const out: RecommendationCandidate[] = [];
+  for (const s of seeds) {
+    // Only foods the catalog itself marks recommendable, with complete macros.
+    if (s.recommendable !== true) continue;
+    const kcal = amount(s, 'energy_kcal');
+    const protein = amount(s, 'protein');
+    const carbs = amount(s, 'carbohydrate');
+    const fat = amount(s, 'fat');
+    if (kcal === null || protein === null || carbs === null || fat === null) continue;
+
+    const productVersionId = `${s.productId}@v1`;
+    out.push({
+      productVersion: {
+        productId: s.productId,
+        productVersionId,
+        versionNo: 1,
+        displayName: s.displayName,
+        preparationState: s.preparationState,
+        basis: {
+          kind: 'per_100g', kcal, proteinG: protein, carbohydrateG: carbs, fatG: fat,
+        },
+        source: {
+          kind: 'usda_generic', sourceId: s.productId, verificationStatus: 'published',
+        },
+        effectiveFrom: '2026-01-01T00:00:00.000Z',
+        // NO servingGrams. The generic USDA seed genuinely has none, and
+        // injecting one would fabricate the very data DATA-1 identified as the
+        // catalog's largest gap — then measure the engine against a catalog
+        // that does not exist.
+      } as never,
+      head: {
+        productId: s.productId,
+        currentProductVersionId: productVersionId,
+        isActive: true,
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      } as never,
+    });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
+// Scenario space
+// ---------------------------------------------------------------------------
+
+type Goal = 'lose' | 'maintain' | 'gain';
+type DayPhase = 'early' | 'middle' | 'late';
+
+interface Scenario {
+  readonly id: string;
+  readonly goal: Goal;
+  readonly phase: DayPhase;
+  readonly targetKcal: number;
+  readonly consumedFraction: number;
+  readonly proteinFraction: number;
+  readonly carbFraction: number;
+  readonly fatFraction: number;
+  readonly balanceKcal: number;
+}
+
+const GOALS: Goal[] = ['lose', 'maintain', 'gain'];
+const PHASES: DayPhase[] = ['early', 'middle', 'late'];
+const TARGETS = [1600, 2000, 2400, 2800];
+/** How much of the day's energy is already eaten. 1.15 = target exceeded. */
+const CONSUMED = [0.05, 0.3, 0.55, 0.8, 0.95, 1.15];
+/** Per-macro consumption as a fraction of that macro's target. */
+const MACRO_MIXES: readonly [number, number, number][] = [
+  [0.15, 0.60, 0.60],  // severe protein deficit
+  [0.55, 0.60, 0.60],  // mild protein deficit
+  [0.85, 0.25, 0.60],  // carbohydrate deficit
+  [0.85, 0.70, 0.20],  // fat deficit
+  [0.60, 0.60, 0.95],  // fat almost exhausted
+  [0.60, 0.95, 0.60],  // carbohydrate almost exhausted
+  [0.60, 0.60, 0.60],  // balanced remaining
+  [1.05, 0.90, 0.90],  // protein already met
+];
+
+function buildScenarios(): Scenario[] {
+  const out: Scenario[] = [];
+  let n = 0;
+  for (const goal of GOALS) {
+    for (const phase of PHASES) {
+      for (const targetKcal of TARGETS) {
+        for (const consumedFraction of CONSUMED) {
+          for (const [p, c, f] of MACRO_MIXES) {
+            n += 1;
+            // Balance varies with goal and how much of the day has passed.
+            const drift = goal === 'lose' ? -400 : goal === 'gain' ? 250 : 0;
+            const eaten = targetKcal * consumedFraction;
+            out.push({
+              id: `S${String(n).padStart(4, '0')}`,
+              goal, phase, targetKcal, consumedFraction,
+              proteinFraction: p, carbFraction: c, fatFraction: f,
+              balanceKcal: Math.round(eaten - targetKcal + drift),
+            });
+          }
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/** Macro targets in grams, derived once from the energy target. */
+const macroTargets = (targetKcal: number) => ({
+  targetKcal,
+  proteinG: Math.round((targetKcal * 0.30) / 4),
+  carbohydrateG: Math.round((targetKcal * 0.40) / 4),
+  fatG: Math.round((targetKcal * 0.30) / 9),
+  policyVersion: 'macro-policy@int1-eval',
+  policyReviewStatus: 'reviewed',
+});
+
+function inputFor(s: Scenario, candidates: readonly RecommendationCandidate[]): RecommendationInput {
+  const t = macroTargets(s.targetKcal);
+  const consumedKcal = Math.round(s.targetKcal * s.consumedFraction);
+  const consumedProtein = Math.round(t.proteinG * s.proteinFraction);
+  const consumedCarb = Math.round(t.carbohydrateG * s.carbFraction);
+  const consumedFat = Math.round(t.fatG * s.fatFraction);
+
+  return {
+    userId: USER,
+    nowIso: NOW,
+    localDate: LOCAL_DATE,
+    energy: {
+      currentBalanceKcal: s.balanceKcal,
+      targetDeltaKcal: s.goal === 'lose' ? -500 : s.goal === 'gain' ? 300 : 0,
+      remainingIntakeKcal: s.targetKcal - consumedKcal,
+      ifNoMoreFoodBalanceKcal: s.balanceKcal,
+      tefStatus: 'unavailable',
+      tefEstimatedTotalKcal: null,
+      tefBaseMacroKcal: null,
+      tefIndividualAdjustmentKcal: null,
+      tefConfidence: null,
+      completeness: 'complete',
+      completenessGaps: [],
+    } as never,
+    macros: {
+      targets: t,
+      consumedKcal,
+      consumedProteinG: consumedProtein,
+      consumedCarbohydrateG: consumedCarb,
+      consumedFatG: consumedFat,
+      remainingKcal: s.targetKcal - consumedKcal,
+      remainingProteinG: t.proteinG - consumedProtein,
+      remainingCarbohydrateG: t.carbohydrateG - consumedCarb,
+      remainingFatG: t.fatG - consumedFat,
+      calcVersion: 'macro@int1-eval',
+    } as never,
+    candidates,
+    history: { userId: USER, observations: [] },
+    preferences: null,
+    policy: DEFAULT_RECOMMENDATION_POLICY,
+    environment: 'test',
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Metrics. Judged by arithmetic, never by naming a required food.
+// ---------------------------------------------------------------------------
+
+interface Verdict {
+  readonly hardViolation: string | null;
+  readonly energyFit: boolean | null;
+  readonly macroFit: boolean | null;
+  readonly unnecessaryOvershoot: boolean | null;
+  readonly rankingRational: boolean | null;
+}
+
+const basisOf = (byId: Map<string, RecommendationCandidate>, id: string) => {
+  const c = byId.get(id);
+  return (c?.productVersion as unknown as {
+    basis: { kcal: number; proteinG: number; carbohydrateG: number; fatG: number };
+  } | undefined)?.basis;
+};
+
+function judge(
+  s: Scenario, set: RecommendationSet, byId: Map<string, RecommendationCandidate>,
+): Verdict {
+  const t = macroTargets(s.targetKcal);
+  const remainingKcal = s.targetKcal - Math.round(s.targetKcal * s.consumedFraction);
+  const remainingProtein = t.proteinG - Math.round(t.proteinG * s.proteinFraction);
+  const remainingFat = t.fatG - Math.round(t.fatG * s.fatFraction);
+  const remainingCarb = t.carbohydrateG - Math.round(t.carbohydrateG * s.carbFraction);
+
+  const top = set.recommendations[0];
+
+  // --- hard safety ------------------------------------------------------
+  for (const r of set.recommendations) {
+    if (r.portionProposal !== undefined) {
+      const g = r.portionProposal.grams as unknown as number;
+      if (!Number.isFinite(g) || g <= 0) {
+        return { hardViolation: 'impossible_portion', energyFit: null, macroFit: null,
+          unnecessaryOvershoot: null, rankingRational: null };
+      }
+      // A portion must have a defensible basis, never energy-density division.
+      if (r.portionProposal.basis !== 'source_serving'
+          && r.portionProposal.basis !== 'user_history') {
+        return { hardViolation: 'ungrounded_portion', energyFit: null, macroFit: null,
+          unnecessaryOvershoot: null, rankingRational: null };
+      }
+    }
+    if (!byId.has(r.productVersionId)) {
+      return { hardViolation: 'unknown_candidate', energyFit: null, macroFit: null,
+        unnecessaryOvershoot: null, rankingRational: null };
+    }
+    if (!Number.isFinite(r.score)) {
+      return { hardViolation: 'non_finite_score', energyFit: null, macroFit: null,
+        unnecessaryOvershoot: null, rankingRational: null };
+    }
+  }
+
+  // An exhausted budget must not yield recommendations.
+  if (remainingKcal <= 0 && set.recommendations.length > 0
+      && set.status === 'available') {
+    return { hardViolation: 'recommended_past_budget', energyFit: null, macroFit: null,
+      unnecessaryOvershoot: null, rankingRational: null };
+  }
+
+  if (top === undefined) {
+    return { hardViolation: null, energyFit: null, macroFit: null,
+      unnecessaryOvershoot: null, rankingRational: null };
+  }
+
+  const basis = basisOf(byId, top.productVersionId);
+  if (basis === undefined) {
+    return { hardViolation: 'missing_basis', energyFit: null, macroFit: null,
+      unnecessaryOvershoot: null, rankingRational: null };
+  }
+
+  // --- energy fit ------------------------------------------------------
+  // With no source serving in the generic seed, the engine cannot propose a
+  // portion, so fit is assessed at a REFERENCE 100 g. That is a measurement
+  // convention, stated plainly — not a claim that anyone eats 100 g.
+  const portionG = (top.portionProposal?.grams as unknown as number | undefined) ?? 100;
+  const kcalAtPortion = (basis.kcal * portionG) / 100;
+  const energyFit = remainingKcal > 0 ? kcalAtPortion <= remainingKcal * 1.25 : null;
+
+  // --- macro fit: does it address the MOST deficient macro? --------------
+  // Deficit is measured as a share of that macro's target, so the comparison
+  // is scale-free across very different targets.
+  const deficits: [string, number][] = [
+    ['protein', remainingProtein / Math.max(1, t.proteinG)],
+    ['carbohydrate', remainingCarb / Math.max(1, t.carbohydrateG)],
+    ['fat', remainingFat / Math.max(1, t.fatG)],
+  ];
+  deficits.sort((a, b) => b[1] - a[1]);
+  const worst = deficits[0]!;
+  const worstMargin = worst[1] - deficits[1]![1];
+
+  let macroFit: boolean | null = null;
+  if (worstMargin > 0.15) {
+    // A materially dominant gap exists, so the pick should lean that way.
+    const energyFrom = {
+      protein: basis.proteinG * 4,
+      carbohydrate: basis.carbohydrateG * 4,
+      fat: basis.fatG * 9,
+    };
+    const totalMacroKcal = energyFrom.protein + energyFrom.carbohydrate + energyFrom.fat;
+    const share = totalMacroKcal > 0
+      ? energyFrom[worst[0] as 'protein' | 'carbohydrate' | 'fat'] / totalMacroKcal
+      : 0;
+    macroFit = share >= 0.30;
+  }
+
+  // --- unnecessary overshoot -------------------------------------------
+  let unnecessaryOvershoot: boolean | null = null;
+  if (remainingKcal > 0) {
+    const nearExhausted = deficits.filter(([, v]) => v < 0.1).map(([k]) => k);
+    if (nearExhausted.length > 0) {
+      const worstNearlyGone = nearExhausted[0]!;
+      const grams = worstNearlyGone === 'protein' ? basis.proteinG
+        : worstNearlyGone === 'carbohydrate' ? basis.carbohydrateG : basis.fatG;
+      const remainingOfThat = worstNearlyGone === 'protein' ? remainingProtein
+        : worstNearlyGone === 'carbohydrate' ? remainingCarb : remainingFat;
+      const atPortion = (grams * portionG) / 100;
+      unnecessaryOvershoot = atPortion > Math.max(2, remainingOfThat) * 1.5;
+    }
+  }
+
+  // --- ranking rationality: is the set ordered by its own score? ---------
+  let rankingRational = true;
+  for (let i = 1; i < set.recommendations.length; i += 1) {
+    if (set.recommendations[i]!.score > set.recommendations[i - 1]!.score + 1e-9) {
+      rankingRational = false;
+      break;
+    }
+  }
+
+  return { hardViolation: null, energyFit, macroFit, unnecessaryOvershoot, rankingRational };
+}
+
+// ---------------------------------------------------------------------------
+
+function main(): void {
+  const candidates = loadCandidates();
+  const byId = new Map(candidates.map((c) => [
+    (c.productVersion as unknown as { productVersionId: string }).productVersionId, c]));
+  process.stderr.write(`candidates: ${candidates.length.toLocaleString()} recommendable foods\n`);
+
+  const scenarios = buildScenarios();
+  process.stderr.write(`scenarios : ${scenarios.length}\n`);
+
+  const statuses: Record<string, number> = {};
+  let hardViolations = 0;
+  const violationKinds: Record<string, number> = {};
+  let energyConsidered = 0; let energyPass = 0;
+  let macroConsidered = 0; let macroPass = 0;
+  let overshootConsidered = 0; let overshootBad = 0;
+  let rankingConsidered = 0; let rankingBad = 0;
+  let emptyWhenBudgetGone = 0; let budgetGoneScenarios = 0;
+  const failures: Record<string, unknown>[] = [];
+  let totalMs = 0;
+  // How often the winning pick is nutritionally degenerate: near-zero energy
+  // (coffee, water) or extreme density (oils, rendered fat). Both satisfy a
+  // PROPORTIONAL macro-fit test while being poor meal suggestions.
+  let nearZeroEnergyWins = 0;
+  let extremeDensityWins = 0;
+  const topNames: Record<string, number> = {};
+
+  for (const s of scenarios) {
+    const input = inputFor(s, candidates);
+    const started = performance.now();
+    const set = recommendFoods(input);
+    totalMs += performance.now() - started;
+
+    statuses[set.status] = (statuses[set.status] ?? 0) + 1;
+
+    const remainingKcal = s.targetKcal - Math.round(s.targetKcal * s.consumedFraction);
+    if (remainingKcal <= 0) {
+      budgetGoneScenarios += 1;
+      if (set.recommendations.length === 0) emptyWhenBudgetGone += 1;
+    }
+
+    const winner = set.recommendations[0];
+    if (winner !== undefined) {
+      topNames[winner.displayName] = (topNames[winner.displayName] ?? 0) + 1;
+      const b = basisOf(byId, winner.productVersionId);
+      if (b !== undefined) {
+        if (b.kcal < 25) nearZeroEnergyWins += 1;
+        if (b.kcal > 700) extremeDensityWins += 1;
+      }
+    }
+
+    const v = judge(s, set, byId);
+    if (v.hardViolation !== null) {
+      hardViolations += 1;
+      violationKinds[v.hardViolation] = (violationKinds[v.hardViolation] ?? 0) + 1;
+      failures.push({ id: s.id, kind: 'CRITICAL', reason: v.hardViolation, scenario: s });
+      continue;
+    }
+    if (v.energyFit !== null) {
+      energyConsidered += 1;
+      if (v.energyFit) energyPass += 1;
+      else failures.push({
+        id: s.id, kind: 'MAJOR', reason: 'energy_fit',
+        top: set.recommendations[0]?.displayName, scenario: s,
+      });
+    }
+    if (v.macroFit !== null) {
+      macroConsidered += 1;
+      if (v.macroFit) macroPass += 1;
+      else failures.push({
+        id: s.id, kind: 'MAJOR', reason: 'macro_fit',
+        top: set.recommendations[0]?.displayName, scenario: s,
+      });
+    }
+    if (v.unnecessaryOvershoot !== null) {
+      overshootConsidered += 1;
+      if (v.unnecessaryOvershoot) {
+        overshootBad += 1;
+        failures.push({
+          id: s.id, kind: 'MINOR', reason: 'unnecessary_overshoot',
+          top: set.recommendations[0]?.displayName, scenario: s,
+        });
+      }
+    }
+    if (v.rankingRational !== null) {
+      rankingConsidered += 1;
+      if (!v.rankingRational) {
+        rankingBad += 1;
+        failures.push({ id: s.id, kind: 'CRITICAL', reason: 'ranking_not_monotonic', scenario: s });
+      }
+    }
+  }
+
+  const pct = (a: number, b: number): number =>
+    b === 0 ? 0 : Math.round((1000 * a) / b) / 10;
+
+  const withRecommendations = scenarios.length - (statuses['energy_budget_exhausted'] ?? 0);
+  const topPickProfile = {
+    nearZeroEnergyWinsPercent: pct(nearZeroEnergyWins, withRecommendations),
+    extremeDensityWinsPercent: pct(extremeDensityWins, withRecommendations),
+    distinctTopPicks: Object.keys(topNames).length,
+    mostFrequentTopPicks: Object.entries(topNames)
+      .sort((a, b) => b[1] - a[1]).slice(0, 8),
+  };
+
+  const summary = {
+    evaluationVersion: 'int1-recommendation-eval@1.0.0',
+    engine: 'recommendFoods (production)',
+    policyVersion: DEFAULT_RECOMMENDATION_POLICY.version,
+    scenarios: scenarios.length,
+    candidatePool: candidates.length,
+    meanRecommendMs: Math.round((totalMs / scenarios.length) * 100) / 100,
+    statuses,
+    hardViolationRatePercent: pct(hardViolations, scenarios.length),
+    violationKinds,
+    energyFitRatePercent: pct(energyPass, energyConsidered),
+    energyFitConsidered: energyConsidered,
+    macroFitRatePercent: pct(macroPass, macroConsidered),
+    macroFitConsidered: macroConsidered,
+    unnecessaryOvershootRatePercent: pct(overshootBad, overshootConsidered),
+    overshootConsidered,
+    rankingMonotonicPercent: pct(rankingConsidered - rankingBad, rankingConsidered),
+    budgetExhaustedScenarios: budgetGoneScenarios,
+    budgetExhaustedHandledHonestly: emptyWhenBudgetGone,
+    failureCounts: failures.reduce<Record<string, number>>((acc, f) => {
+      const k = `${f['kind']}:${f['reason']}`;
+      acc[k] = (acc[k] ?? 0) + 1;
+      return acc;
+    }, {}),
+    exampleFailures: failures.slice(0, 25),
+    topPickProfile,
+  };
+
+  writeFileSync(OUT, `${JSON.stringify(summary, null, 2)}\n`);
+
+  console.log(`\nengine            : ${summary.engine}`);
+  console.log(`scenarios         : ${summary.scenarios}`);
+  console.log(`candidate pool    : ${summary.candidatePool.toLocaleString()} real foods`);
+  console.log(`mean recommend    : ${summary.meanRecommendMs} ms`);
+  console.log(`\nstatuses          : ${JSON.stringify(statuses)}`);
+  console.log(`\nHARD VIOLATIONS   : ${summary.hardViolationRatePercent}%  ${JSON.stringify(violationKinds)}`);
+  console.log(`energy fit        : ${summary.energyFitRatePercent}%  (n=${energyConsidered})`);
+  console.log(`macro fit         : ${summary.macroFitRatePercent}%  (n=${macroConsidered})`);
+  console.log(`unnecessary overshoot: ${summary.unnecessaryOvershootRatePercent}%  (n=${overshootConsidered})`);
+  console.log(`ranking monotonic : ${summary.rankingMonotonicPercent}%`);
+  console.log(`budget exhausted  : ${emptyWhenBudgetGone}/${budgetGoneScenarios} handled honestly`);
+  console.log(`\nfailure counts    : ${JSON.stringify(summary.failureCounts, null, 2)}`);
+
+  const named = runNamedCases(candidates);
+  for (const c of named) {
+    console.log(`  ${c.name.padEnd(26)} ${c.status.padEnd(26)} ${(c.top ?? '(none)').slice(0, 38)}`);
+    const sh = c.topMacroShares;
+    if (sh !== null) {
+      console.log(`      P${sh['protein']}% C${sh['carbohydrate']}% F${sh['fat']}%`
+        + `  ${sh['kcalPer100g']} kcal/100g`);
+    }
+  }
+  writeFileSync(repoPath('data', 'recommendation-named-cases.json'),
+    `${JSON.stringify(named, null, 2)}\n`);
+}
+
+
+// ---------------------------------------------------------------------------
+// NAMED ADVERSARIAL CASES — human-readable, using only engine-supported state.
+// ---------------------------------------------------------------------------
+
+export interface NamedCase {
+  readonly name: string;
+  readonly description: string;
+  readonly scenario: Scenario;
+  /** What a nutritionally sensible engine should do, in engine terms. */
+  readonly expectation: string;
+}
+
+export const NAMED_CASES: readonly NamedCase[] = [
+  {
+    name: 'LEAN_PROTEIN_LATE_DAY',
+    description: '~450 kcal left, major protein gap, fat nearly exhausted',
+    scenario: {
+      id: 'N1', goal: 'lose', phase: 'late', targetKcal: 2000,
+      consumedFraction: 0.775, proteinFraction: 0.20, carbFraction: 0.65,
+      fatFraction: 0.92, balanceKcal: -450,
+    },
+    expectation: 'a comparatively lean high-protein food, not a fat-dense one',
+  },
+  {
+    name: 'FAT_ALREADY_HIGH',
+    description: 'fat target exceeded, protein and carbs still open',
+    scenario: {
+      id: 'N2', goal: 'maintain', phase: 'middle', targetKcal: 2400,
+      consumedFraction: 0.55, proteinFraction: 0.45, carbFraction: 0.50,
+      fatFraction: 1.10, balanceKcal: -80,
+    },
+    expectation: 'should not lead with a fat-dominant food',
+  },
+  {
+    name: 'PROTEIN_ALREADY_MET',
+    description: 'protein target reached, carbohydrate gap remains',
+    scenario: {
+      id: 'N3', goal: 'maintain', phase: 'middle', targetKcal: 2200,
+      consumedFraction: 0.60, proteinFraction: 1.05, carbFraction: 0.35,
+      fatFraction: 0.60, balanceKcal: -120,
+    },
+    expectation: 'should lean carbohydrate rather than more protein',
+  },
+  {
+    name: 'CARBS_NEEDED_PRE_WORKOUT',
+    description: 'large carbohydrate gap, ample energy left',
+    scenario: {
+      id: 'N4', goal: 'gain', phase: 'middle', targetKcal: 2800,
+      consumedFraction: 0.35, proteinFraction: 0.60, carbFraction: 0.20,
+      fatFraction: 0.55, balanceKcal: 150,
+    },
+    expectation: 'carbohydrate-dominant food',
+  },
+  {
+    name: 'SMALL_CALORIE_BUDGET',
+    description: 'only ~120 kcal of useful intake left',
+    scenario: {
+      id: 'N5', goal: 'lose', phase: 'late', targetKcal: 1600,
+      consumedFraction: 0.925, proteinFraction: 0.70, carbFraction: 0.80,
+      fatFraction: 0.75, balanceKcal: -500,
+    },
+    expectation: 'a low-energy-density option that fits, or honest degradation',
+  },
+  {
+    name: 'CALORIES_ALREADY_EXCEEDED',
+    description: 'target exceeded by 15%',
+    scenario: {
+      id: 'N6', goal: 'lose', phase: 'late', targetKcal: 1800,
+      consumedFraction: 1.15, proteinFraction: 0.90, carbFraction: 1.10,
+      fatFraction: 1.00, balanceKcal: 270,
+    },
+    expectation: 'energy_budget_exhausted, NOT a manufactured suggestion',
+  },
+  {
+    name: 'BALANCED_MAINTENANCE',
+    description: 'everything roughly on track, mid-day',
+    scenario: {
+      id: 'N7', goal: 'maintain', phase: 'middle', targetKcal: 2200,
+      consumedFraction: 0.50, proteinFraction: 0.50, carbFraction: 0.50,
+      fatFraction: 0.50, balanceKcal: 0,
+    },
+    expectation: 'any reasonable balanced food; no dominant gap to chase',
+  },
+  {
+    name: 'CONTROLLED_SURPLUS',
+    description: 'deliberate gain, early day, everything open',
+    scenario: {
+      id: 'N8', goal: 'gain', phase: 'early', targetKcal: 2800,
+      consumedFraction: 0.10, proteinFraction: 0.10, carbFraction: 0.10,
+      fatFraction: 0.10, balanceKcal: 200,
+    },
+    expectation: 'energy-dense options are acceptable here',
+  },
+  {
+    name: 'NO_GOOD_CANDIDATE',
+    description: 'empty candidate pool',
+    scenario: {
+      id: 'N9', goal: 'maintain', phase: 'middle', targetKcal: 2000,
+      consumedFraction: 0.50, proteinFraction: 0.50, carbFraction: 0.50,
+      fatFraction: 0.50, balanceKcal: 0,
+    },
+    expectation: 'no_eligible_candidates, never a manufactured recommendation',
+  },
+];
+
+export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
+  readonly name: string; readonly status: string; readonly top: string | null;
+  readonly topMacroShares: Record<string, number> | null;
+  readonly expectation: string;
+}[] {
+  const byId = new Map(candidates.map((c) => [
+    (c.productVersion as unknown as { productVersionId: string }).productVersionId, c]));
+  return NAMED_CASES.map((c) => {
+    const pool = c.name === 'NO_GOOD_CANDIDATE' ? [] : candidates;
+    const set = recommendFoods(inputFor(c.scenario, pool));
+    const top = set.recommendations[0];
+    let shares: Record<string, number> | null = null;
+    if (top !== undefined) {
+      const b = basisOf(byId, top.productVersionId);
+      if (b !== undefined) {
+        const p = b.proteinG * 4; const cb = b.carbohydrateG * 4; const f = b.fatG * 9;
+        const total = p + cb + f;
+        shares = total > 0
+          ? {
+            protein: Math.round((100 * p) / total),
+            carbohydrate: Math.round((100 * cb) / total),
+            fat: Math.round((100 * f) / total),
+            kcalPer100g: Math.round(b.kcal),
+          }
+          : null;
+      }
+    }
+    return {
+      name: c.name, status: set.status, top: top?.displayName ?? null,
+      topMacroShares: shares, expectation: c.expectation,
+    };
+  });
+}
+
+main();

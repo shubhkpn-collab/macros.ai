@@ -1,0 +1,488 @@
+{
+  "evaluationVersion": "int1-recommendation-eval@1.0.0",
+  "engine": "recommendFoods (production)",
+  "policyVersion": "recommendation-policy@1.0.0",
+  "scenarios": 1728,
+  "candidatePool": 6630,
+  "meanRecommendMs": 7.91,
+  "statuses": {
+    "available": 1440,
+    "energy_budget_exhausted": 288
+  },
+  "hardViolationRatePercent": 0,
+  "violationKinds": {},
+  "energyFitRatePercent": 89.4,
+  "energyFitConsidered": 1440,
+  "macroFitRatePercent": 100,
+  "macroFitConsidered": 540,
+  "unnecessaryOvershootRatePercent": 0,
+  "overshootConsidered": 540,
+  "rankingMonotonicPercent": 100,
+  "budgetExhaustedScenarios": 288,
+  "budgetExhaustedHandledHonestly": 288,
+  "failureCounts": {
+    "MAJOR:energy_fit": 153
+  },
+  "exampleFailures": [
+    {
+      "id": "S0028",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0028",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -720
+      }
+    },
+    {
+      "id": "S0036",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0036",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0076",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0076",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0078",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0078",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.95,
+        "fatFraction": 0.6,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0079",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0079",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0080",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0080",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 1.05,
+        "carbFraction": 0.9,
+        "fatFraction": 0.9,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0084",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0084",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0086",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0086",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.95,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0087",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0087",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0088",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0088",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 1.05,
+        "carbFraction": 0.9,
+        "fatFraction": 0.9,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0124",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0124",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -880
+      }
+    },
+    {
+      "id": "S0127",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Coconut meat nuts, dried (desiccated), creamed",
+      "scenario": {
+        "id": "S0127",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -880
+      }
+    },
+    {
+      "id": "S0132",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0132",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0135",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Coconut meat nuts, dried (desiccated), creamed",
+      "scenario": {
+        "id": "S0135",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0136",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Gluten-free cookies, lemon wafer",
+      "scenario": {
+        "id": "S0136",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 1.05,
+        "carbFraction": 0.9,
+        "fatFraction": 0.9,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0172",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0172",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2800,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -960
+      }
+    },
+    {
+      "id": "S0180",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0180",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0220",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0220",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 1600,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -720
+      }
+    },
+    {
+      "id": "S0228",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0228",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0268",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0268",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0270",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0270",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.95,
+        "fatFraction": 0.6,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0271",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0271",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0272",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0272",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 1.05,
+        "carbFraction": 0.9,
+        "fatFraction": 0.9,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0276",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0276",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0278",
+      "kind": "MAJOR",
+      "reason": "energy_fit",
+      "top": "Beluga oil, whale (Alaska Native)",
+      "scenario": {
+        "id": "S0278",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.95,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
+    }
+  ],
+  "topPickProfile": {
+    "nearZeroEnergyWinsPercent": 31.3,
+    "extremeDensityWinsPercent": 21.9,
+    "distinctTopPicks": 7,
+    "mostFrequentTopPicks": [
+      [
+        "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+        450
+      ],
+      [
+        "Beluga oil, whale (Alaska Native)",
+        315
+      ],
+      [
+        "Beverages, Kiwi Strawberry Juice Drink",
+        270
+      ],
+      [
+        "Beverages, pineapple and orange juice drink, canned",
+        270
+      ],
+      [
+        "Trout fish, rainbow, farmed, raw",
+        45
+      ],
+      [
+        "Coconut meat nuts, dried (desiccated), creamed",
+        45
+      ],
+      [
+        "Gluten-free cookies, lemon wafer",
+        45
+      ]
+    ]
+  }
+}

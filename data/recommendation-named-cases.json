@@ -1,0 +1,100 @@
+[
+  {
+    "name": "LEAN_PROTEIN_LATE_DAY",
+    "status": "available",
+    "top": "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+    "topMacroShares": {
+      "protein": 100,
+      "carbohydrate": 0,
+      "fat": 0,
+      "kcalPer100g": 0
+    },
+    "expectation": "a comparatively lean high-protein food, not a fat-dense one"
+  },
+  {
+    "name": "FAT_ALREADY_HIGH",
+    "status": "available",
+    "top": "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+    "topMacroShares": {
+      "protein": 100,
+      "carbohydrate": 0,
+      "fat": 0,
+      "kcalPer100g": 0
+    },
+    "expectation": "should not lead with a fat-dominant food"
+  },
+  {
+    "name": "PROTEIN_ALREADY_MET",
+    "status": "available",
+    "top": "Beverages, Kiwi Strawberry Juice Drink",
+    "topMacroShares": {
+      "protein": 0,
+      "carbohydrate": 100,
+      "fat": 0,
+      "kcalPer100g": 47
+    },
+    "expectation": "should lean carbohydrate rather than more protein"
+  },
+  {
+    "name": "CARBS_NEEDED_PRE_WORKOUT",
+    "status": "available",
+    "top": "Beverages, Kiwi Strawberry Juice Drink",
+    "topMacroShares": {
+      "protein": 0,
+      "carbohydrate": 100,
+      "fat": 0,
+      "kcalPer100g": 47
+    },
+    "expectation": "carbohydrate-dominant food"
+  },
+  {
+    "name": "SMALL_CALORIE_BUDGET",
+    "status": "available",
+    "top": "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+    "topMacroShares": {
+      "protein": 100,
+      "carbohydrate": 0,
+      "fat": 0,
+      "kcalPer100g": 0
+    },
+    "expectation": "a low-energy-density option that fits, or honest degradation"
+  },
+  {
+    "name": "CALORIES_ALREADY_EXCEEDED",
+    "status": "energy_budget_exhausted",
+    "top": null,
+    "topMacroShares": null,
+    "expectation": "energy_budget_exhausted, NOT a manufactured suggestion"
+  },
+  {
+    "name": "BALANCED_MAINTENANCE",
+    "status": "available",
+    "top": "Beverages, Kiwi Strawberry Juice Drink",
+    "topMacroShares": {
+      "protein": 0,
+      "carbohydrate": 100,
+      "fat": 0,
+      "kcalPer100g": 47
+    },
+    "expectation": "any reasonable balanced food; no dominant gap to chase"
+  },
+  {
+    "name": "CONTROLLED_SURPLUS",
+    "status": "available",
+    "top": "Beluga oil, whale (Alaska Native)",
+    "topMacroShares": {
+      "protein": 0,
+      "carbohydrate": 0,
+      "fat": 100,
+      "kcalPer100g": 900
+    },
+    "expectation": "energy-dense options are acceptable here"
+  },
+  {
+    "name": "NO_GOOD_CANDIDATE",
+    "status": "no_eligible_candidates",
+    "top": null,
+    "topMacroShares": null,
+    "expectation": "no_eligible_candidates, never a manufactured recommendation"
+  }
+]
