@@ -5,6 +5,7 @@ import type {
   RecommendationCandidate, RecommendationHistorySnapshot, RecommendationInput,
   RecommendationSet, ScoreComponents,
 } from './contracts.js';
+import { assessActionability, type ActionabilityClass } from '@macros/domain-catalog';
 import type { RecommendationPolicy } from './policy.js';
 
 /**
@@ -312,9 +313,47 @@ export function recommendFoods(input: RecommendationInput): RecommendationSet {
   }
 
   // Deterministic ordering: score, then productVersionId. Never input order.
-  const ranked = [...scored].sort(
+  const byScore = [...scored].sort(
     (a, b) => b.score - a.score || a.productVersionId.localeCompare(b.productVersionId),
   );
+
+  /**
+   * ACTIONABILITY GATE.
+   *
+   * A weight alone cannot express the requirement. Blending actionability into
+   * the score forces a false choice: heavy enough to demote ingredients means
+   * actionability overpowers nutrition, and light enough to preserve nutrition
+   * means ingredients still win. Measured directly — at weight 0.45 macro fit
+   * fell from 93.3% to 88.3%, and at 0.25 ingredients still won 7.5% of the
+   * time.
+   *
+   * The requirement is really a GATE: among candidates that are all
+   * nutritionally qualifying, prefer one a person would actually eat. So
+   * ranking stays purely nutritional, and this promotes an actionable
+   * alternative only when it is nutritionally comparable to the leader.
+   *
+   * Nutrition still decides which candidates qualify. Actionability only
+   * chooses between candidates that already do.
+   */
+  const ACTIONABLE = new Set<ActionabilityClass>([
+    'ready_to_eat', 'meal_component', 'beverage',
+  ]);
+  const isActionable = (r: Recommendation): boolean => {
+    const cls = r.actionabilityClass as ActionabilityClass | undefined;
+    return cls !== undefined && ACTIONABLE.has(cls);
+  };
+
+  const ranked = (() => {
+    const leader = byScore[0];
+    if (leader === undefined || isActionable(leader)) return byScore;
+
+    const threshold = leader.score * policy.bounds.actionabilityPromotionRatio;
+    const promoted = byScore.find((r) => isActionable(r) && r.score >= threshold);
+    if (promoted === undefined) return byScore;
+
+    // The promoted candidate is nutritionally comparable AND edible as-is.
+    return [promoted, ...byScore.filter((r) => r !== promoted)];
+  })();
 
   return {
     ...base,
@@ -390,6 +429,21 @@ function scoreCandidate(
     }
   }
 
+  /**
+   * CONSUMER ACTIONABILITY, from catalog metadata. Derived from the USDA
+   * category, canonical preparation state and descriptive form — never from a
+   * list of food names, so it generalises to every flour and every oil rather
+   * than the four that happened to surface in testing.
+   */
+  const v2 = v as unknown as Record<string, unknown>;
+  const actionability = assessActionability({
+    displayName: v.displayName,
+    category: typeof v2['category'] === 'string' ? v2['category'] : null,
+    preparationState: v.preparationState,
+    sourceDescription: typeof v2['sourceDescription'] === 'string'
+      ? v2['sourceDescription'] : null,
+  });
+
   const portion = proposePortion(candidate, input, remainingKcal);
   let energyFit = 0;
   /**
@@ -450,9 +504,12 @@ function scoreCandidate(
     void usedComparisonBasisForEnergy;
 
     if (remainingKcal !== null && remainingKcal > 0) {
-      const comparisonKcal = (macroGrams(v, 'protein') * KCAL_PER_G.protein
-        + macroGrams(v, 'carbohydrate') * KCAL_PER_G.carbohydrate
-        + macroGrams(v, 'fat') * KCAL_PER_G.fat) * (comparison.basisGrams / 100);
+      // AUTHORITATIVE energy. INT-2 computed protein*4 + carb*4 + fat*9 here,
+      // making the recommendation engine a second nutrition calculator — and a
+      // second calculator eventually disagrees with the first. The comparison
+      // basis is a mass like any other, so the canonical path handles it.
+      const comparisonKcal = calculateNutrition(
+        v.basis, comparison.basisGrams as unknown as Grams).totals.kcal as unknown as number;
       const ratio = comparisonKcal / remainingKcal;
       if (ratio > 1) {
         // Density incompatible with what is left. Penalised, not rejected: with
@@ -504,6 +561,10 @@ function scoreCandidate(
 
   const components: ScoreComponents = {
     macroFit: macroFit * policy.weights.macroFit,
+    // Scaled by macroFit so actionability can only reorder candidates that
+    // already solve the user's state. A nutritionally poor food gains almost
+    // nothing from being familiar.
+    actionability: actionability.score * macroFit * policy.weights.actionability,
     energyFit: energyFit * policy.weights.energyFit,
     historyNudge,
     preferenceNudge,
@@ -516,7 +577,8 @@ function scoreCandidate(
   };
 
   const score =
-    components.macroFit + components.energyFit + components.historyNudge + components.preferenceNudge
+    components.macroFit + components.energyFit + components.actionability
+    + components.historyNudge + components.preferenceNudge
     - components.energyOvershootPenalty - components.macroOvershootPenalty - components.repetitionPenalty;
 
   return {
@@ -527,6 +589,7 @@ function scoreCandidate(
     preparationState: String(v.preparationState),
     score: Math.round(score * 1e6) / 1e6,
     scoreComponents: components,
+    actionabilityClass: actionability.actionabilityClass,
     rationaleCodes: rationale,
     ...(portion !== null ? { portionProposal: portion } : {}),
     ...(nutrition !== undefined ? { nutritionAtProposedPortion: nutrition } : {}),

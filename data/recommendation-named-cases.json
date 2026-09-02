@@ -2,12 +2,12 @@
   {
     "name": "LEAN_PROTEIN_LATE_DAY",
     "status": "available",
-    "top": "Soy flour, defatted",
+    "top": "Fat free parmesan cheese topping",
     "topMacroShares": {
-      "protein": 56,
-      "carbohydrate": 36,
-      "fat": 8,
-      "kcalPer100g": 366
+      "protein": 44,
+      "carbohydrate": 44,
+      "fat": 12,
+      "kcalPer100g": 370
     },
     "expectation": "a comparatively lean high-protein food, not a fat-dense one",
     "remainingKcal": 450,
@@ -18,12 +18,30 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 366,
-      "protein": 51.1,
-      "carbohydrate": 32.9,
-      "fat": 3.3
+      "kcal": 370,
+      "protein": 40,
+      "carbohydrate": 40,
+      "fat": 5
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "meal_component",
+    "topThree": [
+      {
+        "name": "Fat free parmesan cheese topping",
+        "cls": "meal_component",
+        "score": 1.239
+      },
+      {
+        "name": "Soy flour, defatted",
+        "cls": "ingredient",
+        "score": 1.3
+      },
+      {
+        "name": "Cottonseed meal seeds, partially defatted (glandless)",
+        "cls": "ingredient",
+        "score": 1.295
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "strong_protein_fit",
@@ -34,12 +52,12 @@
   {
     "name": "FAT_ALREADY_HIGH",
     "status": "available",
-    "top": "Cottonseed flour seeds, low fat (glandless)",
+    "top": "Papad",
     "topMacroShares": {
-      "protein": 56,
-      "carbohydrate": 41,
-      "fat": 4,
-      "kcalPer100g": 332
+      "protein": 28,
+      "carbohydrate": 65,
+      "fat": 8,
+      "kcalPer100g": 371
     },
     "expectation": "should not lead with a fat-dominant food",
     "remainingKcal": 1080,
@@ -50,16 +68,35 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 332,
-      "protein": 49.8,
-      "carbohydrate": 36.1,
-      "fat": 1.4
+      "kcal": 371,
+      "protein": 25.6,
+      "carbohydrate": 59.9,
+      "fat": 3.3
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "meal_component",
+    "topThree": [
+      {
+        "name": "Papad",
+        "cls": "meal_component",
+        "score": 1.143
+      },
+      {
+        "name": "Cottonseed flour seeds, low fat (glandless)",
+        "cls": "ingredient",
+        "score": 1.223
+      },
+      {
+        "name": "Sesame flour seeds, low-fat",
+        "cls": "ingredient",
+        "score": 1.218
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "strong_protein_fit",
       "strong_carb_fit",
+      "would_overshoot_macro",
       "portion_unavailable",
       "fits_remaining_energy"
     ]
@@ -67,12 +104,12 @@
   {
     "name": "PROTEIN_ALREADY_MET",
     "status": "available",
-    "top": "Gluten-free cookies, lemon wafer",
+    "top": "Fudge candies, chocolate marshmallow, prepared-from-recipe",
     "topMacroShares": {
-      "protein": 0,
-      "carbohydrate": 58,
-      "fat": 42,
-      "kcalPer100g": 515
+      "protein": 2,
+      "carbohydrate": 63,
+      "fat": 35,
+      "kcalPer100g": 453
     },
     "expectation": "should lean carbohydrate rather than more protein",
     "remainingKcal": 880,
@@ -83,12 +120,30 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 515,
-      "protein": 0,
-      "carbohydrate": 74.4,
-      "fat": 24.2
+      "kcal": 453,
+      "protein": 2.3,
+      "carbohydrate": 71.3,
+      "fat": 17.5
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "ready_to_eat",
+    "topThree": [
+      {
+        "name": "Fudge candies, chocolate marshmallow, prepared-from-recipe",
+        "cls": "ready_to_eat",
+        "score": 1.478
+      },
+      {
+        "name": "Snacks, yucca (cassava) chips, salted",
+        "cls": "ready_to_eat",
+        "score": 1.458
+      },
+      {
+        "name": "Mexican baking chocolate, squares",
+        "cls": "ready_to_eat",
+        "score": 1.449
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "strong_carb_fit",
@@ -121,6 +176,24 @@
       "fat": 21.6
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "meal_component",
+    "topThree": [
+      {
+        "name": "Mature seeds soybeans, dry roasted",
+        "cls": "meal_component",
+        "score": 1.082
+      },
+      {
+        "name": "Mature seeds soybeans, roasted, salted",
+        "cls": "meal_component",
+        "score": 1.072
+      },
+      {
+        "name": "Mature seeds soybeans, roasted, no salt added",
+        "cls": "meal_component",
+        "score": 1.072
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "portion_unavailable",
@@ -130,12 +203,12 @@
   {
     "name": "SMALL_CALORIE_BUDGET",
     "status": "available",
-    "top": "Whole turkey, giblets, raw",
+    "top": "Mature seeds lupins, cooked, boiled, without salt",
     "topMacroShares": {
-      "protein": 61,
-      "carbohydrate": 0,
-      "fat": 39,
-      "kcalPer100g": 124
+      "protein": 49,
+      "carbohydrate": 31,
+      "fat": 20,
+      "kcalPer100g": 119
     },
     "expectation": "a low-energy-density option that fits, or honest degradation",
     "remainingKcal": 120,
@@ -146,12 +219,30 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 124,
-      "protein": 18.2,
-      "carbohydrate": 0.1,
-      "fat": 5.1
+      "kcal": 119,
+      "protein": 15.6,
+      "carbohydrate": 9.9,
+      "fat": 2.9
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "meal_component",
+    "topThree": [
+      {
+        "name": "Mature seeds lupins, cooked, boiled, without salt",
+        "cls": "meal_component",
+        "score": 1.11
+      },
+      {
+        "name": "Mature seeds lupins, cooked, boiled, with salt",
+        "cls": "meal_component",
+        "score": 1.1
+      },
+      {
+        "name": "Cured pork, ham, extra lean (approximately 4% fat), canned, unheated",
+        "cls": "meal_component",
+        "score": 1.079
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "strong_protein_fit",
@@ -173,6 +264,8 @@
     },
     "comparisonBasis": null,
     "groundedPortionGrams": null,
+    "actionabilityClass": null,
+    "topThree": [],
     "portionStatable": false,
     "whyItWon": []
   },
@@ -201,6 +294,24 @@
       "fat": 21.6
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "meal_component",
+    "topThree": [
+      {
+        "name": "Mature seeds soybeans, dry roasted",
+        "cls": "meal_component",
+        "score": 1.302
+      },
+      {
+        "name": "Mature seeds soybeans, roasted, salted",
+        "cls": "meal_component",
+        "score": 1.289
+      },
+      {
+        "name": "Mature seeds soybeans, roasted, no salt added",
+        "cls": "meal_component",
+        "score": 1.289
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "portion_unavailable",
@@ -210,12 +321,12 @@
   {
     "name": "CONTROLLED_SURPLUS",
     "status": "available",
-    "top": "Whole egg, dried, stabilized, glucose reduced",
+    "top": "Creamy peanut butter",
     "topMacroShares": {
-      "protein": 32,
-      "carbohydrate": 2,
-      "fat": 66,
-      "kcalPer100g": 615
+      "protein": 15,
+      "carbohydrate": 14,
+      "fat": 70,
+      "kcalPer100g": 632
     },
     "expectation": "energy-dense options are acceptable here",
     "remainingKcal": 2520,
@@ -226,12 +337,30 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 615,
-      "protein": 48.2,
-      "carbohydrate": 2.4,
-      "fat": 44
+      "kcal": 632,
+      "protein": 24,
+      "carbohydrate": 22.7,
+      "fat": 49.4
     },
     "groundedPortionGrams": null,
+    "actionabilityClass": "meal_component",
+    "topThree": [
+      {
+        "name": "Creamy peanut butter",
+        "cls": "meal_component",
+        "score": 0.913
+      },
+      {
+        "name": "Whole egg, dried, stabilized, glucose reduced",
+        "cls": "ingredient",
+        "score": 0.902
+      },
+      {
+        "name": "Dark chocolate, 70-85% cacao solids",
+        "cls": "ready_to_eat",
+        "score": 0.901
+      }
+    ],
     "portionStatable": false,
     "whyItWon": [
       "portion_unavailable",
@@ -252,6 +381,8 @@
     },
     "comparisonBasis": null,
     "groundedPortionGrams": null,
+    "actionabilityClass": null,
+    "topThree": [],
     "portionStatable": false,
     "whyItWon": []
   }

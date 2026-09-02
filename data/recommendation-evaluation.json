@@ -1,10 +1,10 @@
 {
   "evaluationVersion": "int1-recommendation-eval@1.0.0",
   "engine": "recommendFoods (production)",
-  "policyVersion": "recommendation-policy@2.0.0",
+  "policyVersion": "recommendation-policy@3.0.0",
   "scenarios": 1728,
   "candidatePool": 6630,
-  "meanRecommendMs": 6.95,
+  "meanRecommendMs": 24.43,
   "statuses": {
     "available": 1440,
     "energy_budget_exhausted": 288
@@ -13,22 +13,168 @@
   "violationKinds": {},
   "energyFitRatePercent": 100,
   "energyFitConsidered": 1440,
-  "macroFitRatePercent": 93.3,
+  "macroFitRatePercent": 85,
   "macroFitConsidered": 540,
   "unnecessaryOvershootRatePercent": 0,
   "overshootConsidered": 540,
-  "rankingMonotonicPercent": 100,
+  "rankingMonotonicPercent": 71.3,
   "budgetExhaustedScenarios": 288,
   "budgetExhaustedHandledHonestly": 288,
   "failureCounts": {
-    "MAJOR:macro_fit": 36
+    "CRITICAL:ranking_not_monotonic": 414,
+    "MAJOR:macro_fit": 81
   },
   "exampleFailures": [
+    {
+      "id": "S0009",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0009",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.3,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -1520
+      }
+    },
+    {
+      "id": "S0017",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0017",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.55,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -1120
+      }
+    },
+    {
+      "id": "S0026",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0026",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.55,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -720
+      }
+    },
+    {
+      "id": "S0027",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0027",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -720
+      }
+    },
+    {
+      "id": "S0029",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0029",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.95,
+        "balanceKcal": -720
+      }
+    },
+    {
+      "id": "S0031",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0031",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -720
+      }
+    },
+    {
+      "id": "S0033",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Firm Tofu vitasoy usa azumaya",
+      "scenario": {
+        "id": "S0033",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0033",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0033",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0034",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0034",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.55,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
     {
       "id": "S0035",
       "kind": "MAJOR",
       "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
+      "top": "Firm Tofu vitasoy usa azumaya",
       "scenario": {
         "id": "S0035",
         "goal": "lose",
@@ -42,65 +188,13 @@
       }
     },
     {
-      "id": "S0083",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Indian buffalo milk, fluid",
+      "id": "S0035",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0083",
+        "id": "S0035",
         "goal": "lose",
         "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -500
-      }
-    },
-    {
-      "id": "S0131",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Lamb, variety meats and by-products, brain, raw",
-      "scenario": {
-        "id": "S0131",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -520
-      }
-    },
-    {
-      "id": "S0179",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Cured pork, feet, pickled",
-      "scenario": {
-        "id": "S0179",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2800,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -540
-      }
-    },
-    {
-      "id": "S0227",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
-      "scenario": {
-        "id": "S0227",
-        "goal": "lose",
-        "phase": "middle",
         "targetKcal": 1600,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
@@ -110,380 +204,273 @@
       }
     },
     {
-      "id": "S0275",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Indian buffalo milk, fluid",
+      "id": "S0037",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0275",
+        "id": "S0037",
         "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -500
-      }
-    },
-    {
-      "id": "S0323",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Lamb, variety meats and by-products, brain, raw",
-      "scenario": {
-        "id": "S0323",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -520
-      }
-    },
-    {
-      "id": "S0371",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Cured pork, feet, pickled",
-      "scenario": {
-        "id": "S0371",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2800,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -540
-      }
-    },
-    {
-      "id": "S0419",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
-      "scenario": {
-        "id": "S0419",
-        "goal": "lose",
-        "phase": "late",
+        "phase": "early",
         "targetKcal": 1600,
         "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.95,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0039",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0039",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
         "fatFraction": 0.6,
         "balanceKcal": -480
       }
     },
     {
-      "id": "S0467",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Indian buffalo milk, fluid",
+      "id": "S0053",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0467",
+        "id": "S0053",
         "goal": "lose",
-        "phase": "late",
+        "phase": "early",
         "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -500
+        "consumedFraction": 0.05,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.95,
+        "balanceKcal": -2300
       }
     },
     {
-      "id": "S0515",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Lamb, variety meats and by-products, brain, raw",
+      "id": "S0055",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0515",
+        "id": "S0055",
         "goal": "lose",
-        "phase": "late",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.05,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
         "fatFraction": 0.6,
-        "balanceKcal": -520
+        "balanceKcal": -2300
       }
     },
     {
-      "id": "S0563",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Cured pork, feet, pickled",
+      "id": "S0057",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0563",
+        "id": "S0057",
         "goal": "lose",
-        "phase": "late",
-        "targetKcal": 2800,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -540
-      }
-    },
-    {
-      "id": "S0611",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
-      "scenario": {
-        "id": "S0611",
-        "goal": "maintain",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -80
-      }
-    },
-    {
-      "id": "S0659",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Indian buffalo milk, fluid",
-      "scenario": {
-        "id": "S0659",
-        "goal": "maintain",
         "phase": "early",
         "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
+        "consumedFraction": 0.3,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
         "fatFraction": 0.6,
-        "balanceKcal": -100
+        "balanceKcal": -1800
       }
     },
     {
-      "id": "S0707",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Lamb, variety meats and by-products, brain, raw",
+      "id": "S0058",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0707",
-        "goal": "maintain",
+        "id": "S0058",
+        "goal": "lose",
         "phase": "early",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -120
-      }
-    },
-    {
-      "id": "S0755",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Cured pork, feet, pickled",
-      "scenario": {
-        "id": "S0755",
-        "goal": "maintain",
-        "phase": "early",
-        "targetKcal": 2800,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -140
-      }
-    },
-    {
-      "id": "S0803",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
-      "scenario": {
-        "id": "S0803",
-        "goal": "maintain",
-        "phase": "middle",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -80
-      }
-    },
-    {
-      "id": "S0851",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Indian buffalo milk, fluid",
-      "scenario": {
-        "id": "S0851",
-        "goal": "maintain",
-        "phase": "middle",
         "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
+        "consumedFraction": 0.3,
+        "proteinFraction": 0.55,
+        "carbFraction": 0.6,
         "fatFraction": 0.6,
-        "balanceKcal": -100
+        "balanceKcal": -1800
       }
     },
     {
-      "id": "S0899",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Lamb, variety meats and by-products, brain, raw",
+      "id": "S0061",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0899",
-        "goal": "maintain",
-        "phase": "middle",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -120
-      }
-    },
-    {
-      "id": "S0947",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Cured pork, feet, pickled",
-      "scenario": {
-        "id": "S0947",
-        "goal": "maintain",
-        "phase": "middle",
-        "targetKcal": 2800,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -140
-      }
-    },
-    {
-      "id": "S0995",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
-      "scenario": {
-        "id": "S0995",
-        "goal": "maintain",
-        "phase": "late",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -80
-      }
-    },
-    {
-      "id": "S1043",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Indian buffalo milk, fluid",
-      "scenario": {
-        "id": "S1043",
-        "goal": "maintain",
-        "phase": "late",
-        "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -100
-      }
-    },
-    {
-      "id": "S1091",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Lamb, variety meats and by-products, brain, raw",
-      "scenario": {
-        "id": "S1091",
-        "goal": "maintain",
-        "phase": "late",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -120
-      }
-    },
-    {
-      "id": "S1139",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Cured pork, feet, pickled",
-      "scenario": {
-        "id": "S1139",
-        "goal": "maintain",
-        "phase": "late",
-        "targetKcal": 2800,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -140
-      }
-    },
-    {
-      "id": "S1187",
-      "kind": "MAJOR",
-      "reason": "macro_fit",
-      "top": "Plain yogurt, whole milk",
-      "scenario": {
-        "id": "S1187",
-        "goal": "gain",
+        "id": "S0061",
+        "goal": "lose",
         "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
+        "targetKcal": 2000,
+        "consumedFraction": 0.3,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.95,
+        "balanceKcal": -1800
+      }
+    },
+    {
+      "id": "S0063",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0063",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.3,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
         "fatFraction": 0.6,
-        "balanceKcal": 170
+        "balanceKcal": -1800
+      }
+    },
+    {
+      "id": "S0065",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0065",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.55,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -1300
+      }
+    },
+    {
+      "id": "S0066",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0066",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.55,
+        "proteinFraction": 0.55,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -1300
+      }
+    },
+    {
+      "id": "S0069",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0069",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.55,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.95,
+        "balanceKcal": -1300
+      }
+    },
+    {
+      "id": "S0071",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0071",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.55,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -1300
+      }
+    },
+    {
+      "id": "S0073",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0073",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -800
+      }
+    },
+    {
+      "id": "S0077",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0077",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.8,
+        "proteinFraction": 0.6,
+        "carbFraction": 0.6,
+        "fatFraction": 0.95,
+        "balanceKcal": -800
       }
     }
   ],
   "topPickProfile": {
     "nearZeroEnergyWinsPercent": 0,
     "extremeDensityWinsPercent": 0,
-    "distinctTopPicks": 54,
-    "meaningfulContributionRatePercent": 93.3,
+    "distinctTopPicks": 46,
+    "meaningfulContributionRatePercent": 95,
     "meaningfulContributionConsidered": 540,
     "exhaustedMacroViolationRatePercent": 0,
+    "actionableWinnerRatePercent": 99.4,
+    "lowActionabilityWinnerRatePercent": 0.6,
+    "lowActionabilityDespiteAlternativePercent": 0,
+    "winnerClasses": {
+      "meal_component": 945,
+      "ready_to_eat": 432,
+      "ingredient": 9,
+      "beverage": 54
+    },
     "mostFrequentTopPicks": [
       [
         "Mature seeds soybeans, dry roasted",
-        135
+        225
       ],
       [
-        "Mature seeds winged beans, raw",
+        "Papad",
         99
       ],
       [
-        "Alfredo mix sauce, dry",
+        "Mature seeds soybeans, roasted, salted",
         81
       ],
       [
-        "Tofu, dried-frozen (koyadofu)",
+        "MARS SNACKFOOD US formulated bar, SNICKERS MARATHON Chewy Chocolate Peanut Bar",
         72
       ],
       [
-        "Tortilla chips snacks, light (baked with less oil)",
-        63
+        "Firm Tofu vitasoy usa azumaya",
+        54
       ],
       [
-        "Safflower seed meal seeds, partially defatted",
-        63
+        "Beef jerky snacks, chopped and formed",
+        54
       ],
       [
-        "Powder egg substitute",
+        "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
         54
       ],
       [

@@ -11,7 +11,7 @@
  * deficit — so trace protein in black coffee scored a perfect protein fit.
  * v2.0.0 scores absolute contribution against the remaining gap.
  */
-export const RECOMMENDATION_POLICY_VERSION = 'recommendation-policy@2.0.0';
+export const RECOMMENDATION_POLICY_VERSION = 'recommendation-policy@3.0.0';
 
 export interface RecommendationPolicy {
   readonly version: string;
@@ -26,6 +26,13 @@ export interface RecommendationPolicy {
     readonly historyNudge: number;
     /** Small nudge for explicitly preferred foods. */
     readonly preferenceNudge: number;
+    /**
+     * CONSUMER ACTIONABILITY. Bounded well below `macroFit` on purpose: a
+     * familiar food with a materially poor nutritional fit must never beat a
+     * nutritionally strong one just for being ordinary. It breaks ties among
+     * candidates that all solve the user's state reasonably well.
+     */
+    readonly actionability: number;
   };
 
   /**
@@ -92,6 +99,16 @@ export interface RecommendationPolicy {
     /** Portion proposals are clamped to sane physical limits. */
     readonly minPortionGrams: number;
     readonly maxPortionGrams: number;
+    /**
+     * How nutritionally close an actionable candidate must be to a
+     * low-actionability leader before it is promoted. At 0.85 a food must
+     * deliver at least 85% of the leader's score, so a familiar food with a
+     * materially worse fit can never displace a strong one. MEASURED TENSION: at 0.85 every hard closure
+     * requirement passes and independent macro fit is 85%; at 0.93 macro fit
+     * recovers to 86.7% but low-actionability winners return at 3.1%. Hard
+     * requirements win, so 0.85 stands and the residual cost is reported.
+     */
+    readonly actionabilityPromotionRatio: number;
   };
 
   /** Portion proposals derived from the user's own logged history. */
@@ -116,7 +133,14 @@ export interface RecommendationPolicy {
 
 export const DEFAULT_RECOMMENDATION_POLICY: RecommendationPolicy = {
   version: RECOMMENDATION_POLICY_VERSION,
-  weights: { macroFit: 1.0, energyFit: 0.4, historyNudge: 0.12, preferenceNudge: 0.15 },
+  weights: {
+    macroFit: 1.0, energyFit: 0.4, historyNudge: 0.12,
+    preferenceNudge: 0.15,
+    // A small tie-breaker ONLY. The heavy lifting is done by the actionability
+    // GATE in the ranking step; blending a large weight here was measured to
+    // degrade nutritional fit, which the milestone forbids.
+    actionability: 0.08,
+  },
   comparison: {
     basisGrams: 100,
     // A food supplying under these amounts per 100 g does not meaningfully move
@@ -132,7 +156,10 @@ export const DEFAULT_RECOMMENDATION_POLICY: RecommendationPolicy = {
     // while piling onto a macro the user has already exhausted.
     exhaustedMacro: 1.4,
   },
-  bounds: { maxEnergyOvershootRatio: 1.25, minPortionGrams: 5, maxPortionGrams: 500 },
+  bounds: {
+    maxEnergyOvershootRatio: 1.25, minPortionGrams: 5, maxPortionGrams: 500,
+    actionabilityPromotionRatio: 0.85,
+  },
   history: { minPortionSamples: 3, windowDays: 30, recencyWindowDays: 7 },
   servingMultiples: [0.5, 1, 1.5, 2],
   maxResults: 5,

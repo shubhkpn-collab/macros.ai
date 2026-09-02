@@ -122,6 +122,11 @@ export interface EnergyConfidence {
 export interface ScoreComponents {
   readonly macroFit: number;
   readonly energyFit: number;
+  /**
+   * Consumer actionability, scaled by macro fit so it can only reorder
+   * candidates that already solve the user's state.
+   */
+  readonly actionability: number;
   readonly historyNudge: number;
   readonly preferenceNudge: number;
   readonly energyOvershootPenalty: number;
@@ -139,6 +144,8 @@ export interface Recommendation {
   readonly scoreComponents: ScoreComponents;
   readonly rationaleCodes: readonly RationaleCode[];
   readonly portionProposal?: PortionProposal;
+  /** How suitable this record is as a DEFAULT suggestion. Catalog metadata. */
+  readonly actionabilityClass?: string;
   /** Produced by calculateNutrition(), never by recommendation arithmetic. */
   readonly nutritionAtProposedPortion?: NutritionTotals;
 }

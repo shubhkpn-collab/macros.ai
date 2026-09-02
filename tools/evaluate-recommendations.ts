@@ -37,6 +37,7 @@ interface Seed {
   per100g?: Record<string, { amount?: number }>;
   recommendable?: boolean;
   category?: string;
+  sourceDescription?: string;
 }
 
 const amount = (s: Seed, key: string): number | null => {
@@ -71,6 +72,10 @@ function loadCandidates(): RecommendationCandidate[] {
           kind: 'usda_generic', sourceId: s.productId, verificationStatus: 'published',
         },
         effectiveFrom: '2026-01-01T00:00:00.000Z',
+        // Real source metadata, carried through so actionability is assessed
+        // from what the catalog actually says rather than a harness guess.
+        category: s.category ?? null,
+        sourceDescription: s.sourceDescription ?? s.displayName,
         // NO servingGrams. The generic USDA seed genuinely has none, and
         // injecting one would fabricate the very data DATA-1 identified as the
         // catalog's largest gap — then measure the engine against a catalog
@@ -379,6 +384,12 @@ function main(): void {
   let meaningfulConsidered = 0;
   /** Winner adds a material amount of an ALREADY-EXHAUSTED macro. */
   let exhaustedMacroViolations = 0;
+  /** Winner is a class a normal person would actually eat as a suggestion. */
+  let actionableWins = 0;
+  let lowActionabilityWins = 0;
+  /** Low-actionability winner DESPITE a qualifying actionable alternative. */
+  let lowActionabilityDespiteAlternative = 0;
+  const winnerClasses: Record<string, number> = {};
 
   for (const s of scenarios) {
     const input = inputFor(s, candidates);
@@ -448,6 +459,24 @@ function main(): void {
       }
     }
 
+    if (winner !== undefined) {
+      const cls = (winner as unknown as { actionabilityClass?: string })
+        .actionabilityClass ?? 'unknown';
+      winnerClasses[cls] = (winnerClasses[cls] ?? 0) + 1;
+      const ACTIONABLE = new Set(['ready_to_eat', 'meal_component', 'beverage']);
+      if (ACTIONABLE.has(cls)) actionableWins += 1;
+      else {
+        lowActionabilityWins += 1;
+        // Only a violation if a qualifying actionable alternative was ranked.
+        const alternative = set.recommendations.slice(1).some((r) => {
+          const rc = (r as unknown as { actionabilityClass?: string }).actionabilityClass;
+          return rc !== undefined && ACTIONABLE.has(rc)
+            && r.score >= winner.score * 0.75;
+        });
+        if (alternative) lowActionabilityDespiteAlternative += 1;
+      }
+    }
+
     const v = judge(s, set, byId);
     if (v.hardViolation !== null) {
       hardViolations += 1;
@@ -501,6 +530,11 @@ function main(): void {
     meaningfulContributionRatePercent: pct(meaningfulContributionWins, meaningfulConsidered),
     meaningfulContributionConsidered: meaningfulConsidered,
     exhaustedMacroViolationRatePercent: pct(exhaustedMacroViolations, withRecommendations),
+    actionableWinnerRatePercent: pct(actionableWins, withRecommendations),
+    lowActionabilityWinnerRatePercent: pct(lowActionabilityWins, withRecommendations),
+    lowActionabilityDespiteAlternativePercent:
+      pct(lowActionabilityDespiteAlternative, withRecommendations),
+    winnerClasses,
     mostFrequentTopPicks: Object.entries(topNames)
       .sort((a, b) => b[1] - a[1]).slice(0, 8),
   };
@@ -733,6 +767,14 @@ export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
       topMacroShares: shares, expectation: c.expectation,
       remainingKcal, remaining, comparisonBasis,
       groundedPortionGrams: grounded,
+      actionabilityClass:
+        (top as unknown as { actionabilityClass?: string } | undefined)?.actionabilityClass
+        ?? null,
+      topThree: set.recommendations.slice(0, 3).map((r) => ({
+        name: r.displayName,
+        cls: (r as unknown as { actionabilityClass?: string }).actionabilityClass ?? 'unknown',
+        score: Math.round(r.score * 1000) / 1000,
+      })),
       // A portion may be stated ONLY when the engine grounded one.
       portionStatable: grounded !== null,
       whyItWon: top?.rationaleCodes ?? [],

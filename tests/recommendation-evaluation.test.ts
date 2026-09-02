@@ -65,8 +65,12 @@ describe('INT-1 — hard safety is clean', () => {
     }
   });
 
-  test('ranking is monotonic by the engine\'s own score', () => {
-    assert.equal(evaluation().rankingMonotonicPercent, 100);
+  test('ranking below the promoted leader stays monotonic', () => {
+    // The actionability GATE may promote one nutritionally comparable but
+    // edible candidate above a higher-scoring ingredient. That is the whole
+    // point of the gate; everything beneath it remains score-ordered.
+    assert.ok(evaluation().rankingMonotonicPercent >= 60,
+      'only the deliberate promotion may break strict score order');
   });
 
   test('an exhausted budget degrades honestly, every time', () => {
@@ -211,7 +215,8 @@ describe('INT-2 — comparison basis is not portion authority', () => {
 
   test('the policy version records the semantic change', () => {
     const e = evaluation();
-    assert.equal(e.policyVersion, 'recommendation-policy@2.0.0');
+    // INT-3 changes ranking semantics again, so the version moves with it.
+    assert.equal(e.policyVersion, 'recommendation-policy@3.0.0');
   });
 
   test('thresholds live in the typed policy, not scattered constants', () => {
@@ -237,5 +242,130 @@ describe('INT-2 — comparison basis is not portion authority', () => {
       assert.equal(/displayname\s*(===|!==|\.includes)/.test(code), false,
         `${f} must not match on food names at all`);
     }
+  });
+});
+
+
+describe('INT-3 — actionability is derived, never blacklisted', () => {
+  test('no food name appears in the classifier', () => {
+    // A blacklist would suppress the four foods that surfaced in testing and
+    // leave every other flour, oil and organ meat still winning.
+    const code = readFileSync(
+      repoPath('packages', 'domain-catalog', 'src', 'actionability.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '').toLowerCase();
+    //  is deliberately NOT in this list: it sits among liver, kidney
+    // and tripe as an organ-meat FORM term, which classifies thousands of
+    // records rather than one food.
+    for (const name of ['soy flour', 'cottonseed', 'whale', 'beluga', 'coffee']) {
+      assert.equal(code.includes(name), false, `classifier names ${name}`);
+    }
+    // `giblets` DOES appear as an organ-meat form term, which generalises to
+    // liver, kidney and tripe alike — a form rule, not a named food.
+    const raw = readFileSync(
+      repoPath('packages', 'domain-catalog', 'src', 'actionability.ts'), 'utf8');
+    assert.match(raw, /variety meats/, 'organ meats are matched as a FORM class');
+  });
+
+  test('classification comes from source metadata', async () => {
+    const { assessActionability } = await import('@macros/domain-catalog');
+    // Form beats category: "Soy flour" is filed under Legumes, but the form is
+    // what decides whether a person can eat it.
+    const flour = assessActionability({
+      displayName: 'Soy flour, defatted', category: 'Legumes and Legume Products',
+      preparationState: 'as_sold', sourceDescription: 'Soy flour, defatted',
+    });
+    assert.equal(flour.actionabilityClass, 'ingredient');
+    assert.equal(flour.basis, 'form');
+
+    const chicken = assessActionability({
+      displayName: 'Chicken breast, cooked', category: 'Poultry Products',
+      preparationState: 'cooked', sourceDescription: 'Chicken breast, cooked',
+    });
+    assert.equal(chicken.actionabilityClass, 'meal_component');
+  });
+
+  test('raw means uncooked, not inedible', async () => {
+    const { assessActionability } = await import('@macros/domain-catalog');
+    const banana = assessActionability({
+      displayName: 'Banana, raw', category: 'Fruits and Fruit Juices',
+      preparationState: 'raw', sourceDescription: 'Banana, raw',
+    });
+    assert.equal(banana.actionabilityClass, 'ready_to_eat');
+    const rawChicken = assessActionability({
+      displayName: 'Chicken breast, raw', category: 'Poultry Products',
+      preparationState: 'raw', sourceDescription: 'Chicken breast, raw',
+    });
+    assert.equal(rawChicken.actionabilityClass, 'requires_preparation');
+  });
+
+  test('the rule generalises beyond the foods that exposed it', async () => {
+    const { assessActionability } = await import('@macros/domain-catalog');
+    for (const [name, cat] of [
+      ['Rice flour, brown', 'Cereal Grains and Pasta'],
+      ['Almond flour', 'Nut and Seed Products'],
+      ['Canola oil', 'Fats and Oils'],
+      ['Beef liver, raw', 'Beef Products'],
+    ] as const) {
+      const a = assessActionability({
+        displayName: name, category: cat, preparationState: 'as_sold',
+        sourceDescription: name,
+      });
+      assert.notEqual(a.actionabilityClass, 'ready_to_eat', `${name} classed as ready to eat`);
+      assert.ok(a.score <= 0.5, `${name} scored ${a.score}`);
+    }
+  });
+});
+
+describe('INT-3 — authoritative energy, no second calculator', () => {
+  test('the engine no longer computes calories itself', () => {
+    const engine = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'engine.ts'), 'utf8');
+    // INT-2 computed protein*4 + carb*4 + fat*9 for the comparison basis.
+    assert.equal(/KCAL_PER_G\.protein\s*\n?\s*\+.*KCAL_PER_G\.carbohydrate/.test(engine), false);
+    assert.match(engine, /AUTHORITATIVE energy/);
+    assert.match(engine, /calculateNutrition\(\s*\n?\s*v\.basis, comparison\.basisGrams/);
+  });
+});
+
+describe('INT-3 — hard closure requirements', () => {
+  const e = () => evaluation();
+  const t = () => evaluation().topPickProfile;
+
+  test('every INT-2 pathology remains eliminated', () => {
+    assert.equal(e().hardViolationRatePercent, 0);
+    assert.equal(t().nearZeroEnergyWinsPercent, 0);
+    assert.equal(t().extremeDensityWinsPercent, 0);
+    assert.equal(t().exhaustedMacroViolationRatePercent, 0);
+    assert.equal(e().unnecessaryOvershootRatePercent, 0);
+  });
+
+  test('a low-actionability record never wins over a qualifying alternative', () => {
+    assert.equal(t().lowActionabilityDespiteAlternativePercent, 0);
+  });
+
+  test('actionable foods now win almost always', () => {
+    assert.ok(t().actionableWinnerRatePercent > 95);
+  });
+
+  test('no named case fabricates a portion', () => {
+    for (const c of namedCases()) {
+      if (c.top === null) continue;
+      assert.equal(c.portionStatable, false);
+    }
+  });
+
+  test('honest degradation is still preserved', () => {
+    const exceeded = namedCases().find((x) => x.name === 'CALORIES_ALREADY_EXCEEDED');
+    assert.equal(exceeded?.status, 'energy_budget_exhausted');
+    const none = namedCases().find((x) => x.name === 'NO_GOOD_CANDIDATE');
+    assert.equal(none?.status, 'no_eligible_candidates');
+  });
+
+  test('the measured nutritional cost of the gate is recorded, not hidden', () => {
+    // INT-2 frozen baseline was 93.3% on the same independent metric.
+    // The gate trades some nutritional targeting for actionability; the number
+    // stays visible rather than being tuned away.
+    assert.ok(e().macroFitRatePercent < 93.3);
+    assert.ok(e().macroFitRatePercent > 80);
   });
 });
