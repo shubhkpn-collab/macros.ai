@@ -17,6 +17,7 @@ import {
   DEFAULT_RECOMMENDATION_POLICY, recommendFoods,
   type RecommendationCandidate, type RecommendationInput, type RecommendationSet,
 } from '@macros/domain-recommendation';
+import { recommendFoodPlan } from '@macros/domain-recommendation';
 import { repoPath } from './repo-paths.js';
 
 const GENERIC = repoPath('data', 'usda-seed.json');
@@ -390,6 +391,19 @@ function main(): void {
   /** Low-actionability winner DESPITE a qualifying actionable alternative. */
   let lowActionabilityDespiteAlternative = 0;
   const winnerClasses: Record<string, number> = {};
+  // --- INT-4 plan-level measurement ------------------------------------
+  const planSizes: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+  let planComponents = 0;
+  let actionableComponents = 0;
+  let dominantGapCovered = 0;
+  let dominantGapConsidered = 0;
+  let complementaryGapCovered = 0;
+  let complementaryGapConsidered = 0;
+  let duplicateComponents = 0;
+  let ungroundedPortionClaims = 0;
+  let treatPrimaryDespiteStaple = 0;
+  let lowActionabilityComponentDespiteAlternative = 0;
+  const planRoles: Record<string, number> = {};
 
   for (const s of scenarios) {
     const input = inputFor(s, candidates);
@@ -477,6 +491,67 @@ function main(): void {
       }
     }
 
+    // The planner runs on the SAME state, so plan metrics are directly
+    // comparable with the single-food numbers above.
+    const plan = recommendFoodPlan(input);
+    planSizes[Math.min(3, plan.components.length)] =
+      (planSizes[Math.min(3, plan.components.length)] ?? 0) + 1;
+
+    const ACTIONABLE_SET = new Set(['ready_to_eat', 'meal_component']);
+    const seenProducts = new Set<string>();
+    for (const comp of plan.components) {
+      planComponents += 1;
+      planRoles[comp.role] = (planRoles[comp.role] ?? 0) + 1;
+      if (ACTIONABLE_SET.has(comp.actionabilityClass)) actionableComponents += 1;
+      if (seenProducts.has(comp.productId)) duplicateComponents += 1;
+      seenProducts.add(comp.productId);
+      // A quantity may never be stated without grounded authority.
+      if (comp.portionProposal !== undefined
+          && comp.portionProposal.basis !== 'source_serving'
+          && comp.portionProposal.basis !== 'user_history') {
+        ungroundedPortionClaims += 1;
+      }
+    }
+
+    if (plan.objectives.length > 0 && plan.components.length > 0) {
+      const first = plan.objectives[0];
+      if (first !== 'energy') {
+        dominantGapConsidered += 1;
+        const wanted = `${first === 'protein' ? 'protein' : first === 'carbohydrate'
+          ? 'carbohydrate' : 'fat'}_forward`;
+        if (plan.components.some((c) => c.role === wanted || c.role === 'balanced')) {
+          dominantGapCovered += 1;
+        }
+      }
+      const second = plan.objectives[1];
+      if (second !== undefined && second !== 'energy') {
+        complementaryGapConsidered += 1;
+        const wanted2 = `${second}_forward`;
+        if (plan.components.some((c) => c.role === wanted2 || c.role === 'balanced')) {
+          complementaryGapCovered += 1;
+        }
+      }
+      // A treat should not lead when an ordinary staple was available.
+      const primaryComp = plan.components[0]!;
+      if (primaryComp.actionabilityClass === 'treat'
+          || primaryComp.actionabilityClass === 'snack') {
+        const stapleAvailable = set.recommendations.some((r) => {
+          const cls = (r as unknown as { actionabilityClass?: string }).actionabilityClass;
+          return cls !== undefined && ACTIONABLE_SET.has(cls)
+            && r.score >= set.recommendations[0]!.score * 0.75;
+        });
+        if (stapleAvailable) treatPrimaryDespiteStaple += 1;
+      }
+      for (const comp of plan.components) {
+        if (ACTIONABLE_SET.has(comp.actionabilityClass)) continue;
+        const alt = set.recommendations.some((r) => {
+          const cls = (r as unknown as { actionabilityClass?: string }).actionabilityClass;
+          return cls !== undefined && ACTIONABLE_SET.has(cls);
+        });
+        if (alt) { lowActionabilityComponentDespiteAlternative += 1; break; }
+      }
+    }
+
     const v = judge(s, set, byId);
     if (v.hardViolation !== null) {
       hardViolations += 1;
@@ -535,6 +610,22 @@ function main(): void {
     lowActionabilityDespiteAlternativePercent:
       pct(lowActionabilityDespiteAlternative, withRecommendations),
     winnerClasses,
+    plan: {
+      singleFoodRatePercent: pct(planSizes[1] ?? 0, withRecommendations),
+      twoComponentRatePercent: pct(planSizes[2] ?? 0, withRecommendations),
+      threeComponentRatePercent: pct(planSizes[3] ?? 0, withRecommendations),
+      actionableComponentRatePercent: pct(actionableComponents, planComponents),
+      dominantGapCoveragePercent: pct(dominantGapCovered, dominantGapConsidered),
+      complementaryGapCoveragePercent: pct(complementaryGapCovered, complementaryGapConsidered),
+      duplicateComponentRatePercent: pct(duplicateComponents, planComponents),
+      ungroundedPortionClaims,
+      treatPrimaryDespiteStaplePercent: pct(treatPrimaryDespiteStaple, withRecommendations),
+      lowActionabilityComponentDespiteAlternativePercent:
+        pct(lowActionabilityComponentDespiteAlternative, withRecommendations),
+      noCandidateHonest: statuses['no_eligible_candidates'] === undefined
+        || (planSizes[0] ?? 0) > 0,
+      roles: planRoles,
+    },
     mostFrequentTopPicks: Object.entries(topNames)
       .sort((a, b) => b[1] - a[1]).slice(0, 8),
   };
@@ -718,7 +809,9 @@ export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
     (c.productVersion as unknown as { productVersionId: string }).productVersionId, c]));
   return NAMED_CASES.map((c) => {
     const pool = c.name === 'NO_GOOD_CANDIDATE' ? [] : candidates;
-    const set = recommendFoods(inputFor(c.scenario, pool));
+    const planInput = inputFor(c.scenario, pool);
+    const set = recommendFoods(planInput);
+    const plan = recommendFoodPlan(planInput);
     const top = set.recommendations[0];
     let shares: Record<string, number> | null = null;
     if (top !== undefined) {
@@ -770,6 +863,17 @@ export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
       actionabilityClass:
         (top as unknown as { actionabilityClass?: string } | undefined)?.actionabilityClass
         ?? null,
+      plan: {
+        objectives: plan.objectives,
+        moreGuidanceUsefulAfterWeighing: plan.moreGuidanceUsefulAfterWeighing,
+        plannedTotals: plan.plannedTotals,
+        components: plan.components.map((comp) => ({
+          name: comp.displayName, role: comp.role,
+          actionability: comp.actionabilityClass,
+          portion: comp.portionProposal?.grams ?? null,
+          why: comp.rationaleCodes.slice(0, 3),
+        })),
+      },
       topThree: set.recommendations.slice(0, 3).map((r) => ({
         name: r.displayName,
         cls: (r as unknown as { actionabilityClass?: string }).actionabilityClass ?? 'unknown',

@@ -25,11 +25,32 @@
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "meal_component",
+    "plan": {
+      "objectives": [
+        "protein",
+        "carbohydrate"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Fat free parmesan cheese topping",
+          "role": "balanced",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "strong_protein_fit",
+            "portion_unavailable"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
         "name": "Fat free parmesan cheese topping",
         "cls": "meal_component",
-        "score": 1.239
+        "score": 1.242
       },
       {
         "name": "Soy flour, defatted",
@@ -75,11 +96,32 @@
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "meal_component",
+    "plan": {
+      "objectives": [
+        "protein",
+        "carbohydrate"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Papad",
+          "role": "carbohydrate_forward",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "strong_protein_fit",
+            "strong_carb_fit"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
         "name": "Papad",
         "cls": "meal_component",
-        "score": 1.143
+        "score": 1.146
       },
       {
         "name": "Cottonseed flour seeds, low fat (glandless)",
@@ -104,12 +146,12 @@
   {
     "name": "PROTEIN_ALREADY_MET",
     "status": "available",
-    "top": "Fudge candies, chocolate marshmallow, prepared-from-recipe",
+    "top": "Chocolate chip cookies, commercially prepared, special dietary",
     "topMacroShares": {
-      "protein": 2,
-      "carbohydrate": 63,
-      "fat": 35,
-      "kcalPer100g": 453
+      "protein": 3,
+      "carbohydrate": 64,
+      "fat": 33,
+      "kcalPer100g": 450
     },
     "expectation": "should lean carbohydrate rather than more protein",
     "remainingKcal": 880,
@@ -120,33 +162,55 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 453,
-      "protein": 2.3,
-      "carbohydrate": 71.3,
-      "fat": 17.5
+      "kcal": 450,
+      "protein": 3.9,
+      "carbohydrate": 73.4,
+      "fat": 16.8
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "ready_to_eat",
+    "plan": {
+      "objectives": [
+        "carbohydrate",
+        "fat"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Chocolate chip cookies, commercially prepared, special dietary",
+          "role": "carbohydrate_forward",
+          "actionability": "ready_to_eat",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "strong_carb_fit",
+            "would_overshoot_macro"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
-        "name": "Fudge candies, chocolate marshmallow, prepared-from-recipe",
+        "name": "Chocolate chip cookies, commercially prepared, special dietary",
         "cls": "ready_to_eat",
-        "score": 1.478
+        "score": 1.447
       },
       {
-        "name": "Snacks, yucca (cassava) chips, salted",
-        "cls": "ready_to_eat",
-        "score": 1.458
+        "name": "Cocoa mix beverages, NESTLE, Hot Cocoa Mix Rich Chocolate With Marshmallows",
+        "cls": "beverage",
+        "score": 1.444
       },
       {
-        "name": "Mexican baking chocolate, squares",
+        "name": "Chocolate sandwich cookies, with creme filling, reduced fat",
         "cls": "ready_to_eat",
-        "score": 1.449
+        "score": 1.443
       }
     ],
     "portionStatable": false,
     "whyItWon": [
       "strong_carb_fit",
+      "would_overshoot_macro",
       "portion_unavailable",
       "fits_remaining_energy"
     ]
@@ -177,21 +241,54 @@
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "meal_component",
+    "plan": {
+      "objectives": [
+        "carbohydrate",
+        "fat",
+        "protein"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Mature seeds soybeans, dry roasted",
+          "role": "balanced",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "portion_unavailable",
+            "fits_remaining_energy"
+          ]
+        },
+        {
+          "name": "Chinese noodles, chow mein",
+          "role": "carbohydrate_forward",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "complements_primary_component",
+            "strong_carb_fit",
+            "portion_unavailable"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
         "name": "Mature seeds soybeans, dry roasted",
         "cls": "meal_component",
-        "score": 1.082
+        "score": 1.084
       },
       {
         "name": "Mature seeds soybeans, roasted, salted",
         "cls": "meal_component",
-        "score": 1.072
+        "score": 1.074
       },
       {
         "name": "Mature seeds soybeans, roasted, no salt added",
         "cls": "meal_component",
-        "score": 1.072
+        "score": 1.074
       }
     ],
     "portionStatable": false,
@@ -226,21 +323,43 @@
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "meal_component",
+    "plan": {
+      "objectives": [
+        "protein",
+        "fat",
+        "carbohydrate"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Mature seeds lupins, cooked, boiled, without salt",
+          "role": "protein_forward",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "strong_protein_fit",
+            "portion_unavailable"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
         "name": "Mature seeds lupins, cooked, boiled, without salt",
         "cls": "meal_component",
-        "score": 1.11
+        "score": 1.113
       },
       {
         "name": "Mature seeds lupins, cooked, boiled, with salt",
         "cls": "meal_component",
-        "score": 1.1
+        "score": 1.102
       },
       {
         "name": "Cured pork, ham, extra lean (approximately 4% fat), canned, unheated",
         "cls": "meal_component",
-        "score": 1.079
+        "score": 1.082
       }
     ],
     "portionStatable": false,
@@ -265,6 +384,12 @@
     "comparisonBasis": null,
     "groundedPortionGrams": null,
     "actionabilityClass": null,
+    "plan": {
+      "objectives": [],
+      "moreGuidanceUsefulAfterWeighing": false,
+      "plannedTotals": null,
+      "components": []
+    },
     "topThree": [],
     "portionStatable": false,
     "whyItWon": []
@@ -295,21 +420,54 @@
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "meal_component",
+    "plan": {
+      "objectives": [
+        "carbohydrate",
+        "protein",
+        "fat"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Mature seeds soybeans, dry roasted",
+          "role": "balanced",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "portion_unavailable",
+            "fits_remaining_energy"
+          ]
+        },
+        {
+          "name": "Seeds, pumpkin and squash seeds, whole, roasted, with salt added",
+          "role": "carbohydrate_forward",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "complements_primary_component",
+            "portion_unavailable",
+            "fits_remaining_energy"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
         "name": "Mature seeds soybeans, dry roasted",
         "cls": "meal_component",
-        "score": 1.302
+        "score": 1.305
       },
       {
         "name": "Mature seeds soybeans, roasted, salted",
         "cls": "meal_component",
-        "score": 1.289
+        "score": 1.292
       },
       {
         "name": "Mature seeds soybeans, roasted, no salt added",
         "cls": "meal_component",
-        "score": 1.289
+        "score": 1.292
       }
     ],
     "portionStatable": false,
@@ -344,11 +502,33 @@
     },
     "groundedPortionGrams": null,
     "actionabilityClass": "meal_component",
+    "plan": {
+      "objectives": [
+        "fat",
+        "protein",
+        "carbohydrate"
+      ],
+      "moreGuidanceUsefulAfterWeighing": true,
+      "plannedTotals": null,
+      "components": [
+        {
+          "name": "Creamy peanut butter",
+          "role": "fat_forward",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "addresses_primary_gap",
+            "portion_unavailable",
+            "fits_remaining_energy"
+          ]
+        }
+      ]
+    },
     "topThree": [
       {
         "name": "Creamy peanut butter",
         "cls": "meal_component",
-        "score": 0.913
+        "score": 0.915
       },
       {
         "name": "Whole egg, dried, stabilized, glucose reduced",
@@ -356,9 +536,9 @@
         "score": 0.902
       },
       {
-        "name": "Dark chocolate, 70-85% cacao solids",
-        "cls": "ready_to_eat",
-        "score": 0.901
+        "name": "Creamy almond butter",
+        "cls": "meal_component",
+        "score": 0.899
       }
     ],
     "portionStatable": false,
@@ -382,6 +562,12 @@
     "comparisonBasis": null,
     "groundedPortionGrams": null,
     "actionabilityClass": null,
+    "plan": {
+      "objectives": [],
+      "moreGuidanceUsefulAfterWeighing": false,
+      "plannedTotals": null,
+      "components": []
+    },
     "topThree": [],
     "portionStatable": false,
     "whyItWon": []

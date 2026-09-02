@@ -20,10 +20,19 @@
 export const ACTIONABILITY_VERSION = 'recommendation-actionability@1.0.0';
 
 export type ActionabilityClass =
-  /** Eaten as-is with no preparation: fruit, yoghurt, a cooked meal. */
+  /**
+   * Eaten as-is and a sensible default: fruit, yoghurt, bread, a cooked meal.
+   * INT-3 lumped sweets in here, so fudge could be the default answer to a
+   * carbohydrate gap. "Can be eaten immediately" is not the same as "a good
+   * thing to suggest", and the source category already distinguishes them.
+   */
   | 'ready_to_eat'
   /** A normal component of a meal, usually cooked: chicken breast, rice. */
   | 'meal_component'
+  /** Crisps, bars — real food, but a poor default suggestion. */
+  | 'snack'
+  /** Confectionery and desserts. Legitimate to eat, wrong to lead with. */
+  | 'treat'
   | 'beverage'
   /** Flour, powder, isolate, meal — used to MAKE food, not eaten alone. */
   | 'ingredient'
@@ -44,7 +53,9 @@ export type ActionabilityClass =
  */
 export const ACTIONABILITY_SCORE: Readonly<Record<ActionabilityClass, number>> = {
   ready_to_eat: 1.0,
-  meal_component: 0.9,
+  meal_component: 0.95,
+  snack: 0.45,
+  treat: 0.3,
   beverage: 0.55,
   requires_preparation: 0.5,
   specialty: 0.3,
@@ -63,8 +74,8 @@ const CATEGORY_CLASS: Readonly<Record<string, ActionabilityClass>> = {
   'Restaurant Foods': 'ready_to_eat',
   'Fast Foods': 'ready_to_eat',
   'Meals, Entrees, and Side Dishes': 'ready_to_eat',
-  'Snacks': 'ready_to_eat',
-  'Sweets': 'ready_to_eat',
+  'Snacks': 'snack',
+  'Sweets': 'treat',
   'Fruits and Fruit Juices': 'ready_to_eat',
   'Baked Products': 'ready_to_eat',
   'Breakfast Cereals': 'ready_to_eat',

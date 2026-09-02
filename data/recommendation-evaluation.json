@@ -4,7 +4,7 @@
   "policyVersion": "recommendation-policy@3.0.0",
   "scenarios": 1728,
   "candidatePool": 6630,
-  "meanRecommendMs": 24.43,
+  "meanRecommendMs": 18.8,
   "statuses": {
     "available": 1440,
     "energy_budget_exhausted": 288
@@ -17,46 +17,14 @@
   "macroFitConsidered": 540,
   "unnecessaryOvershootRatePercent": 0,
   "overshootConsidered": 540,
-  "rankingMonotonicPercent": 71.3,
+  "rankingMonotonicPercent": 70,
   "budgetExhaustedScenarios": 288,
   "budgetExhaustedHandledHonestly": 288,
   "failureCounts": {
-    "CRITICAL:ranking_not_monotonic": 414,
+    "CRITICAL:ranking_not_monotonic": 432,
     "MAJOR:macro_fit": 81
   },
   "exampleFailures": [
-    {
-      "id": "S0009",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0009",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.3,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1520
-      }
-    },
-    {
-      "id": "S0017",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0017",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.55,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1120
-      }
-    },
     {
       "id": "S0026",
       "kind": "CRITICAL",
@@ -252,17 +220,17 @@
       }
     },
     {
-      "id": "S0055",
+      "id": "S0054",
       "kind": "CRITICAL",
       "reason": "ranking_not_monotonic",
       "scenario": {
-        "id": "S0055",
+        "id": "S0054",
         "goal": "lose",
         "phase": "early",
         "targetKcal": 2000,
         "consumedFraction": 0.05,
         "proteinFraction": 0.6,
-        "carbFraction": 0.6,
+        "carbFraction": 0.95,
         "fatFraction": 0.6,
         "balanceKcal": -2300
       }
@@ -426,12 +394,44 @@
         "fatFraction": 0.95,
         "balanceKcal": -800
       }
+    },
+    {
+      "id": "S0081",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0081",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0082",
+      "kind": "CRITICAL",
+      "reason": "ranking_not_monotonic",
+      "scenario": {
+        "id": "S0082",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.55,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
     }
   ],
   "topPickProfile": {
     "nearZeroEnergyWinsPercent": 0,
     "extremeDensityWinsPercent": 0,
-    "distinctTopPicks": 46,
+    "distinctTopPicks": 45,
     "meaningfulContributionRatePercent": 95,
     "meaningfulContributionConsidered": 540,
     "exhaustedMacroViolationRatePercent": 0,
@@ -439,15 +439,38 @@
     "lowActionabilityWinnerRatePercent": 0.6,
     "lowActionabilityDespiteAlternativePercent": 0,
     "winnerClasses": {
-      "meal_component": 945,
-      "ready_to_eat": 432,
+      "meal_component": 1098,
+      "ready_to_eat": 288,
       "ingredient": 9,
-      "beverage": 54
+      "beverage": 45
+    },
+    "plan": {
+      "singleFoodRatePercent": 73.1,
+      "twoComponentRatePercent": 25.6,
+      "threeComponentRatePercent": 1.3,
+      "actionableComponentRatePercent": 97.1,
+      "dominantGapCoveragePercent": 66.4,
+      "complementaryGapCoveragePercent": 62.1,
+      "duplicateComponentRatePercent": 0,
+      "ungroundedPortionClaims": 0,
+      "treatPrimaryDespiteStaplePercent": 0,
+      "lowActionabilityComponentDespiteAlternativePercent": 3.1,
+      "noCandidateHonest": true,
+      "roles": {
+        "balanced": 342,
+        "carbohydrate_forward": 801,
+        "fat_forward": 495,
+        "protein_forward": 207
+      }
     },
     "mostFrequentTopPicks": [
       [
         "Mature seeds soybeans, dry roasted",
         225
+      ],
+      [
+        "Wheat germ cereals ready-to-eat, toasted, plain",
+        99
       ],
       [
         "Papad",
@@ -458,24 +481,20 @@
         81
       ],
       [
-        "MARS SNACKFOOD US formulated bar, SNICKERS MARATHON Chewy Chocolate Peanut Bar",
-        72
-      ],
-      [
         "Firm Tofu vitasoy usa azumaya",
         54
       ],
       [
-        "Beef jerky snacks, chopped and formed",
+        "SILK French Vanilla Creamer",
+        54
+      ],
+      [
+        "Cashew nuts, raw",
         54
       ],
       [
         "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
         54
-      ],
-      [
-        "Chicken, broilers or fryers, back, meat only, cooked, fried",
-        45
       ]
     ]
   }
