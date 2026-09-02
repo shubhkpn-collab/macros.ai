@@ -17,6 +17,12 @@ const namedCases = () => JSON.parse(
   readFileSync(repoPath('data', 'recommendation-named-cases.json'), 'utf8')) as {
     name: string; status: string; top: string | null;
     topMacroShares: Record<string, number> | null;
+    remaining: Record<string, number>;
+    remainingKcal: number;
+    comparisonBasis: Record<string, number> | null;
+    groundedPortionGrams: number | null;
+    portionStatable: boolean;
+    whyItWon: readonly string[];
   }[];
 
 describe('INT-1 — evaluation exercises the real engine', () => {
@@ -83,58 +89,153 @@ describe('INT-1 — hard safety is clean', () => {
   });
 });
 
-describe('INT-1 — the measured weakness, recorded not fixed', () => {
-  test('the winner set collapses to a handful of foods', () => {
-    // 7 distinct winners across 1,440 scenarios. A recommender that answers
-    // almost every question with the same food is not reading the question.
+describe('INT-2 — the proven defect is corrected', () => {
+  test('the winner set is no longer collapsed', () => {
+    // INT-1 baseline: 7 distinct winners across 1,440 scenarios.
     const e = evaluation();
-    assert.ok(e.topPickProfile.distinctTopPicks < 20,
-      `${e.topPickProfile.distinctTopPicks} distinct winners — baseline recorded`);
+    assert.ok(e.topPickProfile.distinctTopPicks > 30,
+      `only ${e.topPickProfile.distinctTopPicks} distinct winners`);
   });
 
-  test('near-zero-energy foods win a large share of scenarios', () => {
-    // Coffee scores a perfect PROPORTIONAL protein fit because its trivial
-    // protein is 100% of its trivial macro energy. Share is scale-free, so
-    // magnitude never enters the comparison.
-    const e = evaluation();
-    assert.ok(e.topPickProfile.nearZeroEnergyWinsPercent > 20,
-      'baseline: proportional macro fit rewards nutritionally empty foods');
+  test('near-zero-energy foods no longer win', () => {
+    // INT-1 baseline: 31.3%. Black coffee scored a perfect PROPORTIONAL protein
+    // fit because trace protein was 100% of its macro energy.
+    assert.equal(evaluation().topPickProfile.nearZeroEnergyWinsPercent, 0);
   });
 
-  test('extreme-energy-density foods win fat-gap scenarios', () => {
-    const e = evaluation();
-    assert.ok(e.topPickProfile.extremeDensityWinsPercent > 15,
-      'baseline: pure fats satisfy a fat gap perfectly by proportion');
+  test('extreme-density foods no longer win', () => {
+    // INT-1 baseline: 21.9%, led by whale oil.
+    assert.equal(evaluation().topPickProfile.extremeDensityWinsPercent, 0);
   });
 
-  test('energy fit is the weakest measured dimension', () => {
-    const e = evaluation();
-    assert.ok(e.energyFitRatePercent < 95);
-    assert.ok(e.energyFitRatePercent > 80);
+  test('a materially useful contribution is now the norm', () => {
+    // Judged by ABSOLUTE grams against the gap, on thresholds independent of
+    // the engine's policy — so this cannot be satisfied by tuning the policy.
+    assert.ok(evaluation().topPickProfile.meaningfulContributionRatePercent >= 90);
   });
 
-  test('LEAN_PROTEIN_LATE_DAY does not return a lean protein food', () => {
-    // The headline named case. Recorded as failing; NOT corrected here.
+  test('an already-exhausted macro is never materially worsened', () => {
+    // Counted only where a qualifying alternative existed, so the engine is not
+    // blamed for gaps in the catalog.
+    assert.equal(evaluation().topPickProfile.exhaustedMacroViolationRatePercent, 0);
+  });
+
+  test('unnecessary overshoot is eliminated', () => {
+    assert.equal(evaluation().unnecessaryOvershootRatePercent, 0);
+  });
+
+  test('energy fit no longer rewards contributing nothing', () => {
+    // v1 scored `1 - ratio`, so a zero-energy food earned the maximum.
+    assert.equal(evaluation().energyFitRatePercent, 100);
+  });
+
+  test('LEAN_PROTEIN_LATE_DAY returns a real protein source', () => {
     const c = namedCases().find((x) => x.name === 'LEAN_PROTEIN_LATE_DAY');
     assert.equal(c?.status, 'available');
-    assert.ok((c?.topMacroShares?.['kcalPer100g'] ?? 0) < 25,
-      'baseline: a near-zero-energy beverage wins a protein-gap scenario');
+    const b = c?.comparisonBasis;
+    assert.ok(b !== null && b !== undefined);
+    assert.ok((b['protein'] ?? 0) >= 5, 'a trace-protein food must not qualify');
+    assert.ok((b['kcal'] ?? 0) > 25, 'a nutritionally negligible beverage must not win');
   });
 
-  test('CONTROLLED_SURPLUS returns an extreme-density fat', () => {
+  test('FAT_ALREADY_HIGH does not pile on fat', () => {
+    const c = namedCases().find((x) => x.name === 'FAT_ALREADY_HIGH');
+    assert.ok((c?.remaining['fat'] ?? 0) <= 0, 'the scenario really is exhausted');
+    assert.ok((c?.comparisonBasis?.fat ?? 99) < 10,
+      'the winner must not materially worsen an exhausted allowance');
+  });
+
+  test('PROTEIN_ALREADY_MET stops chasing protein', () => {
+    const c = namedCases().find((x) => x.name === 'PROTEIN_ALREADY_MET');
+    assert.ok((c?.remaining['protein'] ?? 0) <= 0);
+    assert.ok((c?.comparisonBasis?.protein ?? 99) < 5,
+      'protein is met; a high-protein percentage must not keep winning');
+  });
+
+  test('CARBS_NEEDED_PRE_WORKOUT materially addresses carbohydrate', () => {
+    const c = namedCases().find((x) => x.name === 'CARBS_NEEDED_PRE_WORKOUT');
+    assert.ok((c?.comparisonBasis?.carbohydrate ?? 0) >= 8);
+  });
+
+  test('SMALL_CALORIE_BUDGET makes real progress within the budget', () => {
+    const c = namedCases().find((x) => x.name === 'SMALL_CALORIE_BUDGET');
+    const b = c?.comparisonBasis;
+    assert.ok((b?.kcal ?? 0) > 25, 'zero-calorie irrelevance must not be rewarded');
+    assert.ok((b?.protein ?? 0) + (b?.carbohydrate ?? 0) >= 5,
+      'it must contribute something the user still needs');
+  });
+
+  test('CONTROLLED_SURPLUS allows density but not a pathological pure fat', () => {
     const c = namedCases().find((x) => x.name === 'CONTROLLED_SURPLUS');
-    assert.ok((c?.topMacroShares?.['kcalPer100g'] ?? 0) > 700,
-      'baseline recorded: acceptable in surplus, alarming as a general pattern');
+    const shares = c?.topMacroShares;
+    assert.ok((shares?.['fat'] ?? 100) < 90,
+      'a near-pure-fat candidate must not win on density alone');
   });
 
-  test('macro fit passing at 100% is a metric limitation, not a triumph', () => {
-    // My own metric judged macro fit PROPORTIONALLY — the same blind spot the
-    // engine has — so it certified coffee as a good protein choice. Recorded
-    // so the number is not misread as engine quality.
+  test('honest degradation is preserved exactly as in INT-1', () => {
+    const exceeded = namedCases().find((x) => x.name === 'CALORIES_ALREADY_EXCEEDED');
+    assert.equal(exceeded?.status, 'energy_budget_exhausted');
+    assert.equal(exceeded?.top, null);
+    const none = namedCases().find((x) => x.name === 'NO_GOOD_CANDIDATE');
+    assert.equal(none?.status, 'no_eligible_candidates');
+    assert.equal(none?.top, null);
+  });
+});
+
+describe('INT-2 — comparison basis is not portion authority', () => {
+  test('no named case fabricates a portion', () => {
+    // The generic seed has no serving weights, so the engine must recommend the
+    // FOOD while declining to state an amount. Ranking on a 100 g basis must
+    // never leak out as "eat 100 g".
+    for (const c of namedCases()) {
+      if (c.top === null) continue;
+      assert.equal(c.groundedPortionGrams, null);
+      assert.equal(c.portionStatable, false);
+    }
+  });
+
+  test('the engine separates the two concepts in code', () => {
+    const engine = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'engine.ts'), 'utf8');
+    assert.match(engine, /COMPARISON quantity only/);
+    assert.match(engine, /never become a `portionProposal`/);
+    // Portion authority is unchanged: still only source serving or history.
+    assert.match(engine, /PORTION AUTHORITY/);
+  });
+
+  test('portion authority still has exactly two grounded bases', () => {
+    const engine = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'engine.ts'), 'utf8');
+    assert.match(engine, /There is deliberately no third option/);
+  });
+
+  test('the policy version records the semantic change', () => {
     const e = evaluation();
-    assert.equal(e.macroFitRatePercent, 100);
-    const harness = readFileSync(
-      repoPath('tools', 'evaluate-recommendations.ts'), 'utf8');
-    assert.match(harness, /share >= 0\.30/, 'the proportional test that shares the blind spot');
+    assert.equal(e.policyVersion, 'recommendation-policy@2.0.0');
+  });
+
+  test('thresholds live in the typed policy, not scattered constants', () => {
+    const policy = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'policy.ts'), 'utf8');
+    for (const field of ['basisGrams', 'minMeaningfulGrams', 'fullClosureFraction',
+                         'usefulEnergyFraction', 'exhaustedMacro']) {
+      assert.ok(policy.includes(field), `${field} must be policy-versioned`);
+    }
+  });
+
+  test('no food name is hard-coded anywhere in the engine or policy', () => {
+    // The fix had to be a scoring principle, not a blacklist. Comments may name
+    // the foods that EXPOSED the defect — that is the explanation of why the
+    // rule exists — but no executable line may branch on a food name.
+    for (const f of ['engine.ts', 'policy.ts']) {
+      const code = readFileSync(repoPath('packages', 'domain-recommendation', 'src', f), 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+        .toLowerCase();
+      for (const name of ['coffee', 'whale', 'beluga', 'juice']) {
+        assert.equal(code.includes(name), false, `${f} branches on ${name}`);
+      }
+      assert.equal(/displayname\s*(===|!==|\.includes)/.test(code), false,
+        `${f} must not match on food names at all`);
+    }
   });
 });

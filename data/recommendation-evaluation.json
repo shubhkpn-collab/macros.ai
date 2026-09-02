@@ -1,19 +1,19 @@
 {
   "evaluationVersion": "int1-recommendation-eval@1.0.0",
   "engine": "recommendFoods (production)",
-  "policyVersion": "recommendation-policy@1.0.0",
+  "policyVersion": "recommendation-policy@2.0.0",
   "scenarios": 1728,
   "candidatePool": 6630,
-  "meanRecommendMs": 7.91,
+  "meanRecommendMs": 6.95,
   "statuses": {
     "available": 1440,
     "energy_budget_exhausted": 288
   },
   "hardViolationRatePercent": 0,
   "violationKinds": {},
-  "energyFitRatePercent": 89.4,
+  "energyFitRatePercent": 100,
   "energyFitConsidered": 1440,
-  "macroFitRatePercent": 100,
+  "macroFitRatePercent": 93.3,
   "macroFitConsidered": 540,
   "unnecessaryOvershootRatePercent": 0,
   "overshootConsidered": 540,
@@ -21,466 +21,473 @@
   "budgetExhaustedScenarios": 288,
   "budgetExhaustedHandledHonestly": 288,
   "failureCounts": {
-    "MAJOR:energy_fit": 153
+    "MAJOR:macro_fit": 36
   },
   "exampleFailures": [
     {
-      "id": "S0028",
+      "id": "S0035",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
       "scenario": {
-        "id": "S0028",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -720
-      }
-    },
-    {
-      "id": "S0036",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0036",
+        "id": "S0035",
         "goal": "lose",
         "phase": "early",
         "targetKcal": 1600,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
         "balanceKcal": -480
       }
     },
     {
-      "id": "S0076",
+      "id": "S0083",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
+      "reason": "macro_fit",
+      "top": "Indian buffalo milk, fluid",
       "scenario": {
-        "id": "S0076",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0078",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0078",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.95,
-        "fatFraction": 0.6,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0079",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0079",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0080",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0080",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 1.05,
-        "carbFraction": 0.9,
-        "fatFraction": 0.9,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0084",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0084",
+        "id": "S0083",
         "goal": "lose",
         "phase": "early",
         "targetKcal": 2000,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -500
-      }
-    },
-    {
-      "id": "S0086",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0086",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.95,
+        "carbFraction": 0.25,
         "fatFraction": 0.6,
         "balanceKcal": -500
       }
     },
     {
-      "id": "S0087",
+      "id": "S0131",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
+      "reason": "macro_fit",
+      "top": "Lamb, variety meats and by-products, brain, raw",
       "scenario": {
-        "id": "S0087",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -500
-      }
-    },
-    {
-      "id": "S0088",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0088",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.95,
-        "proteinFraction": 1.05,
-        "carbFraction": 0.9,
-        "fatFraction": 0.9,
-        "balanceKcal": -500
-      }
-    },
-    {
-      "id": "S0124",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0124",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2400,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -880
-      }
-    },
-    {
-      "id": "S0127",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Coconut meat nuts, dried (desiccated), creamed",
-      "scenario": {
-        "id": "S0127",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2400,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -880
-      }
-    },
-    {
-      "id": "S0132",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0132",
+        "id": "S0131",
         "goal": "lose",
         "phase": "early",
         "targetKcal": 2400,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -520
-      }
-    },
-    {
-      "id": "S0135",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Coconut meat nuts, dried (desiccated), creamed",
-      "scenario": {
-        "id": "S0135",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
+        "carbFraction": 0.25,
         "fatFraction": 0.6,
         "balanceKcal": -520
       }
     },
     {
-      "id": "S0136",
+      "id": "S0179",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Gluten-free cookies, lemon wafer",
+      "reason": "macro_fit",
+      "top": "Cured pork, feet, pickled",
       "scenario": {
-        "id": "S0136",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2400,
-        "consumedFraction": 0.95,
-        "proteinFraction": 1.05,
-        "carbFraction": 0.9,
-        "fatFraction": 0.9,
-        "balanceKcal": -520
-      }
-    },
-    {
-      "id": "S0172",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0172",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2800,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -960
-      }
-    },
-    {
-      "id": "S0180",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0180",
+        "id": "S0179",
         "goal": "lose",
         "phase": "early",
         "targetKcal": 2800,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
         "balanceKcal": -540
       }
     },
     {
-      "id": "S0220",
+      "id": "S0227",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
       "scenario": {
-        "id": "S0220",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 1600,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -720
-      }
-    },
-    {
-      "id": "S0228",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0228",
+        "id": "S0227",
         "goal": "lose",
         "phase": "middle",
         "targetKcal": 1600,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
         "balanceKcal": -480
       }
     },
     {
-      "id": "S0268",
+      "id": "S0275",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
+      "reason": "macro_fit",
+      "top": "Indian buffalo milk, fluid",
       "scenario": {
-        "id": "S0268",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0270",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0270",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.95,
-        "fatFraction": 0.6,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0271",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0271",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0272",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0272",
-        "goal": "lose",
-        "phase": "middle",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 1.05,
-        "carbFraction": 0.9,
-        "fatFraction": 0.9,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0276",
-      "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
-      "scenario": {
-        "id": "S0276",
+        "id": "S0275",
         "goal": "lose",
         "phase": "middle",
         "targetKcal": 2000,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
-        "carbFraction": 0.7,
-        "fatFraction": 0.2,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
         "balanceKcal": -500
       }
     },
     {
-      "id": "S0278",
+      "id": "S0323",
       "kind": "MAJOR",
-      "reason": "energy_fit",
-      "top": "Beluga oil, whale (Alaska Native)",
+      "reason": "macro_fit",
+      "top": "Lamb, variety meats and by-products, brain, raw",
       "scenario": {
-        "id": "S0278",
+        "id": "S0323",
         "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0371",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Cured pork, feet, pickled",
+      "scenario": {
+        "id": "S0371",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0419",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
+      "scenario": {
+        "id": "S0419",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0467",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Indian buffalo milk, fluid",
+      "scenario": {
+        "id": "S0467",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0515",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Lamb, variety meats and by-products, brain, raw",
+      "scenario": {
+        "id": "S0515",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0563",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Cured pork, feet, pickled",
+      "scenario": {
+        "id": "S0563",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0611",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
+      "scenario": {
+        "id": "S0611",
+        "goal": "maintain",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -80
+      }
+    },
+    {
+      "id": "S0659",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Indian buffalo milk, fluid",
+      "scenario": {
+        "id": "S0659",
+        "goal": "maintain",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -100
+      }
+    },
+    {
+      "id": "S0707",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Lamb, variety meats and by-products, brain, raw",
+      "scenario": {
+        "id": "S0707",
+        "goal": "maintain",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -120
+      }
+    },
+    {
+      "id": "S0755",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Cured pork, feet, pickled",
+      "scenario": {
+        "id": "S0755",
+        "goal": "maintain",
+        "phase": "early",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -140
+      }
+    },
+    {
+      "id": "S0803",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
+      "scenario": {
+        "id": "S0803",
+        "goal": "maintain",
+        "phase": "middle",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -80
+      }
+    },
+    {
+      "id": "S0851",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Indian buffalo milk, fluid",
+      "scenario": {
+        "id": "S0851",
+        "goal": "maintain",
         "phase": "middle",
         "targetKcal": 2000,
         "consumedFraction": 0.95,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
         "fatFraction": 0.6,
-        "balanceKcal": -500
+        "balanceKcal": -100
+      }
+    },
+    {
+      "id": "S0899",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Lamb, variety meats and by-products, brain, raw",
+      "scenario": {
+        "id": "S0899",
+        "goal": "maintain",
+        "phase": "middle",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -120
+      }
+    },
+    {
+      "id": "S0947",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Cured pork, feet, pickled",
+      "scenario": {
+        "id": "S0947",
+        "goal": "maintain",
+        "phase": "middle",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -140
+      }
+    },
+    {
+      "id": "S0995",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
+      "scenario": {
+        "id": "S0995",
+        "goal": "maintain",
+        "phase": "late",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -80
+      }
+    },
+    {
+      "id": "S1043",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Indian buffalo milk, fluid",
+      "scenario": {
+        "id": "S1043",
+        "goal": "maintain",
+        "phase": "late",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -100
+      }
+    },
+    {
+      "id": "S1091",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Lamb, variety meats and by-products, brain, raw",
+      "scenario": {
+        "id": "S1091",
+        "goal": "maintain",
+        "phase": "late",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -120
+      }
+    },
+    {
+      "id": "S1139",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Cured pork, feet, pickled",
+      "scenario": {
+        "id": "S1139",
+        "goal": "maintain",
+        "phase": "late",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -140
+      }
+    },
+    {
+      "id": "S1187",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Plain yogurt, whole milk",
+      "scenario": {
+        "id": "S1187",
+        "goal": "gain",
+        "phase": "early",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": 170
       }
     }
   ],
   "topPickProfile": {
-    "nearZeroEnergyWinsPercent": 31.3,
-    "extremeDensityWinsPercent": 21.9,
-    "distinctTopPicks": 7,
+    "nearZeroEnergyWinsPercent": 0,
+    "extremeDensityWinsPercent": 0,
+    "distinctTopPicks": 54,
+    "meaningfulContributionRatePercent": 93.3,
+    "meaningfulContributionConsidered": 540,
+    "exhaustedMacroViolationRatePercent": 0,
     "mostFrequentTopPicks": [
       [
-        "Coffee beverages, brewed, prepared with tap water, decaffeinated",
-        450
+        "Mature seeds soybeans, dry roasted",
+        135
       ],
       [
-        "Beluga oil, whale (Alaska Native)",
-        315
+        "Mature seeds winged beans, raw",
+        99
       ],
       [
-        "Beverages, Kiwi Strawberry Juice Drink",
-        270
+        "Alfredo mix sauce, dry",
+        81
       ],
       [
-        "Beverages, pineapple and orange juice drink, canned",
-        270
+        "Tofu, dried-frozen (koyadofu)",
+        72
       ],
       [
-        "Trout fish, rainbow, farmed, raw",
-        45
+        "Tortilla chips snacks, light (baked with less oil)",
+        63
       ],
       [
-        "Coconut meat nuts, dried (desiccated), creamed",
-        45
+        "Safflower seed meal seeds, partially defatted",
+        63
       ],
       [
-        "Gluten-free cookies, lemon wafer",
+        "Powder egg substitute",
+        54
+      ],
+      [
+        "Chicken, broilers or fryers, back, meat only, cooked, fried",
         45
       ]
     ]

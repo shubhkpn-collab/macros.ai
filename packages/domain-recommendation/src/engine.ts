@@ -113,6 +113,58 @@ export function macroEnergyShares(v: ProductVersion): Record<MacroName, number> 
   };
 }
 
+/**
+ * MACRO CONTRIBUTION on the ranking comparison basis.
+ *
+ * Answers "how much of the macro I still need would this food actually
+ * supply?", replacing v1's "what fraction of this food's energy is that
+ * macro?". The distinction is the whole of the INT-1 defect: trace protein was
+ * 100% of black coffee's macro energy, so coffee scored a perfect protein fit
+ * while supplying no protein.
+ *
+ * The returned grams are a COMPARISON quantity only. They are never presented,
+ * and they never become a `portionProposal`.
+ */
+export function macroContributionGrams(
+  v: ProductVersion,
+  basisGrams: number,
+): Record<MacroName, number> {
+  const scale = basisGrams / 100;
+  return {
+    protein: macroGrams(v, 'protein') * scale,
+    carbohydrate: macroGrams(v, 'carbohydrate') * scale,
+    fat: macroGrams(v, 'fat') * scale,
+  };
+}
+
+/**
+ * How much of a remaining gap a comparison-basis amount would close, in [0, 1].
+ *
+ * Three properties matter:
+ *   - a contribution below the meaningful floor closes NOTHING, so trace
+ *     amounts cannot produce a strong score;
+ *   - closure saturates at `fullClosureFraction` of the gap, so one enormous
+ *     nutrient amount cannot produce an unbounded score;
+ *   - normalisation is against the user's own remaining gap, so protein grams
+ *     and carbohydrate grams are never compared naively.
+ */
+export function gapClosure(
+  contributionG: number,
+  remainingG: number,
+  minMeaningfulG: number,
+  fullClosureFraction: number,
+): number {
+  if (!Number.isFinite(contributionG) || contributionG < minMeaningfulG) return 0;
+  if (!Number.isFinite(remainingG) || remainingG <= 0) return 0;
+  const target = remainingG * fullClosureFraction;
+  if (target <= 0) return 0;
+  // Only the portion of the contribution that FITS inside the gap counts as
+  // closing it. Beyond the gap it is overshoot, handled separately — otherwise
+  // a food supplying 20 g against a 3 g deficit scores a perfect fit.
+  const useful = Math.min(contributionG, remainingG);
+  return Math.min(1, useful / target);
+}
+
 const daysBetween = (aIso: string, bIso: string): number =>
   Math.abs(Date.parse(aIso) - Date.parse(bIso)) / 86_400_000;
 
@@ -284,22 +336,69 @@ function scoreCandidate(
 ): Recommendation | null {
   const { policy } = input;
   const v = candidate.productVersion;
-  const shares = macroEnergyShares(v);
   const rationale: RationaleCode[] = [];
+  const { comparison } = policy;
 
-  // Dimensionless: Σ(deficit weight × candidate's energy share) ∈ [0, 1].
-  const macroFit = MACROS.reduce((s, m) => s + weights[m] * shares[m], 0);
+  // CONTRIBUTION, not composition. See macroContributionGrams.
+  const contribution = macroContributionGrams(v, comparison.basisGrams);
+  const closure: Record<MacroName, number> = {
+    protein: gapClosure(contribution.protein, remaining.protein,
+      comparison.minMeaningfulGrams.protein, comparison.fullClosureFraction),
+    carbohydrate: gapClosure(contribution.carbohydrate, remaining.carbohydrate,
+      comparison.minMeaningfulGrams.carbohydrate, comparison.fullClosureFraction),
+    fat: gapClosure(contribution.fat, remaining.fat,
+      comparison.minMeaningfulGrams.fat, comparison.fullClosureFraction),
+  };
+
+  // Weights sum to 1 and each closure is in [0, 1], so macroFit is bounded.
+  const macroFit = MACROS.reduce((s, m) => s + weights[m] * closure[m], 0);
 
   for (const m of MACROS) {
-    if (weights[m] >= 0.4 && shares[m] >= 0.4) {
+    if (weights[m] >= 0.4 && closure[m] >= 0.4) {
       rationale.push(
         m === 'protein' ? 'strong_protein_fit' : m === 'carbohydrate' ? 'strong_carb_fit' : 'strong_fat_fit',
       );
     }
   }
 
+  /**
+   * ALREADY-EXHAUSTED MACROS.
+   *
+   * A macro at or below zero remaining cannot be "closed", so it earns nothing
+   * above — but adding a material amount of it must also cost something.
+   * Scaling by the macro TARGET keeps this bounded and avoids dividing by a
+   * remaining value that is zero or negative.
+   */
+  let exhaustedMacroPenalty = 0;
+  const targets = input.macros === null ? null : {
+    protein: input.macros.targets.proteinG as unknown as number,
+    carbohydrate: input.macros.targets.carbohydrateG as unknown as number,
+    fat: input.macros.targets.fatG as unknown as number,
+  };
+  if (targets !== null) {
+    let exhaustedLoad = 0;
+    for (const m of MACROS) {
+      if (remaining[m] > 0) continue;
+      if (contribution[m] < comparison.minMeaningfulGrams[m]) continue;
+      const target = targets[m];
+      if (!Number.isFinite(target) || target <= 0) continue;
+      exhaustedLoad += Math.min(1, contribution[m] / target);
+    }
+    if (exhaustedLoad > 0) {
+      exhaustedMacroPenalty = policy.penalties.exhaustedMacro * Math.min(1, exhaustedLoad);
+      rationale.push('would_overshoot_macro');
+    }
+  }
+
   const portion = proposePortion(candidate, input, remainingKcal);
   let energyFit = 0;
+  /**
+   * Candidates WITHOUT portion authority were previously scored on composition
+   * alone, because energy fit was only computed for grounded portions. They are
+   * now compared on the same normalized basis — a ranking device that makes no
+   * quantity claim and produces no `portionProposal`.
+   */
+  let usedComparisonBasisForEnergy = false;
   let energyOvershootPenalty = 0;
   let macroOvershootPenalty = 0;
   let nutrition;
@@ -320,7 +419,10 @@ function scoreCandidate(
         energyOvershootPenalty = policy.penalties.energyOvershoot * (ratio - 1);
         rationale.push('would_overshoot_energy');
       } else {
-        energyFit = 1 - ratio;
+        // USEFUL PROGRESS within the budget, not "fewest calories wins".
+        // v1 used `1 - ratio`, which awarded a near-zero-energy food the maximum
+        // score precisely because it contributed nothing.
+        energyFit = Math.min(1, ratio / comparison.usefulEnergyFraction);
         rationale.push('fits_remaining_energy');
       }
     }
@@ -340,7 +442,45 @@ function scoreCandidate(
       rationale.push('would_overshoot_macro');
     }
   } else {
+    // NO PORTION AUTHORITY. The food may still be a good answer to "what should
+    // I eat?"; only "how much?" is unanswerable. It is ranked on the normalized
+    // comparison basis, and no quantity is proposed or shown.
     rationale.push('portion_unavailable');
+    usedComparisonBasisForEnergy = true;
+    void usedComparisonBasisForEnergy;
+
+    if (remainingKcal !== null && remainingKcal > 0) {
+      const comparisonKcal = (macroGrams(v, 'protein') * KCAL_PER_G.protein
+        + macroGrams(v, 'carbohydrate') * KCAL_PER_G.carbohydrate
+        + macroGrams(v, 'fat') * KCAL_PER_G.fat) * (comparison.basisGrams / 100);
+      const ratio = comparisonKcal / remainingKcal;
+      if (ratio > 1) {
+        // Density incompatible with what is left. Penalised, not rejected: with
+        // no serving mass we cannot claim the person would eat this much, so
+        // eliminating the food outright would overstate what we know.
+        energyOvershootPenalty = policy.penalties.energyOvershoot * Math.min(2, ratio - 1);
+        rationale.push('would_overshoot_energy');
+      } else {
+        energyFit = Math.min(1, ratio / comparison.usefulEnergyFraction);
+        rationale.push('fits_remaining_energy');
+      }
+    }
+
+    // Macro overshoot on the SAME comparison basis. Without this a nearly
+    // exhausted macro — say 3 g of fat left — was treated as fully closed by
+    // any material contribution, because closure saturates. Overfilling a
+    // gap is not filling it.
+    let comparisonMacroOver = 0;
+    for (const m of MACROS) {
+      if (remaining[m] <= 0) continue;
+      if (contribution[m] > remaining[m]) {
+        comparisonMacroOver += (contribution[m] - remaining[m]) / remaining[m];
+      }
+    }
+    if (comparisonMacroOver > 0) {
+      macroOvershootPenalty = policy.penalties.macroOvershoot * Math.min(1, comparisonMacroOver);
+      rationale.push('would_overshoot_macro');
+    }
   }
 
   // History and preference are RANKING nudges only — never nutrition authority
@@ -368,7 +508,10 @@ function scoreCandidate(
     historyNudge,
     preferenceNudge,
     energyOvershootPenalty,
-    macroOvershootPenalty,
+    // Both overshoot signals share one component: exceeding a macro you still
+    // have room for, and adding to one you have already exhausted, are the same
+    // kind of harm.
+    macroOvershootPenalty: macroOvershootPenalty + exhaustedMacroPenalty,
     repetitionPenalty,
   };
 

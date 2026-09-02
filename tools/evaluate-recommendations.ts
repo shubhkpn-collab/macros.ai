@@ -298,17 +298,26 @@ function judge(
 
   let macroFit: boolean | null = null;
   if (worstMargin > 0.15) {
-    // A materially dominant gap exists, so the pick should lean that way.
-    const energyFrom = {
-      protein: basis.proteinG * 4,
-      carbohydrate: basis.carbohydrateG * 4,
-      fat: basis.fatG * 9,
-    };
-    const totalMacroKcal = energyFrom.protein + energyFrom.carbohydrate + energyFrom.fat;
-    const share = totalMacroKcal > 0
-      ? energyFrom[worst[0] as 'protein' | 'carbohydrate' | 'fat'] / totalMacroKcal
-      : 0;
-    macroFit = share >= 0.30;
+    // INDEPENDENT of the engine. INT-1 judged this by ENERGY SHARE — the same
+    // proportional logic the engine used — so two measurements shared a blind
+    // spot, agreed with each other, and certified black coffee as a good
+    // protein choice. INT-2 judges ABSOLUTE contribution instead: does a
+    // standard comparison amount supply a materially useful quantity of the
+    // macro the user actually lacks?
+    const worstMacro = worst[0] as 'protein' | 'carbohydrate' | 'fat';
+    const gramsPer100g = worstMacro === 'protein' ? basis.proteinG
+      : worstMacro === 'carbohydrate' ? basis.carbohydrateG : basis.fatG;
+    const remainingOfWorst = worstMacro === 'protein' ? remainingProtein
+      : worstMacro === 'carbohydrate' ? remainingCarb : remainingFat;
+
+    // Deliberately independent thresholds, not the engine's policy values, so
+    // this cannot be satisfied by tuning the policy.
+    const MEANINGFUL_GRAMS = { protein: 5, carbohydrate: 8, fat: 3 } as const;
+    const suppliesMeaningfulAmount = gramsPer100g >= MEANINGFUL_GRAMS[worstMacro];
+    const closesUsefulShare = remainingOfWorst > 0
+      && gramsPer100g / remainingOfWorst >= 0.10;
+
+    macroFit = suppliesMeaningfulAmount && closesUsefulShare;
   }
 
   // --- unnecessary overshoot -------------------------------------------
@@ -365,6 +374,11 @@ function main(): void {
   let nearZeroEnergyWins = 0;
   let extremeDensityWins = 0;
   const topNames: Record<string, number> = {};
+  /** Winner supplies a materially useful amount of the most-deficient macro. */
+  let meaningfulContributionWins = 0;
+  let meaningfulConsidered = 0;
+  /** Winner adds a material amount of an ALREADY-EXHAUSTED macro. */
+  let exhaustedMacroViolations = 0;
 
   for (const s of scenarios) {
     const input = inputFor(s, candidates);
@@ -387,6 +401,50 @@ function main(): void {
       if (b !== undefined) {
         if (b.kcal < 25) nearZeroEnergyWins += 1;
         if (b.kcal > 700) extremeDensityWins += 1;
+      }
+    }
+
+    if (winner !== undefined) {
+      const b = basisOf(byId, winner.productVersionId);
+      if (b !== undefined) {
+        const tt = macroTargets(s.targetKcal);
+        const remP = tt.proteinG - Math.round(tt.proteinG * s.proteinFraction);
+        const remC = tt.carbohydrateG - Math.round(tt.carbohydrateG * s.carbFraction);
+        const remF = tt.fatG - Math.round(tt.fatG * s.fatFraction);
+        // Independent thresholds, not the engine's policy.
+        const MEANINGFUL = { protein: 5, carbohydrate: 8, fat: 3 } as const;
+        const gaps: [keyof typeof MEANINGFUL, number, number][] = [
+          ['protein', remP / Math.max(1, tt.proteinG), b.proteinG],
+          ['carbohydrate', remC / Math.max(1, tt.carbohydrateG), b.carbohydrateG],
+          ['fat', remF / Math.max(1, tt.fatG), b.fatG],
+        ];
+        gaps.sort((x, y) => y[1] - x[1]);
+        const [worstName, worstFrac, worstGrams] = gaps[0]!;
+        if (worstFrac - gaps[1]![1] > 0.15) {
+          meaningfulConsidered += 1;
+          if (worstGrams >= MEANINGFUL[worstName]) meaningfulContributionWins += 1;
+        }
+        for (const [name, , grams] of gaps) {
+          const rem = name === 'protein' ? remP : name === 'carbohydrate' ? remC : remF;
+          if (rem > 0 || grams < MEANINGFUL[name]) continue;
+          // A violation only counts if a QUALIFYING ALTERNATIVE existed: a food
+          // that addresses the dominant gap without materially adding the
+          // exhausted macro. Otherwise the engine had no better answer, and
+          // calling it a violation would blame it for the catalog.
+          const alternativeExists = candidates.some((cand) => {
+            const cb = (cand.productVersion as unknown as {
+              basis: { proteinG: number; carbohydrateG: number; fatG: number };
+            }).basis;
+            const addsExhausted = name === 'protein' ? cb.proteinG
+              : name === 'carbohydrate' ? cb.carbohydrateG : cb.fatG;
+            if (addsExhausted >= MEANINGFUL[name]) return false;
+            const addressesGap = worstName === 'protein' ? cb.proteinG
+              : worstName === 'carbohydrate' ? cb.carbohydrateG : cb.fatG;
+            return addressesGap >= MEANINGFUL[worstName];
+          });
+          if (alternativeExists) exhaustedMacroViolations += 1;
+          break;
+        }
       }
     }
 
@@ -440,6 +498,9 @@ function main(): void {
     nearZeroEnergyWinsPercent: pct(nearZeroEnergyWins, withRecommendations),
     extremeDensityWinsPercent: pct(extremeDensityWins, withRecommendations),
     distinctTopPicks: Object.keys(topNames).length,
+    meaningfulContributionRatePercent: pct(meaningfulContributionWins, meaningfulConsidered),
+    meaningfulContributionConsidered: meaningfulConsidered,
+    exhaustedMacroViolationRatePercent: pct(exhaustedMacroViolations, withRecommendations),
     mostFrequentTopPicks: Object.entries(topNames)
       .sort((a, b) => b[1] - a[1]).slice(0, 8),
   };
@@ -610,6 +671,14 @@ export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
   readonly name: string; readonly status: string; readonly top: string | null;
   readonly topMacroShares: Record<string, number> | null;
   readonly expectation: string;
+  readonly remainingKcal: number;
+  readonly remaining: { protein: number; carbohydrate: number; fat: number };
+  readonly comparisonBasis: {
+    grams: number; kcal: number; protein: number; carbohydrate: number; fat: number;
+  } | null;
+  readonly groundedPortionGrams: number | null;
+  readonly portionStatable: boolean;
+  readonly whyItWon: readonly string[];
 }[] {
   const byId = new Map(candidates.map((c) => [
     (c.productVersion as unknown as { productVersionId: string }).productVersionId, c]));
@@ -633,9 +702,40 @@ export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
           : null;
       }
     }
+    const t = macroTargets(c.scenario.targetKcal);
+    const remainingKcal = c.scenario.targetKcal
+      - Math.round(c.scenario.targetKcal * c.scenario.consumedFraction);
+    const remaining = {
+      protein: t.proteinG - Math.round(t.proteinG * c.scenario.proteinFraction),
+      carbohydrate: t.carbohydrateG - Math.round(t.carbohydrateG * c.scenario.carbFraction),
+      fat: t.fatG - Math.round(t.fatG * c.scenario.fatFraction),
+    };
+
+    let comparisonBasis = null;
+    if (top !== undefined) {
+      const b = basisOf(byId, top.productVersionId);
+      if (b !== undefined) {
+        // The 100 g comparison basis — a RANKING device. It is reported here so
+        // the table is legible; it is never shown to a user as an amount.
+        comparisonBasis = {
+          grams: 100, kcal: Math.round(b.kcal),
+          protein: Math.round(b.proteinG * 10) / 10,
+          carbohydrate: Math.round(b.carbohydrateG * 10) / 10,
+          fat: Math.round(b.fatG * 10) / 10,
+        };
+      }
+    }
+
+    const grounded = (top?.portionProposal?.grams as unknown as number | undefined) ?? null;
+
     return {
       name: c.name, status: set.status, top: top?.displayName ?? null,
       topMacroShares: shares, expectation: c.expectation,
+      remainingKcal, remaining, comparisonBasis,
+      groundedPortionGrams: grounded,
+      // A portion may be stated ONLY when the engine grounded one.
+      portionStatable: grounded !== null,
+      whyItWon: top?.rationaleCodes ?? [],
     };
   });
 }

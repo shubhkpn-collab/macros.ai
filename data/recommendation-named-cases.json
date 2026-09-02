@@ -2,99 +2,257 @@
   {
     "name": "LEAN_PROTEIN_LATE_DAY",
     "status": "available",
-    "top": "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+    "top": "Soy flour, defatted",
     "topMacroShares": {
-      "protein": 100,
-      "carbohydrate": 0,
-      "fat": 0,
-      "kcalPer100g": 0
+      "protein": 56,
+      "carbohydrate": 36,
+      "fat": 8,
+      "kcalPer100g": 366
     },
-    "expectation": "a comparatively lean high-protein food, not a fat-dense one"
+    "expectation": "a comparatively lean high-protein food, not a fat-dense one",
+    "remainingKcal": 450,
+    "remaining": {
+      "protein": 120,
+      "carbohydrate": 70,
+      "fat": 5
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 366,
+      "protein": 51.1,
+      "carbohydrate": 32.9,
+      "fat": 3.3
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "strong_protein_fit",
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "FAT_ALREADY_HIGH",
     "status": "available",
-    "top": "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+    "top": "Cottonseed flour seeds, low fat (glandless)",
     "topMacroShares": {
-      "protein": 100,
-      "carbohydrate": 0,
-      "fat": 0,
-      "kcalPer100g": 0
+      "protein": 56,
+      "carbohydrate": 41,
+      "fat": 4,
+      "kcalPer100g": 332
     },
-    "expectation": "should not lead with a fat-dominant food"
+    "expectation": "should not lead with a fat-dominant food",
+    "remainingKcal": 1080,
+    "remaining": {
+      "protein": 99,
+      "carbohydrate": 120,
+      "fat": -8
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 332,
+      "protein": 49.8,
+      "carbohydrate": 36.1,
+      "fat": 1.4
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "strong_protein_fit",
+      "strong_carb_fit",
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "PROTEIN_ALREADY_MET",
     "status": "available",
-    "top": "Beverages, Kiwi Strawberry Juice Drink",
+    "top": "Gluten-free cookies, lemon wafer",
     "topMacroShares": {
       "protein": 0,
-      "carbohydrate": 100,
-      "fat": 0,
-      "kcalPer100g": 47
+      "carbohydrate": 58,
+      "fat": 42,
+      "kcalPer100g": 515
     },
-    "expectation": "should lean carbohydrate rather than more protein"
+    "expectation": "should lean carbohydrate rather than more protein",
+    "remainingKcal": 880,
+    "remaining": {
+      "protein": -8,
+      "carbohydrate": 143,
+      "fat": 29
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 515,
+      "protein": 0,
+      "carbohydrate": 74.4,
+      "fat": 24.2
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "strong_carb_fit",
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "CARBS_NEEDED_PRE_WORKOUT",
     "status": "available",
-    "top": "Beverages, Kiwi Strawberry Juice Drink",
+    "top": "Mature seeds soybeans, dry roasted",
     "topMacroShares": {
-      "protein": 0,
-      "carbohydrate": 100,
-      "fat": 0,
-      "kcalPer100g": 47
+      "protein": 36,
+      "carbohydrate": 24,
+      "fat": 40,
+      "kcalPer100g": 449
     },
-    "expectation": "carbohydrate-dominant food"
+    "expectation": "carbohydrate-dominant food",
+    "remainingKcal": 1820,
+    "remaining": {
+      "protein": 84,
+      "carbohydrate": 224,
+      "fat": 42
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 449,
+      "protein": 43.3,
+      "carbohydrate": 29,
+      "fat": 21.6
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "SMALL_CALORIE_BUDGET",
     "status": "available",
-    "top": "Coffee beverages, brewed, prepared with tap water, decaffeinated",
+    "top": "Whole turkey, giblets, raw",
     "topMacroShares": {
-      "protein": 100,
+      "protein": 61,
       "carbohydrate": 0,
-      "fat": 0,
-      "kcalPer100g": 0
+      "fat": 39,
+      "kcalPer100g": 124
     },
-    "expectation": "a low-energy-density option that fits, or honest degradation"
+    "expectation": "a low-energy-density option that fits, or honest degradation",
+    "remainingKcal": 120,
+    "remaining": {
+      "protein": 36,
+      "carbohydrate": 32,
+      "fat": 13
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 124,
+      "protein": 18.2,
+      "carbohydrate": 0.1,
+      "fat": 5.1
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "strong_protein_fit",
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "CALORIES_ALREADY_EXCEEDED",
     "status": "energy_budget_exhausted",
     "top": null,
     "topMacroShares": null,
-    "expectation": "energy_budget_exhausted, NOT a manufactured suggestion"
+    "expectation": "energy_budget_exhausted, NOT a manufactured suggestion",
+    "remainingKcal": -270,
+    "remaining": {
+      "protein": 13,
+      "carbohydrate": -18,
+      "fat": 0
+    },
+    "comparisonBasis": null,
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": []
   },
   {
     "name": "BALANCED_MAINTENANCE",
     "status": "available",
-    "top": "Beverages, Kiwi Strawberry Juice Drink",
+    "top": "Mature seeds soybeans, dry roasted",
     "topMacroShares": {
-      "protein": 0,
-      "carbohydrate": 100,
-      "fat": 0,
-      "kcalPer100g": 47
+      "protein": 36,
+      "carbohydrate": 24,
+      "fat": 40,
+      "kcalPer100g": 449
     },
-    "expectation": "any reasonable balanced food; no dominant gap to chase"
+    "expectation": "any reasonable balanced food; no dominant gap to chase",
+    "remainingKcal": 1100,
+    "remaining": {
+      "protein": 82,
+      "carbohydrate": 110,
+      "fat": 36
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 449,
+      "protein": 43.3,
+      "carbohydrate": 29,
+      "fat": 21.6
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "CONTROLLED_SURPLUS",
     "status": "available",
-    "top": "Beluga oil, whale (Alaska Native)",
+    "top": "Whole egg, dried, stabilized, glucose reduced",
     "topMacroShares": {
-      "protein": 0,
-      "carbohydrate": 0,
-      "fat": 100,
-      "kcalPer100g": 900
+      "protein": 32,
+      "carbohydrate": 2,
+      "fat": 66,
+      "kcalPer100g": 615
     },
-    "expectation": "energy-dense options are acceptable here"
+    "expectation": "energy-dense options are acceptable here",
+    "remainingKcal": 2520,
+    "remaining": {
+      "protein": 189,
+      "carbohydrate": 252,
+      "fat": 84
+    },
+    "comparisonBasis": {
+      "grams": 100,
+      "kcal": 615,
+      "protein": 48.2,
+      "carbohydrate": 2.4,
+      "fat": 44
+    },
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": [
+      "portion_unavailable",
+      "fits_remaining_energy"
+    ]
   },
   {
     "name": "NO_GOOD_CANDIDATE",
     "status": "no_eligible_candidates",
     "top": null,
     "topMacroShares": null,
-    "expectation": "no_eligible_candidates, never a manufactured recommendation"
+    "expectation": "no_eligible_candidates, never a manufactured recommendation",
+    "remainingKcal": 1000,
+    "remaining": {
+      "protein": 75,
+      "carbohydrate": 100,
+      "fat": 33
+    },
+    "comparisonBasis": null,
+    "groundedPortionGrams": null,
+    "portionStatable": false,
+    "whyItWon": []
   }
 ]
