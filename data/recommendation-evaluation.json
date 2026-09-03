@@ -4,7 +4,7 @@
   "policyVersion": "recommendation-policy@3.0.0",
   "scenarios": 1728,
   "candidatePool": 6630,
-  "meanRecommendMs": 24.91,
+  "meanRecommendMs": 22.49,
   "statuses": {
     "available": 1440,
     "energy_budget_exhausted": 288
@@ -17,79 +17,16 @@
   "macroFitConsidered": 540,
   "unnecessaryOvershootRatePercent": 0,
   "overshootConsidered": 540,
-  "rankingMonotonicPercent": 70,
+  "baseRankingIntegrityPercent": 100,
+  "finalOrderingIntegrityPercent": 100,
+  "orderingContractChecked": "base_score_desc_with_single_actionability_promotion",
   "budgetExhaustedScenarios": 288,
   "budgetExhaustedHandledHonestly": 288,
   "failureCounts": {
-    "CRITICAL:ranking_not_monotonic": 432,
     "MAJOR:macro_fit": 81
   },
   "exampleFailures": [
     {
-      "id": "S0026",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0026",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.55,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -720
-      }
-    },
-    {
-      "id": "S0027",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0027",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.85,
-        "carbFraction": 0.25,
-        "fatFraction": 0.6,
-        "balanceKcal": -720
-      }
-    },
-    {
-      "id": "S0029",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0029",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.95,
-        "balanceKcal": -720
-      }
-    },
-    {
-      "id": "S0031",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0031",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -720
-      }
-    },
-    {
       "id": "S0033",
       "kind": "MAJOR",
       "reason": "macro_fit",
@@ -101,38 +38,6 @@
         "targetKcal": 1600,
         "consumedFraction": 0.95,
         "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -480
-      }
-    },
-    {
-      "id": "S0033",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0033",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -480
-      }
-    },
-    {
-      "id": "S0034",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0034",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.55,
         "carbFraction": 0.6,
         "fatFraction": 0.6,
         "balanceKcal": -480
@@ -156,13 +61,150 @@
       }
     },
     {
-      "id": "S0035",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
+      "id": "S0083",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, steamed, with salt",
       "scenario": {
-        "id": "S0035",
+        "id": "S0083",
         "goal": "lose",
         "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0084",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, steamed, with salt",
+      "scenario": {
+        "id": "S0084",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0129",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
+      "scenario": {
+        "id": "S0129",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0131",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
+      "scenario": {
+        "id": "S0131",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0177",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0177",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0179",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0179",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0180",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0180",
+        "goal": "lose",
+        "phase": "early",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0225",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Firm Tofu vitasoy usa azumaya",
+      "scenario": {
+        "id": "S0225",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0227",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Firm Tofu vitasoy usa azumaya",
+      "scenario": {
+        "id": "S0227",
+        "goal": "lose",
+        "phase": "middle",
         "targetKcal": 1600,
         "consumedFraction": 0.95,
         "proteinFraction": 0.85,
@@ -172,259 +214,241 @@
       }
     },
     {
-      "id": "S0037",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
+      "id": "S0275",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, steamed, with salt",
       "scenario": {
-        "id": "S0037",
+        "id": "S0275",
         "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.95,
-        "balanceKcal": -480
-      }
-    },
-    {
-      "id": "S0039",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0039",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 1600,
-        "consumedFraction": 0.95,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -480
-      }
-    },
-    {
-      "id": "S0053",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0053",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.05,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.95,
-        "balanceKcal": -2300
-      }
-    },
-    {
-      "id": "S0054",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0054",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.05,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.95,
-        "fatFraction": 0.6,
-        "balanceKcal": -2300
-      }
-    },
-    {
-      "id": "S0057",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0057",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.3,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1800
-      }
-    },
-    {
-      "id": "S0058",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0058",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.3,
-        "proteinFraction": 0.55,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1800
-      }
-    },
-    {
-      "id": "S0061",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0061",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.3,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.95,
-        "balanceKcal": -1800
-      }
-    },
-    {
-      "id": "S0063",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0063",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.3,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1800
-      }
-    },
-    {
-      "id": "S0065",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0065",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.55,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1300
-      }
-    },
-    {
-      "id": "S0066",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0066",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.55,
-        "proteinFraction": 0.55,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1300
-      }
-    },
-    {
-      "id": "S0069",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0069",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.55,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.95,
-        "balanceKcal": -1300
-      }
-    },
-    {
-      "id": "S0071",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0071",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.55,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -1300
-      }
-    },
-    {
-      "id": "S0073",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0073",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
-        "fatFraction": 0.6,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0077",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0077",
-        "goal": "lose",
-        "phase": "early",
-        "targetKcal": 2000,
-        "consumedFraction": 0.8,
-        "proteinFraction": 0.6,
-        "carbFraction": 0.6,
-        "fatFraction": 0.95,
-        "balanceKcal": -800
-      }
-    },
-    {
-      "id": "S0081",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
-      "scenario": {
-        "id": "S0081",
-        "goal": "lose",
-        "phase": "early",
+        "phase": "middle",
         "targetKcal": 2000,
         "consumedFraction": 0.95,
-        "proteinFraction": 0.15,
-        "carbFraction": 0.6,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
         "fatFraction": 0.6,
         "balanceKcal": -500
       }
     },
     {
-      "id": "S0082",
-      "kind": "CRITICAL",
-      "reason": "ranking_not_monotonic",
+      "id": "S0276",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, steamed, with salt",
       "scenario": {
-        "id": "S0082",
+        "id": "S0276",
         "goal": "lose",
-        "phase": "early",
+        "phase": "middle",
         "targetKcal": 2000,
         "consumedFraction": 0.95,
-        "proteinFraction": 0.55,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0321",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
+      "scenario": {
+        "id": "S0321",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
         "carbFraction": 0.6,
         "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0323",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
+      "scenario": {
+        "id": "S0323",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0369",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0369",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0371",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0371",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0372",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0372",
+        "goal": "lose",
+        "phase": "middle",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -540
+      }
+    },
+    {
+      "id": "S0417",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Firm Tofu vitasoy usa azumaya",
+      "scenario": {
+        "id": "S0417",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0419",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Firm Tofu vitasoy usa azumaya",
+      "scenario": {
+        "id": "S0419",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 1600,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -480
+      }
+    },
+    {
+      "id": "S0467",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, steamed, with salt",
+      "scenario": {
+        "id": "S0467",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
         "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0468",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, steamed, with salt",
+      "scenario": {
+        "id": "S0468",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2000,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.7,
+        "fatFraction": 0.2,
+        "balanceKcal": -500
+      }
+    },
+    {
+      "id": "S0513",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
+      "scenario": {
+        "id": "S0513",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0515",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Tofu, salted and fermented (fuyu), prepared with calcium sulfate",
+      "scenario": {
+        "id": "S0515",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2400,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.85,
+        "carbFraction": 0.25,
+        "fatFraction": 0.6,
+        "balanceKcal": -520
+      }
+    },
+    {
+      "id": "S0561",
+      "kind": "MAJOR",
+      "reason": "macro_fit",
+      "top": "Mature seeds soybeans, sprouted, cooked, stir-fried",
+      "scenario": {
+        "id": "S0561",
+        "goal": "lose",
+        "phase": "late",
+        "targetKcal": 2800,
+        "consumedFraction": 0.95,
+        "proteinFraction": 0.15,
+        "carbFraction": 0.6,
+        "fatFraction": 0.6,
+        "balanceKcal": -540
       }
     }
   ],

@@ -343,10 +343,33 @@ function judge(
     }
   }
 
-  // --- ranking rationality: is the set ordered by its own score? ---------
+  /**
+   * --- ORDERING INTEGRITY, against the DOCUMENTED contract ---------------
+   *
+   * The old check asserted plain descending score, which the actionability
+   * gate legitimately violates by design. It flagged 432 scenarios CRITICAL
+   * for behaviour that was intended — the order was right, the contract was
+   * simply not expressed in the returned data.
+   *
+   * Two invariants are now checked separately:
+   *   BASE  — every non-promoted item descends by baseScore;
+   *   FINAL — the list is ordered by finalRank, at most one item is promoted,
+   *           and a promoted item sits at position 0.
+   */
   let rankingRational = true;
-  for (let i = 1; i < set.recommendations.length; i += 1) {
-    if (set.recommendations[i]!.score > set.recommendations[i - 1]!.score + 1e-9) {
+  const recs = set.recommendations;
+
+  const promotedCount = recs.filter((r) => r.promotedForActionability).length;
+  if (promotedCount > 1) rankingRational = false;
+  if (promotedCount === 1 && !recs[0]!.promotedForActionability) rankingRational = false;
+  for (let i = 0; i < recs.length; i += 1) {
+    if (recs[i]!.finalRank !== i) rankingRational = false;
+    if (recs[i]!.baseScore !== recs[i]!.score) rankingRational = false;
+  }
+  // Base ordering, ignoring the single promoted item.
+  const unpromoted = recs.filter((r) => !r.promotedForActionability);
+  for (let i = 1; i < unpromoted.length; i += 1) {
+    if (unpromoted[i]!.baseScore > unpromoted[i - 1]!.baseScore + 1e-9) {
       rankingRational = false;
       break;
     }
@@ -373,6 +396,7 @@ function main(): void {
   let macroConsidered = 0; let macroPass = 0;
   let overshootConsidered = 0; let overshootBad = 0;
   let rankingConsidered = 0; let rankingBad = 0;
+  let baseOrderingOk = 0; let finalOrderingOk = 0; let orderingConsidered = 0;
   let emptyWhenBudgetGone = 0; let budgetGoneScenarios = 0;
   const failures: Record<string, unknown>[] = [];
   let totalMs = 0;
@@ -393,6 +417,7 @@ function main(): void {
   /** Low-actionability winner DESPITE a qualifying actionable alternative. */
   let lowActionabilityDespiteAlternative = 0;
   const winnerClasses: Record<string, number> = {};
+  const winnerIds: Record<string, string | null> = {};
   // --- INT-4 plan-level measurement ------------------------------------
   const planSizes: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
   let planComponents = 0;
@@ -503,6 +528,7 @@ function main(): void {
 
     // The planner runs on the SAME state, so plan metrics are directly
     // comparable with the single-food numbers above.
+    winnerIds[s.id] = set.recommendations[0]?.productVersionId ?? null;
     const plan = recommendFoodPlan(input);
     planSizes[Math.min(3, plan.components.length)] =
       (planSizes[Math.min(3, plan.components.length)] ?? 0) + 1;
@@ -579,6 +605,24 @@ function main(): void {
       }
     }
 
+    if (set.recommendations.length > 0) {
+      orderingConsidered += 1;
+      const recs = set.recommendations;
+      const unpromoted = recs.filter((r) => !r.promotedForActionability);
+      let baseOk = true;
+      for (let i = 1; i < unpromoted.length; i += 1) {
+        if (unpromoted[i]!.baseScore > unpromoted[i - 1]!.baseScore + 1e-9) baseOk = false;
+      }
+      if (baseOk) baseOrderingOk += 1;
+
+      const promoted = recs.filter((r) => r.promotedForActionability).length;
+      const finalOk = promoted <= 1
+        && (promoted === 0 || recs[0]!.promotedForActionability)
+        && recs.every((r, i) => r.finalRank === i)
+        && set.orderingContract === 'base_score_desc_with_single_actionability_promotion';
+      if (finalOk) finalOrderingOk += 1;
+    }
+
     const v = judge(s, set, byId);
     if (v.hardViolation !== null) {
       hardViolations += 1;
@@ -623,6 +667,11 @@ function main(): void {
 
   const pct = (a: number, b: number): number =>
     b === 0 ? 0 : Math.round((1000 * a) / b) / 10;
+
+  // Winner identity per scenario, so a refactor can be PROVEN not to change
+  // which food is recommended.
+  writeFileSync(repoPath('data', 'recommendation-winners.json'),
+    `${JSON.stringify(winnerIds, null, 0)}\n`);
 
   const withRecommendations = scenarios.length - (statuses['energy_budget_exhausted'] ?? 0);
   const topPickProfile = {
@@ -676,7 +725,10 @@ function main(): void {
     macroFitConsidered: macroConsidered,
     unnecessaryOvershootRatePercent: pct(overshootBad, overshootConsidered),
     overshootConsidered,
-    rankingMonotonicPercent: pct(rankingConsidered - rankingBad, rankingConsidered),
+    // Named unambiguously: "ranking monotonic" hid WHICH ranking was meant.
+    baseRankingIntegrityPercent: pct(baseOrderingOk, orderingConsidered),
+    finalOrderingIntegrityPercent: pct(finalOrderingOk, orderingConsidered),
+    orderingContractChecked: 'base_score_desc_with_single_actionability_promotion',
     budgetExhaustedScenarios: budgetGoneScenarios,
     budgetExhaustedHandledHonestly: emptyWhenBudgetGone,
     failureCounts: failures.reduce<Record<string, number>>((acc, f) => {
@@ -699,7 +751,8 @@ function main(): void {
   console.log(`energy fit        : ${summary.energyFitRatePercent}%  (n=${energyConsidered})`);
   console.log(`macro fit         : ${summary.macroFitRatePercent}%  (n=${macroConsidered})`);
   console.log(`unnecessary overshoot: ${summary.unnecessaryOvershootRatePercent}%  (n=${overshootConsidered})`);
-  console.log(`ranking monotonic : ${summary.rankingMonotonicPercent}%`);
+  console.log(`base ranking      : ${summary.baseRankingIntegrityPercent}%`);
+  console.log(`final ordering    : ${summary.finalOrderingIntegrityPercent}%`);
   console.log(`budget exhausted  : ${emptyWhenBudgetGone}/${budgetGoneScenarios} handled honestly`);
   console.log(`\nfailure counts    : ${JSON.stringify(summary.failureCounts, null, 2)}`);
 

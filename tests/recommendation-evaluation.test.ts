@@ -65,12 +65,13 @@ describe('INT-1 — hard safety is clean', () => {
     }
   });
 
-  test('ranking below the promoted leader stays monotonic', () => {
-    // The actionability GATE may promote one nutritionally comparable but
-    // edible candidate above a higher-scoring ingredient. That is the whole
-    // point of the gate; everything beneath it remains score-ordered.
-    assert.ok(evaluation().rankingMonotonicPercent >= 60,
-      'only the deliberate promotion may break strict score order');
+  test('ordering integrity is checked against the documented contract', () => {
+    // This assertion previously accepted >= 60%, which is how a 70% result and
+    // 432 CRITICAL failures coexisted with a green report. A weakened threshold
+    // is not a passing test; the contract is now explicit and must be 100%.
+    const e = evaluation();
+    assert.equal(e.baseRankingIntegrityPercent, 100);
+    assert.equal(e.finalOrderingIntegrityPercent, 100);
   });
 
   test('an exhausted budget degrades honestly, every time', () => {

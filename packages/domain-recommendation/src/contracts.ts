@@ -140,7 +140,24 @@ export interface Recommendation {
   readonly displayName: string;
   readonly brandName?: string;
   readonly preparationState: string;
+  /**
+   * NUTRITIONAL score from the frozen scorer. This is the admission score and
+   * it is NOT the final ordering key — see `finalRank`.
+   */
   readonly score: number;
+  /** Alias of `score`, named to make the two-stage contract unmistakable. */
+  readonly baseScore: number;
+  /**
+   * True when the actionability gate lifted this item above a higher-scoring
+   * but low-actionability candidate. Without this the returned order could not
+   * be explained from the object, which is exactly the defect this records.
+   */
+  readonly promotedForActionability: boolean;
+  /**
+   * FINAL ordering position, ascending from 0. The returned list is always
+   * sorted by this. It is the only ordering contract callers should rely on.
+   */
+  readonly finalRank: number;
   readonly scoreComponents: ScoreComponents;
   readonly rationaleCodes: readonly RationaleCode[];
   readonly portionProposal?: PortionProposal;
@@ -152,6 +169,20 @@ export interface Recommendation {
 
 export interface RecommendationSet {
   readonly status: RecommendationStatus;
+  /**
+   * THE FINAL ORDERING CONTRACT.
+   *
+   * `recommendations` is ordered by `finalRank`, produced in two documented
+   * stages:
+   *
+   *   1. every item is ranked descending by `baseScore` (frozen nutrition);
+   *   2. at most ONE item may then be promoted to position 0 by the
+   *      actionability gate, flagged with `promotedForActionability`.
+   *
+   * So `baseScore` is descending across all items EXCEPT a promoted one. That
+   * is deliberate, and callers must sort by `finalRank`, never by `baseScore`.
+   */
+  readonly orderingContract: 'base_score_desc_with_single_actionability_promotion';
   readonly policyVersion: string;
   readonly generatedAt: string;
   readonly recommendations: readonly Recommendation[];

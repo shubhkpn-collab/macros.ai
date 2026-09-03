@@ -257,6 +257,9 @@ export function recommendFoods(input: RecommendationInput): RecommendationSet {
     generatedAt: input.nowIso,
     recommendations: [] as readonly Recommendation[],
     energyConfidence,
+    // Every returned set carries the contract, including the empty ones: a
+    // caller must never have to guess whether ordering rules applied.
+    orderingContract: 'base_score_desc_with_single_actionability_promotion' as const,
   };
 
   // OWNERSHIP, verified here rather than assumed of the caller. Preferences and
@@ -355,6 +358,23 @@ export function recommendFoods(input: RecommendationInput): RecommendationSet {
     return [promoted, ...byScore.filter((r) => r !== promoted)];
   })();
 
+  /**
+   * Stamp the final ordering contract onto every item.
+   *
+   * Before this, promotion reordered the list while each object still exposed
+   * only its pre-promotion nutritional score — so the returned order could not
+   * be explained from the returned data, and an evaluator checking descending
+   * `score` correctly flagged it. The order was right; the contract was
+   * invisible.
+   */
+  const promotedId = ranked[0] !== byScore[0] ? ranked[0]?.productVersionId : undefined;
+  const orderedWithContract = ranked.map((r, index) => ({
+    ...r,
+    baseScore: r.score,
+    promotedForActionability: r.productVersionId === promotedId,
+    finalRank: index,
+  }));
+
   return {
     ...base,
     // Availability and energy confidence are separate axes: an incomplete
@@ -362,9 +382,18 @@ export function recommendFoods(input: RecommendationInput): RecommendationSet {
     status: energyConfidence.level === 'complete'
       ? 'available'
       : 'available_with_limited_energy_confidence',
-    recommendations: ranked.slice(0, policy.maxResults),
+    recommendations: orderedWithContract.slice(0, policy.maxResults),
   };
 }
+
+/**
+ * A scored candidate BEFORE ordering exists. `baseScore`, `finalRank` and the
+ * promotion flag are stamped on once the list is ranked, because a single
+ * candidate cannot know its own position.
+ */
+type ScoredCandidate = Omit<
+  Recommendation, 'baseScore' | 'promotedForActionability' | 'finalRank'
+>;
 
 function scoreCandidate(
   candidate: RecommendationCandidate,
@@ -372,7 +401,7 @@ function scoreCandidate(
   weights: Record<MacroName, number>,
   remaining: Record<MacroName, number>,
   remainingKcal: number | null,
-): Recommendation | null {
+): ScoredCandidate | null {
   const { policy } = input;
   const v = candidate.productVersion;
   const rationale: RationaleCode[] = [];
