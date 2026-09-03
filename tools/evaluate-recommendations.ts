@@ -17,11 +17,13 @@ import {
   DEFAULT_RECOMMENDATION_POLICY, recommendFoods,
   type RecommendationCandidate, type RecommendationInput, type RecommendationSet,
 } from '@macros/domain-recommendation';
-import { recommendFoodPlan } from '@macros/domain-recommendation';
+import { assessRole as assessRoleRaw, recommendFoodPlan } from '@macros/domain-recommendation';
 import { repoPath } from './repo-paths.js';
 
 const GENERIC = repoPath('data', 'usda-seed.json');
 const OUT = repoPath('data', 'recommendation-evaluation.json');
+
+const assessRole = (v: unknown): string => assessRoleRaw(v as never).role;
 
 const NOW = '2026-08-29T18:00:00.000Z';
 const LOCAL_DATE = '2026-08-29';
@@ -404,6 +406,14 @@ function main(): void {
   let treatPrimaryDespiteStaple = 0;
   let lowActionabilityComponentDespiteAlternative = 0;
   const planRoles: Record<string, number> = {};
+  /**
+   * A QUALIFYING opportunity: a candidate that is nutritionally competitive,
+   * actionable, and carries the dominant gap's role. Measuring missed
+   * opportunities is fairer than demanding raw coverage, which would blame the
+   * planner for gaps the catalog cannot fill.
+   */
+  let dominantRoleOpportunities = 0;
+  let missedDominantRoleOpportunities = 0;
 
   for (const s of scenarios) {
     const input = inputFor(s, candidates);
@@ -517,6 +527,23 @@ function main(): void {
       const first = plan.objectives[0];
       if (first !== 'energy') {
         dominantGapConsidered += 1;
+        const wantedRole = `${first}_forward`;
+        const ACT = new Set(['ready_to_eat', 'meal_component']);
+        const leaderScore = set.recommendations[0]!.score;
+        const qualifying = set.recommendations.some((r) => {
+          if (r.score < leaderScore * 0.8) return false;
+          const cls = (r as unknown as { actionabilityClass?: string }).actionabilityClass;
+          if (cls === undefined || !ACT.has(cls)) return false;
+          const cand = byId.get(r.productVersionId);
+          if (cand === undefined) return false;
+          return assessRole(cand.productVersion) === wantedRole;
+        });
+        if (qualifying) {
+          dominantRoleOpportunities += 1;
+          if (plan.components[0]?.role !== wantedRole) {
+            missedDominantRoleOpportunities += 1;
+          }
+        }
         const wanted = `${first === 'protein' ? 'protein' : first === 'carbohydrate'
           ? 'carbohydrate' : 'fat'}_forward`;
         if (plan.components.some((c) => c.role === wanted || c.role === 'balanced')) {
@@ -616,6 +643,9 @@ function main(): void {
       threeComponentRatePercent: pct(planSizes[3] ?? 0, withRecommendations),
       actionableComponentRatePercent: pct(actionableComponents, planComponents),
       dominantGapCoveragePercent: pct(dominantGapCovered, dominantGapConsidered),
+      dominantRoleOpportunities,
+      missedDominantRoleOpportunityRatePercent:
+        pct(missedDominantRoleOpportunities, dominantRoleOpportunities),
       complementaryGapCoveragePercent: pct(complementaryGapCovered, complementaryGapConsidered),
       duplicateComponentRatePercent: pct(duplicateComponents, planComponents),
       ungroundedPortionClaims,

@@ -20,7 +20,21 @@ import type {
  * performs no nutritional arithmetic: candidates, ranking and portion authority
  * all come from `recommendFoods`.
  */
-export const PLANNER_VERSION = 'meal-component-planner@1.0.0';
+/**
+ * Bumped for INT-4B. v1.0.0 inherited the engine leader as the primary
+ * component even after computing the ordered macro gaps and the role each
+ * would need — which is why dominant-gap role coverage sat at 66.4% and a
+ * `balanced` parmesan topping led a large protein gap.
+ */
+export const PLANNER_VERSION = 'meal-component-planner@2.0.0';
+
+/**
+ * How competitive a role-matched candidate must be to displace the engine
+ * leader. Nutrition remains the ADMISSION gate: a role match cannot rescue a
+ * materially worse food, it only chooses among candidates already close enough
+ * to be interchangeable on nutrition.
+ */
+const PRIMARY_ROLE_MIN_SCORE_RATIO = 0.8;
 
 export type ComponentRationale = RationaleCode | 'addresses_primary_gap'
   | 'complements_primary_component' | 'avoids_exhausted_macro';
@@ -152,8 +166,27 @@ export function recommendFoodPlan(input: RecommendationInput): FoodPlan {
     return v === undefined ? 'unknown' : assessRole(v).role;
   };
 
-  // --- primary component: the engine's own leader ------------------------
-  const primaryRec = set.recommendations[0]!;
+  /**
+   * --- PRIMARY COMPONENT: role-aware ------------------------------------
+   *
+   * v1.0.0 took `set.recommendations[0]` unconditionally, so all the gap and
+   * role analysis above was computed and then ignored. The engine leader is
+   * still the default and still the fallback; it is displaced only by a
+   * candidate that is nutritionally competitive, actionable as a normal
+   * default, and carries the role the dominant gap actually needs.
+   */
+  const engineLeader = set.recommendations[0]!;
+  const dominantGap = gaps[0];
+  const dominantRole = dominantGap === undefined
+    ? null : roleForMacro(dominantGap.macro);
+
+  const roleMatchedPrimary = dominantRole === null ? undefined
+    : set.recommendations.find((r) =>
+      r.score >= engineLeader.score * PRIMARY_ROLE_MIN_SCORE_RATIO
+      && ACTIONABLE_DEFAULTS.has(classOf(r) as ActionabilityClass)
+      && roleOf(r) === dominantRole);
+
+  const primaryRec = roleMatchedPrimary ?? engineLeader;
   const primary: PlanComponent = {
     productId: primaryRec.productId,
     productVersionId: primaryRec.productVersionId,
@@ -186,6 +219,8 @@ export function recommendFoodPlan(input: RecommendationInput): FoodPlan {
       // foods — a plan of "soybeans and soybeans" is not guidance.
       if (components.some((c) => c.productId === r.productId)) return false;
       if (components.some((c) => nearDuplicate(c.displayName, r.displayName))) return false;
+      // Compared against the SELECTED primary, not the discarded engine leader,
+      // so the threshold means the same thing whichever primary was chosen.
       if (r.score < primaryRec.score * COMPLEMENT_MIN_SCORE_RATIO) return false;
       // Actionability stays subordinate to nutrition, but a complement is a
       // free choice among qualifying candidates, so prefer an ordinary food.

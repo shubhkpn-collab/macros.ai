@@ -4,7 +4,7 @@
   "policyVersion": "recommendation-policy@3.0.0",
   "scenarios": 1728,
   "candidatePool": 6630,
-  "meanRecommendMs": 18.8,
+  "meanRecommendMs": 24.91,
   "statuses": {
     "available": 1440,
     "energy_budget_exhausted": 288
@@ -445,22 +445,24 @@
       "beverage": 45
     },
     "plan": {
-      "singleFoodRatePercent": 73.1,
-      "twoComponentRatePercent": 25.6,
-      "threeComponentRatePercent": 1.3,
-      "actionableComponentRatePercent": 97.1,
+      "singleFoodRatePercent": 76.3,
+      "twoComponentRatePercent": 23.8,
+      "threeComponentRatePercent": 0,
+      "actionableComponentRatePercent": 97.5,
       "dominantGapCoveragePercent": 66.4,
-      "complementaryGapCoveragePercent": 62.1,
+      "dominantRoleOpportunities": 540,
+      "missedDominantRoleOpportunityRatePercent": 0,
+      "complementaryGapCoveragePercent": 59.3,
       "duplicateComponentRatePercent": 0,
       "ungroundedPortionClaims": 0,
       "treatPrimaryDespiteStaplePercent": 0,
-      "lowActionabilityComponentDespiteAlternativePercent": 3.1,
+      "lowActionabilityComponentDespiteAlternativePercent": 2.5,
       "noCandidateHonest": true,
       "roles": {
-        "balanced": 342,
+        "balanced": 288,
         "carbohydrate_forward": 801,
         "fat_forward": 495,
-        "protein_forward": 207
+        "protein_forward": 198
       }
     },
     "mostFrequentTopPicks": [

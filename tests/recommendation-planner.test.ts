@@ -194,3 +194,110 @@ describe('INT-4 — every earlier guarantee is preserved', () => {
     assert.equal(/Math\.random|Date\.now\(\)/.test(code), false);
   });
 });
+
+describe('INT-4B — role-aware primary selection', () => {
+  const plan = () => evaluation().topPickProfile.plan;
+
+  test('a qualifying dominant-role opportunity is never missed', () => {
+    // The hard closure requirement. Measured conditionally: the planner is
+    // judged on opportunities that actually existed, not on raw coverage,
+    // which would blame it for gaps the catalog cannot fill.
+    assert.equal(plan().missedDominantRoleOpportunityRatePercent, 0);
+    assert.ok(plan().dominantRoleOpportunities > 100,
+      'the metric must be exercised, not vacuously zero');
+  });
+
+  test('the planner no longer inherits the engine leader unconditionally', () => {
+    const code = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'planner.ts'), 'utf8');
+    // v1.0.0 computed the gaps and roles, then ignored them.
+    assert.equal(/const primaryRec = set\.recommendations\[0\]!/.test(code), false);
+    assert.match(code, /roleMatchedPrimary \?\? engineLeader/,
+      'the leader remains the default and the fallback');
+  });
+
+  test('nutrition remains the admission gate for a role swap', () => {
+    const code = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'planner.ts'), 'utf8');
+    assert.match(code, /PRIMARY_ROLE_MIN_SCORE_RATIO/);
+    // A role match may not rescue a materially worse food.
+    assert.match(code, /engineLeader\.score \* PRIMARY_ROLE_MIN_SCORE_RATIO/);
+  });
+
+  test('the planner version records the semantic change', () => {
+    const code = readFileSync(
+      repoPath('packages', 'domain-recommendation', 'src', 'planner.ts'), 'utf8');
+    assert.match(code, /meal-component-planner@2\.0\.0/);
+  });
+
+  test('INT-2 and INT-3 scoring are untouched', () => {
+    const e = evaluation();
+    // The frozen policy version must not have moved.
+    assert.equal(e.policyVersion, 'recommendation-policy@3.0.0');
+    assert.equal(e.hardViolationRatePercent, 0);
+    assert.equal(e.topPickProfile.exhaustedMacroViolationRatePercent, 0);
+    assert.equal(e.topPickProfile.lowActionabilityDespiteAlternativePercent, 0);
+  });
+});
+
+describe('INT-4B — dessert forms are not staples', () => {
+  test('the broad category no longer overrides the consumer form', async () => {
+    const { assessActionability } = await import('@macros/domain-catalog');
+    // `Baked Products` legitimately holds both bread and cake, so the category
+    // alone cannot separate a staple from a dessert.
+    const cookie = assessActionability({
+      displayName: 'Chocolate chip cookies, commercially prepared',
+      category: 'Baked Products', preparationState: 'as_sold',
+      sourceDescription: 'Chocolate chip cookies, commercially prepared',
+    });
+    assert.equal(cookie.actionabilityClass, 'treat');
+  });
+
+  test('HELD OUT: the rule generalises to records that never surfaced', async () => {
+    const { assessActionability } = await import('@macros/domain-catalog');
+    // None of these was a reported winner; all must classify from the form.
+    for (const name of [
+      'Cake, chocolate, prepared from recipe',
+      'Apple pie, commercially prepared',
+      'Muffins, blueberry, commercially prepared',
+      'Doughnuts, cake type, plain',
+      'Danish pastry, cheese',
+    ]) {
+      const a = assessActionability({
+        displayName: name, category: 'Baked Products',
+        preparationState: 'as_sold', sourceDescription: name,
+      });
+      assert.equal(a.actionabilityClass, 'treat', `${name} classed as ${a.actionabilityClass}`);
+    }
+  });
+
+  test('HELD OUT: ordinary baked staples are NOT demoted', async () => {
+    const { assessActionability } = await import('@macros/domain-catalog');
+    for (const name of [
+      'Bread, whole wheat, commercially prepared',
+      'Crackers, saltine',
+      'Rolls, dinner, plain',
+      'Tortillas, ready-to-bake or -fry, corn',
+    ]) {
+      const a = assessActionability({
+        displayName: name, category: 'Baked Products',
+        preparationState: 'as_sold', sourceDescription: name,
+      });
+      assert.equal(a.actionabilityClass, 'ready_to_eat', `${name} was demoted`);
+    }
+  });
+
+  test('no individual food id or exact record is branched on', () => {
+    const code = readFileSync(
+      repoPath('packages', 'domain-catalog', 'src', 'actionability.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    // Form terms are general nouns; a product id or a full record name is not.
+    assert.equal(/keebler|nestl|abbott|commercially prepared/i.test(code), false);
+    assert.equal(/productId|productVersionId/.test(code), false);
+  });
+
+  test('the actionability version records the semantic change', async () => {
+    const { ACTIONABILITY_VERSION } = await import('@macros/domain-catalog');
+    assert.equal(ACTIONABILITY_VERSION, 'recommendation-actionability@2.0.0');
+  });
+});

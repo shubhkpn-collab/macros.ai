@@ -146,12 +146,12 @@
   {
     "name": "PROTEIN_ALREADY_MET",
     "status": "available",
-    "top": "Chocolate chip cookies, commercially prepared, special dietary",
+    "top": "Cocoa mix beverages, NESTLE, Hot Cocoa Mix Rich Chocolate With Marshmallows",
     "topMacroShares": {
       "protein": 3,
-      "carbohydrate": 64,
-      "fat": 33,
-      "kcalPer100g": 450
+      "carbohydrate": 67,
+      "fat": 30,
+      "kcalPer100g": 400
     },
     "expectation": "should lean carbohydrate rather than more protein",
     "remainingKcal": 880,
@@ -162,13 +162,13 @@
     },
     "comparisonBasis": {
       "grams": 100,
-      "kcal": 450,
-      "protein": 3.9,
-      "carbohydrate": 73.4,
-      "fat": 16.8
+      "kcal": 400,
+      "protein": 2.8,
+      "carbohydrate": 75,
+      "fat": 15
     },
     "groundedPortionGrams": null,
-    "actionabilityClass": "ready_to_eat",
+    "actionabilityClass": "beverage",
     "plan": {
       "objectives": [
         "carbohydrate",
@@ -178,7 +178,7 @@
       "plannedTotals": null,
       "components": [
         {
-          "name": "Chocolate chip cookies, commercially prepared, special dietary",
+          "name": "Keebler, Keebler Chocolate Graham SELECTS",
           "role": "carbohydrate_forward",
           "actionability": "ready_to_eat",
           "portion": null,
@@ -192,25 +192,24 @@
     },
     "topThree": [
       {
-        "name": "Chocolate chip cookies, commercially prepared, special dietary",
-        "cls": "ready_to_eat",
-        "score": 1.447
-      },
-      {
         "name": "Cocoa mix beverages, NESTLE, Hot Cocoa Mix Rich Chocolate With Marshmallows",
         "cls": "beverage",
         "score": 1.444
       },
       {
-        "name": "Chocolate sandwich cookies, with creme filling, reduced fat",
+        "name": "Fudge candies, chocolate marshmallow, prepared-from-recipe",
+        "cls": "treat",
+        "score": 1.422
+      },
+      {
+        "name": "Keebler, Keebler Chocolate Graham SELECTS",
         "cls": "ready_to_eat",
-        "score": 1.443
+        "score": 1.42
       }
     ],
     "portionStatable": false,
     "whyItWon": [
       "strong_carb_fit",
-      "would_overshoot_macro",
       "portion_unavailable",
       "fits_remaining_energy"
     ]
@@ -251,25 +250,25 @@
       "plannedTotals": null,
       "components": [
         {
-          "name": "Mature seeds soybeans, dry roasted",
-          "role": "balanced",
-          "actionability": "meal_component",
-          "portion": null,
-          "why": [
-            "addresses_primary_gap",
-            "portion_unavailable",
-            "fits_remaining_energy"
-          ]
-        },
-        {
           "name": "Chinese noodles, chow mein",
           "role": "carbohydrate_forward",
           "actionability": "meal_component",
           "portion": null,
           "why": [
-            "complements_primary_component",
+            "addresses_primary_gap",
             "strong_carb_fit",
             "portion_unavailable"
+          ]
+        },
+        {
+          "name": "Mature seeds soybeans, roasted, salted",
+          "role": "fat_forward",
+          "actionability": "meal_component",
+          "portion": null,
+          "why": [
+            "complements_primary_component",
+            "portion_unavailable",
+            "fits_remaining_energy"
           ]
         }
       ]
@@ -430,8 +429,8 @@
       "plannedTotals": null,
       "components": [
         {
-          "name": "Mature seeds soybeans, dry roasted",
-          "role": "balanced",
+          "name": "Seeds, pumpkin and squash seeds, whole, roasted, with salt added",
+          "role": "carbohydrate_forward",
           "actionability": "meal_component",
           "portion": null,
           "why": [
@@ -441,8 +440,8 @@
           ]
         },
         {
-          "name": "Seeds, pumpkin and squash seeds, whole, roasted, with salt added",
-          "role": "carbohydrate_forward",
+          "name": "Mature seeds soybeans, roasted, salted",
+          "role": "fat_forward",
           "actionability": "meal_component",
           "portion": null,
           "why": [

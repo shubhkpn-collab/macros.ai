@@ -17,7 +17,13 @@
  * food remains a perfectly valid catalog entry that can be searched, logged and
  * weighed; it simply is not a good DEFAULT suggestion.
  */
-export const ACTIONABILITY_VERSION = 'recommendation-actionability@1.0.0';
+/**
+ * Bumped for INT-4B. v1.0.0 let the broad `Baked Products` category classify
+ * cookies and cakes as `ready_to_eat`, so a chocolate chip cookie could lead a
+ * carbohydrate gap while bread sat beside it — and the "treat never leads"
+ * metric read 0% because the treat was not being called one.
+ */
+export const ACTIONABILITY_VERSION = 'recommendation-actionability@2.0.0';
 
 export type ActionabilityClass =
   /**
@@ -107,6 +113,17 @@ const FORM_PATTERNS: readonly { readonly re: RegExp; readonly cls: Actionability
   { re: /\b(dry mix|mix,|unprepared|instant, dry|dry form)\b/, cls: 'ingredient' },
   { re: /\b(oil|shortening|lard|tallow|suet|fat, rendered|rendered fat)\b/, cls: 'cooking_fat' },
   { re: /\b(extract|seasoning|spice|vinegar|syrup|dressing|sauce mix|bouillon)\b/, cls: 'condiment' },
+  /**
+   * DESSERT FORMS. A broad source category describes what a record is made
+   * from; the form describes what it IS. `Baked Products` legitimately holds
+   * both bread and cake, so the category alone cannot separate a staple from a
+   * dessert — the form term can.
+   *
+   * The vocabulary is taken from the catalog's own most frequent descriptors,
+   * so it classifies every cookie and every cake rather than the one record
+   * that happened to surface in testing.
+   */
+  { re: /\b(cookie|cookies|cake|cakes|brownie|brownies|pastry|pastries|doughnut|donut|pie|pies|tart|tarts|muffin|muffins|croissant|danish|cupcake|cupcakes|frosting|icing|candy|candies|fudge|chocolate bar|dessert|desserts)\b/, cls: 'treat' },
   // Organ meats and preparation intermediates: edible, rarely a default answer.
   { re: /\b(giblets|gizzard|liver|kidney|heart|spleen|lung|brain|tripe|variety meats|by-products)\b/, cls: 'specialty' },
   { re: /\b(dried|dehydrated|desiccated|freeze-dried|extender|substitute)\b/, cls: 'ingredient' },
