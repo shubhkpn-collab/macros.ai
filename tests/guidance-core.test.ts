@@ -6,7 +6,7 @@ import {
 } from '@macros/domain-recommendation';
 import {
   FakeGuidanceProvider, UnavailableGuidanceProvider, buildGuidanceEnvelope,
-  deterministicGuidance, renderGuidanceText, requestGuidance, validateGuidance,
+  deterministicGuidance, requestGuidance, validateGuidance,
   type GuidanceProviderResult,
 } from '@macros/guidance';
 import { repoPath } from '../tools/repo-paths.js';
@@ -97,7 +97,8 @@ const exhausted = () => envelope({
 });
 
 const ok = (over: Partial<GuidanceProviderResult> = {}): GuidanceProviderResult => ({
-  intent: 'what_should_i_eat', selectedProductVersionIds: [], text: 'A good option.',
+  intent: 'what_should_i_eat', templateId: 'need_clarification',
+  selectedProductVersionIds: [],
   clarificationNeeded: false, suggestedNextAction: 'await_choice', ...over,
 });
 
@@ -136,44 +137,47 @@ describe('INT-5 — the envelope exposes only trusted facts', () => {
 describe('INT-5 — adversarial provider output is refused', () => {
   test('a food outside the envelope is rejected', () => {
     const e = envelope();
-    const v = validateGuidance(
-      ok({ selectedProductVersionIds: ['not-a-real-food@v1'] }), e);
+    const v = validateGuidance(ok({
+      templateId: 'single_option', selectedProductVersionIds: ['not-a-real-food@v1'],
+    }), e);
     assert.equal(v.ok, false);
     assert.deepEqual(v.rejections, ['unknown_candidate']);
   });
 
-  test('a fabricated quantity is rejected', () => {
+  test('an unknown template is rejected', () => {
     const e = envelope();
-    const v = validateGuidance(ok({
-      selectedProductVersionIds: [e.planComponents[0]!.productVersionId],
-      text: 'Have about 180 grams of that.',
-    }), e);
+    const v = validateGuidance(ok({ templateId: 'freestyle_prose' as never }), e);
     assert.equal(v.ok, false);
-    assert.ok(v.rejections.includes('fabricated_nutrition')
-      || v.rejections.includes('fabricated_portion'));
+    assert.deepEqual(v.rejections, ['unknown_template']);
   });
 
-  test('an invented nutrition number is rejected', () => {
+  test('a template arity mismatch is rejected', () => {
+    // Two names promised, one supplied: the rendered sentence would dangle.
     const e = envelope();
-    const v = validateGuidance(ok({ text: 'You need 43.7 g protein.' }), e);
+    const v = validateGuidance(ok({
+      templateId: 'two_options',
+      selectedProductVersionIds: [e.planComponents[0]!.productVersionId],
+    }), e);
     assert.equal(v.ok, false);
-    assert.ok(v.rejections.includes('fabricated_nutrition'));
+    assert.deepEqual(v.rejections, ['template_arity_mismatch']);
   });
 
   test('an unknown slot is rejected', () => {
     const e = envelope();
-    const v = validateGuidance(ok({ text: 'You have {invented_slot} left.' }), e);
+    const v = validateGuidance(ok({ slotRefs: ['invented_slot'] }), e);
     assert.equal(v.ok, false);
-    assert.ok(v.rejections.includes('unknown_slot'));
+    assert.deepEqual(v.rejections, ['unknown_slot']);
   });
 
-  test('a TRUSTED slot passes and renders the real value', () => {
+  test('an out-of-range objective is rejected', () => {
     const e = envelope();
-    const v = validateGuidance(ok({ text: 'Protein left: {remaining_protein_g}.' }), e);
-    assert.equal(v.ok, true, `unexpectedly rejected: ${v.rejections.join(',')}`);
-    const rendered = renderGuidanceText('Protein left: {remaining_protein_g}.', e);
-    assert.equal(rendered.includes('{'), false);
-    assert.ok(rendered.includes(e.slots['remaining_protein_g']!));
+    const v = validateGuidance(ok({
+      templateId: 'option_with_objective',
+      selectedProductVersionIds: [e.planComponents[0]!.productVersionId],
+      objectiveIndex: 99,
+    }), e);
+    assert.equal(v.ok, false);
+    assert.deepEqual(v.rejections, ['unknown_objective']);
   });
 
   test('malformed output is rejected', () => {
@@ -181,6 +185,7 @@ describe('INT-5 — adversarial provider output is refused', () => {
     assert.equal(validateGuidance(null, e).ok, false);
     assert.equal(validateGuidance({} as never, e).ok, false);
     assert.equal(validateGuidance(ok({ intent: 'sing_a_song' as never }), e).ok, false);
+    assert.equal(validateGuidance(ok({ tone: 'sarcastic' as never }), e).ok, false);
   });
 
   test('an unsupported action is rejected', () => {
@@ -193,19 +198,79 @@ describe('INT-5 — adversarial provider output is refused', () => {
   test('recommending after an exhausted budget is rejected', () => {
     const e = exhausted();
     assert.notEqual(e.plannerStatus, 'available');
-    const v = validateGuidance(ok({ selectedProductVersionIds: ['anything@v1'] }), e);
+    const v = validateGuidance(ok({
+      templateId: 'single_option', selectedProductVersionIds: ['anything@v1'],
+    }), e);
     assert.equal(v.ok, false);
     assert.deepEqual(v.rejections, ['recommendation_after_exhausted_budget']);
   });
+});
 
-  test('a quantity claim without portion authority is rejected', () => {
+describe('INT-5B — prose hallucination is structurally impossible', () => {
+  test('a provider CANNOT emit free text at all', () => {
+    // The INT-5 hole: "Pizza is the better protein choice" has no number, no
+    // unknown id and no bad slot, so numeric validation passed it. There is now
+    // no field through which such a sentence could arrive.
+    const contracts = readFileSync(
+      repoPath('packages', 'guidance', 'src', 'contracts.ts'), 'utf8');
+    const resultBlock = contracts.slice(
+      contracts.indexOf('export interface GuidanceProviderResult'),
+      contracts.indexOf('export type GuidanceNextAction'));
+    assert.equal(/readonly text\s*[?]?:\s*string/.test(resultBlock), false,
+      'GuidanceProviderResult must expose no free-text field');
+  });
+
+  test('an outside food name cannot surface through any template', () => {
+    const e = envelope();
+    // Even a valid template renders ONLY envelope names.
+    const v = validateGuidance(ok({
+      templateId: 'single_option',
+      selectedProductVersionIds: [e.planComponents[0]!.productVersionId],
+    }), e);
+    assert.equal(v.ok, true);
+    assert.equal(v.text.toLowerCase().includes('pizza'), false);
+    assert.ok(v.text.includes(e.planComponents[0]!.displayName));
+  });
+
+  test('a qualitative nutrition claim cannot be introduced', () => {
+    // Templates are a closed set of sentences the application authored.
+    const templates = readFileSync(
+      repoPath('packages', 'guidance', 'src', 'templates.ts'), 'utf8');
+    const rendered = templates.slice(templates.indexOf('switch (templateId)'));
+    for (const claim of ['better', 'healthier', 'best source', 'rich in']) {
+      assert.equal(rendered.toLowerCase().includes(claim), false,
+        `a template asserts "${claim}"`);
+    }
+  });
+
+  test('a legitimate selection still produces natural text', () => {
     const e = envelope();
     const v = validateGuidance(ok({
+      templateId: 'option_with_objective',
       selectedProductVersionIds: [e.planComponents[0]!.productVersionId],
-      text: 'Have a serving of that.',
+      objectiveIndex: 0,
     }), e);
-    assert.equal(v.ok, false);
-    assert.ok(v.rejections.includes('quantity_without_authority'));
+    assert.equal(v.ok, true);
+    assert.match(v.text, /biggest gap/);
+    assert.ok(v.text.includes(e.planComponents[0]!.displayName));
+  });
+
+  test('trusted slot rendering still works', () => {
+    const e = envelope();
+    const v = validateGuidance(ok({ slotRefs: ['remaining_protein_g'] }), e);
+    assert.equal(v.ok, true, v.rejections.join(','));
+  });
+
+  test('no rendered template states a quantity', () => {
+    const e = envelope();
+    const v = validateGuidance(ok({
+      templateId: 'confirm_choice_await_weight',
+      selectedProductVersionIds: [e.planComponents[0]!.productVersionId],
+      suggestedNextAction: 'await_weight',
+    }), e);
+    assert.equal(v.ok, true);
+    assert.equal(/\d/.test(v.text), false, 'no digit may appear without authority');
+    assert.match(v.text, /scale/i);
   });
 });
 
@@ -237,14 +302,14 @@ describe('INT-5 — the appliance still works without a model', () => {
     const rogue = {
       name: 'rogue',
       generate: async () => ok({
+        templateId: 'single_option',
         selectedProductVersionIds: ['fabricated@v1'],
-        text: 'Eat 300 g of something I made up.',
       }),
     };
     const out = await requestGuidance(e, 'what_should_i_eat', { provider: rogue });
     assert.equal(out.usedFallback, true);
     assert.ok(out.rejections.length > 0);
-    assert.equal(out.text.includes('made up'), false, 'unsafe text must never surface');
+    assert.equal(out.text.includes('fabricated'), false, 'unsafe output must never surface');
   });
 
   test('the fallback never invents a number', () => {
@@ -339,5 +404,68 @@ describe('INT-5 — no live model, no new dependency', () => {
     assert.match(src, /recommendFoodPlan/);
     // No scoring of its own.
     assert.equal(/score\s*[*/+-]/.test(src), false);
+  });
+});
+
+describe('INT-5B — provider privacy projection', () => {
+  test('the provider payload carries NO subject or session identifier', async () => {
+    const { toProviderFacing } = await import('@macros/guidance');
+    const e = envelope();
+    const payload = JSON.stringify(toProviderFacing(e));
+    // Serialization, not shape inspection: this is what would cross a network.
+    assert.equal(payload.includes(USER), false, 'subjectId reached the provider');
+    assert.equal(payload.includes('s1'), false, 'sessionId reached the provider');
+    assert.equal(payload.includes('subjectId'), false);
+    assert.equal(payload.includes('sessionId'), false);
+  });
+
+  test('the projection still carries everything selection needs', async () => {
+    const { toProviderFacing } = await import('@macros/guidance');
+    const p = toProviderFacing(envelope());
+    assert.ok(p.planComponents.length > 0);
+    assert.ok(p.alternatives.length > 0);
+    assert.ok(Object.keys(p.slots).length > 0);
+    assert.equal(typeof p.weighingRequired, 'boolean');
+  });
+
+  test('the orchestrator sends the projection, never the envelope', () => {
+    const src = readFileSync(
+      repoPath('packages', 'guidance', 'src', 'orchestrator.ts'), 'utf8');
+    assert.match(src, /envelope: toProviderFacing\(envelope\)/);
+  });
+
+  test('no repository or raw history reaches the provider', async () => {
+    const { toProviderFacing } = await import('@macros/guidance');
+    const payload = JSON.stringify(toProviderFacing(envelope())).toLowerCase();
+    for (const leak of ['repositor', 'observations', 'policy', 'per100g', 'basis']) {
+      assert.equal(payload.includes(leak), false, `projection leaks ${leak}`);
+    }
+  });
+});
+
+describe('INT-5B — alternatives carry real nutritional roles', () => {
+  test('alternatives are no longer all "unknown"', () => {
+    // The bug: roleById was built only from plan components, so every
+    // alternative silently defaulted to unknown while the code claimed
+    // role diversity.
+    const e = envelope();
+    const roles = e.alternatives.map((a) => a.role);
+    assert.ok(roles.length > 0);
+    assert.equal(roles.every((r) => r === 'unknown'), false,
+      'every alternative role is unknown — the role lookup is broken again');
+  });
+
+  test('at least two distinct real roles are preserved across the envelope', () => {
+    const e = envelope();
+    const roles = new Set([...e.planComponents, ...e.alternatives]
+      .map((c) => c.role).filter((r) => r !== 'unknown'));
+    assert.ok(roles.size >= 2, `only ${roles.size} distinct role(s): ${[...roles].join(',')}`);
+  });
+
+  test('roles come from the authoritative model, not a display name', () => {
+    const src = readFileSync(
+      repoPath('packages', 'guidance', 'src', 'envelope.ts'), 'utf8');
+    assert.match(src, /assessRole\(v\)/);
+    assert.equal(/displayName.*role|role.*displayName\.includes/.test(src), false);
   });
 });

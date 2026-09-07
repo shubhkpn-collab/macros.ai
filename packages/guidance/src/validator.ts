@@ -1,7 +1,8 @@
 import type {
   EnvelopeCandidate, GuidanceEnvelope, GuidanceIntent, GuidanceNextAction,
-  GuidanceProviderResult, GuidanceRejection,
+  GuidanceProviderResult, GuidanceRejection, GuidanceTone,
 } from './contracts.js';
+import { TEMPLATES, renderTemplate } from './templates.js';
 
 /**
  * STRICT POST-VALIDATION.
@@ -25,60 +26,58 @@ const VALID_ACTIONS = new Set<GuidanceNextAction>([
   'await_choice', 'await_weight', 'await_clarification', 'none',
 ]);
 
-/**
- * Any bare number in model text is a fabricated fact.
- *
- * Trusted figures arrive through `{slot}` placeholders, which are substituted
- * AFTER validation — so by construction the model never types a digit that
- * reaches a screen. Digits inside placeholders are not matched.
- */
-const BARE_NUMBER = /(?<!\{[^}]{0,80})\b\d+(?:[.,]\d+)?\b/;
-
-/** Nutrition vocabulary the model must not assert around a number. */
-const NUTRITION_CLAIM = /\b(kcal|calorie|calories|grams?|\bg\b|protein|carb|carbohydrate|fat)\b/i;
-
-const PLACEHOLDER = /\{([a-z0-9_:@.\-]+)\}/gi;
+const VALID_TONES = new Set<GuidanceTone>(['neutral', 'brief', 'encouraging']);
 
 export interface ValidationResult {
   readonly ok: boolean;
   readonly rejections: readonly GuidanceRejection[];
   readonly candidates: readonly EnvelopeCandidate[];
   readonly nextAction: GuidanceNextAction;
+  readonly text: string;
 }
 
 const reject = (...r: GuidanceRejection[]): ValidationResult =>
-  ({ ok: false, rejections: r, candidates: [], nextAction: 'none' });
+  ({ ok: false, rejections: r, candidates: [], nextAction: 'none', text: '' });
 
 /**
  * Validate a provider result against the envelope it was given.
+ *
+ * There is no prose to police any more. The provider returns references and an
+ * enum, so validation is entirely structural — every check below is a fact
+ * about identity, arity or authority rather than a guess about language.
  */
 export function validateGuidance(
   result: GuidanceProviderResult | null | undefined,
   envelope: GuidanceEnvelope,
 ): ValidationResult {
-  // --- shape ------------------------------------------------------------
   if (result === null || result === undefined || typeof result !== 'object') {
     return reject('malformed_result');
   }
-  if (typeof result.text !== 'string' || !Array.isArray(result.selectedProductVersionIds)) {
-    return reject('malformed_result');
-  }
+  if (!Array.isArray(result.selectedProductVersionIds)) return reject('malformed_result');
   if (!VALID_INTENTS.has(result.intent)) return reject('malformed_result');
   if (!VALID_ACTIONS.has(result.suggestedNextAction)) return reject('unsupported_action');
+  if (result.tone !== undefined && !VALID_TONES.has(result.tone)) {
+    return reject('malformed_result');
+  }
+
+  const spec = TEMPLATES[result.templateId];
+  if (spec === undefined) return reject('unknown_template');
 
   const known = new Map<string, EnvelopeCandidate>();
   for (const c of [...envelope.planComponents, ...envelope.alternatives]) {
     known.set(c.productVersionId, c);
   }
 
-  // --- exhausted budget --------------------------------------------------
   // The planner already refused; the conversation must not reopen it.
-  if (envelope.plannerStatus !== 'available'
-      && result.selectedProductVersionIds.length > 0) {
+  const planAvailable = envelope.plannerStatus === 'available';
+  if (!planAvailable && result.selectedProductVersionIds.length > 0) {
     return reject('recommendation_after_exhausted_budget');
   }
+  if (spec.requiresEmptyPlan === true && planAvailable && envelope.planComponents.length > 0) {
+    return reject('unsupported_action');
+  }
 
-  // --- candidate identity -------------------------------------------------
+  // --- candidate identity ------------------------------------------------
   const selected: EnvelopeCandidate[] = [];
   for (const id of result.selectedProductVersionIds) {
     if (typeof id !== 'string') return reject('malformed_result');
@@ -91,69 +90,40 @@ export function validateGuidance(
     if (!known.has(id)) return reject('unknown_candidate');
   }
 
-  // --- placeholders --------------------------------------------------------
-  const rejections: GuidanceRejection[] = [];
-  for (const match of result.text.matchAll(PLACEHOLDER)) {
-    const token = match[1]!;
-    if (token.startsWith('candidate:')) {
-      const id = token.slice('candidate:'.length);
-      if (!known.has(id)) rejections.push('unknown_candidate');
-      continue;
+  // A template renders exactly as many names as it declares.
+  if (selected.length !== spec.candidates) return reject('template_arity_mismatch');
+
+  // --- slots and objectives -----------------------------------------------
+  for (const slot of result.slotRefs ?? []) {
+    if (!(slot in envelope.slots)) return reject('unknown_slot');
+  }
+  if (spec.usesObjective) {
+    const index = result.objectiveIndex ?? 0;
+    if (!Number.isInteger(index) || index < 0 || index >= envelope.objectives.length) {
+      return reject('unknown_objective');
     }
-    // Every other placeholder must be a slot MACROS actually supplied.
-    if (!(token in envelope.slots)) rejections.push('unknown_slot');
   }
 
-  // --- fabricated numbers ---------------------------------------------------
-  const withoutPlaceholders = result.text.replace(PLACEHOLDER, '');
-  if (BARE_NUMBER.test(withoutPlaceholders)) {
-    // A digit outside a trusted slot is either invented nutrition or an
-    // invented quantity; both are refused.
-    rejections.push(NUTRITION_CLAIM.test(withoutPlaceholders)
-      ? 'fabricated_nutrition' : 'fabricated_portion');
+  // --- quantity authority ---------------------------------------------------
+  // Only a template that states an amount could breach this, and none does; the
+  // check stays so a future template cannot quietly introduce one.
+  if (result.templateId === 'confirm_choice_await_weight'
+      && selected[0]?.groundedPortionGrams === null
+      && result.suggestedNextAction !== 'await_weight') {
+    return reject('quantity_without_authority');
   }
 
-  // --- quantity without authority ------------------------------------------
-  const claimsWeight = /\b(gram|grams|\d\s*g\b|portion|serving|scoop|slice)\b/i
-    .test(withoutPlaceholders);
-  if (claimsWeight && selected.some((c) => c.groundedPortionGrams === null)) {
-    rejections.push('quantity_without_authority');
-  }
-
-  // --- next action coherence ------------------------------------------------
   let nextAction = result.suggestedNextAction;
-  if (nextAction === 'await_weight') {
-    if (selected.length === 0) rejections.push('unsupported_action');
-  }
-  // With no grounded portion the only honest next step is the scale.
   if (selected.length === 1 && selected[0]!.groundedPortionGrams === null
       && nextAction === 'none') {
+    // With no grounded portion the only honest next step is the scale.
     nextAction = 'await_weight';
   }
 
-  if (rejections.length > 0) {
-    return { ok: false, rejections, candidates: [], nextAction: 'none' };
-  }
-  return { ok: true, rejections: [], candidates: selected, nextAction };
-}
-
-/**
- * Substitute trusted values into validated text.
- *
- * Runs only AFTER validation, so every inserted string is one MACROS computed.
- */
-export function renderGuidanceText(
-  text: string,
-  envelope: GuidanceEnvelope,
-): string {
-  const known = new Map<string, EnvelopeCandidate>();
-  for (const c of [...envelope.planComponents, ...envelope.alternatives]) {
-    known.set(c.productVersionId, c);
-  }
-  return text.replace(PLACEHOLDER, (whole, token: string) => {
-    if (token.startsWith('candidate:')) {
-      return known.get(token.slice('candidate:'.length))?.displayName ?? whole;
-    }
-    return envelope.slots[token] ?? whole;
+  const text = renderTemplate(result.templateId, selected, envelope, {
+    ...(result.objectiveIndex !== undefined ? { objectiveIndex: result.objectiveIndex } : {}),
+    ...(result.tone !== undefined ? { tone: result.tone } : {}),
   });
+
+  return { ok: true, rejections: [], candidates: selected, nextAction, text };
 }

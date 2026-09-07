@@ -334,7 +334,7 @@
       ],
       "slots": 5,
       "weighingRequired": true,
-      "fallbackText": "Chinese noodles, chow mein and Mature seeds soybeans, roasted, salted are good options.",
+      "fallbackText": "Chinese noodles, chow mein and Mature seeds soybeans, roasted, salted are both good options.",
       "fallbackHasDigit": false
     },
     "topThree": [
@@ -554,7 +554,7 @@
       ],
       "slots": 5,
       "weighingRequired": true,
-      "fallbackText": "Seeds, pumpkin and squash seeds, whole, roasted, with salt added and Mature seeds soybeans, roasted, salted are good options.",
+      "fallbackText": "Seeds, pumpkin and squash seeds, whole, roasted, with salt added and Mature seeds soybeans, roasted, salted are both good options.",
       "fallbackHasDigit": false
     },
     "topThree": [

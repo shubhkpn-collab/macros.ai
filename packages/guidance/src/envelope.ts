@@ -1,7 +1,9 @@
 import type { RecommendationInput, RecommendationSet } from '@macros/domain-recommendation';
-import { recommendFoodPlan, recommendFoods } from '@macros/domain-recommendation';
+import { assessRole, recommendFoodPlan, recommendFoods } from '@macros/domain-recommendation';
 import { formatGrams, formatKcal } from '@macros/tablet-view-model';
-import type { EnvelopeCandidate, GuidanceEnvelope, GuidanceSlots } from './contracts.js';
+import type {
+  EnvelopeCandidate, GuidanceEnvelope, GuidanceSlots, ProviderFacingEnvelope,
+} from './contracts.js';
 
 /**
  * ENVELOPE CONSTRUCTION.
@@ -20,14 +22,24 @@ export interface EnvelopeSubject {
   readonly sessionId: string;
 }
 
+/**
+ * Project a ranked recommendation into an envelope candidate.
+ *
+ * `role` is resolved from the REAL ProductVersion through the frozen role
+ * model. It previously defaulted to 'unknown' for every non-plan candidate,
+ * because the role lookup was populated only from plan components — which
+ * silently made the claim of role-diverse alternatives false while the code
+ * looked correct.
+ */
 const toCandidate = (
   r: RecommendationSet['recommendations'][number],
   isPlanComponent: boolean,
+  role: string,
 ): EnvelopeCandidate => ({
   productId: r.productId,
   productVersionId: r.productVersionId,
   displayName: r.displayName,
-  role: 'unknown',
+  role,
   actionabilityClass:
     (r as unknown as { actionabilityClass?: string }).actionabilityClass ?? 'unknown',
   rationaleCodes: r.rationaleCodes,
@@ -52,7 +64,14 @@ export function buildGuidanceEnvelope(
   const set = recommendFoods(input);
 
   const componentIds = new Set(plan.components.map((c) => c.productVersionId));
-  const roleById = new Map(plan.components.map((c) => [c.productVersionId, c.role]));
+  // Authoritative role for EVERY candidate, from the real ProductVersion via
+  // the frozen role model — never from a display name, and never defaulted.
+  const versionById = new Map(
+    input.candidates.map((c) => [c.productVersion.productVersionId, c.productVersion]));
+  const roleOf = (productVersionId: string): string => {
+    const v = versionById.get(productVersionId);
+    return v === undefined ? 'unknown' : assessRole(v).role;
+  };
 
   const planComponents: EnvelopeCandidate[] = plan.components.map((c) => {
     const r = set.recommendations.find((x) => x.productVersionId === c.productVersionId);
@@ -86,10 +105,10 @@ export function buildGuidanceEnvelope(
       if (alternatives.length >= MAX_ALTERNATIVES) break;
       if (componentIds.has(r.productVersionId)) continue;
       if (seenProducts.has(r.productId)) continue;
-      const role = roleById.get(r.productVersionId) ?? 'unknown';
+      const role = roleOf(r.productVersionId);
       // First pass prefers unseen roles; second fills remaining slots.
       if (pass === 0 && seenRoles.has(role)) continue;
-      alternatives.push(toCandidate(r, false));
+      alternatives.push(toCandidate(r, false, role));
       seenRoles.add(role);
       seenProducts.add(r.productId);
     }
@@ -132,5 +151,25 @@ export function buildGuidanceEnvelope(
     slots,
     weighingRequired,
     moreGuidanceUsefulAfterWeighing: plan.moreGuidanceUsefulAfterWeighing,
+  };
+}
+
+/**
+ * Strip everything a provider does not need.
+ *
+ * `subjectId` and `sessionId` are removed because a conversational model has no
+ * use for them and every identifier that crosses a network boundary is one that
+ * can leak. Isolation is enforced internally, before this point.
+ */
+export function toProviderFacing(envelope: GuidanceEnvelope): ProviderFacingEnvelope {
+  return {
+    envelopeVersion: envelope.envelopeVersion,
+    plannerStatus: envelope.plannerStatus,
+    objectives: envelope.objectives,
+    planComponents: envelope.planComponents,
+    alternatives: envelope.alternatives,
+    slots: envelope.slots,
+    weighingRequired: envelope.weighingRequired,
+    moreGuidanceUsefulAfterWeighing: envelope.moreGuidanceUsefulAfterWeighing,
   };
 }

@@ -4,7 +4,7 @@
   "policyVersion": "recommendation-policy@3.0.0",
   "scenarios": 1728,
   "candidatePool": 6630,
-  "meanRecommendMs": 24.8,
+  "meanRecommendMs": 24.96,
   "statuses": {
     "available": 1440,
     "energy_budget_exhausted": 288

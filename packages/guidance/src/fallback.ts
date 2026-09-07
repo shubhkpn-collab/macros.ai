@@ -1,7 +1,7 @@
 import type {
   GuidanceEnvelope, GuidanceIntent, GuidanceOutcome,
 } from './contracts.js';
-import { renderGuidanceText } from './validator.js';
+import { renderTemplate } from './templates.js';
 
 /**
  * DETERMINISTIC FALLBACK.
@@ -24,27 +24,28 @@ export function deterministicGuidance(
   if (envelope.plannerStatus !== 'available' || components.length === 0) {
     // The planner's honest refusal is passed through unchanged.
     return {
-      text: envelope.plannerStatus === 'energy_budget_exhausted'
-        ? "You're at your energy target for today."
-        : "I don't have a good suggestion right now.",
+      text: renderTemplate(
+        envelope.plannerStatus === 'energy_budget_exhausted'
+          ? 'budget_exhausted' : 'no_suggestion', [], envelope),
       intent, candidates: [], nextAction: 'none',
       usedFallback: true, rejections: [], providerName: null,
     };
   }
 
-  const names = components.map((c) => `{candidate:${c.productVersionId}}`);
-  const text = names.length === 1
-    ? `${names[0]} fits your current needs best.`
-    : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]} are good options.`;
+  // The fallback uses the SAME closed templates as the provider path, so
+  // offline guidance cannot say anything the online path could not.
+  const shown = components.slice(0, 2);
+  const text = renderTemplate(
+    shown.length >= 2 ? 'two_options' : 'single_option', shown, envelope);
 
   // Without portion authority the only honest next step is the scale.
   const nextAction = envelope.weighingRequired ? 'await_weight' as const
     : 'await_choice' as const;
 
   return {
-    text: renderGuidanceText(text, envelope),
+    text,
     intent,
-    candidates: components,
+    candidates: shown,
     nextAction,
     usedFallback: true,
     rejections: [],

@@ -2,8 +2,9 @@ import type {
   GuidanceEnvelope, GuidanceIntent, GuidanceOutcome, GuidanceProvider,
   GuidanceRequest, GuidanceRejection,
 } from './contracts.js';
+import { toProviderFacing } from './envelope.js';
 import { deterministicGuidance } from './fallback.js';
-import { renderGuidanceText, validateGuidance } from './validator.js';
+import { validateGuidance } from './validator.js';
 
 /**
  * GUIDANCE ORCHESTRATION.
@@ -69,7 +70,8 @@ export async function requestGuidance(
   }
 
   const request: GuidanceRequest = {
-    envelope,
+    // The provider receives the PROJECTION: no subject id, no session id.
+    envelope: toProviderFacing(envelope),
     intent,
     // Session-scoped only; there is no long-term memory in this milestone.
     recentTurns: context.recentTurns ?? [],
@@ -100,8 +102,9 @@ export async function requestGuidance(
   }
 
   return {
-    // Substitution happens only after validation passed.
-    text: renderGuidanceText(result!.text, envelope),
+    // Rendered by the APPLICATION from a validated template choice, so every
+    // word is one MACROS owns.
+    text: validation.text,
     intent: result!.intent,
     candidates: validation.candidates,
     nextAction: validation.nextAction,

@@ -23,7 +23,8 @@ export class FakeGuidanceProvider implements GuidanceProvider {
       return {
         intent: 'clarification_needed',
         selectedProductVersionIds: [],
-        text: "You're at your target for today.",
+        templateId: envelope.plannerStatus === 'energy_budget_exhausted'
+          ? 'budget_exhausted' : 'no_suggestion',
         clarificationNeeded: false,
         suggestedNextAction: 'none',
         ...this.override,
@@ -34,21 +35,19 @@ export class FakeGuidanceProvider implements GuidanceProvider {
       return {
         intent: 'choose_candidate',
         selectedProductVersionIds: [request.chosenProductVersionId],
-        text: 'Put it on the scale.',
+        templateId: 'confirm_choice_await_weight',
         clarificationNeeded: false,
         suggestedNextAction: 'await_weight',
         ...this.override,
       };
     }
 
-    const names = components.map((c) => `{candidate:${c.productVersionId}}`);
     return {
       intent,
-      selectedProductVersionIds: components.map((c) => c.productVersionId),
-      // Only placeholders — the provider never types a fact.
-      text: names.length === 1
-        ? `${names[0]} would work well right now.`
-        : `${names.join(' and ')} would work well together.`,
+      selectedProductVersionIds: components.slice(0, 2).map((c) => c.productVersionId),
+      // The provider CHOOSES a template; it never writes a sentence.
+      templateId: components.length >= 2 ? 'two_options' : 'option_with_objective',
+      objectiveIndex: 0,
       clarificationNeeded: false,
       suggestedNextAction: envelope.weighingRequired ? 'await_weight' : 'await_choice',
       alternativeProductVersionIds: envelope.alternatives.map((a) => a.productVersionId),

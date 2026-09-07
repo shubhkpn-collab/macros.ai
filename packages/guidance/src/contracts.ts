@@ -77,8 +77,29 @@ export interface GuidanceEnvelope {
   readonly moreGuidanceUsefulAfterWeighing: boolean;
 }
 
+/**
+ * PROVIDER-FACING PROJECTION.
+ *
+ * What an external model is allowed to see. Deliberately NOT the internal
+ * envelope: a provider needs candidates, objectives and formatted slots to
+ * choose a template, and needs nothing whatever to identify the human being.
+ *
+ * Session isolation stays with the orchestrator, which never delegates it.
+ */
+export interface ProviderFacingEnvelope {
+  readonly envelopeVersion: string;
+  readonly plannerStatus: GuidanceEnvelope['plannerStatus'];
+  readonly objectives: readonly string[];
+  readonly planComponents: readonly EnvelopeCandidate[];
+  readonly alternatives: readonly EnvelopeCandidate[];
+  readonly slots: GuidanceSlots;
+  readonly weighingRequired: boolean;
+  readonly moreGuidanceUsefulAfterWeighing: boolean;
+}
+
 export interface GuidanceRequest {
-  readonly envelope: GuidanceEnvelope;
+  /** The projection, never the member-bound envelope. */
+  readonly envelope: ProviderFacingEnvelope;
   readonly intent: GuidanceIntent;
   /** Session-scoped only. No long-term memory exists in this milestone. */
   readonly recentTurns: readonly { readonly role: 'user' | 'macros'; readonly text: string }[];
@@ -87,15 +108,49 @@ export interface GuidanceRequest {
 }
 
 /**
+ * CLOSED MESSAGE TEMPLATES.
+ *
+ * INT-5 let the provider return free-form prose and tried to police it. That
+ * cannot work: "Pizza is the better protein choice" contains no number, no
+ * unknown id and no bad slot, so every numeric check passes while a food that
+ * was never recommended reaches the user. Proving arbitrary prose contains no
+ * unsupported claim is not a validation problem, it is an impossible one.
+ *
+ * So the provider no longer writes sentences. It CHOOSES one of these
+ * templates and supplies references; the application renders the words. A
+ * template can only say what it was written to say.
+ */
+export type GuidanceTemplateId =
+  | 'single_option'
+  | 'two_options'
+  | 'option_with_objective'
+  | 'confirm_choice_await_weight'
+  | 'ask_quick_or_meal'
+  | 'offer_alternative'
+  | 'need_clarification'
+  | 'budget_exhausted'
+  | 'no_suggestion'
+  | 'declined';
+
+/** Bounded conversational register. Style only; it asserts nothing. */
+export type GuidanceTone = 'neutral' | 'brief' | 'encouraging';
+
+/**
  * What a provider may return.
  *
- * `text` may contain `{slot}` placeholders and `{candidate:<id>}` references,
- * nothing else that asserts a fact.
+ * Every field is a reference or an enum. There is no free text, so the provider
+ * cannot introduce a food identity, a nutrition claim, a quantity or an action
+ * that MACROS did not already establish.
  */
 export interface GuidanceProviderResult {
   readonly intent: GuidanceIntent;
+  readonly templateId: GuidanceTemplateId;
   readonly selectedProductVersionIds: readonly string[];
-  readonly text: string;
+  /** Trusted slot names to render into the template. Validated against the envelope. */
+  readonly slotRefs?: readonly string[];
+  /** Which planner objective to name, by index into the envelope's objectives. */
+  readonly objectiveIndex?: number;
+  readonly tone?: GuidanceTone;
   readonly clarificationNeeded: boolean;
   readonly suggestedNextAction: GuidanceNextAction;
   readonly alternativeProductVersionIds?: readonly string[];
@@ -119,6 +174,9 @@ export type GuidanceRejection =
   | 'fabricated_portion'
   | 'fabricated_nutrition'
   | 'unknown_slot'
+  | 'unknown_template'
+  | 'template_arity_mismatch'
+  | 'unknown_objective'
   | 'recommendation_after_exhausted_budget'
   | 'quantity_without_authority'
   | 'malformed_result'
