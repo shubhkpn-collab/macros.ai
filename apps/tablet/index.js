@@ -53,6 +53,7 @@ function Root() {
       auth={host.auth}
       hasActiveSession={host.hasActiveSession}
       developmentNotice={host.developmentNotice}
+      guidance={host.guidance}
     />
   );
 }

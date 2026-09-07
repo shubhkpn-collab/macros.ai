@@ -122,8 +122,53 @@ export interface ScaleViewState {
   readonly message: string;
 }
 
+/**
+ * GUIDANCE SESSION STATE.
+ *
+ * The minimum an appliance needs — deliberately NOT a chat transcript. There is
+ * no message history because this is a dedicated device answering one question,
+ * not a conversation to scroll back through.
+ */
+export type GuidancePhase =
+  | 'idle'
+  | 'thinking'
+  | 'guidance_available'
+  | 'awaiting_choice'
+  | 'awaiting_clarification'
+  | 'awaiting_weight'
+  | 'fallback';
+
+export interface GuidanceCandidateView {
+  readonly productId: string;
+  readonly productVersionId: string;
+  readonly displayName: string;
+  readonly role: string;
+}
+
+export interface GuidanceState {
+  readonly phase: GuidancePhase;
+  /** Rendered by the application from a validated template. Never raw provider output. */
+  readonly text: string;
+  readonly candidates: readonly GuidanceCandidateView[];
+  readonly alternatives: readonly GuidanceCandidateView[];
+  /**
+   * Identifies the envelope these candidates came from. A choice against a
+   * superseded envelope is refused rather than silently resolved.
+   */
+  readonly envelopeId: string | null;
+  /** Session generation this guidance belongs to; a switch invalidates it. */
+  readonly sessionGeneration: number;
+  readonly usedFallback: boolean;
+}
+
+export const IDLE_GUIDANCE: GuidanceState = {
+  phase: 'idle', text: '', candidates: [], alternatives: [],
+  envelopeId: null, sessionGeneration: 0, usedFallback: false,
+};
+
 export interface AppState {
   readonly subject: AppSubject;
+  readonly guidance: GuidanceState;
   /**
    * Set when the active user changes while the platform is still loaded. The
    * previous occupant's settled candidate must not be capturable by the new

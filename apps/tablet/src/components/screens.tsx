@@ -17,6 +17,8 @@ import {
 
 export interface ScreenActions {
   readonly onAddFood: () => void;
+  readonly onRequestGuidance: () => void;
+  readonly onChooseGuidanceCandidate: (productVersionId: string, envelopeId: string) => void;
   readonly onSearchFood: (query: string) => void;
   readonly onEnterManualWeight: (grams: number) => void;
   readonly onSelectOption: (productVersionId: string) => void;
@@ -104,10 +106,43 @@ export function HomeScreen(
       ) : null}
 
       <PrimaryAction
+        label="What should I eat?"
+        accessibilityLabel="Ask what to eat"
+        onPress={actions.onRequestGuidance}
+        disabled={!vm.offline.canLog}
+      />
+
+      {vm.guidance.visible ? (
+        // Minimal by design: AI-0 is functional integration, and the premium
+        // visual treatment is a later milestone against the locked reference.
+        <Surface>
+          <SectionLabel>Macros suggests</SectionLabel>
+          <Text style={{
+            color: color.textPrimary, fontSize: type.body.size, marginTop: space.sm,
+          }}>
+            {vm.guidance.text}
+          </Text>
+
+          {vm.guidance.candidates.map((c) => (
+            <View key={c.productVersionId} style={{ marginTop: space.md }}>
+              <SecondaryAction
+                label={c.displayName}
+                accessibilityLabel={`Choose ${c.displayName}`}
+                onPress={() => {
+                  if (vm.guidance.envelopeId !== null) {
+                    actions.onChooseGuidanceCandidate(c.productVersionId, vm.guidance.envelopeId);
+                  }
+                }}
+              />
+            </View>
+          ))}
+        </Surface>
+      ) : null}
+
+      <SecondaryAction
         label="Add food"
         accessibilityLabel="Add food"
         onPress={actions.onAddFood}
-        disabled={!vm.offline.canLog}
       />
 
       {vm.recent.length > 0 ? (

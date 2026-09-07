@@ -21,6 +21,12 @@ const capabilities = (over: Record<string, unknown> = {}) => deriveCapabilities(
 const appState = (over: Record<string, unknown> = {}) => ({
   subject: { authenticatedSubjectId: USER_A, userId: USER_A, displayName: 'Demo', sessionId: 's1' },
   requiresScaleClearForCurrentSubject: false,
+  // AI-0 added guidance to AppState; an idle fixture keeps these suites focused
+  // on presentation rather than on guidance.
+  guidance: {
+    phase: 'idle', text: '', candidates: [], alternatives: [],
+    envelopeId: null, sessionGeneration: 0, usedFallback: false,
+  },
   sessionGeneration: 3,
   dashboard: {
     localDate: '2026-08-28',

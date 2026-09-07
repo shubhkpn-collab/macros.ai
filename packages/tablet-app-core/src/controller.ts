@@ -7,6 +7,27 @@ import {
 } from '@macros/contracts';
 import { calculateNutrition } from '@macros/domain-nutrition';
 import {
+  buildGuidanceEnvelope, requestGuidance,
+  type GuidanceEnvelope, type GuidanceProvider,
+} from '@macros/guidance';
+import {
+  IDLE_GUIDANCE, type GuidanceCandidateView, type GuidancePhase, type GuidanceState,
+} from './state.js';
+
+/**
+ * What the guidance intent needs from the host.
+ *
+ * Passed in rather than reached for, so the controller never owns a provider or
+ * a clock and a test can supply either without touching production wiring.
+ */
+export interface GuidanceDeps {
+  readonly provider: GuidanceProvider | null;
+  eligibleCandidates(): Promise<readonly unknown[]>;
+  nowIso(): string;
+  readonly policy: unknown;
+  readonly environment: string;
+}
+import {
   buildVocabulary, resilientSearch,
   type FoodSearchResult, type QueryConfidence,
 } from '@macros/domain-food-search';
@@ -80,6 +101,10 @@ export class TabletAppController {
   /** Confidence of the most recent search. Read by callers deciding whether to
    *  auto-select; never used to auto-select from inside the controller. */
   private lastSearchConfidence: QueryConfidence = 'unresolved';
+  /** Only the NEWEST guidance request may update guidance state. */
+  private guidanceGeneration = 0;
+  /** Identifies the envelope currently on screen, for choice validation. */
+  private activeEnvelope: { id: string; envelope: GuidanceEnvelope } | null = null;
   private lastSearchDidYouMean: string | null = null;
 
   constructor(
@@ -92,6 +117,7 @@ export class TabletAppController {
     this.state = {
       subject,
       sessionGeneration: 1,
+      guidance: IDLE_GUIDANCE,
       dashboard: null,
       addFood: IDLE_ADD_FOOD,
       scale: { connected: false, phase: 'disconnected', displayGrams: null, stableCandidateGrams: null, message: 'Scale not connected' },
@@ -105,6 +131,147 @@ export class TabletAppController {
   }
 
   /** How much the last search could be trusted, and what we corrected. */
+  getGuidanceState(): GuidanceState {
+    return this.state.guidance;
+  }
+
+  /**
+   * THE guidance intent.
+   *
+   * The development "What should I eat?" button and, later, voice both call
+   * exactly this — there is deliberately no UI-only recommendation path, or the
+   * two would drift apart the moment either changed.
+   *
+   * A fresh envelope is built from CURRENT trusted state on every call. Reusing
+   * a previous envelope would answer a question about a day that has since
+   * changed, which is precisely what makes the post-log recommendation wrong.
+   */
+  async requestFoodGuidance(deps: GuidanceDeps): Promise<GuidanceState> {
+    this.guidanceGeneration += 1;
+    const generation = this.guidanceGeneration;
+    const sessionGeneration = this.state.sessionGeneration;
+
+    this.patchGuidance({ phase: 'thinking', text: '', candidates: [], alternatives: [] });
+
+    const dashboard = await this.refreshDashboard();
+    const candidates = await deps.eligibleCandidates();
+
+    // A switch or a newer request during the await invalidates this result.
+    if (generation !== this.guidanceGeneration
+        || sessionGeneration !== this.state.sessionGeneration) {
+      return this.state.guidance;
+    }
+
+    if (dashboard === null) {
+      this.patchGuidance({ phase: 'fallback', text: 'I need a bit more information first.' });
+      return this.state.guidance;
+    }
+
+    const envelope = buildGuidanceEnvelope({
+      userId: this.state.subject.userId,
+      nowIso: deps.nowIso(),
+      localDate: dashboard.localDate,
+      energy: dashboard.energy,
+      macros: dashboard.macros,
+      candidates,
+      history: { userId: this.state.subject.userId, observations: [] },
+      preferences: null,
+      policy: deps.policy,
+      environment: deps.environment,
+    } as never, {
+      subjectId: this.state.subject.userId,
+      sessionId: this.state.subject.sessionId,
+    });
+
+    const outcome = await requestGuidance(envelope, 'what_should_i_eat',
+      { provider: deps.provider });
+
+    // Re-checked AFTER the provider await: a slow result must never overwrite
+    // newer state, and must never surface to a different member.
+    if (generation !== this.guidanceGeneration
+        || sessionGeneration !== this.state.sessionGeneration) {
+      return this.state.guidance;
+    }
+
+    const envelopeId = `env-${generation}`;
+    this.activeEnvelope = { id: envelopeId, envelope };
+
+    const view = (c: { productId: string; productVersionId: string;
+      displayName: string; role: string }): GuidanceCandidateView => ({
+      productId: c.productId, productVersionId: c.productVersionId,
+      displayName: c.displayName, role: c.role,
+    });
+
+    const phase: GuidancePhase = outcome.candidates.length === 0
+      ? (outcome.usedFallback ? 'fallback' : 'guidance_available')
+      : outcome.nextAction === 'await_clarification' ? 'awaiting_clarification'
+      : 'awaiting_choice';
+
+    this.patchGuidance({
+      phase,
+      text: outcome.text,
+      candidates: outcome.candidates.map(view),
+      alternatives: envelope.alternatives.map(view),
+      envelopeId,
+      sessionGeneration,
+      usedFallback: outcome.usedFallback,
+    });
+    return this.state.guidance;
+  }
+
+  /**
+   * Choose a food the guidance actually offered.
+   *
+   * The id must belong to the CURRENTLY ACTIVE envelope. Anything else — an id
+   * from a superseded envelope, from another member, or invented — is refused
+   * rather than searched for, because a food we did not offer has no trusted
+   * recommendation behind it.
+   */
+  async chooseGuidanceCandidate(
+    productVersionId: string,
+    envelopeId: string,
+  ): Promise<GuidanceState> {
+    const active = this.activeEnvelope;
+    const stale = active === null || active.id !== envelopeId
+      || this.state.guidance.envelopeId !== envelopeId
+      || this.state.guidance.sessionGeneration !== this.state.sessionGeneration;
+
+    const offered = active === null ? false
+      : [...active.envelope.planComponents, ...active.envelope.alternatives]
+        .some((c) => c.productVersionId === productVersionId);
+
+    if (stale || !offered) {
+      this.patchGuidance({
+        phase: 'awaiting_clarification',
+        text: "I don't have that as an option right now.",
+        candidates: [], alternatives: [],
+      });
+      return this.state.guidance;
+    }
+
+    // HANDOFF into the EXISTING weighing flow. No second food logger exists:
+    // selectProduct is the same path the touch flow uses.
+    this.beginAddFood();
+    await this.selectProduct(productVersionId);
+
+    this.patchGuidance({
+      phase: 'awaiting_weight',
+      text: 'Put it on the scale when you\'re ready.',
+    });
+    return this.state.guidance;
+  }
+
+  /** Invalidate guidance. Called on log, switch, lock and cancellation. */
+  clearGuidance(): void {
+    this.guidanceGeneration += 1;
+    this.activeEnvelope = null;
+    this.state = { ...this.state, guidance: IDLE_GUIDANCE };
+  }
+
+  private patchGuidance(patch: Partial<GuidanceState>): void {
+    this.state = { ...this.state, guidance: { ...this.state.guidance, ...patch } };
+  }
+
   getSearchConfidence(): {
     readonly confidence: QueryConfidence;
     readonly didYouMean: string | null;
@@ -491,6 +658,13 @@ export class TabletAppController {
         developmentDataNotice: this.env.developmentDataNotice ?? null,
       },
       addFood: { ...this.state.addFood, phase: 'completed', outcome: result.outcome, error: null },
+      /**
+       * The logged food changed today's intake, so guidance built on the
+       * PREVIOUS state is now answering a question about a day that no longer
+       * exists. Clearing here is what forces the next request to rebuild from
+       * recomputed energy and macros.
+       */
+      guidance: IDLE_GUIDANCE,
     });
   }
 
@@ -498,6 +672,13 @@ export class TabletAppController {
   cancelFoodFlow(): void {
     this.cancelOutstandingCaptureIntent();
     this.flowCounter += 1;
+    /**
+     * The outgoing member's guidance — text, offered candidates, envelope and
+     * any pending weighing prompt — must not survive into the incoming
+     * member's state. Bumping the generation also discards any request still
+     * in flight for the previous member.
+     */
+    this.clearGuidance();
     this.patch({ addFood: { ...IDLE_ADD_FOOD, flowId: `flow-${this.flowCounter}` } });
   }
 
@@ -536,6 +717,13 @@ export class TabletAppController {
     }
     this.cancelOutstandingCaptureIntent();
     this.flowCounter += 1;
+    /**
+     * The outgoing member's guidance — text, offered candidates, envelope and
+     * any pending weighing prompt — must not survive into the incoming
+     * member's state. Bumping the generation also discards any request still
+     * in flight for the previous member.
+     */
+    this.clearGuidance();
 
     // If the platform is still loaded, the food on it belongs to the OUTGOING
     // user. The incoming user may not capture that placement, so scale capture
@@ -551,6 +739,7 @@ export class TabletAppController {
       sessionGeneration: activeSession.sessionGeneration,
       dashboard: null,
       addFood: { ...IDLE_ADD_FOOD, flowId: `flow-${this.flowCounter}` },
+      guidance: IDLE_GUIDANCE,
       requiresScaleClearForCurrentSubject: platformLoaded,
     });
     await this.refreshDashboard();

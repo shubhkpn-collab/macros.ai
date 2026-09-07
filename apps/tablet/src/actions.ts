@@ -49,6 +49,8 @@ export interface AuthHostPort {
 
 export interface ActionDeps {
   readonly controller: TabletAppController;
+  /** Supplied by the host. Absent means guidance is unavailable on this build. */
+  readonly guidance?: Parameters<TabletAppController['requestFoodGuidance']>[0];
   readonly auth: AuthHostPort;
   readonly activity: () => Parameters<TabletAppController['switchActiveUser']>[1];
   readonly onChanged: () => void;
@@ -59,6 +61,8 @@ export interface ActionDeps {
 
 export interface TabletActions {
   onAddFood(): void;
+  onRequestGuidance(): void;
+  onChooseGuidanceCandidate(productVersionId: string, envelopeId: string): void;
   onSearchFood(query: string): void;
   onEnterManualWeight(grams: number): void;
   onSelectOption(productVersionId: string): void;
@@ -77,6 +81,20 @@ export function createActions(deps: ActionDeps): TabletActions {
 
   return {
     onAddFood: () => { controller.beginAddFood(); onChanged(); },
+
+    /**
+     * THE guidance intent — the same one voice will call later. The component
+     * knows nothing about envelopes, providers or recommendation; it invokes an
+     * application intent and re-renders.
+     */
+    onRequestGuidance: () => {
+      if (deps.guidance === undefined) return;
+      after(controller.requestFoodGuidance(deps.guidance));
+    },
+
+    onChooseGuidanceCandidate: (productVersionId, envelopeId) => {
+      after(controller.chooseGuidanceCandidate(productVersionId, envelopeId));
+    },
 
     // Straight to the controller: its stale-search protection and error
     // handling are the authority, and duplicating search logic in RN would give

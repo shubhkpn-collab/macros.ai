@@ -124,8 +124,29 @@ export interface OfflineView {
   readonly message: string | null;
 }
 
+/**
+ * GUIDANCE VIEW.
+ *
+ * Only what React Native needs to draw. The renderer never sees a provider
+ * result, an envelope, or a nutrition figure it would have to interpret — the
+ * text arrived already rendered from a validated template.
+ */
+export interface GuidanceView {
+  readonly phase: string;
+  readonly text: string;
+  readonly candidates: readonly {
+    readonly productVersionId: string;
+    readonly displayName: string;
+    readonly role: string;
+  }[];
+  readonly envelopeId: string | null;
+  readonly visible: boolean;
+  readonly usedFallback: boolean;
+}
+
 export interface TabletViewModel {
   readonly screen: Screen;
+  readonly guidance: GuidanceView;
   /** Echoed so the search field can show what was actually searched for. */
   readonly searchQuery: string;
   readonly identity: IdentityView | null;
@@ -172,6 +193,12 @@ const LOCKED_OFFLINE: OfflineView = {
 export function lockedViewModel(): TabletViewModel {
   return {
     screen: 'locked',
+    // Locked state carries no guidance: the previous member's suggestions must
+    // not be readable from a locked screen.
+    guidance: {
+      phase: 'idle', text: '', candidates: [], envelopeId: null,
+      visible: false, usedFallback: false,
+    },
     searchQuery: '',
     identity: null,
     voice: 'idle',
@@ -346,6 +373,18 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
   const attempt = switchState.attempt;
   return {
     screen: screenOf(app),
+    guidance: {
+      phase: app.guidance.phase,
+      text: app.guidance.text,
+      candidates: app.guidance.candidates.map((c) => ({
+        productVersionId: c.productVersionId,
+        displayName: c.displayName,
+        role: c.role,
+      })),
+      envelopeId: app.guidance.envelopeId,
+      visible: app.guidance.phase !== 'idle',
+      usedFallback: app.guidance.usedFallback,
+    },
     searchQuery: app.addFood.query,
     identity: {
       displayName: app.subject.displayName,

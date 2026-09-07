@@ -17,6 +17,8 @@ import type { TabletHost } from './bootstrap.js';
 import type { TabletComposition, TabletPorts } from './composition.js';
 import { toFoodCard, fallbackInitials } from '@macros/domain-catalog';
 import { buildVocabulary, resilientSearch } from '@macros/domain-food-search';
+import { DEFAULT_RECOMMENDATION_POLICY } from '@macros/domain-recommendation';
+import { FakeGuidanceProvider } from '@macros/guidance';
 import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 
 /**
@@ -129,8 +131,33 @@ export async function createDevelopmentHost(
     },
   };
 
+  /**
+   * Guidance dependencies. The FAKE provider only — no network, no key, no
+   * cost. A live adapter swaps in here without touching nutrition,
+   * recommendation or the renderer.
+   */
+  const guidance = {
+    provider: new FakeGuidanceProvider(),
+    // Rebuilt on EVERY request from the live repository, never cached, so
+    // guidance always reflects the food actually logged so far.
+    eligibleCandidates: async (): Promise<readonly unknown[]> => {
+      const searchable = await repositories.products.listSearchable();
+      return searchable.map((v) => ({
+        productVersion: v,
+        head: {
+          productId: v.productId, currentProductVersionId: v.productVersionId,
+          isActive: true, updatedAt: '2026-01-01T00:00:00.000Z',
+        },
+      }));
+    },
+    nowIso: (): string => new Date().toISOString(),
+    policy: DEFAULT_RECOMMENDATION_POLICY,
+    environment: 'test',
+  };
+
   return {
     composition,
+    guidance,
     auth,
     hasActiveSession: true,
     developmentNotice: DEVELOPMENT_NOTICE,

@@ -55,15 +55,35 @@ const check = (abs: string): void => {
   });
 };
 
+/**
+ * GENERATED Android build output.
+ *
+ * Gradle and CMake bake machine-specific absolute paths into their artifacts —
+ * that is correct behaviour for a build cache, not a portability defect, and it
+ * is not executable source authority. These directories are scoped precisely:
+ * `apps/tablet/android/**` as a whole stays protected, so the manifest, Gradle
+ * files and Kotlin/Java sources beneath it are still scanned.
+ */
+const GENERATED_BUILD_DIRS = new Set(['.cxx', 'build', '.gradle', '.idea']);
+
+const isGeneratedAndroidOutput = (absolutePath: string): boolean => {
+  const rel = relative(REPO_ROOT, absolutePath).split('\\').join('/');
+  if (!rel.startsWith('apps/tablet/android/')) return false;
+  return rel.split('/').some((segment) => GENERATED_BUILD_DIRS.has(segment));
+};
+
 const walk = (dir: string): void => {
   let entries: string[];
   try { entries = readdirSync(dir); } catch { return; }
   for (const e of entries) {
     if (e === 'node_modules' || e === '.git') continue;
     const p = join(dir, e);
+    if (isGeneratedAndroidOutput(p)) continue;
     if (statSync(p).isDirectory()) walk(p); else check(p);
   }
 };
+
+export { isGeneratedAndroidOutput };
 
 for (const d of SCAN_DIRS) walk(join(REPO_ROOT, d));
 for (const f of SCAN_FILES) {

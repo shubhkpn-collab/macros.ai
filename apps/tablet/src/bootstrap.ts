@@ -34,6 +34,8 @@ export interface TabletHost {
    * Catalog QA browser. Present ONLY on a development host — a production host
    * returns null, so the surface cannot appear in a shipped configuration.
    */
+  /** Guidance dependencies for the host. Absent disables the guidance intent. */
+  readonly guidance?: unknown;
   readonly catalogBrowser: {
     search(query: string): Promise<readonly unknown[]>;
   } | null;
