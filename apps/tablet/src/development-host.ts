@@ -17,7 +17,9 @@ import type { TabletHost } from './bootstrap.js';
 import type { TabletComposition, TabletPorts } from './composition.js';
 import { toFoodCard, fallbackInitials } from '@macros/domain-catalog';
 import { buildVocabulary, resilientSearch } from '@macros/domain-food-search';
-import { DEFAULT_RECOMMENDATION_POLICY } from '@macros/domain-recommendation';
+import {
+  DEFAULT_RECOMMENDATION_POLICY, type RecommendationCandidate,
+} from '@macros/domain-recommendation';
 import { FakeGuidanceProvider } from '@macros/guidance';
 import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 
@@ -140,13 +142,15 @@ export async function createDevelopmentHost(
     provider: new FakeGuidanceProvider(),
     // Rebuilt on EVERY request from the live repository, never cached, so
     // guidance always reflects the food actually logged so far.
-    eligibleCandidates: async (): Promise<readonly unknown[]> => {
+    eligibleCandidates: async (): Promise<readonly RecommendationCandidate[]> => {
       const searchable = await repositories.products.listSearchable();
-      return searchable.map((v) => ({
+      return searchable.map((v): RecommendationCandidate => ({
         productVersion: v,
         head: {
-          productId: v.productId, currentProductVersionId: v.productVersionId,
-          isActive: true, updatedAt: '2026-01-01T00:00:00.000Z',
+          productId: v.productId,
+          currentProductVersionId: v.productVersionId,
+          isActive: true,
+          updatedAt: '2026-01-01T00:00:00.000Z' as unknown as never,
         },
       }));
     },

@@ -10,6 +10,9 @@ import {
   buildGuidanceEnvelope, requestGuidance,
   type GuidanceEnvelope, type GuidanceProvider,
 } from '@macros/guidance';
+import type {
+  RecommendationCandidate, RecommendationInput, RecommendationPolicy,
+} from '@macros/domain-recommendation';
 import {
   IDLE_GUIDANCE, type GuidanceCandidateView, type GuidancePhase, type GuidanceState,
 } from './state.js';
@@ -22,10 +25,16 @@ import {
  */
 export interface GuidanceDeps {
   readonly provider: GuidanceProvider | null;
-  eligibleCandidates(): Promise<readonly unknown[]>;
+  /**
+   * Typed with the real contract. `Promise<readonly unknown[]>` and a
+   * `policy: unknown` erased compile-time checking at precisely the boundary
+   * where trusted recommendation state is assembled — the one place a mistake
+   * would be silent.
+   */
+  eligibleCandidates(): Promise<readonly RecommendationCandidate[]>;
   nowIso(): string;
-  readonly policy: unknown;
-  readonly environment: string;
+  readonly policy: RecommendationPolicy;
+  readonly environment: RecommendationInput['environment'];
 }
 import {
   buildVocabulary, resilientSearch,
@@ -167,7 +176,10 @@ export class TabletAppController {
       return this.state.guidance;
     }
 
-    const envelope = buildGuidanceEnvelope({
+    // Fully typed: no `as never` around the recommendation input, so a change
+    // to RecommendationInput breaks here at compile time rather than at runtime
+    // on a device.
+    const guidanceInput: RecommendationInput = {
       userId: this.state.subject.userId,
       nowIso: deps.nowIso(),
       localDate: dashboard.localDate,
@@ -178,7 +190,9 @@ export class TabletAppController {
       preferences: null,
       policy: deps.policy,
       environment: deps.environment,
-    } as never, {
+    };
+
+    const envelope = buildGuidanceEnvelope(guidanceInput, {
       subjectId: this.state.subject.userId,
       sessionId: this.state.subject.sessionId,
     });
@@ -658,14 +672,21 @@ export class TabletAppController {
         developmentDataNotice: this.env.developmentDataNotice ?? null,
       },
       addFood: { ...this.state.addFood, phase: 'completed', outcome: result.outcome, error: null },
-      /**
-       * The logged food changed today's intake, so guidance built on the
-       * PREVIOUS state is now answering a question about a day that no longer
-       * exists. Clearing here is what forces the next request to rebuild from
-       * recomputed energy and macros.
-       */
-      guidance: IDLE_GUIDANCE,
     });
+
+    /**
+     * INVALIDATE GUIDANCE AT THE MOMENT THE LOG SUCCEEDS.
+     *
+     * The logged food changed the nutrition truth immediately, so every
+     * pre-log envelope and every pre-log request still in flight is now
+     * answering a question about a day that no longer exists. Patching the
+     * state alone was not enough: it left `activeEnvelope` populated and the
+     * generation unchanged, so a slow pre-log result could still land and an
+     * old candidate could still be chosen during the presentation dwell,
+     * before cancelFoodFlow ran. This uses the same authoritative mechanism as
+     * clearGuidance so all three move together.
+     */
+    this.clearGuidance();
   }
 
   /** Cancel leaves persisted logs untouched and commits nothing. */

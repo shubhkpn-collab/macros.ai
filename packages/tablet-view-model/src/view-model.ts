@@ -139,6 +139,16 @@ export interface GuidanceView {
     readonly displayName: string;
     readonly role: string;
   }[];
+  /**
+   * Bounded alternatives from the SAME envelope. Selecting one goes through
+   * the identical validated intent — there is deliberately no second selection
+   * path, and nothing here is searched for.
+   */
+  readonly alternatives: readonly {
+    readonly productVersionId: string;
+    readonly displayName: string;
+    readonly role: string;
+  }[];
   readonly envelopeId: string | null;
   readonly visible: boolean;
   readonly usedFallback: boolean;
@@ -196,7 +206,7 @@ export function lockedViewModel(): TabletViewModel {
     // Locked state carries no guidance: the previous member's suggestions must
     // not be readable from a locked screen.
     guidance: {
-      phase: 'idle', text: '', candidates: [], envelopeId: null,
+      phase: 'idle', text: '', candidates: [], alternatives: [], envelopeId: null,
       visible: false, usedFallback: false,
     },
     searchQuery: '',
@@ -377,6 +387,11 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
       phase: app.guidance.phase,
       text: app.guidance.text,
       candidates: app.guidance.candidates.map((c) => ({
+        productVersionId: c.productVersionId,
+        displayName: c.displayName,
+        role: c.role,
+      })),
+      alternatives: app.guidance.alternatives.slice(0, 3).map((c) => ({
         productVersionId: c.productVersionId,
         displayName: c.displayName,
         role: c.role,

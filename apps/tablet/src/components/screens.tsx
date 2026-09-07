@@ -136,6 +136,28 @@ export function HomeScreen(
               />
             </View>
           ))}
+
+          {vm.guidance.alternatives.length > 0 ? (
+            <View style={{ marginTop: space.lg }}>
+              <SectionLabel>Or</SectionLabel>
+              {vm.guidance.alternatives.map((c) => (
+                <View key={c.productVersionId} style={{ marginTop: space.sm }}>
+                  <SecondaryAction
+                    label={c.displayName}
+                    accessibilityLabel={`Choose ${c.displayName}`}
+                    tone="quiet"
+                    // The SAME validated intent as a primary candidate.
+                    onPress={() => {
+                      if (vm.guidance.envelopeId !== null) {
+                        actions.onChooseGuidanceCandidate(
+                          c.productVersionId, vm.guidance.envelopeId);
+                      }
+                    }}
+                  />
+                </View>
+              ))}
+            </View>
+          ) : null}
         </Surface>
       ) : null}
 
@@ -282,6 +304,21 @@ export function WeighingScreen(
           </Text>
         ) : null}
       </View>
+
+      {vm.guidance.phase === 'awaiting_weight' && vm.guidance.text.length > 0 ? (
+        // The already-validated deterministic text, rendered rather than
+        // duplicated: React must never author guidance wording.
+        <View
+          accessible
+          accessibilityLiveRegion="polite"
+          accessibilityLabel={vm.guidance.text}
+          style={{ paddingHorizontal: space.md, paddingTop: space.md }}
+        >
+          <Text style={{ color: color.accent, fontSize: type.body.size, textAlign: 'center' }}>
+            {vm.guidance.text}
+          </Text>
+        </View>
+      ) : null}
 
       <ScaleWeightDisplay scale={vm.scale} />
 

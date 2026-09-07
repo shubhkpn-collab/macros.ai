@@ -149,9 +149,12 @@ describe('AI-0 — reuse of the existing weighing and logging flow', () => {
 
 describe('AI-0 — post-log invalidation and freshness', () => {
   test('a successful log clears the previous guidance', () => {
+    // AI-0B strengthened this: patching state alone left activeEnvelope
+    // populated and the generation unchanged, so clearGuidance is now called
+    // at the moment the log succeeds.
     const c = read('packages', 'tablet-app-core', 'src', 'controller.ts');
     const log = c.slice(c.indexOf('async confirmFoodLog'), c.indexOf('cancelFoodFlow()'));
-    assert.match(log, /guidance: IDLE_GUIDANCE/);
+    assert.match(log, /this\.clearGuidance\(\)/);
   });
 
   test('every request builds a FRESH envelope from current state', () => {
