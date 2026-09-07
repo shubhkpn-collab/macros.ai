@@ -46,6 +46,22 @@
         }
       ]
     },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Fat free parmesan cheese topping"
+      ],
+      "alternatives": [
+        "Soy flour, defatted",
+        "Cottonseed meal seeds, partially defatted (glandless)",
+        "Defatted soy meal, raw",
+        "Dry mix gelatin desserts, reduced calorie, with aspartame, added phosphorus, potassium, sodium, vitamin C"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Fat free parmesan cheese topping fits your current needs best.",
+      "fallbackHasDigit": false
+    },
     "topThree": [
       {
         "name": "Fat free parmesan cheese topping",
@@ -116,6 +132,22 @@
           ]
         }
       ]
+    },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Papad"
+      ],
+      "alternatives": [
+        "Cottonseed flour seeds, low fat (glandless)",
+        "Sesame flour seeds, low-fat",
+        "Defatted peanut flour",
+        "Dry milk, nonfat, regular, with added vitamin A and vitamin D"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Papad fits your current needs best.",
+      "fallbackHasDigit": false
     },
     "topThree": [
       {
@@ -189,6 +221,22 @@
           ]
         }
       ]
+    },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Keebler, Keebler Chocolate Graham SELECTS"
+      ],
+      "alternatives": [
+        "Cocoa mix beverages, NESTLE, Hot Cocoa Mix Rich Chocolate With Marshmallows",
+        "Fudge candies, chocolate marshmallow, prepared-from-recipe",
+        "NESTLE cocoa mix, Rich Chocolate Hot Cocoa Mix",
+        "Gluten-free cookies, lemon wafer"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Keebler, Keebler Chocolate Graham SELECTS fits your current needs best.",
+      "fallbackHasDigit": false
     },
     "topThree": [
       {
@@ -273,6 +321,22 @@
         }
       ]
     },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Chinese noodles, chow mein",
+        "Mature seeds soybeans, roasted, salted"
+      ],
+      "alternatives": [
+        "Mature seeds soybeans, dry roasted",
+        "Mature seeds soybeans, roasted, no salt added",
+        "Multigrain crackers"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Chinese noodles, chow mein and Mature seeds soybeans, roasted, salted are good options.",
+      "fallbackHasDigit": false
+    },
     "topThree": [
       {
         "name": "Mature seeds soybeans, dry roasted",
@@ -344,6 +408,22 @@
         }
       ]
     },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Mature seeds lupins, cooked, boiled, without salt"
+      ],
+      "alternatives": [
+        "Mature seeds lupins, cooked, boiled, with salt",
+        "Cured pork, ham, extra lean (approximately 4% fat), canned, unheated",
+        "Cured pork, ham -- water added, whole, boneless, separable lean only, heated, roasted",
+        "Salmon fish, chinook, smoked, (lox), regular"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Mature seeds lupins, cooked, boiled, without salt fits your current needs best.",
+      "fallbackHasDigit": false
+    },
     "topThree": [
       {
         "name": "Mature seeds lupins, cooked, boiled, without salt",
@@ -388,6 +468,15 @@
       "moreGuidanceUsefulAfterWeighing": false,
       "plannedTotals": null,
       "components": []
+    },
+    "guidance": {
+      "plannerStatus": "energy_budget_exhausted",
+      "components": [],
+      "alternatives": [],
+      "slots": 5,
+      "weighingRequired": false,
+      "fallbackText": "You're at your energy target for today.",
+      "fallbackHasDigit": false
     },
     "topThree": [],
     "portionStatable": false,
@@ -451,6 +540,22 @@
           ]
         }
       ]
+    },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Seeds, pumpkin and squash seeds, whole, roasted, with salt added",
+        "Mature seeds soybeans, roasted, salted"
+      ],
+      "alternatives": [
+        "Mature seeds soybeans, dry roasted",
+        "Mature seeds soybeans, roasted, no salt added",
+        "Seeds, pumpkin and squash seeds, whole, roasted, without salt"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Seeds, pumpkin and squash seeds, whole, roasted, with salt added and Mature seeds soybeans, roasted, salted are good options.",
+      "fallbackHasDigit": false
     },
     "topThree": [
       {
@@ -523,6 +628,22 @@
         }
       ]
     },
+    "guidance": {
+      "plannerStatus": "available",
+      "components": [
+        "Creamy peanut butter"
+      ],
+      "alternatives": [
+        "Whole egg, dried, stabilized, glucose reduced",
+        "Creamy almond butter",
+        "Pistachio nuts, raw",
+        "Almonds nuts, whole, raw"
+      ],
+      "slots": 5,
+      "weighingRequired": true,
+      "fallbackText": "Creamy peanut butter fits your current needs best.",
+      "fallbackHasDigit": false
+    },
     "topThree": [
       {
         "name": "Creamy peanut butter",
@@ -566,6 +687,15 @@
       "moreGuidanceUsefulAfterWeighing": false,
       "plannedTotals": null,
       "components": []
+    },
+    "guidance": {
+      "plannerStatus": "no_eligible_candidates",
+      "components": [],
+      "alternatives": [],
+      "slots": 5,
+      "weighingRequired": false,
+      "fallbackText": "I don't have a good suggestion right now.",
+      "fallbackHasDigit": false
     },
     "topThree": [],
     "portionStatable": false,

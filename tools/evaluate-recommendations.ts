@@ -18,6 +18,7 @@ import {
   type RecommendationCandidate, type RecommendationInput, type RecommendationSet,
 } from '@macros/domain-recommendation';
 import { assessRole as assessRoleRaw, recommendFoodPlan } from '@macros/domain-recommendation';
+import { buildGuidanceEnvelope, deterministicGuidance } from '@macros/guidance';
 import { repoPath } from './repo-paths.js';
 
 const GENERIC = repoPath('data', 'usda-seed.json');
@@ -957,6 +958,22 @@ export function runNamedCases(candidates: readonly RecommendationCandidate[]): {
           why: comp.rationaleCodes.slice(0, 3),
         })),
       },
+      guidance: (() => {
+        // The nine cases through the ENVELOPE BUILDER, so the conversational
+        // boundary is measured on the same states as everything else.
+        const env = buildGuidanceEnvelope(planInput,
+          { subjectId: USER, sessionId: 'eval' });
+        const fb = deterministicGuidance(env);
+        return {
+          plannerStatus: env.plannerStatus,
+          components: env.planComponents.map((x) => x.displayName),
+          alternatives: env.alternatives.map((x) => x.displayName),
+          slots: Object.keys(env.slots).length,
+          weighingRequired: env.weighingRequired,
+          fallbackText: fb.text,
+          fallbackHasDigit: /\d/.test(fb.text),
+        };
+      })(),
       topThree: set.recommendations.slice(0, 3).map((r) => ({
         name: r.displayName,
         cls: (r as unknown as { actionabilityClass?: string }).actionabilityClass ?? 'unknown',
