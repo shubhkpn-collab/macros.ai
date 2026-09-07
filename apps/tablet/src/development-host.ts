@@ -124,12 +124,38 @@ export async function createDevelopmentHost(
       // QA would have been inspecting behaviour the product does not have,
       // which is worse than having no QA surface.
       const searchable = await repositories.products.listSearchable();
+
+      /**
+       * Search deliberately exposes each hit as the NARROWER `SearchableFood`,
+       * which carries identity and text but not the nutrient basis, source or
+       * effective date a FoodCard needs. Passing that straight to `toFoodCard`
+       * was the compile error.
+       *
+       * The authoritative versions are already in memory, so a single O(n)
+       * index rehydrates each hit in O(1). Calling `getVersion()` per result
+       * would be a repository round-trip for data we are already holding.
+       */
+      const productVersionById = new Map(
+        searchable.map((version) => [version.productVersionId, version]),
+      );
+
       const vocabulary = buildVocabulary(searchable);
       const response = resilientSearch(searchable, vocabulary, { text: query, limit: 25 });
-      return response.results.map((r) => {
-        const card = toFoodCard(r.productVersion);
-        return toFoodCardView(card as never, fallbackInitials(card.displayName));
-      });
+
+      const cards: FoodCardView[] = [];
+      for (const result of response.results) {
+        const fullVersion = productVersionById.get(result.productVersion.productVersionId);
+        if (fullVersion === undefined) {
+          // Search ranks only what it was given, so this cannot happen. If it
+          // ever does, the honest response is to omit the row rather than
+          // fabricate a nutrition record for a QA surface whose whole purpose
+          // is showing what the catalog really holds.
+          continue;
+        }
+        const card = toFoodCard(fullVersion);
+        cards.push(toFoodCardView(card as never, fallbackInitials(card.displayName)));
+      }
+      return cards;
     },
   };
 

@@ -221,3 +221,59 @@ describe('AI-0B — the typed guidance boundary', () => {
     void candidate('a', 'A');
   });
 });
+
+describe('AI-0C — catalog QA rehydrates the authoritative ProductVersion', () => {
+  const host = () => read('apps', 'tablet', 'src', 'development-host.ts');
+
+  test('search results are rehydrated by productVersionId', () => {
+    // resilientSearch exposes the NARROWER SearchableFood, which carries no
+    // nutrient basis, source or effective date — so it cannot be handed to
+    // toFoodCard, which is what the compiler caught.
+    const code = host();
+    assert.match(code, /const productVersionById = new Map\(/);
+    assert.match(code, /searchable\.map\(\(version\) => \[version\.productVersionId, version\]\)/);
+    assert.match(code,
+      /productVersionById\.get\(result\.productVersion\.productVersionId\)/);
+    assert.match(code, /toFoodCard\(fullVersion\)/);
+  });
+
+  test('the index is built once, not per result', () => {
+    // O(n) construction, O(1) hydration — and no repository round-trip for
+    // data already held in memory. Comments may DISCUSS getVersion; the code
+    // must not call it.
+    const code = host().replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const search = code.slice(code.indexOf('async search(query: string)'),
+      code.indexOf('const guidance = {'));
+    assert.equal((search.match(/new Map\(/g) ?? []).length, 1);
+    assert.equal(/getVersion\(/.test(search), false,
+      'a repository round-trip would refetch what is already loaded');
+  });
+
+  test('an unresolved id is omitted, never fabricated', () => {
+    const code = host();
+    const search = code.slice(code.indexOf('async search(query: string)'),
+      code.indexOf('const guidance = {'));
+    assert.match(search, /if \(fullVersion === undefined\) \{/);
+    assert.match(search, /continue;/);
+    // No placeholder nutrition may be invented for a QA surface whose purpose
+    // is showing what the catalog really holds.
+    assert.equal(/kcal:\s*0|basis:\s*\{/.test(search), false);
+  });
+
+  test('the fix uses no type-safety escape hatch', () => {
+    const code = host();
+    const search = code.slice(code.indexOf('async search(query: string)'),
+      code.indexOf('const guidance = {'));
+    for (const cheat of ['as ProductVersion', 'as unknown as ProductVersion',
+                         '@ts-ignore', '@ts-expect-error', ': any']) {
+      assert.equal(search.includes(cheat), false, `the fix uses ${cheat}`);
+    }
+  });
+
+  test('the search contract itself is untouched', () => {
+    const search = read('packages', 'domain-food-search', 'src', 'resilient-search.ts');
+    // The defect belonged in the development-host projection, not the domain.
+    assert.match(search, /export function resilientSearch\(/);
+    assert.match(search, /readonly results: readonly FoodSearchResult\[\]/);
+  });
+});
