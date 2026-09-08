@@ -262,3 +262,48 @@ describe('DEMO — final closure', () => {
     assert.match(entry, /console\.error\('\[macros\] host start failed'/);
   });
 });
+
+describe('DEMO — Home renders the real view-model contract', () => {
+  test('macro rings come from the MacroView[] array, not assumed keys', () => {
+    // `vm.macros.protein.displayRemaining` red-screened on the owner's device:
+    // the contract is an ARRAY, and naming keys assumed a shape it never had.
+    const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    assert.equal(/vm\.macros\.(protein|carbohydrate|fat)/.test(screens), false,
+      'macros is a MacroView[], not an object keyed by macro name');
+    assert.match(screens, /vm\.macros\.map\(\(macro\) =>/);
+    assert.match(screens, /label=\{macro\.label\}/);
+    assert.match(screens, /value=\{macro\.displayRemaining\}/);
+  });
+
+  test('the view model still supplies Protein, Carbs, Fat in order', async () => {
+    const vm = await import('@macros/tablet-view-model');
+    const locked = vm.lockedViewModel();
+    // Order is the view model's, not React's — duplicating it in the renderer
+    // would let the two drift.
+    assert.deepEqual(locked.macros.map((m) => m.label), []);
+    const source = read('packages', 'tablet-view-model', 'src', 'view-model.ts');
+    assert.match(source, /macroOf\('Protein'/);
+    assert.match(source, /macroOf\('Carbs'/);
+    assert.match(source, /macroOf\('Fat'/);
+    assert.match(source, /readonly macros: readonly MacroView\[\]/);
+  });
+
+  test('nullable view-model fields are narrowed, not coerced away', () => {
+    const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    // energy and selectedFood are legitimately nullable; reaching through
+    // either would have been the next red screen.
+    assert.match(screens, /vm\.energy === null \?/);
+    assert.match(screens, /selected !== null \?/);
+    // No optional chaining or coercion used to suppress a crash.
+    assert.equal(/vm\.(energy|selectedFood|review)\?\./.test(screens), false);
+    assert.equal(/as any|as never|as unknown as/.test(screens), false);
+  });
+
+  test('the manual-weight action can actually be disabled', () => {
+    // SecondaryAction had no `disabled` prop, so the guard was silently inert.
+    const primitives = read('apps', 'tablet', 'src', 'components', 'primitives.tsx');
+    assert.match(primitives, /disabled = false/);
+    assert.match(primitives, /disabled=\{disabled\}/);
+    assert.match(primitives, /accessibilityState=\{\{ disabled \}\}/);
+  });
+});

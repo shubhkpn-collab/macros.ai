@@ -127,14 +127,17 @@ export function HomeScreen(
         Hey! Macros
       </Text>
 
-      {/* ONE sentence, produced by the view model. React computes nothing. */}
+      {/* ONE sentence, produced by the view model. React computes nothing.
+          `energy` is legitimately null before the first dashboard resolves, so
+          the absence is rendered as its own quiet state rather than reached
+          through. */}
       <Text
         style={{
           color: color.textSecondary, fontSize: 20, textAlign: 'center',
           marginBottom: space.xxl, maxWidth: 560,
         }}
       >
-        {vm.energy.semantic}
+        {vm.energy === null ? 'Getting your day ready…' : vm.energy.semantic}
       </Text>
 
       <MacrosOrb
@@ -177,10 +180,18 @@ export function HomeScreen(
         </ScrollView>
       ) : null}
 
+      {/* Projected from the MacroView[] contract in the order the view model
+          supplies — Protein, Carbs, Fat. Naming the keys here assumed a shape
+          the contract never had, and duplicating the order in React would let
+          the two drift. */}
       <View style={{ flexDirection: 'row', marginTop: space.xxl }}>
-        <MacroRing label="Protein" value={vm.macros.protein.displayRemaining} />
-        <MacroRing label="Carbs" value={vm.macros.carbohydrate.displayRemaining} />
-        <MacroRing label="Fat" value={vm.macros.fat.displayRemaining} />
+        {vm.macros.map((macro) => (
+          <MacroRing
+            key={macro.label}
+            label={macro.label}
+            value={macro.displayRemaining}
+          />
+        ))}
       </View>
 
       {/* Secondary and discreet: the orb is the product, this is the escape. */}
@@ -292,7 +303,10 @@ export function WeighingScreen(
   const [showManual, setShowManual] = useState(false);
   const weight = vm.scale.displayWeight;
   const parsed = Number(manual);
-  const selectedName = vm.selectedFood?.displayName ?? '';
+  // `selectedFood` is genuinely nullable, so it is narrowed rather than
+  // coerced to an empty string — a blank line where the food should be reads
+  // as a rendering fault, not as a state.
+  const selected = vm.selectedFood;
 
   return (
     <ScrollView
@@ -337,14 +351,16 @@ export function WeighingScreen(
           ? 'Waiting for a stable weight' : `Weight ${weight}`}
       />
 
-      <Text
-        style={{
-          color: color.textSecondary, fontSize: 22,
-          marginTop: space.xl, textAlign: 'center',
-        }}
-      >
-        {selectedName}
-      </Text>
+      {selected !== null ? (
+        <Text
+          style={{
+            color: color.textSecondary, fontSize: 22,
+            marginTop: space.xl, textAlign: 'center',
+          }}
+        >
+          {selected.displayName}
+        </Text>
+      ) : null}
 
       {/* The real-scale path stays primary. */}
       <View style={{ marginTop: space.xl, width: 320 }}>

@@ -91,18 +91,23 @@ export function PrimaryAction(
 }
 
 export function SecondaryAction(
-  { label, onPress, accessibilityLabel, tone = 'default' }:
+  { label, onPress, accessibilityLabel, tone = 'default', disabled = false }:
   {
     label: string; onPress: () => void; accessibilityLabel: string;
     tone?: 'default' | 'quiet';
+    /** Manual weight entry needs this: an unparseable value must not submit. */
+    disabled?: boolean;
   },
 ): React.JSX.Element {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => ({
+        opacity: disabled ? 0.45 : 1,
         minHeight: touch.secondaryHeight,
         borderRadius: radius.pill,
         borderWidth: tone === 'quiet' ? 0 : 1,
