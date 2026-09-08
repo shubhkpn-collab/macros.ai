@@ -23,6 +23,10 @@ import {
 import { dirname, join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
+import {
+  countRegistrations,
+  registerSpeechPackage,
+} from './register-speech-package.mjs';
 
 const REPO_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const APP_DIR = join(REPO_ROOT, 'apps', 'tablet');

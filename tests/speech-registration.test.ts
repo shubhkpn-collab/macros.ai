@@ -68,6 +68,18 @@ describe('DEMO — native speech registration', () => {
 });
 
 describe('DEMO — the hydration script owns one registration step', () => {
+  test('the script IMPORTS the helper it calls', () => {
+    // node --check parses this file fine without the import; the failure is a
+    // runtime ReferenceError that appears only when the owner actually
+    // hydrates, which is the worst possible moment to find it.
+    const script = read('tools', 'hydrate-android-shell.mjs');
+    const imports = script.match(
+      /import \{[^}]*\} from '\.\/register-speech-package\.mjs';/g) ?? [];
+    assert.equal(imports.length, 1, 'exactly one helper import');
+    assert.match(imports[0]!, /registerSpeechPackage/);
+    assert.match(imports[0]!, /countRegistrations/);
+  });
+
   test('the script has exactly one registration implementation', () => {
     const script = read('tools', 'hydrate-android-shell.mjs');
     // It was duplicated three times, and two copies ran before the sync.
@@ -88,6 +100,9 @@ describe('DEMO — the hydration script owns one registration step', () => {
     const script = read('tools', 'hydrate-android-shell.mjs');
     assert.match(script, /countRegistrations\(readFileSync\(mainApp, 'utf8'\)\)/);
     assert.match(script, /registrations !== 1/);
+    // One call site each: a second would mean a second registration path.
+    assert.equal((script.match(/registerSpeechPackage\(/g) ?? []).length, 1);
+    assert.equal((script.match(/countRegistrations\(/g) ?? []).length, 1);
   });
 
   test('the native speech files are tracked and preserved', async () => {
