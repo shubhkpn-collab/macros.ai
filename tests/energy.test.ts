@@ -462,9 +462,30 @@ describe('profile binding — BMR and TEF cannot see different profiles', () => 
 
 describe('NO PAL — regression guard', () => {
   const energySrc = join(new URL('..', import.meta.url).pathname, 'packages/domain-energy/src');
-  const files = readdirSync(energySrc).filter((f) => f.endsWith('.ts'));
+  /**
+   * The architecture test writes a temporary `__purity_probe__.ts` here to
+   * prove the purity checker catches a banned token, then deletes it. Node runs
+   * test files concurrently, so this scan can discover that probe mid-flight
+   * and fail on the violation the other test deliberately created.
+   *
+   * Excluded by name rather than by serialising the suite: the probe is the one
+   * file in this directory that is not production source.
+   */
+  const PURITY_PROBE = '__purity_probe__.ts';
+  const files = readdirSync(energySrc)
+    .filter((f) => f.endsWith('.ts') && f !== PURITY_PROBE);
 
   const banned = ['PAL_FACTORS', 'palFactor', 'tdeeBaseline', 'activityLevel'];
+
+  test('the architecture probe is excluded, real sources are not', () => {
+    const candidate = (f: string): boolean => f.endsWith('.ts') && f !== PURITY_PROBE;
+    assert.equal(candidate(PURITY_PROBE), false, 'the probe must be skipped');
+    // A normal production filename is still scanned, so the exclusion cannot
+    // quietly hide real sources.
+    assert.equal(candidate('energy-balance.ts'), true);
+    assert.ok(files.length > 0, 'production energy sources are still scanned');
+    assert.equal(files.includes(PURITY_PROBE), false);
+  });
 
   for (const f of files) {
     test(`${f} contains no PAL concept`, () => {
