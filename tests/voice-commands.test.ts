@@ -140,11 +140,13 @@ describe('DEMO — voice and premium UI are actually wired', () => {
   });
 
   test('hydration registers the package automatically', () => {
+    // The literal now lives in the shared helper; the script calls it once and
+    // COUNTS the result. Detailed behaviour is covered in
+    // tests/speech-registration.test.ts.
     const hydrate = read('tools', 'hydrate-android-shell.mjs');
-    assert.match(hydrate, /add\(MacrosSpeechPackage\(\)\)/);
-    // Idempotent, and it proves the patch rather than assuming it.
+    assert.match(hydrate, /registerSpeechPackage\(/);
     assert.match(hydrate, /already registers MacrosSpeechPackage/);
-    assert.match(hydrate, /registration missing after patch/);
+    assert.match(hydrate, /registrations !== 1/);
   });
 
   test('the coordinator is instantiated once, outside its own file', () => {
