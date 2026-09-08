@@ -9,6 +9,16 @@ android/app/src/*
 !android/app/src/main
 android/app/src/main/*
 !android/app/src/main/AndroidManifest.xml
+# MACROS-owned native modules. The blanket main/* rule silently swallowed
+# these, so hydration expected files the bundle did not carry.
+!android/app/src/main/java
+android/app/src/main/java/*
+!android/app/src/main/java/com
+android/app/src/main/java/com/*
+!android/app/src/main/java/com/macrostablet
+android/app/src/main/java/com/macrostablet/*
+!android/app/src/main/java/com/macrostablet/MacrosSpeechModule.kt
+!android/app/src/main/java/com/macrostablet/MacrosSpeechPackage.kt
 !android/app/src/debug
 android/app/src/debug/*
 !android/app/src/debug/AndroidManifest.xml

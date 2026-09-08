@@ -48,7 +48,9 @@ describe('AI-0 — the architectural boundary holds', () => {
     // A UI-only recommendation path would drift from the voice path.
     assert.match(actions, /controller\.requestFoodGuidance\(deps\.guidance\)/);
     const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
-    assert.match(screens, /onPress=\{actions\.onRequestGuidance\}/);
+    // The orb is now the control: push-to-talk when speech exists, the same
+    // guidance intent when it does not.
+    assert.match(screens, /actions\.onOrbPress \?\? actions\.onRequestGuidance/);
   });
 
   test('only rendered text reaches the view model', () => {

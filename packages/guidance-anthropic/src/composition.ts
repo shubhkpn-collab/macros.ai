@@ -21,6 +21,8 @@ export interface GuidanceProviderSettings {
   readonly model: string;
   readonly timeoutMs?: number;
   readonly baseUrl?: string;
+  /** Bounded on the demo path so a runaway response cannot become a bill. */
+  readonly maxTokens?: number;
 }
 
 export interface ServerGuidanceCompositionOptions {
@@ -54,5 +56,6 @@ export function createServerGuidanceProvider(
     transport: createAnthropicFetchTransport(options.fetchImpl),
     ...(settings.timeoutMs !== undefined ? { timeoutMs: settings.timeoutMs } : {}),
     ...(settings.baseUrl !== undefined ? { baseUrl: settings.baseUrl } : {}),
+    ...(settings.maxTokens !== undefined ? { maxTokens: settings.maxTokens } : {}),
   });
 }

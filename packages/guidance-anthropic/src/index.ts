@@ -178,3 +178,4 @@ export class AnthropicGuidanceProvider implements GuidanceProvider {
 export * from './decode.js';
 export * from './fetch-transport.js';
 export * from './composition.js';
+export * from './demo-profile.js';

@@ -21,7 +21,9 @@ import { createPgPool } from '@macros/postgres-driver';
 import {
   FakeAuthSessionProvider, StructuredLogger, loadRoleConfig, type RuntimeConfig,
 } from '@macros/runtime-config';
-import { createServerGuidanceProvider } from '@macros/guidance-anthropic';
+import {
+  createAnthropicFetchTransport, createServerGuidanceProvider, demoProviderSettings,
+} from '@macros/guidance-anthropic';
 
 /** Any UUID; the acceptance host presents the matching bearer. */
 const ACCEPTANCE_SUBJECT = '11111111-1111-4111-8111-111111111111';
@@ -85,15 +87,32 @@ async function main(): Promise<void> {
   });
   if (!loaded.ok) throw new Error('acceptance config invalid');
 
-  const provider = createServerGuidanceProvider({
-    config: { assistant: 'real' },
-    // A recognisable placeholder. No real key is needed because the transport
-    // never reaches a vendor.
-    providerSettings: {
-      apiKey: 'sk-acceptance-NOT-A-REAL-KEY', model: 'acceptance-fake-model',
-    },
-    fetchImpl: fakeVendorFetch as never,
-  });
+  /**
+   * REAL INFERENCE IS OPT-IN, PER RUN.
+   *
+   * Without ANTHROPIC_API_KEY the backend uses the fake vendor transport and
+   * costs nothing — that stays the default so an ordinary run can never bill.
+   * Supplying a key switches the SAME provider onto the real network; nothing
+   * about the guidance contract, the validator or the tablet changes.
+   */
+  const apiKey = process.env['ANTHROPIC_API_KEY'];
+  const model = process.env['MACROS_GUIDANCE_MODEL'] ?? 'claude-sonnet-4-6';
+  const live = apiKey !== undefined && apiKey.length > 0;
+
+  const provider = live
+    ? createServerGuidanceProvider({
+      config: { assistant: 'real' },
+      providerSettings: demoProviderSettings(apiKey, model),
+      // The real transport, with AbortController cancellation on timeout.
+      fetchImpl: fetch as never,
+    })
+    : createServerGuidanceProvider({
+      config: { assistant: 'real' },
+      providerSettings: {
+        apiKey: 'sk-acceptance-NOT-A-REAL-KEY', model: 'acceptance-fake-model',
+      },
+      fetchImpl: fakeVendorFetch as never,
+    });
 
   const deps: ApiDependencies = {
     config: (loaded as { config: RuntimeConfig }).config,
@@ -175,7 +194,8 @@ async function main(): Promise<void> {
       `guidance acceptance backend on http://0.0.0.0:${PORT}\n`
       + `  emulator base URL : http://10.0.2.2:${PORT}\n`
       + `  database          : ${DATABASE} (real PostgresGuidanceAdmission)\n`
-      + '  vendor calls      : NONE (fake transport)\n'
+      + `  inference         : ${live
+        ? `LIVE — model ${model}, BILLABLE` : 'fake transport, $0'}\n`
       + '  credentials       : not printed\n');
   });
 }

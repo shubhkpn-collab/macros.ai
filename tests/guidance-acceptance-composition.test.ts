@@ -424,3 +424,53 @@ describe('AI-2 FINAL FIX — trust boundary and repository hygiene', () => {
     assert.match(ignore, /^\/package-lock\.json$/m);
   });
 });
+
+describe('DEMO — real inference is opt-in and bounded', () => {
+  const backend = () => read('tools', 'guidance-acceptance', 'run-backend.ts');
+
+  test('the fake transport is the default; a key opts in', () => {
+    const code = stripComments(backend());
+    assert.match(code, /const live = apiKey !== undefined && apiKey\.length > 0/);
+    assert.match(code, /live\s*\?\s*createServerGuidanceProvider/);
+    // Without a key an ordinary run cannot bill.
+    assert.match(code, /fetchImpl: fakeVendorFetch as never/);
+  });
+
+  test('the model is configurable, never baked in', () => {
+    assert.match(backend(), /process\.env\['MACROS_GUIDANCE_MODEL'\]/);
+  });
+
+  test('the demo profile is conservative', async () => {
+    const { DEMO_MAX_TOKENS, DEMO_TIMEOUT_MS, demoProviderSettings } =
+      await import('@macros/guidance-anthropic');
+    // The model only picks a template and a few ids; a large ceiling would buy
+    // nothing but exposure during a live demonstration.
+    assert.ok(DEMO_MAX_TOKENS <= 512);
+    assert.ok(DEMO_TIMEOUT_MS <= 8000);
+    const s = demoProviderSettings('sk-test-DO-NOT-LEAK-123', 'some-model');
+    assert.equal(s.maxTokens, DEMO_MAX_TOKENS);
+    assert.equal(s.timeoutMs, DEMO_TIMEOUT_MS);
+  });
+
+  test('the demo profile reads no secret itself', () => {
+    const code = read('packages', 'guidance-anthropic', 'src', 'demo-profile.ts');
+    assert.equal(code.includes('process.env'), false);
+  });
+
+  test('the key never reaches the tablet', () => {
+    for (const f of ['src/acceptance-config.ts', 'src/development-host.ts',
+                     'src/host-selection.acceptance.ts']) {
+      const code = read('apps', 'tablet', ...f.split('/'));
+      for (const banned of ['ANTHROPIC_API_KEY', 'anthropic', 'x-api-key']) {
+        assert.equal(code.toLowerCase().includes(banned.toLowerCase()), false,
+          `${f} references ${banned}`);
+      }
+    }
+  });
+
+  test('one request stays one billable call', () => {
+    const anthropic = read('packages', 'guidance-anthropic', 'src', 'index.ts');
+    assert.equal((anthropic.match(/transport\.send\(/g) ?? []).length, 1);
+    assert.equal(/retry|backoff/i.test(anthropic), false);
+  });
+});

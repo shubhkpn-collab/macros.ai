@@ -99,13 +99,14 @@ describe('AI-0B — alternatives survive to the renderer', () => {
   });
 
   test('an alternative uses the SAME validated choice intent', () => {
+    // The premium Home renders candidates and alternatives through ONE card
+    // list, so a single call site now serves both. That is a stronger
+    // guarantee than two identical ones: there is no second path to drift.
     const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
-    const block = screens.slice(screens.indexOf('vm.guidance.alternatives.length > 0'));
-    assert.match(block, /actions\.onChooseGuidanceCandidate\(/);
-    // No second selection path may exist.
-    assert.equal(/selectProduct|searchFood/.test(block.slice(0, 900)), false);
-    const calls = screens.match(/onChooseGuidanceCandidate\(/g) ?? [];
-    assert.ok(calls.length >= 2, 'candidates and alternatives share one intent');
+    assert.match(screens, /\[\.\.\.guidance\.candidates, \.\.\.guidance\.alternatives\]/);
+    assert.match(screens, /actions\.onChooseGuidanceCandidate\(/);
+    assert.equal(/selectProduct\(|searchFood\(/.test(screens), false,
+      'no second selection path may exist');
   });
 });
 

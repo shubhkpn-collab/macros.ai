@@ -30,17 +30,40 @@ function Root() {
         const built = await createSelectedHost();
         if (!cancelled) setHost(built);
       } catch (e) {
-        if (!cancelled) setError(String(e));
+        if (!cancelled) {
+          // Diagnostics go to the log, never to the screen. A stack trace or a
+          // localhost URL in front of an investor is worse than any outage.
+          console.error('[macros] host start failed', e);
+          setError(true);
+        }
       }
     })();
     return () => { cancelled = true; };
   }, []);
 
   if (error !== null) {
+    // Branded and generic. It says what happened and what to do, and nothing
+    // about databases, providers or hosts.
     return (
-      <View style={{ flex: 1, backgroundColor: '#0E1113', padding: 32, justifyContent: 'center' }}>
-        <Text style={{ color: '#E2705F', fontSize: 22 }}>Host failed to start</Text>
-        <Text style={{ color: '#A8AFB5', fontSize: 18, marginTop: 16 }}>{error}</Text>
+      <View
+        style={{
+          flex: 1, backgroundColor: '#0C0F11', padding: 48,
+          alignItems: 'center', justifyContent: 'center',
+        }}
+      >
+        <Text style={{ color: '#F2F4F5', fontSize: 40, fontWeight: '600' }}>
+          Hey! Macros
+        </Text>
+        <Text
+          style={{
+            color: '#A6ADB4', fontSize: 20, marginTop: 24, textAlign: 'center',
+          }}
+        >
+          Something didn't start correctly.
+        </Text>
+        <Text style={{ color: '#6E767D', fontSize: 18, marginTop: 8 }}>
+          Try again.
+        </Text>
       </View>
     );
   }

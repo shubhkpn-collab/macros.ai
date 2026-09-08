@@ -17,7 +17,9 @@
  * Run from anywhere:  node tools/hydrate-android-shell.mjs
  */
 import { execFileSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
+import {
+  cpSync, existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync,
+} from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -42,6 +44,10 @@ const MACROS_OWNED = [
   // loses its network permission.
   'android/app/src/debug/AndroidManifest.xml',
   'android/app/src/debug/res/xml/network_security.xml',
+  // MACROS-owned native modules. The RN template does not create these, and a
+  // hydrate that dropped them would silently remove voice from the build.
+  'android/app/src/main/java/com/macrostablet/MacrosSpeechModule.kt',
+  'android/app/src/main/java/com/macrostablet/MacrosSpeechPackage.kt',
 ];
 
 const say = (m) => console.log(m);
@@ -72,13 +78,95 @@ try {
     '--skip-install', '--skip-git-init', '--install-pods', 'false',
   ], { stdio: 'inherit' });
 } catch (e) {
-  rmSync(scratch, { recursive: true, force: true });
+  // --- 6. Register the MACROS speech package in the GENERATED MainApplication --
+//
+// The RN template writes MainApplication.kt, so MACROS cannot simply own the
+// file. Patching it here means the owner never edits generated Kotlin before a
+// demo, and a missed manual edit cannot silently remove voice from the build.
+const mainApp = join(APP_DIR, 'android/app/src/main/java/com/macrostablet/MainApplication.kt');
+if (!existsSync(mainApp)) {
+  fail(`hydration incomplete — MainApplication.kt not generated at ${mainApp}`);
+}
+
+let mainSource = readFileSync(mainApp, 'utf8');
+const REGISTRATION = 'add(MacrosSpeechPackage())';
+
+if (mainSource.includes(REGISTRATION)) {
+  // Idempotent: a second hydrate must not register the package twice.
+  say('MainApplication already registers MacrosSpeechPackage — left unchanged.');
+} else {
+  /**
+   * The template's getPackages() returns the autolinked list and then adds
+   * manual packages inside an apply block. Anchoring on that comment is how the
+   * upstream template documents the insertion point.
+   */
+  const anchor = /(PackageList\(this\)\.packages\.apply\s*\{)/;
+  if (!anchor.test(mainSource)) {
+    fail('hydration cannot register MacrosSpeechPackage: MainApplication.kt '
+      + 'does not match the expected RN template shape. Inspect it manually '
+      + 'rather than letting the build ship without voice.');
+  }
+  mainSource = mainSource.replace(anchor,
+    `$1\n              // MACROS speech bridge (STT + TTS). Registered by\n`
+    + `              // tools/hydrate-android-shell.mjs; do not edit by hand.\n`
+    + `              ${REGISTRATION}`);
+  writeFileSync(mainApp, mainSource);
+  say('MainApplication patched to register MacrosSpeechPackage.');
+}
+
+// Prove it, rather than assuming the replace worked.
+if (!readFileSync(mainApp, 'utf8').includes(REGISTRATION)) {
+  fail('MacrosSpeechPackage registration missing after patch');
+}
+
+rmSync(scratch, { recursive: true, force: true });
   fail(`template generation failed — is the network reachable? (${String(e).slice(0, 120)})`);
 }
 
 const templateAndroid = join(scratch, APP_NAME, 'android');
 if (!existsSync(templateAndroid)) {
-  rmSync(scratch, { recursive: true, force: true });
+  // --- 6. Register the MACROS speech package in the GENERATED MainApplication --
+//
+// The RN template writes MainApplication.kt, so MACROS cannot simply own the
+// file. Patching it here means the owner never edits generated Kotlin before a
+// demo, and a missed manual edit cannot silently remove voice from the build.
+const mainApp = join(APP_DIR, 'android/app/src/main/java/com/macrostablet/MainApplication.kt');
+if (!existsSync(mainApp)) {
+  fail(`hydration incomplete — MainApplication.kt not generated at ${mainApp}`);
+}
+
+let mainSource = readFileSync(mainApp, 'utf8');
+const REGISTRATION = 'add(MacrosSpeechPackage())';
+
+if (mainSource.includes(REGISTRATION)) {
+  // Idempotent: a second hydrate must not register the package twice.
+  say('MainApplication already registers MacrosSpeechPackage — left unchanged.');
+} else {
+  /**
+   * The template's getPackages() returns the autolinked list and then adds
+   * manual packages inside an apply block. Anchoring on that comment is how the
+   * upstream template documents the insertion point.
+   */
+  const anchor = /(PackageList\(this\)\.packages\.apply\s*\{)/;
+  if (!anchor.test(mainSource)) {
+    fail('hydration cannot register MacrosSpeechPackage: MainApplication.kt '
+      + 'does not match the expected RN template shape. Inspect it manually '
+      + 'rather than letting the build ship without voice.');
+  }
+  mainSource = mainSource.replace(anchor,
+    `$1\n              // MACROS speech bridge (STT + TTS). Registered by\n`
+    + `              // tools/hydrate-android-shell.mjs; do not edit by hand.\n`
+    + `              ${REGISTRATION}`);
+  writeFileSync(mainApp, mainSource);
+  say('MainApplication patched to register MacrosSpeechPackage.');
+}
+
+// Prove it, rather than assuming the replace worked.
+if (!readFileSync(mainApp, 'utf8').includes(REGISTRATION)) {
+  fail('MacrosSpeechPackage registration missing after patch');
+}
+
+rmSync(scratch, { recursive: true, force: true });
   fail('the generated template contains no android/ directory');
 }
 
@@ -121,6 +209,47 @@ if (missing.length > 0) {
   fail(`hydration incomplete — missing: ${missing.join(', ')}`);
 }
 
+// --- 6. Register the MACROS speech package in the GENERATED MainApplication --
+//
+// The RN template writes MainApplication.kt, so MACROS cannot simply own the
+// file. Patching it here means the owner never edits generated Kotlin before a
+// demo, and a missed manual edit cannot silently remove voice from the build.
+const mainApp = join(APP_DIR, 'android/app/src/main/java/com/macrostablet/MainApplication.kt');
+if (!existsSync(mainApp)) {
+  fail(`hydration incomplete — MainApplication.kt not generated at ${mainApp}`);
+}
+
+let mainSource = readFileSync(mainApp, 'utf8');
+const REGISTRATION = 'add(MacrosSpeechPackage())';
+
+if (mainSource.includes(REGISTRATION)) {
+  // Idempotent: a second hydrate must not register the package twice.
+  say('MainApplication already registers MacrosSpeechPackage — left unchanged.');
+} else {
+  /**
+   * The template's getPackages() returns the autolinked list and then adds
+   * manual packages inside an apply block. Anchoring on that comment is how the
+   * upstream template documents the insertion point.
+   */
+  const anchor = /(PackageList\(this\)\.packages\.apply\s*\{)/;
+  if (!anchor.test(mainSource)) {
+    fail('hydration cannot register MacrosSpeechPackage: MainApplication.kt '
+      + 'does not match the expected RN template shape. Inspect it manually '
+      + 'rather than letting the build ship without voice.');
+  }
+  mainSource = mainSource.replace(anchor,
+    `$1\n              // MACROS speech bridge (STT + TTS). Registered by\n`
+    + `              // tools/hydrate-android-shell.mjs; do not edit by hand.\n`
+    + `              ${REGISTRATION}`);
+  writeFileSync(mainApp, mainSource);
+  say('MainApplication patched to register MacrosSpeechPackage.');
+}
+
+// Prove it, rather than assuming the replace worked.
+if (!readFileSync(mainApp, 'utf8').includes(REGISTRATION)) {
+  fail('MacrosSpeechPackage registration missing after patch');
+}
+
 rmSync(scratch, { recursive: true, force: true });
 
 say('');
@@ -129,3 +258,5 @@ say('Scratch directory removed.');
 say('');
 say('Next:');
 say('  cd apps/tablet && npm install && npm run typecheck');
+say('');
+say('Voice: MacrosSpeechPackage is registered automatically. No manual edit.');

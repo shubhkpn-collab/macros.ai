@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  AccessibilityInfo, Animated, ScrollView, Text, TextInput, View,
+  AccessibilityInfo, Animated, Pressable, ScrollView, Text, TextInput, View,
 } from 'react-native';
 import {
   color, motion, radius, space, touch, type, type TabletViewModel,
@@ -10,12 +10,16 @@ import { EnergyBalanceHero } from './EnergyBalanceHero.js';
 import { MacroProgress } from './MacroProgress.js';
 import { VoiceStateIndicator } from './VoiceStateIndicator.js';
 import { ScaleWeightDisplay } from './ScaleWeightDisplay.js';
+import { FoodCard, MacroRing, MacrosOrb, type OrbState } from './MacrosOrb.js';
 import { FoodOptionCard } from './FoodOptionCard.js';
 import {
   DevelopmentBanner, OfflineStatus, RecentFoodRow, TopIdentityBar,
 } from './status.js';
 
 export interface ScreenActions {
+  /** Push-to-talk. Falls back to the guidance intent when voice is absent. */
+  onOrbPress?: () => void;
+  readonly isListening?: boolean;
   readonly onAddFood: () => void;
   readonly onRequestGuidance: () => void;
   readonly onChooseGuidanceCandidate: (productVersionId: string, envelopeId: string) => void;
@@ -85,109 +89,113 @@ export function LockedHouseholdScreen(
 export function HomeScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
+  /**
+   * THE LOCKED REFERENCE.
+   *
+   *   Hey! Macros
+   *   one contextual sentence
+   *   the orb
+   *   recommendations when active
+   *   three macro rings
+   *
+   * Deliberately not a dashboard. The previous stacked panels read as a
+   * tracking app; this has to read as an appliance, which means one focal
+   * control and very little text.
+   */
+  const guidance = vm.guidance;
+  const orbState: OrbState =
+    guidance.phase === 'thinking' ? 'thinking'
+      : guidance.phase === 'awaiting_choice' || guidance.phase === 'guidance_available'
+        ? 'speaking'
+        : actions.isListening === true ? 'listening' : 'idle';
+
   return (
     <ScrollView
-      contentContainerStyle={{ paddingHorizontal: space.xl, paddingBottom: space.xxl, gap: space.lg }}
+      contentContainerStyle={{
+        paddingHorizontal: space.xl, paddingTop: space.xl,
+        paddingBottom: space.xxl, alignItems: 'center',
+      }}
       showsVerticalScrollIndicator={false}
     >
-      {vm.energy !== null ? (
-        <Surface tone="hero" style={{ paddingVertical: space.lg }}>
-          <EnergyBalanceHero energy={vm.energy} />
-        </Surface>
-      ) : null}
+      <Text
+        accessibilityRole="header"
+        style={{
+          color: color.textPrimary, fontSize: 40, fontWeight: '600',
+          marginBottom: space.sm,
+        }}
+      >
+        Hey! Macros
+      </Text>
 
-      {vm.macros.length > 0 ? (
-        <View style={{ gap: space.sm }}>
-          <SectionLabel>Macros today</SectionLabel>
-          <View style={{ flexDirection: 'row', gap: space.md }}>
-            {vm.macros.map((m) => <MacroProgress key={m.label} macro={m} />)}
-          </View>
-        </View>
-      ) : null}
+      {/* ONE sentence, produced by the view model. React computes nothing. */}
+      <Text
+        style={{
+          color: color.textSecondary, fontSize: 20, textAlign: 'center',
+          marginBottom: space.xxl, maxWidth: 560,
+        }}
+      >
+        {vm.energy.semantic}
+      </Text>
 
-      <PrimaryAction
-        label="What should I eat?"
-        accessibilityLabel="Ask what to eat"
-        onPress={actions.onRequestGuidance}
+      <MacrosOrb
+        state={orbState}
+        caption={guidance.phase === 'thinking' ? 'Thinking' : 'Tap to speak'}
+        accessibilityLabel="Ask Macros what to eat"
+        onPress={actions.onOrbPress ?? actions.onRequestGuidance}
         disabled={!vm.offline.canLog}
       />
 
-      {vm.guidance.visible ? (
-        // Minimal by design: AI-0 is functional integration, and the premium
-        // visual treatment is a later milestone against the locked reference.
-        <Surface>
-          <SectionLabel>Macros suggests</SectionLabel>
-          <Text style={{
-            color: color.textPrimary, fontSize: type.body.size, marginTop: space.sm,
-          }}>
-            {vm.guidance.text}
-          </Text>
+      {guidance.visible && guidance.text.length > 0 ? (
+        <Text
+          style={{
+            color: color.textPrimary, fontSize: 22, textAlign: 'center',
+            marginTop: space.xl, maxWidth: 640,
+          }}
+        >
+          {guidance.text}
+        </Text>
+      ) : null}
 
-          {vm.guidance.candidates.map((c) => (
-            <View key={c.productVersionId} style={{ marginTop: space.md }}>
-              <SecondaryAction
-                label={c.displayName}
-                accessibilityLabel={`Choose ${c.displayName}`}
-                onPress={() => {
-                  if (vm.guidance.envelopeId !== null) {
-                    actions.onChooseGuidanceCandidate(c.productVersionId, vm.guidance.envelopeId);
-                  }
-                }}
-              />
-            </View>
+      {guidance.candidates.length > 0 ? (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingVertical: space.xl }}
+        >
+          {[...guidance.candidates, ...guidance.alternatives].map((c) => (
+            <FoodCard
+              key={c.productVersionId}
+              name={c.displayName}
+              onPress={() => {
+                if (guidance.envelopeId !== null) {
+                  actions.onChooseGuidanceCandidate(c.productVersionId, guidance.envelopeId);
+                }
+              }}
+              accessibilityLabel={`Choose ${c.displayName}`}
+            />
           ))}
-
-          {vm.guidance.alternatives.length > 0 ? (
-            <View style={{ marginTop: space.lg }}>
-              <SectionLabel>Or</SectionLabel>
-              {vm.guidance.alternatives.map((c) => (
-                <View key={c.productVersionId} style={{ marginTop: space.sm }}>
-                  <SecondaryAction
-                    label={c.displayName}
-                    accessibilityLabel={`Choose ${c.displayName}`}
-                    tone="quiet"
-                    // The SAME validated intent as a primary candidate.
-                    onPress={() => {
-                      if (vm.guidance.envelopeId !== null) {
-                        actions.onChooseGuidanceCandidate(
-                          c.productVersionId, vm.guidance.envelopeId);
-                      }
-                    }}
-                  />
-                </View>
-              ))}
-            </View>
-          ) : null}
-        </Surface>
+        </ScrollView>
       ) : null}
 
-      <SecondaryAction
-        label="Add food"
-        accessibilityLabel="Add food"
+      <View style={{ flexDirection: 'row', marginTop: space.xxl }}>
+        <MacroRing label="Protein" value={vm.macros.protein.displayRemaining} />
+        <MacroRing label="Carbs" value={vm.macros.carbohydrate.displayRemaining} />
+        <MacroRing label="Fat" value={vm.macros.fat.displayRemaining} />
+      </View>
+
+      {/* Secondary and discreet: the orb is the product, this is the escape. */}
+      <Pressable
         onPress={actions.onAddFood}
-      />
-
-      {vm.recent.length > 0 ? (
-        <View style={{ gap: space.sm }}>
-          <SectionLabel>Logged today</SectionLabel>
-          <Surface>
-            {vm.recent.map((r, i) => (
-              <RecentFoodRow key={`${r.displayName}-${i}`} name={r.displayName} displayKcal={r.displayKcal} />
-            ))}
-          </Surface>
-        </View>
-      ) : null}
+        accessibilityRole="button"
+        accessibilityLabel="Add food"
+        style={{ marginTop: space.xl, padding: space.md }}
+      >
+        <Text style={{ color: color.textMuted, fontSize: 16 }}>Add food manually</Text>
+      </Pressable>
     </ScrollView>
   );
 }
 
-/**
- * TOUCH FALLBACK SEARCH.
- *
- * Voice is the primary interaction and the mic is a later milestone, so this is
- * explicitly a fallback: calm, roomy, and not dressed up as the brand's main
- * identity.
- */
 export function FoodSearchScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
@@ -275,188 +283,198 @@ export function FoodOptionsScreen(
 export function WeighingScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
+  /**
+   * The orb becomes the scale. Grams dominate; the food sits quietly beneath.
+   * Manual entry stays reachable but visually secondary — it is the fallback,
+   * not the interaction the product is selling.
+   */
   const [manual, setManual] = useState('');
   const [showManual, setShowManual] = useState(false);
-
-  // Parsing decides button enablement ONLY. The controller still validates, the
-  // capture keeps manual provenance, and no scale stability is fabricated.
-  const parsed = Number.parseFloat(manual);
-  const manualUsable = Number.isFinite(parsed) && parsed > 0;
-
-  const food = vm.selectedFood;
+  const weight = vm.scale.displayWeight;
+  const parsed = Number(manual);
+  const selectedName = vm.selectedFood?.displayName ?? '';
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: space.xl, justifyContent: 'space-between' }}>
-      <View style={{ paddingTop: space.lg }}>
-        <SectionLabel>Weighing</SectionLabel>
+    <ScrollView
+      contentContainerStyle={{
+        paddingHorizontal: space.xl, paddingTop: space.xl,
+        paddingBottom: space.xxl, alignItems: 'center',
+      }}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={{ color: color.textPrimary, fontSize: 34, fontWeight: '600' }}>
+        Hey! Macros
+      </Text>
+
+      {/* The validated guidance line, rendered rather than re-worded: the
+          sentence belongs to the guidance templates, not to React. */}
+      {vm.guidance.phase === 'awaiting_weight' && vm.guidance.text.length > 0 ? (
         <Text
-          numberOfLines={2}
+          accessibilityLiveRegion="polite"
           style={{
-            color: color.textPrimary, fontSize: type.screenTitle.size,
-            fontWeight: '600', marginTop: space.xs,
+            color: color.accent, fontSize: 20, marginTop: space.sm,
+            marginBottom: space.xl, textAlign: 'center',
           }}
         >
-          {food?.displayName ?? 'Selected food'}
+          {vm.guidance.text}
         </Text>
-        {food !== null ? (
-          <Text style={{ color: color.textSecondary, fontSize: type.body.size, marginTop: space.xxs }}>
-            {food.brand !== null ? `${food.brand} · ` : ''}{food.preparationState}
-          </Text>
-        ) : null}
-      </View>
-
-      {vm.guidance.phase === 'awaiting_weight' && vm.guidance.text.length > 0 ? (
-        // The already-validated deterministic text, rendered rather than
-        // duplicated: React must never author guidance wording.
-        <View
-          accessible
-          accessibilityLiveRegion="polite"
-          accessibilityLabel={vm.guidance.text}
-          style={{ paddingHorizontal: space.md, paddingTop: space.md }}
+      ) : (
+        <Text
+          style={{
+            color: color.textSecondary, fontSize: 20, marginTop: space.sm,
+            marginBottom: space.xl, textAlign: 'center',
+          }}
         >
-          <Text style={{ color: color.accent, fontSize: type.body.size, textAlign: 'center' }}>
-            {vm.guidance.text}
-          </Text>
-        </View>
-      ) : null}
+          {vm.scale.message}
+        </Text>
+      )}
 
-      <ScaleWeightDisplay scale={vm.scale} />
+      <MacrosOrb
+        state="weighing"
+        weightLabel={weight ?? '—'}
+        caption="Detecting weight"
+        accessibilityLabel={weight === null
+          ? 'Waiting for a stable weight' : `Weight ${weight}`}
+      />
 
-      <View style={{ gap: space.md, paddingBottom: space.xxl }}>
+      <Text
+        style={{
+          color: color.textSecondary, fontSize: 22,
+          marginTop: space.xl, textAlign: 'center',
+        }}
+      >
+        {selectedName}
+      </Text>
+
+      {/* The real-scale path stays primary. */}
+      <View style={{ marginTop: space.xl, width: 320 }}>
         <PrimaryAction
           label="Use this weight"
           accessibilityLabel="Use this weight"
-          // Only a settled candidate may be committed.
-          disabled={!vm.scale.canCommitWeight}
           onPress={actions.onUseWeight}
-        />
-
-        {!vm.scale.connected && !showManual ? (
-          <SecondaryAction
-            label="Enter weight manually"
-            accessibilityLabel="Enter weight manually instead of using the scale"
-            onPress={() => setShowManual(true)}
-          />
-        ) : null}
-
-        {showManual ? (
-          <View style={{ gap: space.md }}>
-            <TextInput
-              accessibilityLabel="Weight in grams"
-              value={manual}
-              onChangeText={setManual}
-              keyboardType="numeric"
-              placeholder="Grams"
-              placeholderTextColor={color.textMuted}
-              style={fieldStyle}
-            />
-            <PrimaryAction
-              label="Continue"
-              accessibilityLabel="Continue with the manually entered weight"
-              disabled={!manualUsable}
-              onPress={() => actions.onEnterManualWeight(parsed)}
-            />
-          </View>
-        ) : null}
-
-        <SecondaryAction
-          label="Change food"
-          accessibilityLabel="Change food"
-          tone="quiet"
-          onPress={actions.onChangeFood}
+          disabled={!vm.scale.canCommitWeight}
         />
       </View>
-    </View>
+
+      {/* The fallback is offered only when there is no scale to fall back FROM,
+          and stays visually secondary when it is. */}
+      {!vm.scale.connected && !showManual ? (
+        <Pressable
+          onPress={() => { setShowManual(true); }}
+          accessibilityRole="button"
+          accessibilityLabel="Enter weight manually"
+          style={{ marginTop: space.xl, padding: space.md }}
+        >
+          <Text style={{ color: color.textMuted, fontSize: 16 }}>
+            Enter weight manually
+          </Text>
+        </Pressable>
+      ) : null}
+
+      {showManual ? (
+        <View style={{ marginTop: space.xl, width: 320, opacity: 0.9 }}>
+          <TextInput
+            value={manual}
+            onChangeText={setManual}
+            keyboardType="number-pad"
+            placeholder="Grams"
+            placeholderTextColor={color.textMuted}
+            accessibilityLabel="Weight in grams"
+            style={{
+              color: color.textPrimary, fontSize: type.body.size,
+              borderBottomWidth: 1, borderBottomColor: color.surfaceMuted,
+              paddingVertical: space.md, textAlign: 'center',
+            }}
+          />
+          <View style={{ marginTop: space.md }}>
+            <SecondaryAction
+              label="Use entered weight"
+              accessibilityLabel="Use entered weight"
+              // Parsed ONLY to enable the action; the controller owns the value
+              // and nothing in the UI is derived from it.
+              disabled={!(Number.isFinite(parsed) && parsed > 0)}
+              onPress={() => { actions.onEnterManualWeight(parsed); }}
+            />
+          </View>
+        </View>
+      ) : null}
+
+      <Pressable
+        onPress={actions.onCancel}
+        accessibilityRole="button"
+        accessibilityLabel="Cancel"
+        style={{ marginTop: space.xl, padding: space.md }}
+      >
+        <Text style={{ color: color.textMuted, fontSize: 16 }}>Cancel</Text>
+      </Pressable>
+    </ScrollView>
   );
 }
 
-/** REVIEW — "is this exactly what I'm about to log?" */
 export function ReviewScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
   const r = vm.review;
   if (r === null) return <View />;
 
+  /**
+   * The confirmation, to the locked reference: one sentence, four circular
+   * figures, two actions. Every value is a pre-formatted string from the view
+   * model — React does no nutrition arithmetic, here or anywhere.
+   */
   return (
-    <View style={{ flex: 1, paddingHorizontal: space.xl, justifyContent: 'space-between' }}>
-      <View style={{ paddingTop: space.lg }}>
-        <SectionLabel>Review</SectionLabel>
-        <Text
-          numberOfLines={2}
-          style={{
-            color: color.textPrimary, fontSize: type.screenTitle.size,
-            fontWeight: '600', marginTop: space.xs,
-          }}
-        >
-          {r.displayName}
-        </Text>
-        <Text style={{ color: color.textSecondary, fontSize: type.body.size, marginTop: space.xxs }}>
-          {r.brand !== null ? `${r.brand} · ` : ''}{r.preparationState}
-        </Text>
+    <ScrollView
+      contentContainerStyle={{
+        paddingHorizontal: space.xl, paddingTop: space.xxl,
+        paddingBottom: space.xxl, alignItems: 'center',
+      }}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text
+        style={{ color: color.textSecondary, fontSize: 22, textAlign: 'center' }}
+      >
+        Confirm {r.displayGrams} of
+      </Text>
+      <Text
+        accessibilityRole="header"
+        style={{
+          color: color.textPrimary, fontSize: 32, fontWeight: '600',
+          textAlign: 'center', marginTop: space.xs, marginBottom: space.xxl,
+        }}
+      >
+        {r.displayName}
+      </Text>
 
-        <Surface tone="hero" style={{ marginTop: space.xl, alignItems: 'center' }}>
-          <Text style={{ color: color.textSecondary, fontSize: type.metric.size }}>
-            {r.displayGrams}
-          </Text>
-          <Text style={{
-            color: color.textPrimary, fontSize: type.energyHero.size * 0.62,
-            fontWeight: '700', letterSpacing: -2, marginTop: space.xs,
-          }}>
-            {r.displayKcal}
-          </Text>
-          <Text style={{ color: color.textMuted, fontSize: type.sectionLabel.size, letterSpacing: 2 }}>
-            KCAL
-          </Text>
-
-          <View style={{
-            flexDirection: 'row', gap: space.xl, marginTop: space.lg,
-            paddingTop: space.lg, borderTopWidth: 1, borderTopColor: color.border,
-            alignSelf: 'stretch', justifyContent: 'center',
-          }}>
-            {([['Protein', r.displayProtein], ['Carbs', r.displayCarbs], ['Fat', r.displayFat]] as const)
-              .map(([label, value]) => (
-                <View key={label} style={{ alignItems: 'center' }}>
-                  <Text style={{ color: color.textPrimary, fontSize: type.metric.size, fontWeight: '600' }}>
-                    {value}
-                  </Text>
-                  <Text style={{ color: color.textMuted, fontSize: type.caption.size }}>{label}</Text>
-                </View>
-              ))}
-          </View>
-        </Surface>
+      <View style={{ flexDirection: 'row', marginBottom: space.xl }}>
+        <MacroRing label="Protein" value={r.displayProtein} />
+        <MacroRing label="Calories" value={r.displayKcal} />
+      </View>
+      <View style={{ flexDirection: 'row' }}>
+        <MacroRing label="Carbs" value={r.displayCarbs} />
+        <MacroRing label="Fat" value={r.displayFat} />
       </View>
 
-      <View style={{ gap: space.md, paddingBottom: space.xxl }}>
-        <PrimaryAction
-          label="Log food"
-          accessibilityLabel={`Log ${r.displayName}, ${r.displayGrams}, ${r.displayKcal} calories`}
-          onPress={actions.onLog}
-        />
-        <View style={{ flexDirection: 'row', gap: space.md }}>
-          <View style={{ flex: 1 }}>
-            <SecondaryAction label="Change weight" accessibilityLabel="Change weight" onPress={actions.onChangeWeight} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <SecondaryAction label="Change food" accessibilityLabel="Change food" onPress={actions.onChangeFood} />
-          </View>
+      <View style={{ flexDirection: 'row', marginTop: space.xxl, gap: space.lg }}>
+        <View style={{ width: 220 }}>
+          <SecondaryAction
+            label="Edit weight"
+            accessibilityLabel="Edit weight"
+            onPress={actions.onChangeWeight}
+          />
         </View>
-        <SecondaryAction
-          label="Cancel"
-          accessibilityLabel="Cancel without logging"
-          tone="quiet"
-          onPress={actions.onCancel}
-        />
+        <View style={{ width: 220 }}>
+          <PrimaryAction
+            label="Confirm"
+            accessibilityLabel="Confirm and log this food"
+            onPress={actions.onLog}
+            disabled={!vm.offline.canLog}
+          />
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
-/**
- * LOGGED — a brief appliance confirmation, never a modal workflow.
- *
- * The return home is driven by the action adapter, not by this component: the
- * UI confirms, the application decides.
- */
 export function LoggedScreen({ vm }: { vm: TabletViewModel }): React.JSX.Element {
   const scale = useRef(new Animated.Value(0.86)).current;
   const fade = useRef(new Animated.Value(0)).current;

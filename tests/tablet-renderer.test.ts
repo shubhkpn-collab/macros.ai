@@ -744,9 +744,22 @@ describe('REAL ANDROID RUNTIME FIXES — observed in the emulator', () => {
     // Without it the device logs EPERM and RN cannot reach Metro at all.
     const manifest = read('android', 'app', 'src', 'main', 'AndroidManifest.xml');
     assert.match(manifest, /<uses-permission android:name="android\.permission\.INTERNET" \/>/);
-    // No unrelated permissions crept in.
+    // No unrelated permissions crept in. This list is deliberate: RECORD_AUDIO
+    // for push-to-talk, the Android 12+ Bluetooth pair for the scale, and the
+    // legacy trio capped at API 30. Anything else is creep and should fail.
     const perms = [...manifest.matchAll(/uses-permission android:name="([^"]+)"/g)].map((m) => m[1]);
-    assert.deepEqual(perms, ['android.permission.INTERNET']);
+    assert.deepEqual(perms, [
+      'android.permission.INTERNET',
+      'android.permission.RECORD_AUDIO',
+      'android.permission.BLUETOOTH_SCAN',
+      'android.permission.BLUETOOTH_CONNECT',
+      'android.permission.BLUETOOTH',
+      'android.permission.BLUETOOTH_ADMIN',
+      'android.permission.ACCESS_FINE_LOCATION',
+    ]);
+    // Location is legacy-only and scanning states it derives no location.
+    assert.match(manifest, /BLUETOOTH_SCAN"\s*\n?\s*android:usesPermissionFlags="neverForLocation"/);
+    assert.match(manifest, /ACCESS_FINE_LOCATION"\s*\n?\s*android:maxSdkVersion="30"/);
   });
 
   test('GAP 2: the Metro fallback is relative-.js only and workspace-scoped', () => {

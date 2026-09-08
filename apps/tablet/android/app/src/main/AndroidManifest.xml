@@ -7,6 +7,25 @@
   -->
   <uses-permission android:name="android.permission.INTERNET" />
 
+  <!-- Push-to-talk. Denied permission degrades to touch; it never crashes. -->
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+  <!--
+    BLE scale. Android 12+ splits Bluetooth into runtime permissions;
+    neverForLocation states plainly that MACROS does not derive location from a
+    scan, which is true and avoids requesting a permission we do not need.
+  -->
+  <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+      android:usesPermissionFlags="neverForLocation" />
+  <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+  <!-- Legacy devices below API 31 only. -->
+  <uses-permission android:name="android.permission.BLUETOOTH"
+      android:maxSdkVersion="30" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+      android:maxSdkVersion="30" />
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+      android:maxSdkVersion="30" />
+
   <application
       android:name=".MainApplication"
       android:label="@string/app_name"
