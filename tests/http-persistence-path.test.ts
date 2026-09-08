@@ -224,10 +224,17 @@ describe('MIGRATIONS REMAIN FROZEN', () => {
     const doc33 = readFileSync(
       repoPath('docs', 'architecture', '33-postgres-validation-harness.md'), 'utf8');
     const dir = repoPath('db', 'migrations');
-    for (const f of readdirSync(dir)) {
+    // 0006 is excluded: it has not run against PostgreSQL, and doc 33 records
+    // it as pending rather than validated.
+    const VALIDATED = ['0001_core_schema.sql', '0002_rls.sql',
+      '0003_catalog_identifiers.sql', '0004_food_log_corrections.sql',
+      '0005_households.sql'];
+    for (const f of VALIDATED) {
       const digest = createHash('sha256').update(readFileSync(join(dir, f))).digest('hex').slice(0, 16);
       assert.ok(doc33.includes(digest), `${f} drifted from the frozen foundation`);
     }
+    assert.match(doc33, /runtime status: pending owner execution/,
+      '0006 must be recorded as pending, not silently pinned');
   });
 });
 

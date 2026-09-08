@@ -37,6 +37,11 @@ const APP_NAME = 'MacrosTablet';
  */
 const MACROS_OWNED = [
   'android/app/src/main/AndroidManifest.xml',
+  // Debug-only local cleartext policy. The RN template ships its own debug
+  // manifest, so these must survive hydration or the acceptance run silently
+  // loses its network permission.
+  'android/app/src/debug/AndroidManifest.xml',
+  'android/app/src/debug/res/xml/network_security.xml',
 ];
 
 const say = (m) => console.log(m);

@@ -20,7 +20,7 @@ import { buildVocabulary, resilientSearch } from '@macros/domain-food-search';
 import {
   DEFAULT_RECOMMENDATION_POLICY, type RecommendationCandidate,
 } from '@macros/domain-recommendation';
-import { FakeGuidanceProvider } from '@macros/guidance';
+import { createTabletGuidanceProvider } from '@macros/guidance-remote';
 import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 
 /**
@@ -53,9 +53,26 @@ class SequentialIds {
   }
 }
 
+/**
+ * Configuration for the development / acceptance host.
+ *
+ * `assistant` reuses the EXISTING runtime selection rather than a new flag, so
+ * there is one answer to "is this build talking to the cloud?" everywhere.
+ */
+export interface DevelopmentHostOptions {
+  readonly auth: AuthHostPort;
+  readonly assistant?: 'synthetic' | 'real';
+  /** Required when assistant is 'real'. Never a vendor endpoint. */
+  readonly apiBaseUrl?: string;
+  /** The MEMBER's MACROS session. Never a vendor credential. */
+  bearerToken?(): Promise<string> | string;
+  readonly fetchImpl?: typeof fetch;
+}
+
 export async function createDevelopmentHost(
-  { auth }: { auth: AuthHostPort },
+  options: DevelopmentHostOptions,
 ): Promise<TabletHost> {
+  const { auth } = options;
   const repositories = {
     foodLogs: new InMemoryFoodLogRepository(),
     products: new InMemoryProductVersionRepository(
@@ -164,8 +181,20 @@ export async function createDevelopmentHost(
    * cost. A live adapter swaps in here without touching nutrition,
    * recommendation or the renderer.
    */
+  /**
+   * Provider chosen by CONFIGURATION, not by editing this file. In `real` mode
+   * the tablet talks to the MACROS backend over HTTP and still knows nothing
+   * about any vendor.
+   */
   const guidance = {
-    provider: new FakeGuidanceProvider(),
+    provider: createTabletGuidanceProvider({
+      config: {
+        assistant: options.assistant ?? 'synthetic',
+        ...(options.apiBaseUrl !== undefined ? { apiBaseUrl: options.apiBaseUrl } : {}),
+      },
+      bearerToken: options.bearerToken ?? (() => 'development-session'),
+      fetchImpl: (options.fetchImpl ?? fetch) as never,
+    }),
     // Rebuilt on EVERY request from the live repository, never cached, so
     // guidance always reflects the food actually logged so far.
     eligibleCandidates: async (): Promise<readonly RecommendationCandidate[]> => {
@@ -182,7 +211,7 @@ export async function createDevelopmentHost(
     },
     nowIso: (): string => new Date().toISOString(),
     policy: DEFAULT_RECOMMENDATION_POLICY,
-    environment: 'test',
+    environment: 'test' as const,
   };
 
   return {

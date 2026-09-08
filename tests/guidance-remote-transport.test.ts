@@ -79,7 +79,7 @@ async function startServer(providerReply: (body: string) =>
 }
 
 async function startServerWith(
-  admission: import('@macros/runtime-api').GuidanceAdmissionGuard | undefined,
+  admission: import('@macros/runtime-api').GuidanceAdmission | undefined,
   providerReply: (body: string) =>
     { status: number; body: string } | Promise<{ status: number; body: string }>) {
   const anthropicTransport = new RecordingTransport(providerReply);
@@ -313,8 +313,8 @@ describe('AI-1 — end-to-end over real HTTP, zero paid calls', () => {
   });
 
   test('the admission guard blocks a concurrent same-user call', async () => {
-    const { GuidanceAdmissionGuard } = await import('@macros/runtime-api');
-    const guard = new GuidanceAdmissionGuard(() => Date.now());
+    const { InMemoryGuidanceAdmission } = await import('@macros/runtime-api');
+    const guard = new InMemoryGuidanceAdmission(() => Date.now());
     let providerCalls = 0;
     const srv = await startServerWith(guard, () => {
       providerCalls += 1;
@@ -377,8 +377,11 @@ describe('AI-1 — strict runtime decoding', () => {
       intent: 'what_should_i_eat', recentTurns: [],
     };
   };
+  // The decoder now returns a TAGGED trusted value, so "is this an error" is
+  // "is the tag anything other than the success tag".
   const isError = (v: unknown): boolean =>
-    typeof v === 'object' && v !== null && 'kind' in v;
+    typeof v !== 'object' || v === null
+    || (v as { kind?: string }).kind !== 'decoded_guidance_request';
 
   test('a well-formed request decodes', () => {
     assert.equal(isError(decodeGuidanceRequest(base())), false);
@@ -622,11 +625,13 @@ describe('AI-1 — cost and duplicate-call safety', () => {
     assert.ok(guards.length >= 2);
   });
 
-  test('the fake provider remains the development default', () => {
+  test('synthetic remains the default and the host names no vendor', () => {
+    // AI-2 moved provider choice into the factory, so the host composes rather
+    // than hard-coding. Synthetic is still what you get without configuration.
     const host = read('apps', 'tablet', 'src', 'development-host.ts');
-    assert.match(host, /new FakeGuidanceProvider\(\)/);
-    assert.equal(host.includes('RemoteGuidanceProvider'), false,
-      'remote must not become the default without explicit composition');
+    assert.match(host, /createTabletGuidanceProvider\(/);
+    assert.match(host, /options\.assistant \?\? 'synthetic'/);
+    assert.equal(host.toLowerCase().includes('anthropic'), false);
   });
 
   test('the route refuses when no provider is configured', () => {

@@ -12,7 +12,6 @@
 import React, { useEffect, useState } from 'react';
 import { AppRegistry, Text, View } from 'react-native';
 import { App } from './src/App';
-import { developmentAuthHost } from './src/bootstrap';
 import { name as appName } from './app.json';
 
 function Root() {
@@ -23,10 +22,12 @@ function Root() {
     let cancelled = false;
     (async () => {
       try {
+        // Which host this resolves to is decided by Metro at BUILD time:
+        // `npm run android` gets synthetic, the acceptance command gets remote.
         // Replace with the production TabletHostFactory when repositories,
         // credentials and hardware adapters are available on device.
-        const { createDevelopmentHost } = await import('./src/development-host');
-        const built = await createDevelopmentHost({ auth: developmentAuthHost() });
+        const { createSelectedHost } = await import('./src/host-selection');
+        const built = await createSelectedHost();
         if (!cancelled) setHost(built);
       } catch (e) {
         if (!cancelled) setError(String(e));

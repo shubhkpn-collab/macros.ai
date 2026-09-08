@@ -108,7 +108,28 @@ function decodeResult(raw: unknown): GuidanceProviderResult | null {
   const tone = o['tone'];
   if (tone !== undefined && (typeof tone !== 'string' || !TONES.has(tone))) return null;
 
-  return o as unknown as GuidanceProviderResult;
+  /**
+   * Constructed FIELD BY FIELD from values just proven, rather than asserting
+   * the whole untrusted object. A whole-object assertion claims every field is
+   * correct on the strength of having checked some of them, and survives the
+   * next field being added.
+   */
+  return {
+    intent: o['intent'] as GuidanceProviderResult['intent'],
+    templateId: o['templateId'] as GuidanceProviderResult['templateId'],
+    selectedProductVersionIds: [...(o['selectedProductVersionIds'] as string[])],
+    clarificationNeeded: o['clarificationNeeded'],
+    suggestedNextAction:
+      o['suggestedNextAction'] as GuidanceProviderResult['suggestedNextAction'],
+    ...(o['slotRefs'] !== undefined
+      ? { slotRefs: [...(o['slotRefs'] as string[])] } : {}),
+    ...(objectiveIndex !== undefined ? { objectiveIndex } : {}),
+    ...(tone !== undefined
+      ? { tone: tone as NonNullable<GuidanceProviderResult['tone']> } : {}),
+    ...(o['alternativeProductVersionIds'] !== undefined
+      ? { alternativeProductVersionIds:
+          [...(o['alternativeProductVersionIds'] as string[])] } : {}),
+  };
 }
 
 /** Transport-level fields the API adds to every response. */

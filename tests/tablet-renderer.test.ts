@@ -399,7 +399,10 @@ describe('EXECUTION READINESS — the RN layer can actually run', () => {
     for (const prop of ['composition={', 'auth={', 'hasActiveSession={']) {
       assert.ok(entry.includes(prop), `entry must supply ${prop}`);
     }
-    assert.match(entry, /createDevelopmentHost/);
+    // AI-2 FINAL: the entry delegates host choice to a Metro-selected module,
+    // so `npm run android` and the acceptance command boot different hosts
+    // without any source edit.
+    assert.match(entry, /createSelectedHost/);
   });
 
   test('BLOCKER 2: the development host is unmistakably not production', () => {

@@ -1,7 +1,7 @@
 import type { GuidanceProvider, GuidanceRequest } from '@macros/guidance';
 import { appError, type AppError } from '@macros/runtime-config';
 import { subjectUserId } from '@macros/domain-auth';
-import type { GuidanceAdmissionGuard } from './guidance-admission.js';
+import type { AdmissionLease, GuidanceAdmission } from './guidance-admission.js';
 import type { RequestContext, Route } from './server.js';
 
 /**
@@ -29,6 +29,27 @@ export const GUIDANCE_LIMITS = {
   maxNameLength: 200,
   maxRationaleCodes: 8,
 } as const;
+
+/**
+ * Fields with a TRUE closed vocabulary are validated against it, not merely
+ * length-bounded — a 200-character `plannerStatus` is still a field we do not
+ * understand. Open strings such as food display names stay bounded only,
+ * because inventing a sanitised name would misreport the catalog.
+ */
+const VALID_PLANNER_STATUSES = new Set([
+  'available', 'energy_budget_exhausted', 'no_eligible_candidates',
+  'insufficient_state', 'preferences_conflict',
+]);
+const VALID_OBJECTIVES = new Set(['protein', 'carbohydrate', 'fat', 'energy']);
+const VALID_ROLES = new Set([
+  'protein_forward', 'carbohydrate_forward', 'fat_forward', 'balanced',
+  'light_accompaniment', 'unknown',
+]);
+const VALID_ACTIONABILITY = new Set([
+  'ready_to_eat', 'meal_component', 'snack', 'treat', 'beverage',
+  'ingredient', 'cooking_fat', 'condiment', 'requires_preparation',
+  'specialty', 'unknown',
+]);
 
 const VALID_INTENTS = new Set([
   'what_should_i_eat', 'request_alternative', 'choose_candidate',
@@ -60,8 +81,9 @@ function decodeCandidate(v: unknown): boolean {
   if (!boundedString(v['productId'], GUIDANCE_LIMITS.maxIdLength)) return false;
   if (!boundedString(v['productVersionId'], GUIDANCE_LIMITS.maxIdLength)) return false;
   if (!boundedString(v['displayName'], GUIDANCE_LIMITS.maxNameLength)) return false;
-  if (!boundedString(v['role'], GUIDANCE_LIMITS.maxNameLength)) return false;
-  if (!boundedString(v['actionabilityClass'], GUIDANCE_LIMITS.maxNameLength)) return false;
+  if (typeof v['role'] !== 'string' || !VALID_ROLES.has(v['role'])) return false;
+  if (typeof v['actionabilityClass'] !== 'string'
+      || !VALID_ACTIONABILITY.has(v['actionabilityClass'])) return false;
   const codes = v['rationaleCodes'];
   if (!Array.isArray(codes) || codes.length > GUIDANCE_LIMITS.maxRationaleCodes) return false;
   if (codes.some((c) => !boundedString(c, GUIDANCE_LIMITS.maxNameLength))) return false;
@@ -78,7 +100,21 @@ function decodeCandidate(v: unknown): boolean {
  * A TypeScript interface is a compile-time claim; this is the runtime check
  * that actually protects the endpoint.
  */
-export function decodeGuidanceRequest(body: Record<string, unknown>): GuidanceRequest | AppError {
+/**
+ * A decoded, TRUSTED guidance request.
+ *
+ * Tagged so the handler can narrow it normally. Returning a bare
+ * `GuidanceRequest` forced the handler to re-assert the network object it had
+ * already validated, which is exactly the assertion this milestone removes.
+ */
+export interface DecodedGuidanceRequest {
+  readonly kind: 'decoded_guidance_request';
+  readonly value: GuidanceRequest;
+}
+
+export function decodeGuidanceRequest(
+  body: Record<string, unknown>,
+): DecodedGuidanceRequest | AppError {
   const invalid = (why: string): AppError =>
     appError('validation', 'invalid_guidance_request', why);
 
@@ -94,7 +130,8 @@ export function decodeGuidanceRequest(body: Record<string, unknown>): GuidanceRe
   if (!boundedString(envelope['envelopeVersion'], GUIDANCE_LIMITS.maxNameLength)) {
     return invalid('Invalid envelope version.');
   }
-  if (!boundedString(envelope['plannerStatus'], GUIDANCE_LIMITS.maxNameLength)) {
+  if (typeof envelope['plannerStatus'] !== 'string'
+      || !VALID_PLANNER_STATUSES.has(envelope['plannerStatus'])) {
     return invalid('Invalid planner status.');
   }
 
@@ -102,7 +139,7 @@ export function decodeGuidanceRequest(body: Record<string, unknown>): GuidanceRe
   if (!Array.isArray(objectives) || objectives.length > GUIDANCE_LIMITS.maxObjectives) {
     return invalid('Too many objectives.');
   }
-  if (objectives.some((o) => !boundedString(o, GUIDANCE_LIMITS.maxNameLength))) {
+  if (objectives.some((o) => typeof o !== 'string' || !VALID_OBJECTIVES.has(o))) {
     return invalid('Invalid objective.');
   }
 
@@ -150,14 +187,56 @@ export function decodeGuidanceRequest(body: Record<string, unknown>): GuidanceRe
     return invalid('Invalid chosen candidate.');
   }
 
-  return body as unknown as GuidanceRequest;
+  /**
+   * Built field by field from values just validated. Asserting the whole body
+   * would claim correctness for fields nobody checked, and would keep claiming
+   * it after the contract grew.
+   */
+  const envelopeOut: GuidanceRequest['envelope'] = {
+    envelopeVersion: envelope['envelopeVersion'] as string,
+    plannerStatus: envelope['plannerStatus'] as GuidanceRequest['envelope']['plannerStatus'],
+    objectives: [...(objectives as string[])],
+    planComponents: (components as Record<string, unknown>[]).map(toCandidate),
+    alternatives: (alternatives as Record<string, unknown>[]).map(toCandidate),
+    slots: { ...(slots as Record<string, string>) },
+    weighingRequired: envelope['weighingRequired'] as boolean,
+    moreGuidanceUsefulAfterWeighing: envelope['moreGuidanceUsefulAfterWeighing'] as boolean,
+  };
+
+  return {
+    kind: 'decoded_guidance_request',
+    value: {
+      envelope: envelopeOut,
+      intent: body['intent'] as GuidanceRequest['intent'],
+      recentTurns: (turns as Record<string, unknown>[]).map((t) => ({
+        role: t['role'] as 'user' | 'macros',
+        text: t['text'] as string,
+      })),
+      ...(chosen !== undefined ? { chosenProductVersionId: chosen as string } : {}),
+    },
+  };
+}
+
+/** Narrow a validated candidate record into the contract shape. */
+function toCandidate(v: Record<string, unknown>): GuidanceRequest['envelope']['planComponents'][number] {
+  return {
+    productId: v['productId'] as string,
+    productVersionId: v['productVersionId'] as string,
+    displayName: v['displayName'] as string,
+    role: v['role'] as string,
+    actionabilityClass: v['actionabilityClass'] as string,
+    rationaleCodes: [...(v['rationaleCodes'] as string[])],
+    rank: v['rank'] as number,
+    isPlanComponent: v['isPlanComponent'] as boolean,
+    groundedPortionGrams: v['groundedPortionGrams'] as number | null,
+  };
 }
 
 export interface GuidanceRouteDeps {
   /** Configured at the composition edge. Null disables remote guidance. */
   readonly provider: GuidanceProvider | null;
   /** Cost guard. Omitted only in tests that assert the unguarded path. */
-  readonly admission?: GuidanceAdmissionGuard;
+  readonly admission?: GuidanceAdmission;
 }
 
 export function guidanceRoute(deps: GuidanceRouteDeps): Route {
@@ -171,11 +250,15 @@ export function guidanceRoute(deps: GuidanceRouteDeps): Route {
       if (ctx.subject === undefined) {
         return appError('authentication', 'missing_credential', 'Not signed in.');
       }
-      const decoded = (ctx.body as { decoded?: GuidanceRequest | AppError }).decoded;
+      const decoded = (ctx.body as {
+        decoded?: DecodedGuidanceRequest | AppError;
+      }).decoded;
       if (decoded === undefined) {
         return appError('validation', 'missing_guidance_request', 'A request is required.');
       }
-      if ('kind' in (decoded as object)) return decoded as AppError;
+      // Narrowed on the tag, so the trusted value carries its own type and the
+      // handler never re-asserts the network object.
+      if (decoded.kind !== 'decoded_guidance_request') return decoded;
 
       if (deps.provider === null) {
         return appError('dependency_unavailable', 'guidance_provider_disabled',
@@ -187,14 +270,18 @@ export function guidanceRoute(deps: GuidanceRouteDeps): Route {
        * request costs nothing. Keyed by the verified subject, never by anything
        * the caller supplied.
        */
-      const admission = deps.admission?.admit(subjectUserId(ctx.subject));
-      if (admission !== undefined && !admission.admitted) {
-        return appError('dependency_unavailable', 'guidance_rate_limited',
-          'Guidance is busy. Try again in a moment.');
+      let lease: AdmissionLease | null = null;
+      if (deps.admission !== undefined) {
+        const decision = await deps.admission.acquire(subjectUserId(ctx.subject));
+        if (!decision.admitted) {
+          return appError('dependency_unavailable', 'guidance_rate_limited',
+            'Guidance is busy. Try again in a moment.');
+        }
+        lease = decision.lease;
       }
 
       try {
-        return await deps.provider.generate(decoded as GuidanceRequest);
+        return await deps.provider.generate(decoded.value);
       } catch {
         // The vendor's message never crosses this boundary: it could carry
         // wording, or detail about our configuration, that must not reach a
@@ -202,7 +289,9 @@ export function guidanceRoute(deps: GuidanceRouteDeps): Route {
         return appError('dependency_unavailable', 'guidance_provider_failed',
           'Guidance is not available.');
       } finally {
-        if (admission !== undefined && admission.admitted) admission.release();
+        // Release never throws: a release failure must not turn a successful
+        // answer into an error. The lease TTL is the backstop.
+        if (lease !== null) await deps.admission?.release(lease).catch(() => undefined);
       }
     },
   };

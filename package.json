@@ -15,7 +15,9 @@
     "postgres:integration": "node --import tsx tools/postgres-integration/run-integration.ts",
     "auth:live-gate": "node --import tsx tools/supabase-gate/run-live-gate.ts",
     "check:renderer": "node --import tsx tools/check-renderer-purity.ts",
-    "benchmark:search": "node --import tsx tools/benchmark-search-quality.ts"
+    "benchmark:search": "node --import tsx tools/benchmark-search-quality.ts",
+    "guidance:acceptance:backend": "node --import tsx tools/guidance-acceptance/run-backend.ts",
+    "postgres:guidance-validate": "node --import tsx tools/postgres-validation/validate-guidance-admission.ts"
   },
   "engines": {
     "node": ">=22.0.0",

@@ -1,4 +1,5 @@
 import type { TabletComposition } from './composition.js';
+import type { GuidanceDeps } from '@macros/tablet-app-core';
 import type { AuthHostPort } from './actions.js';
 
 /**
@@ -34,8 +35,13 @@ export interface TabletHost {
    * Catalog QA browser. Present ONLY on a development host — a production host
    * returns null, so the surface cannot appear in a shipped configuration.
    */
-  /** Guidance dependencies for the host. Absent disables the guidance intent. */
-  readonly guidance?: unknown;
+  /**
+   * Guidance dependencies for the host. Absent disables the guidance intent.
+   *
+   * Typed with the real contract the controller consumes: `unknown` here forced
+   * a cast at the one boundary where a mismatch would only surface on a device.
+   */
+  readonly guidance?: GuidanceDeps;
   readonly catalogBrowser: {
     search(query: string): Promise<readonly unknown[]>;
   } | null;

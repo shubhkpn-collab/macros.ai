@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { color } from '@macros/tablet-view-model';
 import { TabletShell } from './components/screens.js';
+import type { GuidanceDeps } from '@macros/tablet-app-core';
 import { createActions, type AuthHostPort } from './actions.js';
 import { renderModel, type TabletComposition } from './composition.js';
 
@@ -17,7 +18,7 @@ export function App(
   {
     composition: TabletComposition; auth: AuthHostPort;
     hasActiveSession: boolean; developmentNotice?: string | null;
-    guidance?: Parameters<typeof createActions>[0]['guidance'];
+    guidance?: GuidanceDeps;
   },
 ): React.JSX.Element {
   const [tick, setTick] = useState(0);

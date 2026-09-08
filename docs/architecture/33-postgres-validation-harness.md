@@ -85,3 +85,30 @@ Recorded because it is the argument for executing rather than reviewing:
 The PostgreSQL and RLS foundation is frozen. Migrations 0001–0005 and the
 policies, helpers and constraints they define are not to be modified without new
 runtime evidence of a defect.
+
+
+## Migration 0006 — guidance admission
+
+`0006_guidance_admission.sql`
+**checksum `9c41feed9ee7b619`**
+**runtime status: pending owner execution**
+
+Distributed cost admission for the paid guidance provider: subject, lease
+expiry and a short-window count of ADMITTED calls. No prompts, conversations,
+model responses or nutrition data. RLS is enabled and forced with no policy, so
+the table is reachable only by server authority.
+
+It is applied by the migration runner, which owns the file, its checksum, the
+transaction, the schema change and the ledger row atomically — never by
+`psql -f`:
+
+```bash
+PGHOST=/tmp npm run postgres:validate          # applies 0006 + ledger row
+PGHOST=/tmp npm run postgres:guidance-validate # proves it against real PostgreSQL
+```
+
+When `postgres:guidance-validate` exits zero against `macros_dev`, this exact
+checksum becomes the runtime-validated artifact and the status line above is the
+only thing that changes. Until then the checksum is a candidate, and the frozen
+0001–0005 pin deliberately excludes it: recording evidence that does not exist
+would be worse than recording a gap.

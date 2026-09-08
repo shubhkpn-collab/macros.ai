@@ -52,7 +52,23 @@ const isWithinWorkspace = (filePath) => {
   return !relative.split(path.sep).includes('node_modules');
 };
 
+/**
+ * REMOTE GUIDANCE ACCEPTANCE selection.
+ *
+ * Read here, in Node, at Metro composition time. The React Native sources never
+ * read it, so nothing in the running app depends on an ambient environment
+ * value — the acceptance build is a property of how the bundle was made.
+ */
+const GUIDANCE_ACCEPTANCE = process.env.MACROS_GUIDANCE_ACCEPTANCE === '1';
+
 const resolveRequest = (context, moduleName, platform) => {
+  if (GUIDANCE_ACCEPTANCE && /(^|\/)host-selection(\.js)?$/.test(moduleName)) {
+    return context.resolveRequest(
+      context,
+      moduleName.replace(/host-selection(\.js)?$/, 'host-selection.acceptance'),
+      platform);
+  }
+
   try {
     return context.resolveRequest(context, moduleName, platform);
   } catch (originalError) {

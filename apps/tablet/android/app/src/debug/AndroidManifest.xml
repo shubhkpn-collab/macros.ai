@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+  <!--
+    DEBUG ONLY. Merged into debug builds and never into release.
+
+    The emulator reaches Metro and the local guidance acceptance backend over
+    plain HTTP on 10.0.2.2, which Android blocks by default. This permits
+    cleartext for those local development hosts ONLY — see network_security.xml.
+    Production traffic stays HTTPS, because the release manifest never merges
+    this file.
+  -->
+  <application
+      android:networkSecurityConfig="@xml/network_security"
+      tools:replace="android:networkSecurityConfig" />
+</manifest>

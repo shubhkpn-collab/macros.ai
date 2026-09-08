@@ -495,7 +495,13 @@ describe('postgres foundation — frozen after runtime validation', () => {
   test('the validated migrations are pinned by checksum', () => {
     // Doc 33 records the SHA-256 of every migration that actually executed. If
     // a migration changes without new runtime evidence, this fails.
-    for (const f of readdirSync(MIG_DIR)) {
+    // Scoped to the migrations that ACTUALLY EXECUTED against PostgreSQL.
+    // 0006 is deliberately excluded: it has not been runtime validated, and
+    // pinning it here would claim evidence that does not exist.
+    const VALIDATED = ['0001_core_schema.sql', '0002_rls.sql',
+      '0003_catalog_identifiers.sql', '0004_food_log_corrections.sql',
+      '0005_households.sql'];
+    for (const f of VALIDATED) {
       const digest = createHash('sha256')
         .update(readFileSync(join(MIG_DIR, f))).digest('hex').slice(0, 16);
       assert.ok(doc33.includes(digest),

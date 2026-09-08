@@ -1,4 +1,4 @@
-import type { TabletAppController } from '@macros/tablet-app-core';
+import type { GuidanceDeps, TabletAppController } from '@macros/tablet-app-core';
 
 /**
  * RN ACTION ADAPTER.
@@ -50,7 +50,7 @@ export interface AuthHostPort {
 export interface ActionDeps {
   readonly controller: TabletAppController;
   /** Supplied by the host. Absent means guidance is unavailable on this build. */
-  readonly guidance?: Parameters<TabletAppController['requestFoodGuidance']>[0];
+  readonly guidance?: GuidanceDeps;
   readonly auth: AuthHostPort;
   readonly activity: () => Parameters<TabletAppController['switchActiveUser']>[1];
   readonly onChanged: () => void;

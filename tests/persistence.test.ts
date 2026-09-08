@@ -519,6 +519,9 @@ describe('MIGRATIONS — static assertions (RLS runtime verification PENDING)', 
       '0003_catalog_identifiers.sql',
       '0004_food_log_corrections.sql',
       '0005_households.sql',
+      // AI-2: distributed guidance admission. Cost infrastructure only — no
+      // nutrition, conversation or model data.
+      '0006_guidance_admission.sql',
     ]);
   });
 

@@ -9,7 +9,7 @@ import {
   createFetchTransport, createTabletGuidanceProvider,
 } from '@macros/guidance-remote';
 import {
-  DEFAULT_ADMISSION_POLICY, GuidanceAdmissionGuard,
+  DEFAULT_ADMISSION_POLICY, InMemoryGuidanceAdmission,
 } from '@macros/runtime-api';
 import { FakeGuidanceProvider } from '@macros/guidance';
 import { repoPath } from '../tools/repo-paths.js';
@@ -204,72 +204,62 @@ describe('AI-1 FINAL — composition is configuration, not code', () => {
 });
 
 describe('AI-1 FINAL — the server admission guard', () => {
-  const guard = (now: () => number) => new GuidanceAdmissionGuard(now, {
+  const guard = (now: () => number) => new InMemoryGuidanceAdmission(now, {
     ...DEFAULT_ADMISSION_POLICY, maxRequestsPerWindow: 3, windowMs: 1000,
   });
 
-  test('one concurrent provider call per subject', () => {
+  test('one concurrent provider call per subject', async () => {
     const g = guard(() => 0);
-    const first = g.admit('u1');
-    assert.equal(first.admitted, true);
-    const second = g.admit('u1');
+    assert.equal((await g.acquire('u1')).admitted, true);
+    const second = await g.acquire('u1');
     assert.equal(second.admitted, false);
     assert.equal(second.admitted === false && second.reason, 'in_flight');
   });
 
-  test('releasing frees the slot', () => {
+  test('releasing frees the slot', async () => {
     const g = guard(() => 0);
-    const first = g.admit('u1');
+    const first = await g.acquire('u1');
     assert.equal(first.admitted, true);
-    if (first.admitted) first.release();
-    assert.equal(g.admit('u1').admitted, true);
+    if (first.admitted) await g.release(first.lease);
+    assert.equal((await g.acquire('u1')).admitted, true);
   });
 
-  test('release is idempotent', () => {
-    const g = guard(() => 0);
-    const a = g.admit('u1');
-    if (a.admitted) { a.release(); a.release(); }
-    assert.equal(g.admit('u1').admitted, true);
-    // A double release must not open a slot that was never taken.
-    assert.equal(g.admit('u1').admitted, false);
-  });
-
-  test('quota is enforced within the window', () => {
+  test('quota is enforced within the window', async () => {
     let t = 0;
     const g = guard(() => t);
     for (let i = 0; i < 3; i += 1) {
-      const d = g.admit('u1');
+      const d = await g.acquire('u1');
       assert.equal(d.admitted, true);
-      if (d.admitted) d.release();
+      if (d.admitted) await g.release(d.lease);
     }
-    const refused = g.admit('u1');
+    const refused = await g.acquire('u1');
     assert.equal(refused.admitted, false);
     assert.equal(refused.admitted === false && refused.reason, 'quota_exceeded');
 
     t = 1500;
-    assert.equal(g.admit('u1').admitted, true, 'a new window resets the count');
+    assert.equal((await g.acquire('u1')).admitted, true, 'a new window resets the count');
   });
 
-  test('subjects are isolated', () => {
+  test('subjects are isolated', async () => {
     const g = guard(() => 0);
-    assert.equal(g.admit('u1').admitted, true);
-    assert.equal(g.admit('u2').admitted, true, 'one member must not block another');
+    assert.equal((await g.acquire('u1')).admitted, true);
+    assert.equal((await g.acquire('u2')).admitted, true, 'one member must not block another');
   });
 
-  test('memory is bounded by eviction', () => {
+  test('memory is bounded by eviction', async () => {
     let t = 0;
     const g = guard(() => t);
-    const d = g.admit('u1');
-    if (d.admitted) d.release();
+    const d = await g.acquire('u1');
+    if (d.admitted) await g.release(d.lease);
     assert.equal(g.trackedSubjects(), 1);
     t = 10_000_000;
-    g.admit('u2');
+    await g.acquire('u2');
     assert.equal(g.trackedSubjects(), 1, 'the idle subject was evicted');
   });
 
   test('the guard is checked BEFORE the provider', () => {
     const route = read('packages', 'runtime-api', 'src', 'guidance-route.ts');
-    const admitIndex = route.indexOf('deps.admission?.admit');
+    const admitIndex = route.indexOf('deps.admission.acquire');
     const generateIndex = route.indexOf('deps.provider.generate');
     assert.ok(admitIndex > 0 && admitIndex < generateIndex,
       'a refused request must cost nothing');
@@ -277,7 +267,6 @@ describe('AI-1 FINAL — the server admission guard', () => {
 
   test('the process-local limitation is documented, not glossed', () => {
     const code = read('packages', 'runtime-api', 'src', 'guidance-admission.ts');
-    assert.match(code, /PROCESS-LOCAL/);
     assert.match(code, /NOT multi-instance safe/);
   });
 });

@@ -227,9 +227,12 @@ describe('AI-0 — provider unavailable', () => {
     assert.equal(/error|stack|providerName/.test(block), false);
   });
 
-  test('the development host uses the FAKE provider only', () => {
+  test('the development host composes its provider and names no vendor', () => {
+    // AI-2 moved provider choice into createTabletGuidanceProvider, keyed off
+    // the existing `assistant` selection. Synthetic remains the default.
     const host = read('apps', 'tablet', 'src', 'development-host.ts');
-    assert.match(host, /new FakeGuidanceProvider\(\)/);
+    assert.match(host, /createTabletGuidanceProvider\(/);
+    assert.match(host, /options\.assistant \?\? 'synthetic'/);
     for (const banned of ['openai', 'anthropic', 'apiKey', 'https://']) {
       assert.equal(host.toLowerCase().includes(banned), false, `host references ${banned}`);
     }

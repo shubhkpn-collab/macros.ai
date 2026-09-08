@@ -6,7 +6,9 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "hydrate:android": "node ../../tools/hydrate-android-shell.mjs"
+    "hydrate:android": "node ../../tools/hydrate-android-shell.mjs",
+    "android:guidance-acceptance": "MACROS_GUIDANCE_ACCEPTANCE=1 react-native run-android",
+    "start:guidance-acceptance": "MACROS_GUIDANCE_ACCEPTANCE=1 react-native start --reset-cache"
   },
   "dependencies": {
     "react": "19.1.0",

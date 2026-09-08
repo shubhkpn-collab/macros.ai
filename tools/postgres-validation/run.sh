@@ -198,15 +198,21 @@ MIG_SECS=$(( $(date +%s) - MIG_START ))
 say "  migration duration: ${MIG_SECS}s"
 
 # A second run must skip everything. An already-migrated database is a VALID
-# starting state: applied=0 skipped=5 on both runs is expected after the first
+# starting state: applied=0 on the second run is expected after the first
 # real execution.
 say "  re-running (idempotency)..."
 if ! apply_migrations "run 2"; then
   say "  [FAIL] re-run did not skip cleanly"; FAILURES=$((FAILURES + 1))
 fi
+# COUNTED FROM THE MIGRATION SET, not hard-coded. A literal broke the moment
+# 0006 arrived and would break again at 0007; the authoritative number is
+# however many migration files exist.
+EXPECTED_MIGRATIONS=$(find "$MIGRATIONS" -name '[0-9]*.sql' | wc -l | tr -d ' ')
 LEDGER=$(psql_owner -tAc "SELECT count(*) FROM schema_migrations;")
-say "  ledger rows: $LEDGER (expect 5)"
-[ "$LEDGER" = "5" ] || { say "  [FAIL] expected 5 ledger rows"; FAILURES=$((FAILURES + 1)); }
+say "  ledger rows: $LEDGER (expect $EXPECTED_MIGRATIONS)"
+[ "$LEDGER" = "$EXPECTED_MIGRATIONS" ] || {
+  say "  [FAIL] ledger has $LEDGER rows, migration set has $EXPECTED_MIGRATIONS"
+  FAILURES=$((FAILURES + 1)); }
 
 # --- C19 CHECKSUM DRIFT REFUSAL ---------------------------------------------
 section "CHECKSUM DRIFT REFUSAL (intentional negative probe)"
