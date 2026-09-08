@@ -55,6 +55,8 @@
       "@macros/domain-food-search": [
         "./packages/domain-food-search/src/index.ts"
       ],
+      "@macros/guidance-anthropic": ["./packages/guidance-anthropic/src/index.ts"],
+      "@macros/guidance-remote": ["./packages/guidance-remote/src/index.ts"],
       "@macros/guidance": ["./packages/guidance/src/index.ts"],
       "@macros/tablet-view-model": ["./packages/tablet-view-model/src/index.ts"],
       "@macros/tablet-app-core": [

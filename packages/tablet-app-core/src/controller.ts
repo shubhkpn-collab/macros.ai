@@ -114,6 +114,18 @@ export class TabletAppController {
   private guidanceGeneration = 0;
   /** Identifies the envelope currently on screen, for choice validation. */
   private activeEnvelope: { id: string; envelope: GuidanceEnvelope } | null = null;
+  /**
+   * The guidance request currently in flight, if any.
+   *
+   * Generation guards stop a stale result from LANDING, but they do not stop a
+   * second provider call from being MADE — and on the remote path that call is
+   * billed. A double tap therefore cost twice. Coalescing onto the outstanding
+   * promise means one intent is one provider call.
+   */
+  private inFlightGuidance: {
+    readonly sessionGeneration: number;
+    readonly promise: Promise<GuidanceState>;
+  } | null = null;
   private lastSearchDidYouMean: string | null = null;
 
   constructor(
@@ -156,6 +168,32 @@ export class TabletAppController {
    * changed, which is precisely what makes the post-log recommendation wrong.
    */
   async requestFoodGuidance(deps: GuidanceDeps): Promise<GuidanceState> {
+    /**
+     * Coalesce a duplicate tap onto the outstanding request. A member or
+     * session change makes the in-flight request unusable, so it is not
+     * reused across a switch.
+     */
+    const outstanding = this.inFlightGuidance;
+    if (outstanding !== null
+        && outstanding.sessionGeneration === this.state.sessionGeneration) {
+      return outstanding.promise;
+    }
+
+    const promise = this.performGuidanceRequest(deps);
+    this.inFlightGuidance = {
+      sessionGeneration: this.state.sessionGeneration,
+      promise,
+    };
+    try {
+      return await promise;
+    } finally {
+      // Cleared only if this request is still the outstanding one, so a newer
+      // request's slot is never released by an older one completing.
+      if (this.inFlightGuidance?.promise === promise) this.inFlightGuidance = null;
+    }
+  }
+
+  private async performGuidanceRequest(deps: GuidanceDeps): Promise<GuidanceState> {
     this.guidanceGeneration += 1;
     const generation = this.guidanceGeneration;
     const sessionGeneration = this.state.sessionGeneration;
@@ -279,6 +317,9 @@ export class TabletAppController {
   clearGuidance(): void {
     this.guidanceGeneration += 1;
     this.activeEnvelope = null;
+    // An outstanding request belongs to state that no longer exists; releasing
+    // the slot lets the next explicit intent start a fresh one.
+    this.inFlightGuidance = null;
     this.state = { ...this.state, guidance: IDLE_GUIDANCE };
   }
 
