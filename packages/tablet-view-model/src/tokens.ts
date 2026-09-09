@@ -50,6 +50,28 @@ export const color = {
   deficit: '#79D4A0',
   surplus: '#E3B155',
   neutral: '#A6ADB4',
+
+  /**
+   * MACRO IDENTITY. Per the approved reference, each macro ring carries its own
+   * hue so the three read apart at a glance across a kitchen.
+   *
+   * Deliberately separate from `warning`/`danger` above: amber there means
+   * something is wrong, whereas amber here simply means fat. Reusing the status
+   * colours would have made a normal ring look like an alert.
+   */
+  macroProtein: '#6E9BE8',
+  macroFat: '#D89A4E',
+  macroCarbs: '#4FBFA8',
+
+  /**
+   * ORB SPECTRUM. The reference orb is a prismatic ring, not a bordered circle.
+   * These are the halo stops; they are decoration only and never encode state
+   * on their own — intensity and motion do that.
+   */
+  orbSpectrumA: '#7FD8FF',
+  orbSpectrumB: '#8FA2FF',
+  orbSpectrumC: '#C78BFF',
+  orbSpectrumD: '#FF9BD2',
 } as const;
 
 /** 4pt base. Generous by phone standards; correct at arm's length. */

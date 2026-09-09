@@ -1,5 +1,6 @@
 import type { TabletComposition } from './composition.js';
 import type { GuidanceDeps } from '@macros/tablet-app-core';
+import type { PremiumSpeechTransport } from '@macros/tablet-voice';
 import type { AuthHostPort } from './actions.js';
 
 /**
@@ -42,6 +43,8 @@ export interface TabletHost {
    * a cast at the one boundary where a mismatch would only surface on a device.
    */
   readonly guidance?: GuidanceDeps;
+  /** Absent means native speech only — a good demo, just less warm. */
+  readonly premiumSpeech?: PremiumSpeechTransport;
   readonly catalogBrowser: {
     search(query: string): Promise<readonly unknown[]>;
   } | null;

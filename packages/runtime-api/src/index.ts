@@ -4,3 +4,4 @@ export * from './food-log-route.js';
 export * from './shared-device-auth.js';
 export * from './guidance-route.js';
 export * from './guidance-admission.js';
+export * from './voice-route.js';

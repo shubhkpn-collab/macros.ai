@@ -13,10 +13,11 @@
  */
 import { randomUUID } from 'node:crypto';
 import {
-  DEFAULT_ADMISSION_POLICY, MacrosApi, registerGuidanceRoute,
+  DEFAULT_ADMISSION_POLICY, MacrosApi, registerGuidanceRoute, registerVoiceRoute,
   type ApiDependencies,
 } from '@macros/runtime-api';
 import { PostgresGuidanceAdmission } from '@macros/persistence';
+import { createOpenAiSpeechProvider } from '@macros/voice-openai';
 import { createPgPool } from '@macros/postgres-driver';
 import {
   FakeAuthSessionProvider, StructuredLogger, loadRoleConfig, type RuntimeConfig,
@@ -180,7 +181,26 @@ async function main(): Promise<void> {
       + 'to apply migration 0006 before starting the acceptance backend');
   }
 
+  /**
+   * PREMIUM SPEECH. Opt-in exactly like guidance: no OPENAI_API_KEY means no
+   * provider, the route answers unavailable immediately, and the tablet speaks
+   * in its own voice — native speech must never depend on the network.
+   */
+  const speechKey = process.env['OPENAI_API_KEY'];
+  const speech = createOpenAiSpeechProvider(
+    speechKey !== undefined && speechKey.length > 0
+      ? {
+        apiKey: speechKey,
+        ...(process.env['MACROS_TTS_MODEL'] !== undefined
+          ? { model: process.env['MACROS_TTS_MODEL'] } : {}),
+        ...(process.env['MACROS_TTS_VOICE'] !== undefined
+          ? { voice: process.env['MACROS_TTS_VOICE'] } : {}),
+      }
+      : null,
+    fetch as never);
+
   const api = new MacrosApi(deps).withSystemRoutes();
+  registerVoiceRoute(api, { provider: speech });
   registerGuidanceRoute(api, {
     provider,
     admission: new PostgresGuidanceAdmission(
@@ -196,6 +216,8 @@ async function main(): Promise<void> {
       + `  database          : ${DATABASE} (real PostgresGuidanceAdmission)\n`
       + `  inference         : ${live
         ? `LIVE — model ${model}, BILLABLE` : 'fake transport, $0'}\n`
+      + `  premium voice     : ${speech === null
+        ? 'off (native TTS only, $0)' : 'LIVE — BILLABLE'}\n`
       + '  credentials       : not printed\n');
   });
 }

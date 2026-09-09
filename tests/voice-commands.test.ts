@@ -87,9 +87,10 @@ describe('DEMO — speech is input only, and speaks once', () => {
 
   test('an unavailable device leaves touch fully usable', async () => {
     assert.equal(await UNAVAILABLE_SPEECH.isAvailable(), false);
-    // Every method is a safe no-op rather than a throw.
-    UNAVAILABLE_SPEECH.startListening();
-    UNAVAILABLE_SPEECH.speak('anything');
+    // Every method is safe rather than a throw, and starting REPORTS that it
+    // could not, so the caller never waits for an event that cannot arrive.
+    assert.equal(await UNAVAILABLE_SPEECH.startListening(), 'unavailable');
+    UNAVAILABLE_SPEECH.speak('anything', 'utt-1');
     assert.equal(typeof UNAVAILABLE_SPEECH.onResult(() => undefined), 'function');
   });
 
@@ -113,11 +114,14 @@ describe('DEMO — speech is input only, and speaks once', () => {
   test('the native module carries no nutrition logic', () => {
     const kotlin = code('apps', 'tablet', 'android', 'app', 'src', 'main', 'java',
       'com', 'macrostablet', 'MacrosSpeechModule.kt');
-    for (const banned of ['kcal', 'protein', 'carbohydrate', 'recommend']) {
-      assert.equal(kotlin.toLowerCase().includes(banned), false, `kotlin has ${banned}`);
+    for (const banned of ['kcal', 'protein', 'carbohydrate', 'recommendFood']) {
+      assert.equal(kotlin.toLowerCase().includes(banned.toLowerCase()), false,
+        `kotlin has ${banned}`);
     }
-    // Only final transcripts cross the bridge.
-    assert.match(kotlin, /EXTRA_PARTIAL_RESULTS, false/);
+    // Partial results now drive the live caption and the wake acknowledgement,
+    // but only the FINAL transcript is ever acted on — see onResults.
+    assert.match(kotlin, /EXTRA_PARTIAL_RESULTS, true/);
+    assert.match(kotlin, /RESULTS_RECOGNITION/);
   });
 
   test('RECORD_AUDIO is declared and survives hydration', () => {
@@ -161,7 +165,10 @@ describe('DEMO — voice and premium UI are actually wired', () => {
   test('the orb is the push-to-talk control', () => {
     const app = read('apps', 'tablet', 'src', 'App.tsx');
     assert.match(app, /onOrbPress: \(\) => \{/);
-    assert.match(app, /voice\.toggleListening\(\);/);
+    // The outcome is awaited now, so a refused start settles the orb instead
+    // of leaving it on "Listening…".
+    assert.match(app, /voice\.toggleListening\(\)\.then\(\(outcome\)/);
+    assert.match(app, /setListening\(outcome === 'started'\)/);
     const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
     assert.match(screens, /<MacrosOrb/);
     assert.match(screens, /actions\.onOrbPress \?\? actions\.onRequestGuidance/);
@@ -193,7 +200,7 @@ describe('DEMO — voice and premium UI are actually wired', () => {
     const orb = read('apps', 'tablet', 'src', 'components', 'MacrosOrb.tsx');
     // A dedicated image area exists now so dropping photos in later needs no
     // second layout pass, and no external URL is invented.
-    assert.match(orb, /Placeholder image area/);
+    assert.match(orb, /Image panel/);
     assert.equal(/https?:\/\//.test(orb), false);
   });
 });
@@ -307,5 +314,113 @@ describe('DEMO — Home renders the real view-model contract', () => {
     assert.match(primitives, /disabled = false/);
     assert.match(primitives, /disabled=\{disabled\}/);
     assert.match(primitives, /accessibilityState=\{\{ disabled \}\}/);
+  });
+});
+
+describe('LOCKED REFERENCE — orb, cards and macro rings', () => {
+  const orb = () => read('apps', 'tablet', 'src', 'components', 'MacrosOrb.tsx');
+  const screens = () => read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+
+  test('the orb is a prismatic ring, not a bordered circle', () => {
+    const code = orb();
+    // The reference shows concentric spectrum haloes around an empty centre.
+    assert.match(code, /orbSpectrumA/);
+    assert.match(code, /orbSpectrumD/);
+    assert.match(code, /const haloes/);
+    // The pressable itself carries no border or fill.
+    assert.equal(/backgroundColor: color\.surface,\s*\n\s*alignItems: 'center', justifyContent: 'center',\s*\n\s*\}\}\s*\n\s*>/.test(code), false);
+  });
+
+  test('all four speech states share ONE component', () => {
+    const code = orb();
+    for (const state of ['idle', 'listening', 'thinking', 'speaking', 'weighing']) {
+      assert.ok(code.includes(`'${state}'`), `missing orb state ${state}`);
+    }
+    // Distinguished only by intensity and tempo, per the reference.
+    assert.match(code, /const INTENSITY: Record<OrbState, number>/);
+    assert.match(code, /isReduceMotionEnabled/);
+  });
+
+  test('no audio-player affordance exists anywhere', () => {
+    // An appliance that grows a media player stops feeling like an appliance.
+    // Comments may EXPLAIN the absence; the rendered code must not contain one.
+    const strip = (src: string): string => src
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    for (const code of [strip(orb()), strip(screens())]) {
+      for (const banned of ['waveform', 'Play', 'Pause', 'seek', 'OpenAI',
+                            'Generating audio']) {
+        assert.equal(code.includes(banned), false, `found audio control: ${banned}`);
+      }
+    }
+  });
+
+  test('macro rings carry their own hue, distinct from status colours', async () => {
+    const tokens = await import('@macros/tablet-view-model');
+    // Amber as "fat" must not be confused with amber as "warning".
+    assert.notEqual(tokens.color.macroFat, tokens.color.warning);
+    assert.notEqual(tokens.color.macroProtein, tokens.color.accent);
+    const code = orb();
+    assert.match(code, /Protein: color\.macroProtein/);
+    assert.match(code, /Fat: color\.macroFat/);
+    assert.match(code, /Carbs: color\.macroCarbs/);
+  });
+
+  test('the leading recommendation is visibly selected', () => {
+    const code = screens();
+    assert.match(code, /selected=\{index === 0\}/);
+    assert.match(orb(), /borderColor: selected \? color\.textPrimary/);
+  });
+
+  test('the food card keeps a real image panel', () => {
+    const code = orb();
+    assert.match(code, /Image panel/);
+    // No external URL is invented while photography is unavailable.
+    assert.equal(/https?:\/\/[a-z]/i.test(code), false);
+  });
+});
+
+describe('LOCKED REFERENCE — the orb returns to rest', () => {
+  test('speaking is driven by playback, not by the guidance phase', () => {
+    const code = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    // Deriving it from the phase left the orb pulsing after the sentence ended.
+    assert.match(code, /actions\.isSpeaking === true \? 'speaking'/);
+    assert.equal(/guidance\.phase === 'awaiting_choice'[\s\S]{0,40}'speaking'/.test(code), false);
+  });
+
+  test('listening takes priority over speaking', () => {
+    const code = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    const block = code.slice(code.indexOf('const orbState: OrbState'));
+    assert.ok(block.indexOf('isListening') < block.indexOf('isSpeaking'));
+  });
+
+  test('every ending path clears the speaking flag', () => {
+    const coordinator = read('apps', 'tablet', 'src', 'voice', 'voice-coordinator.ts');
+    assert.match(coordinator, /markSpeechFinished\(speechId: string \| null = null\): void \{/);
+    assert.match(coordinator, /this\.speaking = false;/);
+    // The pending utterance is cleared too, so a late failure cannot re-speak.
+    assert.match(coordinator, /this\.pendingText = null;/);
+    // Starting to listen also stops speech, so the microphone does not hear
+    // the appliance.
+    assert.match(coordinator, /this\.deps\.speech\.stopSpeaking\(\);/);
+    assert.match(coordinator, /this\.listening = true;/);
+
+    const app = read('apps', 'tablet', 'src', 'App.tsx');
+    assert.match(app, /onSpeechFinished\(\(speechId\) => \{/);
+    // An error must rest the orb too, or a silent speaker leaves it pulsing.
+    const effect = app.slice(app.indexOf('onError'), app.indexOf('offDone'));
+    assert.match(effect, /markSpeechFinished\(speechId\)|markSpeechFinished\(null\)/);
+  });
+
+  test('the native module reports completion, interruption and failure', () => {
+    const kotlin = read('apps', 'tablet', 'android', 'app', 'src', 'main', 'java',
+      'com', 'macrostablet', 'MacrosSpeechModule.kt');
+    assert.match(kotlin, /UtteranceProgressListener/);
+    // All endings funnel through one guarded emitter, so the raw event appears
+    // once and cannot fire twice for a single utterance. Every call now carries
+    // the utterance identity.
+    assert.equal((kotlin.match(/emit\("MacrosSpeechDone"/g) ?? []).length, 1);
+    assert.equal(/emitFinishOnce\(\)/.test(kotlin), false, 'no anonymous ending');
+    assert.ok((kotlin.match(/emitFinishOnce\([a-zA-Z]/g) ?? []).length >= 4,
+      'done, error, stop and interruption must all report an ending');
   });
 });

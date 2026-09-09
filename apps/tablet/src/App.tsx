@@ -3,6 +3,7 @@ import { SafeAreaView, StatusBar } from 'react-native';
 import { color } from '@macros/tablet-view-model';
 import { TabletShell } from './components/screens.js';
 import type { GuidanceDeps } from '@macros/tablet-app-core';
+import type { PremiumSpeechTransport } from '@macros/tablet-voice';
 import { createActions, type AuthHostPort } from './actions.js';
 import { createNativeSpeechPort } from './voice/native-speech.js';
 import { VoiceCoordinator } from './voice/voice-coordinator.js';
@@ -16,11 +17,15 @@ import { renderModel, type TabletComposition } from './composition.js';
  * copy that could drift from it.
  */
 export function App(
-  { composition, auth, hasActiveSession, developmentNotice = null, guidance }:
+  {
+    composition, auth, hasActiveSession, developmentNotice = null, guidance,
+    premiumSpeech,
+  }:
   {
     composition: TabletComposition; auth: AuthHostPort;
     hasActiveSession: boolean; developmentNotice?: string | null;
     guidance?: GuidanceDeps;
+    premiumSpeech?: PremiumSpeechTransport;
   },
 ): React.JSX.Element {
   const [tick, setTick] = useState(0);
@@ -47,6 +52,10 @@ export function App(
   viewModelRef.current = vm;
 
   const [listening, setListening] = useState(false);
+  // Smoothed microphone amplitude for the orb waveform, 0–1.
+  const [level, setLevel] = useState(0);
+  // Increments once per wake acknowledgement; the orb pulses on change.
+  const [wakePulse, setWakePulse] = useState(0);
 
   /**
    * ONE coordinator for the app's life, not one per render. A new instance on
@@ -57,7 +66,8 @@ export function App(
     speech: createNativeSpeechPort(),
     actions,
     viewModel: () => viewModelRef.current,
-  }), [actions]);
+    ...(premiumSpeech !== undefined ? { premium: premiumSpeech } : {}),
+  }), [actions, premiumSpeech]);
 
   /**
    * Every path that ends listening returns the orb to idle: a final result,
@@ -68,6 +78,7 @@ export function App(
   useEffect(() => {
     const offResult = voice.speechPort.onResult((t) => {
       setListening(false);
+      setLevel(0);
       voice.handleTranscript(t);
       refresh();
     });
@@ -78,13 +89,57 @@ export function App(
     // A speech failure is never surfaced raw; the touch path simply remains.
     const offError = voice.speechPort.onError(() => {
       setListening(false);
+      voice.handleRecognitionEnded();
+      voice.markSpeechFinished(null);
       refresh();
     });
-    return () => { offResult(); offState(); offError(); };
+    // Ends, interruptions and playback failures all land here, so the orb
+    // always comes to rest.
+    const offDone = voice.speechPort.onSpeechFinished((speechId) => {
+      voice.markSpeechFinished(speechId);
+      refresh();
+    });
+    // The orb lights only when audio is genuinely audible.
+    const offStart = voice.speechPort.onPlaybackStart((speechId) => {
+      voice.handlePlaybackStart(speechId);
+      refresh();
+    });
+    // Premium playback failed; the appliance speaks in its own voice, once.
+    const offPremium = voice.speechPort.onPremiumFailure((speechId) => {
+      voice.handlePremiumFailure(speechId);
+      refresh();
+    });
+    // Amplitude drives the waveform. Nothing is stored.
+    const offLevel = voice.speechPort.onLevel((rmsDb) => {
+      setLevel(voice.handleLevel(rmsDb));
+    });
+    // "Hey Macros" heard: one acknowledging pulse. Recognition continues, and
+    // no partial ever reaches the provider.
+    const offPartial = voice.speechPort.onPartial((transcript) => {
+      if (voice.handlePartial(transcript)) setWakePulse((n) => n + 1);
+    });
+    return () => {
+      offResult(); offState(); offError(); offDone();
+      offStart(); offPremium(); offLevel(); offPartial();
+    };
   }, [voice, refresh]);
 
-  // Speak a completed answer exactly once.
-  useEffect(() => { voice.speakGuidanceIfNew(); }, [voice, vm.guidance.text, vm.guidance.phase]);
+  // Stop audio and refuse late callbacks when the host goes away, so nothing
+  // speaks into a screen that no longer exists.
+  useEffect(() => () => { voice.dispose(); }, [voice]);
+
+  /**
+   * Speak a completed answer exactly once.
+   *
+   * `envelopeId` MUST be a dependency: the coordinator keys speech on it, and a
+   * second question can legitimately return the same sentence in the same
+   * phase. Watching only text and phase meant React never re-invoked this, so
+   * the second recommendation of the demo would have been silent while the
+   * coordinator sat ready to speak it.
+   */
+  useEffect(() => {
+    voice.speakGuidanceIfNew();
+  }, [voice, vm.guidance.envelopeId, vm.guidance.text, vm.guidance.phase]);
 
   /**
    * Screen-facing actions: the shared set plus push-to-talk. Defined after the
@@ -93,14 +148,18 @@ export function App(
   const screenActions = useMemo(() => ({
     ...actions,
     onOrbPress: () => {
-      voice.toggleListening();
-      // Optimistic, then corrected by the native start/end events. Waiting for
-      // the event alone leaves the orb dead for the moment it takes the
-      // recogniser to spin up.
-      setListening(voice.isListening());
+      // The outcome is authoritative: a refusal settles the orb immediately
+      // instead of leaving it on "Listening…" for an event that never comes.
+      void voice.toggleListening().then((outcome) => {
+        setListening(outcome === 'started');
+        refresh();
+      });
     },
     isListening: listening,
-  }), [actions, voice, listening]);
+    isSpeaking: voice.isSpeaking(),
+    micLevel: level,
+    wakePulse,
+  }), [actions, voice, listening, level, wakePulse, tick]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>

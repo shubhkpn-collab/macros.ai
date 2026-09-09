@@ -21,6 +21,26 @@ export type VoiceIntent =
 const normalize = (text: string): string =>
   text.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 
+/**
+ * The product wake phrase.
+ *
+ * Stripped here, before intent parsing, so nothing downstream has to know the
+ * product is called anything. "Hey Macros, what should I eat?" and "what should
+ * I eat?" must reach the router as the same request — and later, when a real
+ * always-listening engine replaces the tap, the phrase will already be handled
+ * in one place.
+ */
+const WAKE_PHRASE = /^(hey|hi|ok|okay)?\s*macros\b[\s,]*/;
+
+export function stripWakePhrase(text: string): string {
+  return text.replace(WAKE_PHRASE, '').trim();
+}
+
+/** True when a transcript opens with the wake phrase, for the orb acknowledgement. */
+export function containsWakePhrase(text: string): boolean {
+  return WAKE_PHRASE.test(normalize(text));
+}
+
 /** Ordinal words the demo needs. Deliberately short — this is not a parser. */
 const ORDINALS: ReadonlyArray<readonly [RegExp, number]> = [
   [/\b(option|number|the)?\s*(one|1|a|first)\b/, 0],
@@ -39,7 +59,8 @@ export function interpretVoiceCommand(
   transcript: string,
   candidateCount: number,
 ): VoiceIntent {
-  const text = normalize(transcript);
+  // Addressing the appliance is not part of the request.
+  const text = stripWakePhrase(normalize(transcript));
   if (text.length === 0) return { kind: 'unrecognized' };
 
   // Cancellation is checked FIRST so it can always interrupt, whatever else the

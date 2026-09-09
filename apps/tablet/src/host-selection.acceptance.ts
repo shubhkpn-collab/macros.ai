@@ -4,6 +4,7 @@ import type { TabletHost } from './bootstrap.js';
 import {
   ACCEPTANCE_API_BASE_URL, ACCEPTANCE_BANNER, acceptanceBearerToken,
 } from './acceptance-config.js';
+import { createPremiumSpeechTransport } from './premium-transport.js';
 
 /**
  * REMOTE GUIDANCE ACCEPTANCE host selection.
@@ -26,5 +27,15 @@ export async function createSelectedHost(): Promise<TabletHost> {
     apiBaseUrl: ACCEPTANCE_API_BASE_URL,
     bearerToken: acceptanceBearerToken,
   });
-  return { ...host, developmentNotice: ACCEPTANCE_BANNER };
+  return {
+    ...host,
+    developmentNotice: ACCEPTANCE_BANNER,
+    // Same URL and session as guidance; speech is not a reason to invent a
+    // second networking configuration.
+    premiumSpeech: createPremiumSpeechTransport({
+      baseUrl: ACCEPTANCE_API_BASE_URL,
+      bearerToken: acceptanceBearerToken,
+      fetchImpl: fetch,
+    }),
+  };
 }

@@ -20,6 +20,12 @@ export interface ScreenActions {
   /** Push-to-talk. Falls back to the guidance intent when voice is absent. */
   onOrbPress?: () => void;
   readonly isListening?: boolean;
+  /** True only while audio is actually playing, so the orb can return to idle. */
+  readonly isSpeaking?: boolean;
+  /** Smoothed microphone amplitude, 0–1, for the listening waveform. */
+  readonly micLevel?: number;
+  /** Increments when the wake phrase is heard; the orb pulses once on change. */
+  readonly wakePulse?: number;
   readonly onAddFood: () => void;
   readonly onRequestGuidance: () => void;
   readonly onChooseGuidanceCandidate: (productVersionId: string, envelopeId: string) => void;
@@ -103,11 +109,17 @@ export function HomeScreen(
    * control and very little text.
    */
   const guidance = vm.guidance;
+  /**
+   * One orb, four states, in priority order. Speaking is driven by whether
+   * audio is ACTUALLY playing — deriving it from the guidance phase left the
+   * orb pulsing long after the sentence had finished, which reads as a hung
+   * device rather than a speaking one.
+   */
   const orbState: OrbState =
-    guidance.phase === 'thinking' ? 'thinking'
-      : guidance.phase === 'awaiting_choice' || guidance.phase === 'guidance_available'
-        ? 'speaking'
-        : actions.isListening === true ? 'listening' : 'idle';
+    actions.isListening === true ? 'listening'
+      : guidance.phase === 'thinking' ? 'thinking'
+        : actions.isSpeaking === true ? 'speaking'
+          : 'idle';
 
   return (
     <ScrollView
@@ -120,8 +132,8 @@ export function HomeScreen(
       <Text
         accessibilityRole="header"
         style={{
-          color: color.textPrimary, fontSize: 40, fontWeight: '600',
-          marginBottom: space.sm,
+          color: color.textPrimary, fontSize: 42, fontWeight: '700',
+          marginBottom: space.xs,
         }}
       >
         Hey! Macros
@@ -137,12 +149,17 @@ export function HomeScreen(
           marginBottom: space.xxl, maxWidth: 560,
         }}
       >
-        {vm.energy === null ? 'Getting your day ready…' : vm.energy.semantic}
+        {orbState === 'listening' ? 'Listening…'
+          : orbState === 'thinking' ? 'Thinking…'
+            : vm.energy === null ? 'What are you eating today?'
+              : vm.energy.semantic}
       </Text>
 
       <MacrosOrb
         state={orbState}
-        caption={guidance.phase === 'thinking' ? 'Thinking' : 'Tap to speak'}
+        {...(orbState === 'idle' ? { caption: 'Tap to speak' } : {})}
+        level={actions.micLevel ?? 0}
+        wakePulse={actions.wakePulse ?? 0}
         accessibilityLabel="Ask Macros what to eat"
         onPress={actions.onOrbPress ?? actions.onRequestGuidance}
         disabled={!vm.offline.canLog}
@@ -165,10 +182,11 @@ export function HomeScreen(
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingVertical: space.xl }}
         >
-          {[...guidance.candidates, ...guidance.alternatives].map((c) => (
+          {[...guidance.candidates, ...guidance.alternatives].map((c, index) => (
             <FoodCard
               key={c.productVersionId}
               name={c.displayName}
+              selected={index === 0}
               onPress={() => {
                 if (guidance.envelopeId !== null) {
                   actions.onChooseGuidanceCandidate(c.productVersionId, guidance.envelopeId);

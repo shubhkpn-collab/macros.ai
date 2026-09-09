@@ -15,8 +15,9 @@ interface NativeSpeech {
   isAvailable(): Promise<boolean>;
   startListening(): void;
   stopListening(): void;
-  speak(text: string): void;
+  speak(text: string, speechId: string): void;
   stopSpeaking(): void;
+  playBase64Audio(audioBase64: string, mimeType: string, speechId: string): void;
   addListener(event: string): void;
   removeListeners(count: number): void;
 }
@@ -44,6 +45,7 @@ async function ensureMicrophonePermission(): Promise<boolean> {
 
 export function createNativeSpeechPort(): SpeechPort {
   const native = (NativeModules as { MacrosSpeech?: NativeSpeech }).MacrosSpeech;
+  // An absent module costs voice and nothing else; the caller is told plainly.
   if (native === undefined) return UNAVAILABLE_SPEECH;
 
   const emitter = new NativeEventEmitter(native as never);
@@ -59,20 +61,29 @@ export function createNativeSpeechPort(): SpeechPort {
       }
     },
 
-    startListening: () => {
-      void (async () => {
-        if (!permissionChecked) {
-          permitted = await ensureMicrophonePermission();
-          permissionChecked = true;
-        }
-        // Without permission the native call would emit an error anyway; not
-        // making it keeps the failure quiet and the UI on the touch path.
-        if (permitted) native.startListening();
-      })();
+    /**
+     * Reports whether listening actually began.
+     *
+     * The previous version fired and forgot: if permission was denied nothing
+     * started and no event was emitted, so the orb sat on "Listening…"
+     * indefinitely. The caller now learns the outcome and can settle.
+     */
+    startListening: async () => {
+      if (!permissionChecked) {
+        permitted = await ensureMicrophonePermission();
+        permissionChecked = true;
+      }
+      if (!permitted) return 'permission_denied';
+      try {
+        native.startListening();
+        return 'started';
+      } catch {
+        return 'unavailable';
+      }
     },
 
     stopListening: () => { native.stopListening(); },
-    speak: (text: string) => { native.speak(text); },
+    speak: (text: string, speechId: string) => { native.speak(text, speechId); },
     stopSpeaking: () => { native.stopSpeaking(); },
 
     onResult: (handler) => {
@@ -88,6 +99,42 @@ export function createNativeSpeechPort(): SpeechPort {
       const started = emitter.addListener('MacrosSpeechStart', () => { handler('listening'); });
       const ended = emitter.addListener('MacrosSpeechEnd', () => { handler('idle'); });
       return () => { started.remove(); ended.remove(); };
+    },
+
+    playAudio: (audioBase64: string, mimeType: string, speechId: string) => {
+      native.playBase64Audio(audioBase64, mimeType, speechId);
+    },
+
+    onPremiumFailure: (handler) => {
+      const sub = emitter.addListener('MacrosPremiumSpeechError',
+        (e: { speechId?: string }) => { handler(e.speechId ?? null); });
+      return () => { sub.remove(); };
+    },
+
+    onPlaybackStart: (handler) => {
+      const sub = emitter.addListener('MacrosSpeechPlaybackStart',
+        (e: { speechId?: string }) => { handler(e.speechId ?? null); });
+      return () => { sub.remove(); };
+    },
+
+    onLevel: (handler) => {
+      const sub = emitter.addListener('MacrosSpeechLevel',
+        (e: { rmsDb?: number }) => {
+          if (typeof e.rmsDb === 'number') handler(e.rmsDb);
+        });
+      return () => { sub.remove(); };
+    },
+
+    onPartial: (handler) => {
+      const sub = emitter.addListener('MacrosSpeechPartial',
+        (e: { transcript?: string }) => { handler(e.transcript ?? ''); });
+      return () => { sub.remove(); };
+    },
+
+    onSpeechFinished: (handler) => {
+      const sub = emitter.addListener('MacrosSpeechDone',
+        (e: { speechId?: string }) => { handler(e.speechId ?? null); });
+      return () => { sub.remove(); };
     },
 
     onError: (handler) => {

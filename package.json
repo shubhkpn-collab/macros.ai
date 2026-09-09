@@ -17,7 +17,8 @@
     "check:renderer": "node --import tsx tools/check-renderer-purity.ts",
     "benchmark:search": "node --import tsx tools/benchmark-search-quality.ts",
     "guidance:acceptance:backend": "node --import tsx tools/guidance-acceptance/run-backend.ts",
-    "postgres:guidance-validate": "node --import tsx tools/postgres-validation/validate-guidance-admission.ts"
+    "postgres:guidance-validate": "node --import tsx tools/postgres-validation/validate-guidance-admission.ts",
+    "investor:demo": "bash tools/investor-demo/run.sh"
   },
   "engines": {
     "node": ">=22.0.0",
