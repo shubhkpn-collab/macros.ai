@@ -6,7 +6,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
     "check:purity": "node --import tsx tools/check-purity.ts",
-    "verify": "npm run check:toolchain && npm run check:purity && npm run check:portability && npm run check:renderer && npm run check:auth && npm run typecheck && npm run test",
+    "verify": "npm run check:toolchain && npm run check:purity && npm run check:portability && npm run check:renderer && npm run check:tablet-imports && npm run check:auth && npm run typecheck && npm run test",
     "check:portability": "node --import tsx tools/check-portability.ts",
     "check:auth": "node --import tsx tools/check-auth-boundary.ts",
     "docs:generate": "node --import tsx tools/gen-catalog-doc.ts",
@@ -18,7 +18,8 @@
     "benchmark:search": "node --import tsx tools/benchmark-search-quality.ts",
     "guidance:acceptance:backend": "node --import tsx tools/guidance-acceptance/run-backend.ts",
     "postgres:guidance-validate": "node --import tsx tools/postgres-validation/validate-guidance-admission.ts",
-    "investor:demo": "bash tools/investor-demo/run.sh"
+    "investor:demo": "bash tools/investor-demo/run.sh",
+    "check:tablet-imports": "node --import tsx tools/check-tablet-imports.ts"
   },
   "engines": {
     "node": ">=22.0.0",

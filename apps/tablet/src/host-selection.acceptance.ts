@@ -4,7 +4,7 @@ import type { TabletHost } from './bootstrap.js';
 import {
   ACCEPTANCE_API_BASE_URL, ACCEPTANCE_BANNER, acceptanceBearerToken,
 } from './acceptance-config.js';
-import { createPremiumSpeechTransport } from './premium-transport.js';
+import { createPremiumSpeechTransport } from './voice/premium-transport.js';
 
 /**
  * REMOTE GUIDANCE ACCEPTANCE host selection.
