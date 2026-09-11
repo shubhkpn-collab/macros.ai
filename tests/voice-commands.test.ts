@@ -424,3 +424,67 @@ describe('LOCKED REFERENCE — the orb returns to rest', () => {
       'done, error, stop and interruption must all report an ending');
   });
 });
+
+describe('REFERENCE — Home follows the supplied frames', () => {
+  /** The rendered JSX only — the doc comment above it describes the layout. */
+  const home = (): string => {
+    const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    const from = screens.indexOf('export function HomeScreen');
+    const body = screens.slice(from, screens.indexOf('export function', from + 10));
+    return body.slice(body.indexOf('return ('))
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  };
+
+  test('the orb sits ABOVE the greeting, compact', () => {
+    const code = home();
+    // The frames place the ring at the top with the title beneath it; the orb
+    // is the signature here, the food cards are what the eye should land on.
+    assert.ok(code.indexOf('<MacrosOrb') < code.indexOf('Hey! Macros'));
+    assert.match(code, /size=\{132\}/);
+  });
+
+  test('the greeting, question, microphone and weight line are in order', () => {
+    const code = home();
+    const order = ['Hey! Macros', 'What are you eating today?', '<MicButton',
+      'Current weight:', '<FoodCard', 'Would you like', '<MacroRing'];
+    let last = -1;
+    for (const marker of order) {
+      const at = code.indexOf(marker);
+      assert.ok(at > last, `${marker} is out of order`);
+      last = at;
+    }
+  });
+
+  test('four rings, with calories last', () => {
+    const code = home();
+    // Protein, Carbs and Fat come from the macro array; calories from energy.
+    assert.match(code, /vm\.macros\.map\(\(macro\) =>/);
+    assert.match(code, /label="Calories" value=\{vm\.energy\.displayValue\}/);
+    assert.ok(code.indexOf('vm.macros.map') < code.indexOf('label="Calories"'));
+  });
+
+  test('three cards at most, the pick ringed', () => {
+    // The cap is applied above the return, so this one reads the whole body.
+    const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    const from = screens.indexOf('export function HomeScreen');
+    const body = screens.slice(from, screens.indexOf('export function', from + 10));
+    assert.match(body, /\.slice\(0, 3\)/);
+    const code = home();
+    assert.match(code, /selected=\{index === 0\}/);
+    const orb = read('apps', 'tablet', 'src', 'components', 'MacrosOrb.tsx');
+    assert.match(orb, /borderColor: selected \? color\.textPrimary/);
+    assert.match(orb, /opacity: selected \? 1 : 0\.72/);
+  });
+
+  test('the weight line appears only when the scale has one', () => {
+    // An empty "Current weight:" would read as a fault, not a state.
+    assert.match(home(), /vm\.scale\.displayWeight !== null \?/);
+  });
+
+  test('no dashboard hierarchy crept back in', () => {
+    const code = home();
+    for (const banned of ['Daily Totals', 'EnergyBalanceHero', 'Logged today']) {
+      assert.equal(code.includes(banned), false, `Home shows ${banned}`);
+    }
+  });
+});

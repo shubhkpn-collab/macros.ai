@@ -10,7 +10,9 @@ import { EnergyBalanceHero } from './EnergyBalanceHero.js';
 import { MacroProgress } from './MacroProgress.js';
 import { VoiceStateIndicator } from './VoiceStateIndicator.js';
 import { ScaleWeightDisplay } from './ScaleWeightDisplay.js';
-import { FoodCard, MacroRing, MacrosOrb, type OrbState } from './MacrosOrb.js';
+import {
+  FoodCard, MacroRing, MacrosOrb, MicButton, type OrbState,
+} from './MacrosOrb.js';
 import { FoodOptionCard } from './FoodOptionCard.js';
 import {
   DevelopmentBanner, OfflineStatus, RecentFoodRow, TopIdentityBar,
@@ -96,93 +98,98 @@ export function HomeScreen(
   { vm, actions }: { vm: TabletViewModel; actions: ScreenActions },
 ): React.JSX.Element {
   /**
-   * THE LOCKED REFERENCE.
+   * THE REFERENCE COMPOSITION, top to bottom:
    *
+   *   prismatic orb
    *   Hey! Macros
-   *   one contextual sentence
-   *   the orb
-   *   recommendations when active
-   *   three macro rings
+   *   What are you eating today?
+   *   microphone
+   *   current weight
+   *   three food cards, the pick ringed
+   *   the question
+   *   Protein · Carbs · Fat · Calories
    *
-   * Deliberately not a dashboard. The previous stacked panels read as a
-   * tracking app; this has to read as an appliance, which means one focal
-   * control and very little text.
+   * The orb sits above the greeting rather than beneath it, and is compact
+   * here: on this screen it is the product's signature, and the food cards are
+   * what the eye should land on.
    */
   const guidance = vm.guidance;
-  /**
-   * One orb, four states, in priority order. Speaking is driven by whether
-   * audio is ACTUALLY playing — deriving it from the guidance phase left the
-   * orb pulsing long after the sentence had finished, which reads as a hung
-   * device rather than a speaking one.
-   */
   const orbState: OrbState =
     actions.isListening === true ? 'listening'
       : guidance.phase === 'thinking' ? 'thinking'
         : actions.isSpeaking === true ? 'speaking'
           : 'idle';
 
+  const offered = [...guidance.candidates, ...guidance.alternatives].slice(0, 3);
+  const lead = guidance.candidates[0];
+
   return (
     <ScrollView
       contentContainerStyle={{
-        paddingHorizontal: space.xl, paddingTop: space.xl,
-        paddingBottom: space.xxl, alignItems: 'center',
+        paddingHorizontal: space.xl, paddingTop: space.lg,
+        paddingBottom: space.xl, alignItems: 'center',
       }}
       showsVerticalScrollIndicator={false}
     >
+      <MacrosOrb
+        state={orbState}
+        size={132}
+        accessibilityLabel="Ask Macros what to eat"
+        onPress={actions.onOrbPress ?? actions.onRequestGuidance}
+        disabled={!vm.offline.canLog}
+        level={actions.micLevel ?? 0}
+        wakePulse={actions.wakePulse ?? 0}
+      />
+
       <Text
         accessibilityRole="header"
         style={{
-          color: color.textPrimary, fontSize: 42, fontWeight: '700',
-          marginBottom: space.xs,
+          color: color.textPrimary, fontSize: 38, fontWeight: '700',
+          marginTop: space.xl,
         }}
       >
         Hey! Macros
       </Text>
 
-      {/* ONE sentence, produced by the view model. React computes nothing.
-          `energy` is legitimately null before the first dashboard resolves, so
-          the absence is rendered as its own quiet state rather than reached
-          through. */}
+      {/* One trusted line. React computes nothing. */}
       <Text
         style={{
           color: color.textSecondary, fontSize: 20, textAlign: 'center',
-          marginBottom: space.xxl, maxWidth: 560,
+          marginTop: space.xs, maxWidth: 560,
         }}
       >
         {orbState === 'listening' ? 'Listening…'
           : orbState === 'thinking' ? 'Thinking…'
-            : vm.energy === null ? 'What are you eating today?'
-              : vm.energy.semantic}
+            : guidance.text.length > 0 ? guidance.text
+              : vm.energy === null ? 'What are you eating today?'
+                : vm.energy.semantic}
       </Text>
 
-      <MacrosOrb
-        state={orbState}
-        {...(orbState === 'idle' ? { caption: 'Tap to speak' } : {})}
-        level={actions.micLevel ?? 0}
-        wakePulse={actions.wakePulse ?? 0}
-        accessibilityLabel="Ask Macros what to eat"
-        onPress={actions.onOrbPress ?? actions.onRequestGuidance}
-        disabled={!vm.offline.canLog}
-      />
+      <View style={{ marginTop: space.lg }}>
+        <MicButton
+          active={orbState === 'listening'}
+          onPress={actions.onOrbPress ?? actions.onRequestGuidance}
+          accessibilityLabel="Speak to Macros"
+        />
+      </View>
 
-      {guidance.visible && guidance.text.length > 0 ? (
+      {/* Only shown when the scale has something to say. */}
+      {vm.scale.displayWeight !== null ? (
         <Text
-          style={{
-            color: color.textPrimary, fontSize: 22, textAlign: 'center',
-            marginTop: space.xl, maxWidth: 640,
-          }}
+          style={{ color: color.textMuted, fontSize: 16, marginTop: space.lg }}
         >
-          {guidance.text}
+          Current weight: {vm.scale.displayWeight}
         </Text>
       ) : null}
 
-      {guidance.candidates.length > 0 ? (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: space.xl }}
+      {offered.length > 0 ? (
+        <View
+          style={{
+            flexDirection: 'row', justifyContent: 'center',
+            marginTop: space.lg, flexWrap: 'wrap',
+          }}
         >
-          {[...guidance.candidates, ...guidance.alternatives].map((c, index) => (
+          {offered.map((c, index) => (
             <FoodCard
               key={c.productVersionId}
               name={c.displayName}
@@ -195,14 +202,31 @@ export function HomeScreen(
               accessibilityLabel={`Choose ${c.displayName}`}
             />
           ))}
-        </ScrollView>
+        </View>
       ) : null}
 
-      {/* Projected from the MacroView[] contract in the order the view model
-          supplies — Protein, Carbs, Fat. Naming the keys here assumed a shape
-          the contract never had, and duplicating the order in React would let
-          the two drift. */}
-      <View style={{ flexDirection: 'row', marginTop: space.xxl }}>
+      {/* The question, as a quiet pill under the cards. */}
+      {lead !== undefined ? (
+        <View
+          style={{
+            marginTop: space.lg, paddingHorizontal: space.xl,
+            paddingVertical: space.md, borderRadius: radius.pill,
+            backgroundColor: color.surface,
+          }}
+        >
+          <Text style={{ color: color.textSecondary, fontSize: 17 }}>
+            Would you like {lead.displayName}?
+          </Text>
+        </View>
+      ) : null}
+
+      {/* Protein · Carbs · Fat · Calories, per the reference. */}
+      <View
+        style={{
+          flexDirection: 'row', justifyContent: 'center',
+          marginTop: space.xl, flexWrap: 'wrap',
+        }}
+      >
         {vm.macros.map((macro) => (
           <MacroRing
             key={macro.label}
@@ -210,16 +234,18 @@ export function HomeScreen(
             value={macro.displayRemaining}
           />
         ))}
+        {vm.energy !== null ? (
+          <MacroRing label="Calories" value={vm.energy.displayValue} />
+        ) : null}
       </View>
 
-      {/* Secondary and discreet: the orb is the product, this is the escape. */}
       <Pressable
         onPress={actions.onAddFood}
         accessibilityRole="button"
         accessibilityLabel="Add food"
-        style={{ marginTop: space.xl, padding: space.md }}
+        style={{ marginTop: space.lg, padding: space.md }}
       >
-        <Text style={{ color: color.textMuted, fontSize: 16 }}>Add food manually</Text>
+        <Text style={{ color: color.textMuted, fontSize: 15 }}>Add food manually</Text>
       </Pressable>
     </ScrollView>
   );

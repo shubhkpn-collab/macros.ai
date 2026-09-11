@@ -31,6 +31,8 @@ export interface MacrosOrbProps {
   readonly onPress?: () => void;
   readonly accessibilityLabel: string;
   readonly disabled?: boolean;
+  /** Diameter. Home places a compact orb above the title; weighing goes large. */
+  readonly size?: number;
 }
 
 const DIAMETER = 300;
@@ -46,8 +48,9 @@ const INTENSITY: Record<OrbState, number> = {
 
 export function MacrosOrb({
   state, weightLabel, weightUnit, caption, level = 0, wakePulse = 0, onPress,
-  accessibilityLabel, disabled = false,
+  accessibilityLabel, disabled = false, size,
 }: MacrosOrbProps): React.JSX.Element {
+  const diameter = size ?? DIAMETER;
   const pulse = useRef(new Animated.Value(0)).current;
   /** One short brightening when "Hey Macros" is recognised. */
   const wake = useRef(new Animated.Value(0)).current;
@@ -109,11 +112,12 @@ export function MacrosOrb({
   const breathe = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.05] });
 
   /** Concentric spectrum haloes, widest and softest on the outside. */
+  const ring = diameter / 300;
   const haloes: readonly { readonly size: number; readonly tint: string; readonly a: number }[] = [
-    { size: DIAMETER + 120, tint: color.orbSpectrumD, a: 0.30 },
-    { size: DIAMETER + 78, tint: color.orbSpectrumC, a: 0.45 },
-    { size: DIAMETER + 44, tint: color.orbSpectrumB, a: 0.60 },
-    { size: DIAMETER + 16, tint: color.orbSpectrumA, a: 0.85 },
+    { size: diameter + (120 * ring), tint: color.orbSpectrumD, a: 0.30 },
+    { size: diameter + (78 * ring), tint: color.orbSpectrumC, a: 0.45 },
+    { size: diameter + (44 * ring), tint: color.orbSpectrumB, a: 0.60 },
+    { size: diameter + (16 * ring), tint: color.orbSpectrumA, a: 0.85 },
   ];
 
   return (
@@ -140,7 +144,7 @@ export function MacrosOrb({
         pointerEvents="none"
         style={{
           position: 'absolute',
-          width: DIAMETER, height: DIAMETER, borderRadius: DIAMETER / 2,
+          width: diameter, height: diameter, borderRadius: diameter / 2,
           borderWidth: 3, borderColor: color.orbSpectrumA,
           opacity: glow, transform: [{ scale: breathe }],
         }}
@@ -153,7 +157,7 @@ export function MacrosOrb({
         accessibilityLabel={accessibilityLabel}
         accessibilityState={{ busy: state === 'thinking', disabled }}
         style={{
-          width: DIAMETER, height: DIAMETER, borderRadius: DIAMETER / 2,
+          width: diameter, height: diameter, borderRadius: diameter / 2,
           alignItems: 'center', justifyContent: 'center',
         }}
       >
@@ -168,7 +172,7 @@ export function MacrosOrb({
            */
           <View
             style={{
-              width: DIAMETER, height: DIAMETER,
+              width: diameter, height: diameter,
               alignItems: 'center', justifyContent: 'center',
             }}
           >
@@ -177,7 +181,7 @@ export function MacrosOrb({
                 key={`stroke-${String(index)}`}
                 style={{
                   position: 'absolute',
-                  width: DIAMETER, height: DIAMETER,
+                  width: diameter, height: diameter,
                   alignItems: 'center',
                   transform: [{ rotate: `${String(segmentAngle(index))}deg` }],
                 }}
@@ -186,8 +190,8 @@ export function MacrosOrb({
                   style={{
                     width: 5, borderRadius: 3,
                     // Grows inward from the ring, leaving the centre open.
-                    height: Math.max(8, height * 74),
-                    marginTop: 26,
+                    height: Math.max(8, height * 74 * ring),
+                    marginTop: 26 * ring,
                     backgroundColor: index % 2 === 0
                       ? color.orbSpectrumA : color.orbSpectrumC,
                     opacity: 0.4 + (height * 0.6),
@@ -201,7 +205,7 @@ export function MacrosOrb({
             <Text
               style={{
                 color: color.textPrimary,
-                fontSize: 88, fontWeight: '700', letterSpacing: -3,
+                fontSize: Math.round(88 * ring), fontWeight: '700', letterSpacing: -3,
               }}
             >
               {weightLabel}
@@ -247,11 +251,13 @@ export function FoodCard({
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected }}
       style={{
-        width: 210, minHeight: 236, borderRadius: 22,
+        width: 172, minHeight: 196, borderRadius: 20,
         backgroundColor: color.surface,
+        // The pick is ringed in white, as in the reference; the others recede.
         borderWidth: selected ? 2 : 1,
         borderColor: selected ? color.textPrimary : color.surfaceMuted,
-        overflow: 'hidden', marginRight: space.md,
+        opacity: selected ? 1 : 0.72,
+        overflow: 'hidden', marginHorizontal: space.sm,
       }}
     >
       {/* Image panel. Present even with no photograph, so real product imagery
@@ -259,12 +265,12 @@ export function FoodCard({
           invented in the meantime. */}
       <View
         style={{
-          height: 132, margin: space.sm, borderRadius: 14,
+          height: 106, margin: space.sm, borderRadius: 14,
           backgroundColor: color.surfaceMuted,
           alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <Text style={{ color: color.textMuted, fontSize: 32, fontWeight: '600' }}>
+        <Text style={{ color: color.textMuted, fontSize: 28, fontWeight: '600' }}>
           {name.slice(0, 1).toUpperCase()}
         </Text>
       </View>
@@ -272,7 +278,7 @@ export function FoodCard({
       <View style={{ paddingHorizontal: space.md, paddingBottom: space.md }}>
         <Text
           numberOfLines={2}
-          style={{ color: color.textPrimary, fontSize: 17, textAlign: 'center' }}
+          style={{ color: color.textPrimary, fontSize: 15, textAlign: 'center' }}
         >
           {name}
         </Text>
@@ -306,7 +312,7 @@ const MACRO_TINT: Readonly<Record<string, string>> = {
  * Values arrive pre-formatted; nothing is computed here.
  */
 export function MacroRing({
-  label, value, size = 62,
+  label, value, size = 56,
 }: {
   readonly label: string;
   readonly value?: string;
@@ -314,7 +320,7 @@ export function MacroRing({
 }): React.JSX.Element {
   const tint = MACRO_TINT[label] ?? color.neutral;
   return (
-    <View style={{ alignItems: 'center', marginHorizontal: space.lg }}>
+    <View style={{ alignItems: 'center', marginHorizontal: space.md }}>
       <View
         style={{
           width: size, height: size, borderRadius: size / 2,
@@ -323,14 +329,61 @@ export function MacroRing({
         }}
       >
         {value !== undefined ? (
-          <Text style={{ color: color.textPrimary, fontSize: 15, fontWeight: '600' }}>
+          <Text style={{ color: color.textPrimary, fontSize: 13, fontWeight: '600' }}>
             {value}
           </Text>
         ) : null}
       </View>
-      <Text style={{ color: color.textMuted, fontSize: 14, marginTop: space.sm }}>
+      <Text style={{ color: color.textMuted, fontSize: 13, marginTop: space.xs }}>
         {label}
       </Text>
     </View>
+  );
+}
+
+
+/**
+ * The small microphone control beneath the greeting.
+ *
+ * A secondary affordance, not the primary one — the orb above is still the
+ * product's focal interaction. This exists because the reference shows it and
+ * because it names the gesture for someone seeing the device for the first
+ * time.
+ */
+export function MicButton({
+  active, onPress, accessibilityLabel,
+}: {
+  readonly active: boolean;
+  readonly onPress?: () => void;
+  readonly accessibilityLabel: string;
+}): React.JSX.Element {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      style={{
+        width: 52, height: 52, borderRadius: 26,
+        borderWidth: 1,
+        borderColor: active ? color.orbSpectrumA : color.textMuted,
+        alignItems: 'center', justifyContent: 'center',
+      }}
+    >
+      {/* Drawn from primitives rather than shipping an icon font for one glyph. */}
+      <View
+        style={{
+          width: 11, height: 18, borderRadius: 6,
+          backgroundColor: active ? color.orbSpectrumA : color.textSecondary,
+        }}
+      />
+      <View
+        style={{
+          width: 17, height: 6, borderBottomLeftRadius: 9,
+          borderBottomRightRadius: 9, borderWidth: 1.5, borderTopWidth: 0,
+          borderColor: active ? color.orbSpectrumA : color.textSecondary,
+          marginTop: 2,
+        }}
+      />
+    </Pressable>
   );
 }
