@@ -64,6 +64,4 @@ node_modules/
 artifacts/
 tools/__pycache__/
 
-# Root lockfile is not tracked: the repository is not an npm workspace and
-# 851f6c0 carried none. apps/tablet keeps its own intentional lockfile.
-/package-lock.json
+# Root lockfile is tracked for reproducible npm installs.
