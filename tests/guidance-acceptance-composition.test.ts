@@ -418,10 +418,17 @@ describe('AI-2 FINAL FIX — trust boundary and repository hygiene', () => {
     }
   });
 
-  test('no root package-lock is tracked', () => {
-    // 851f6c0 carried none; the sandbox npm install added it accidentally.
-    const ignore = read('.gitignore');
-    assert.match(ignore, /^\/package-lock\.json$/m);
+  test('root lockfile pins registry dependencies for a fresh clone', () => {
+    assert.doesNotMatch(read('.gitignore'), /^\/package-lock\.json$/m);
+    const lock = JSON.parse(read('package-lock.json'));
+    const pkg = JSON.parse(read('package.json'));
+    assert.equal(lock.lockfileVersion, 3);
+    for (const [name, version] of Object.entries({ ...pkg.dependencies, ...pkg.devDependencies })) {
+      const entry = lock.packages[`node_modules/${name}`];
+      assert.equal(entry.version, version, `${name} must match its declared pin`);
+      assert.match(entry.resolved, /^https:\/\/registry\.npmjs\.org\//);
+      assert.match(entry.integrity, /^sha512-/);
+    }
   });
 });
 

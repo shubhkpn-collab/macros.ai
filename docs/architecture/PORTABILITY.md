@@ -76,11 +76,7 @@ npm install   # generates the lockfile; commit it
 **No global `tsc` or `tsx` is required.** All scripts resolve binaries from the
 repository's `node_modules`.
 
-> **`package-lock.json` is not yet committed.** The authoring sandbox has no npm
-> registry access (403), so any lockfile produced there points at a global
-> install directory with no `resolved` URLs or `integrity` hashes — worse than
-> none, because `npm ci` would fail or resolve wrongly. Run `npm install` on a
-> machine with registry access and commit the result.
+> **`package-lock.json` is now committed.** The September 30, 2026 recovery generated it against the npm registry, with resolved URLs and integrity hashes. Use `npm ci` for reproducible root installs. The tablet app remains a separate install.
 
 ### tsconfig decision
 
