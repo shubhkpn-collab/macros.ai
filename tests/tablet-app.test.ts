@@ -958,3 +958,19 @@ describe('PART A — recent history ranking (T-5 closed)', () => {
     );
   });
 });
+
+describe('NATIVE UI — effective-dated goal editing', () => {
+  test('a saved adjustment recomputes current targets without rewriting previous goals', async () => {
+    const h = await harness();
+    assert.equal(await h.app.updateEnergyGoal(-100),true);
+    assert.equal(h.app.getState().dashboard!.energy.targetDeltaKcal,-100);
+    assert.equal((await h.repos.goals.getEffective(USER_A,'2026-08-10T16:50:00.000Z'))!.targetDeltaKcal,250);
+  });
+  test('invalid and mid-food-flow changes are refused', async () => {
+    const h = await harness();
+    assert.equal(await h.app.updateEnergyGoal(NaN),false);
+    h.app.beginAddFood();
+    assert.equal(await h.app.updateEnergyGoal(-100),false);
+    assert.equal(h.app.getState().addFood.phase,'searching');
+  });
+});

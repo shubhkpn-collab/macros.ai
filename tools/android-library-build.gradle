@@ -1,0 +1,7 @@
+// Keep native libraries on the same installed build-tools release as the app.
+// Some libraries otherwise ask AGP to download a separate default SDK toolset.
+subprojects { project ->
+    project.plugins.withId('com.android.library') {
+        project.android.buildToolsVersion = rootProject.ext.buildToolsVersion
+    }
+}

@@ -94,6 +94,7 @@ export interface ScaleView {
  * which is precisely when knowing what you are weighing matters most.
  */
 export interface SelectedFoodView {
+  readonly productVersionId: string;
   readonly displayName: string;
   readonly brand: string | null;
   readonly preparationState: string;
@@ -154,8 +155,21 @@ export interface GuidanceView {
   readonly usedFallback: boolean;
 }
 
+export interface DailyView {
+  readonly date: string;
+  readonly displayCalories: string;
+  readonly displayCalorieGoal: string;
+  readonly calorieFraction: number | null;
+  readonly displayRemainingCalories: string;
+  readonly displayItems: string;
+  readonly targetDeltaKcal: number;
+  readonly displayDelta: string;
+  readonly goalBelowFloor: boolean;
+}
+
 export interface TabletViewModel {
   readonly screen: Screen;
+  readonly daily: DailyView | null;
   readonly guidance: GuidanceView;
   /** Echoed so the search field can show what was actually searched for. */
   readonly searchQuery: string;
@@ -165,6 +179,7 @@ export interface TabletViewModel {
   readonly macros: readonly MacroView[];
   readonly recent: readonly {
     readonly displayName: string; readonly kcal: number; readonly displayKcal: string;
+    readonly displayWeight?: string;
   }[];
   readonly options: readonly FoodOptionView[];
   readonly scale: ScaleView;
@@ -181,7 +196,7 @@ export interface ViewModelInput {
   readonly app: AppState | null;
   readonly capabilities: OfflineCapabilities;
   readonly switchState: SwitchState;
-  readonly recent: readonly { readonly displayName: string; readonly kcal: number }[];
+  readonly recent: readonly { readonly displayName: string; readonly kcal: number; readonly grams?: number }[];
 }
 
 const EMPTY_SCALE: ScaleView = {
@@ -203,6 +218,7 @@ const LOCKED_OFFLINE: OfflineView = {
 export function lockedViewModel(): TabletViewModel {
   return {
     screen: 'locked',
+    daily: null,
     // Locked state carries no guidance: the previous member's suggestions must
     // not be readable from a locked screen.
     guidance: {
@@ -383,6 +399,17 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
   const attempt = switchState.attempt;
   return {
     screen: screenOf(app),
+    daily: dash === null ? null : {
+      date: dash.localDate,
+      displayCalories: formatKcal(dash.macros.consumedKcal),
+      displayCalorieGoal: formatKcal(dash.macros.targets.targetKcal),
+      calorieFraction: progressFraction(dash.macros.consumedKcal, dash.macros.targets.targetKcal),
+      displayRemainingCalories: formatKcal(dash.macros.remainingKcal),
+      displayItems: String(dash.intake.itemCount ?? input.recent.length),
+      targetDeltaKcal: dash.energy.targetDeltaKcal ?? 0,
+      displayDelta: formatKcal(dash.energy.targetDeltaKcal ?? 0, { sign: true }),
+      goalBelowFloor: dash.guardrails.belowFloor === true,
+    },
     guidance: {
       phase: app.guidance.phase,
       text: app.guidance.text,
@@ -411,10 +438,14 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
     voice: voicePresenceOf(app, offline),
     energy,
     macros,
-    recent: input.recent.map((r) => ({ ...r, displayKcal: formatKcal(r.kcal) })),
+    recent: input.recent.map((r) => ({
+      ...r, displayKcal: formatKcal(r.kcal),
+      ...(r.grams === undefined ? {} : { displayWeight: formatGramsWithUnit(r.grams) }),
+    })),
     options,
     scale,
     selectedFood: selected === null ? null : {
+      productVersionId: selected.productVersionId,
       displayName: selected.displayName,
       brand: (selected as { brandName?: string | null }).brandName ?? null,
       preparationState: selected.preparationState,

@@ -172,3 +172,9 @@ say('Next:');
 say('  cd apps/tablet && npm install && npm run typecheck');
 say('');
 say('Voice: MacrosSpeechPackage is registered automatically. No manual edit.');
+
+// Reuse the app build-tools version for all native libraries.
+const rootBuildFile = join(ANDROID_DIR, 'build.gradle');
+const toolsLine = "apply from: new File(rootProject.projectDir, '../../../tools/android-library-build.gradle')";
+const rootBuild = readFileSync(rootBuildFile, 'utf8');
+if (!rootBuild.includes(toolsLine)) writeFileSync(rootBuildFile, rootBuild + '\n' + toolsLine + '\n');

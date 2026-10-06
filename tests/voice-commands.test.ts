@@ -181,7 +181,7 @@ describe('DEMO — voice and premium UI are actually wired', () => {
     assert.match(home, /Hey! Macros/);
     assert.match(home, /<MacrosOrb/);
     assert.match(home, /<FoodCard/);
-    assert.match(home, /<MacroRing/);
+    assert.match(home, /<MacroFooter/);
     // The stacked dashboard panels are gone.
     assert.equal(home.includes('EnergyBalanceHero'), false);
     assert.equal(home.includes('Macros today'), false);
@@ -248,8 +248,8 @@ describe('DEMO — final closure', () => {
     const weighing = screens.slice(screens.indexOf('export function WeighingScreen'),
       screens.indexOf('export function ReviewScreen'));
     assert.match(weighing, /<MacrosOrb/);
-    assert.match(weighing, /state="weighing"/);
-    assert.match(weighing, /weightLabel=/);
+    assert.match(weighing, /Current weight:/);
+    assert.match(weighing, /selected=\{selected !== null && card\.productVersionId === selected\.productVersionId\}/);
 
     const review = screens.slice(screens.indexOf('export function ReviewScreen'));
     assert.match(review, /Confirm \{r\.displayGrams\} of/);
@@ -281,7 +281,7 @@ describe('DEMO — Home renders the real view-model contract', () => {
       'macros is a MacroView[], not an object keyed by macro name');
     assert.match(screens, /vm\.macros\.map\(\(macro\) =>/);
     assert.match(screens, /label=\{macro\.label\}/);
-    assert.match(screens, /value=\{macro\.displayRemaining\}/);
+    assert.match(screens, /value=\{macro\.displayConsumed\}/);
   });
 
   test('the view model still supplies Protein, Carbs, Fat in order', async () => {
@@ -301,8 +301,8 @@ describe('DEMO — Home renders the real view-model contract', () => {
     const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
     // energy and selectedFood are legitimately nullable; reaching through
     // either would have been the next red screen.
-    assert.match(screens, /vm\.energy === null \?/);
-    assert.match(screens, /selected !== null \?/);
+    assert.match(screens, /selected === null \?/);
+    assert.match(screens, /vm\.selectedFood !== null/);
     // No optional chaining or coercion used to suppress a crash.
     assert.equal(/vm\.(energy|selectedFood|review)\?\./.test(screens), false);
     assert.equal(/as any|as never|as unknown as/.test(screens), false);
@@ -365,9 +365,9 @@ describe('LOCKED REFERENCE — orb, cards and macro rings', () => {
     assert.match(code, /Carbs: color\.macroCarbs/);
   });
 
-  test('the leading recommendation is visibly selected', () => {
+  test('only the chosen recommendation is visibly selected', () => {
     const code = screens();
-    assert.match(code, /selected=\{index === 0\}/);
+    assert.match(code, /selected=\{vm\.selectedFood !== null && vm\.selectedFood\.productVersionId === c\.productVersionId\}/);
     assert.match(orb(), /borderColor: selected \? color\.textPrimary/);
   });
 
@@ -440,13 +440,13 @@ describe('REFERENCE — Home follows the supplied frames', () => {
     // The frames place the ring at the top with the title beneath it; the orb
     // is the signature here, the food cards are what the eye should land on.
     assert.ok(code.indexOf('<MacrosOrb') < code.indexOf('Hey! Macros'));
-    assert.match(code, /size=\{132\}/);
+    assert.match(code, /size=\{124\}/);
   });
 
   test('the greeting, question, microphone and weight line are in order', () => {
     const code = home();
     const order = ['Hey! Macros', 'What are you eating today?', '<MicButton',
-      'Current weight:', '<FoodCard', 'Would you like', '<MacroRing'];
+      'Current weight:', '<FoodCard', '<MacroFooter'];
     let last = -1;
     for (const marker of order) {
       const at = code.indexOf(marker);
@@ -456,10 +456,11 @@ describe('REFERENCE — Home follows the supplied frames', () => {
   });
 
   test('four rings, with calories last', () => {
-    const code = home();
-    // Protein, Carbs and Fat come from the macro array; calories from energy.
+    const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
+    const code = screens.slice(screens.indexOf('function MacroFooter'), screens.indexOf('export function HomeScreen'));
+    // Consumed totals and goals come from the view model, not energy balance.
     assert.match(code, /vm\.macros\.map\(\(macro\) =>/);
-    assert.match(code, /label="Calories" value=\{vm\.energy\.displayValue\}/);
+    assert.match(code, /label="Calories" value=\{vm\.daily\?\.displayCalories/);
     assert.ok(code.indexOf('vm.macros.map') < code.indexOf('label="Calories"'));
   });
 
@@ -468,9 +469,9 @@ describe('REFERENCE — Home follows the supplied frames', () => {
     const screens = read('apps', 'tablet', 'src', 'components', 'screens.tsx');
     const from = screens.indexOf('export function HomeScreen');
     const body = screens.slice(from, screens.indexOf('export function', from + 10));
-    assert.match(body, /\.slice\(0, 3\)/);
+    assert.match(body, /\.slice\(0,\s*3\)/);
     const code = home();
-    assert.match(code, /selected=\{index === 0\}/);
+    assert.match(code, /selected=\{vm\.selectedFood !== null && vm\.selectedFood\.productVersionId === c\.productVersionId\}/);
     const orb = read('apps', 'tablet', 'src', 'components', 'MacrosOrb.tsx');
     assert.match(orb, /borderColor: selected \? color\.textPrimary/);
     assert.match(orb, /opacity: selected \? 1 : 0\.72/);
@@ -478,7 +479,7 @@ describe('REFERENCE — Home follows the supplied frames', () => {
 
   test('the weight line appears only when the scale has one', () => {
     // An empty "Current weight:" would read as a fault, not a state.
-    assert.match(home(), /vm\.scale\.displayWeight !== null \?/);
+    assert.match(home(), /vm\.scale\.displayWeight === null \?/);
   });
 
   test('no dashboard hierarchy crept back in', () => {

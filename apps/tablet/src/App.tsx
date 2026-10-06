@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { Alert, SafeAreaView, StatusBar } from 'react-native';
 import { color } from '@macros/tablet-view-model';
 import { TabletShell } from './components/screens.js';
 import type { GuidanceDeps } from '@macros/tablet-app-core';
@@ -152,6 +152,7 @@ export function App(
       // instead of leaving it on "Listening…" for an event that never comes.
       void voice.toggleListening().then((outcome) => {
         setListening(outcome === 'started');
+        if (outcome === 'refused') Alert.alert('Voice unavailable', 'Android speech recognition is unavailable or microphone access was denied. You can still search and log food using the touch controls.');
         refresh();
       });
     },

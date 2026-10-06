@@ -78,6 +78,7 @@ function Root() {
       hasActiveSession={host.hasActiveSession}
       developmentNotice={host.developmentNotice}
       guidance={host.guidance}
+      premiumSpeech={host.premiumSpeech}
     />
   );
 }

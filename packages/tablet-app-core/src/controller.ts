@@ -354,6 +354,27 @@ export class TabletAppController {
    * Rebuild the dashboard from the repository. Energy inputs may be missing or
    * degraded; that is reported honestly and NEVER blocks food logging.
    */
+  /** A user-entered goal appends history and recomputes through the domain. */
+  async updateEnergyGoal(targetDeltaKcal: number): Promise<boolean> {
+    if (!Number.isFinite(targetDeltaKcal) || this.state.addFood.phase !== 'idle') return false;
+    const generation = this.state.sessionGeneration;
+    const userId = this.state.subject.userId;
+    try {
+      await this.env.repositories.goals.append({
+        goalVersionId: this.env.ids.next(), userId,
+        effectiveFrom: this.env.clock.now(), targetDeltaKcal,
+        goal: targetDeltaKcal < 0 ? 'lose' : targetDeltaKcal > 0 ? 'gain' : 'maintain',
+      });
+      if (generation !== this.state.sessionGeneration) return false;
+      return (await this.refreshDashboard()) !== null;
+    } catch {
+      if (generation === this.state.sessionGeneration) {
+        this.patchFlow({ error: err('repository_failure', 'Could not save your goal. Please try again.', true) });
+      }
+      return false;
+    }
+  }
+
   async refreshDashboard(): Promise<DashboardState | null> {
     const generation = this.state.sessionGeneration;
     const at = this.env.clock.now();

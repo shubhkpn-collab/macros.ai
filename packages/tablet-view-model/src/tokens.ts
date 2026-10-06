@@ -18,20 +18,20 @@ export const TOKEN_VERSION = 'tablet-tokens@2.0.0';
  */
 export const color = {
   /** The appliance canvas. Near-black, slightly warm, never pure #000. */
-  canvas: '#0C0F11',
+  canvas: '#08121C',
   /** Raised content: heroes, cards, fields. */
-  surface: '#15191C',
+  surface: '#142331',
   /** Secondary surface for nested or quieter blocks. */
-  surfaceMuted: '#1D2226',
+  surfaceMuted: '#1D3040',
   /** Pressed/active fill. */
-  surfaceActive: '#252B30',
+  surfaceActive: '#263D4F',
   /** Hairline borders and dividers. */
-  border: '#2A3137',
+  border: '#2D4253',
   borderStrong: '#3A424A',
 
-  textPrimary: '#F4F1EB',
-  textSecondary: '#A6ADB4',
-  textMuted: '#6B747C',
+  textPrimary: '#F4F8FF',
+  textSecondary: '#B6C6D7',
+  textMuted: '#879DB0',
   textDisabled: '#4A5158',
 
   /** Fresh, restrained green. Positive, active, ready — never decorative. */
@@ -59,9 +59,9 @@ export const color = {
    * something is wrong, whereas amber here simply means fat. Reusing the status
    * colours would have made a normal ring look like an alert.
    */
-  macroProtein: '#6E9BE8',
-  macroFat: '#D89A4E',
-  macroCarbs: '#4FBFA8',
+  macroProtein: '#41E0EC',
+  macroFat: '#F36AAE',
+  macroCarbs: '#66EBAF',
 
   /**
    * ORB SPECTRUM. The reference orb is a prismatic ring, not a bordered circle.
@@ -125,3 +125,37 @@ export const elevation = {
 
 /** Opacity for disabled affordances that must still look intentional. */
 export const opacity = { disabled: 0.42, subtle: 0.7 } as const;
+
+/** Reference art, lighting and surface palette. Presentation only. */
+export const referencePalette = {
+  tone0: '#000',
+  tone1: '#000A',
+  tone2: '#0A1522',
+  tone3: '#19DCF4',
+  tone4: '#23384A',
+  tone5: '#2B4356',
+  tone6: '#357451',
+  tone7: '#37EBEF',
+  tone8: '#577756',
+  tone9: '#5DA0FF',
+  tone10: '#74A56A',
+  tone11: '#7AB8DE',
+  tone12: '#87E4FB',
+  tone13: '#9569F4',
+  tone14: '#9DA892',
+  tone15: '#A27946',
+  tone16: '#B48A4E',
+  tone17: '#BBC5BC',
+  tone18: '#C4FBFF',
+  tone19: '#D4A865',
+  tone20: '#D8C695',
+  tone21: '#DDF6FF',
+  tone22: '#DED8BC',
+  tone23: '#E47CF6',
+  tone24: '#F6FDFF',
+  tone25: '#FF9780',
+  tone26: '#FFD561',
+  tone27: '#FFF0BA',
+  tone28: '#FFF8DA',
+  tone29: '#FFF8DE',
+} as const;

@@ -16,3 +16,6 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm run verify
+
+      - run: npm ci --ignore-scripts --prefix apps/tablet
+      - run: npm run typecheck --prefix apps/tablet

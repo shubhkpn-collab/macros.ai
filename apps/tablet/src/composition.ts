@@ -62,7 +62,7 @@ export interface TabletComposition {
   readonly ports: TabletPorts;
   /** Capabilities derived by the offline domain — never inferred in the UI. */
   capabilities(): OfflineCapabilities;
-  recentFoods(): readonly { readonly displayName: string; readonly kcal: number }[];
+  recentFoods(): readonly { readonly displayName: string; readonly kcal: number; readonly grams?: number }[];
   /** Active-energy resolution passed through on a user switch. */
   currentActivity(): Parameters<TabletAppController['switchActiveUser']>[1];
 }

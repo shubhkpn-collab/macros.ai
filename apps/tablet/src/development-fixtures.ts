@@ -93,6 +93,22 @@ export const DEV_PRODUCTS: readonly ProductVersion[] = [
     source: syntheticSource('synthetic:oats'),
     effectiveFrom: EFFECTIVE_FROM,
   },
+  ...[
+    ['dev-firm-tofu', 'Firm tofu'],
+    ['dev-organic-tofu', 'Organic firm tofu'],
+    ['dev-extra-firm-tofu', 'Extra firm tofu'],
+  ].map(([id, name]): ProductVersion => ({
+    productId: id!, productVersionId: `${id}@v1`, versionNo: 1,
+    displayName: name!, preparationState: 'as_sold',
+    basis: { kind: 'per_100g', kcal: 144, proteinG: 17.3, carbohydrateG: 2.8, fatG: 8.7 },
+    source: syntheticSource(`synthetic:${id}`), effectiveFrom: EFFECTIVE_FROM,
+  })),
+  {
+    productId: 'dev-brown-bread', productVersionId: 'dev-brown-bread@v1', versionNo: 1,
+    displayName: 'Brown bread', preparationState: 'as_sold',
+    basis: { kind: 'per_100g', kcal: 250, proteinG: 9, carbohydrateG: 43, fatG: 4 },
+    source: syntheticSource('synthetic:bread'), effectiveFrom: EFFECTIVE_FROM,
+  },
 ] as readonly ProductVersion[];
 
 /** Heads for the searchable products. Cooked chicken is the head; raw is a
@@ -110,6 +126,10 @@ export const DEV_CATALOG_HEADS: readonly ProductCatalogHead[] = [
     isActive: true,
     updatedAt: EFFECTIVE_FROM,
   },
+  ...DEV_PRODUCTS.filter(p => /tofu|brown-bread/.test(p.productId)).map(p => ({
+    productId: p.productId, currentProductVersionId: p.productVersionId,
+    isActive: true, updatedAt: EFFECTIVE_FROM,
+  })),
 ];
 
 /** SYNTHETIC — proves the mathematics, not physiologically approved. */

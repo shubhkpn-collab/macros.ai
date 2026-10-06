@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   TabletAppController, DevScaleAdapter, appSubjectFrom,
 } from '@macros/tablet-app-core';
@@ -5,7 +6,7 @@ import { mintSubjectForTests } from '@macros/domain-auth';
 import { deriveCapabilities } from '@macros/domain-offline-sync';
 import { activeSwitchState } from '@macros/domain-household';
 import {
-  InMemoryEnergyGoalRepository, InMemoryFoodLogRepository,
+  LocalEnergyGoalRepository, LocalFoodLogRepository,
   InMemoryProductVersionRepository, InMemoryUserProfileRepository,
 } from '@macros/persistence';
 import {
@@ -29,9 +30,10 @@ import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
  * Exists for one reason: to make the renderer launchable on an Android emulator
  * before repositories, credentials and hardware adapters are wired on device.
  *
- * It uses IN-MEMORY repositories and SYNTHETIC catalog fixtures. It is not
- * persistence, not authentication and not hardware, and the shell renders a
- * permanent banner saying so. Nothing here may be reused by a production host.
+ * It stores demo food logs and goal history on this device using AsyncStorage,
+ * with SYNTHETIC catalog fixtures and a simulated scale. It supplies no real
+ * authentication or hardware connection. The shell renders a permanent notice.
+ * Local storage is unencrypted and is intended only for this development host.
  *
  * The real domain code still drives everything: this supplies adapters, never
  * nutrition, energy or authorization logic.
@@ -39,7 +41,7 @@ import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 export const DEVELOPMENT_HOST_VERSION = 'development-tablet-host@1.0.0';
 
 const DEVELOPMENT_NOTICE =
-  'DEVELOPMENT BUILD — synthetic data, in-memory storage, no real account';
+  'DEVELOPMENT BUILD — synthetic data, local storage, no real account';
 
 class SystemClock {
   now(): never { return new Date().toISOString() as never; }
@@ -49,7 +51,7 @@ class SequentialIds {
   private n = 0;
   next(): string {
     this.n += 1;
-    return `00000000-0000-4000-8000-${String(this.n).padStart(12, '0')}`;
+    return `native-${Date.now()}-${String(this.n)}-${Math.random().toString(36).slice(2)}`;
   }
 }
 
@@ -74,16 +76,18 @@ export async function createDevelopmentHost(
 ): Promise<TabletHost> {
   const { auth } = options;
   const repositories = {
-    foodLogs: new InMemoryFoodLogRepository(),
+    foodLogs: await LocalFoodLogRepository.open(AsyncStorage, 'macros.preview.food-logs.v1'),
     products: new InMemoryProductVersionRepository(
       DEV_PRODUCTS, DEV_CATALOG_HEADS),
     profiles: new InMemoryUserProfileRepository(),
-    goals: new InMemoryEnergyGoalRepository(),
+    goals: await LocalEnergyGoalRepository.open(AsyncStorage, 'macros.preview.goals.v1'),
   };
   // BOTH are required before refreshDashboard(): a profile alone yields
   // goal_missing and a blank Home.
   await repositories.profiles.append(DEV_PROFILE);
-  await repositories.goals.append(DEV_GOAL);
+  if (await repositories.goals.getEffective(DEV_USER_ID, new Date().toISOString()) === null) {
+    await repositories.goals.append(DEV_GOAL);
+  }
 
   const controller = new TabletAppController(
     {
@@ -122,7 +126,15 @@ export async function createDevelopmentHost(
       catalogInstalled: true, catalogStale: false, localStorageWritable: true,
       authValid: true, cloudVoiceReachable: false, pendingSubmissions: 0,
     } as never),
-    recentFoods: () => [],
+    recentFoods: () => {
+      const state = controller.getState();
+      if (state.dashboard === null) return [];
+      return repositories.foodLogs.snapshot(state.subject.userId, state.dashboard.localDate)
+        .slice().reverse().map(item => ({
+          displayName: DEV_PRODUCTS.find(p => p.productVersionId === item.productVersionId)?.displayName ?? 'Food',
+          kcal: item.nutritionSnapshot.totals.kcal, grams: item.weightCapture.grams,
+        }));
+    },
     currentActivity: () => devActiveEnergy(420) as never,
   };
 

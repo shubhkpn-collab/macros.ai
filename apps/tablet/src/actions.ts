@@ -22,7 +22,7 @@ export const ACTION_ADAPTER_VERSION = 'tablet-actions@1.0.0';
 export const CONTROLLER_METHODS = [
   'beginAddFood', 'searchFood', 'selectProduct', 'selectOption',
   'requestStableWeight', 'enterManualWeight', 'cancelWeight',
-  'confirmFoodLog', 'cancelFoodFlow', 'refreshDashboard', 'switchActiveUser',
+  'confirmFoodLog', 'cancelFoodFlow', 'refreshDashboard', 'switchActiveUser', 'updateEnergyGoal',
 ] as const;
 
 /**
@@ -61,6 +61,7 @@ export interface ActionDeps {
 
 export interface TabletActions {
   onAddFood(): void;
+  onSaveGoal(delta: number): Promise<boolean>;
   onRequestGuidance(): void;
   onChooseGuidanceCandidate(productVersionId: string, envelopeId: string): void;
   onSearchFood(query: string): void;
@@ -76,10 +77,15 @@ export interface TabletActions {
 
 export function createActions(deps: ActionDeps): TabletActions {
   const { controller, onChanged } = deps;
-  const after = <T,>(p: Promise<T>): void => { void p.then(onChanged, onChanged); };
+  const after = <T,>(p: Promise<T>): void => { onChanged(); void p.then(onChanged, onChanged); };
   const schedule = deps.schedule ?? ((fn, ms) => { setTimeout(fn, ms); });
 
   return {
+    onSaveGoal: async (delta) => {
+      const saved = await controller.updateEnergyGoal(delta);
+      onChanged();
+      return saved;
+    },
     onAddFood: () => { controller.beginAddFood(); onChanged(); },
 
     /**
@@ -122,7 +128,9 @@ export function createActions(deps: ActionDeps): TabletActions {
      * dashboard is refreshed so home reflects it.
      */
     onLog: () => {
-      void controller.confirmFoodLog().then(() => {
+      const confirmation = controller.confirmFoodLog();
+      onChanged();
+      void confirmation.then(() => {
         onChanged();
         const state = controller.getState().addFood;
         // Only leave the confirmation when the log actually succeeded. A
@@ -156,7 +164,9 @@ export function createActions(deps: ActionDeps): TabletActions {
      */
     onSelectMember: () => {
       void deps.auth.beginMemberSelection().then((outcome) => {
-        if (outcome.kind !== 'switched') { onChanged(); return; }
+        if (outcome.kind !== 'switched') {
+          onChanged(); return;
+        }
         // The authorized session is passed through; the controller adopts its
         // generation and never mints one.
         void controller

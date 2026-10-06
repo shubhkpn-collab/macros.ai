@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, Easing, Pressable, Text, View } from 'react-native';
-import { color, space, type } from '@macros/tablet-view-model';
+import { referencePalette, color, space, type } from '@macros/tablet-view-model';
+import { FoodArt, Icon, PrismaticGlow } from './ReferenceKit.js';
 import { SEGMENT_COUNT, segmentAngle, segmentHeights } from '@macros/tablet-voice';
 
 /**
@@ -122,6 +123,7 @@ export function MacrosOrb({
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      {state === 'idle' ? <View pointerEvents="none" style={{ position: 'absolute' }}><PrismaticGlow size={diameter * 1.7} /></View> : null}
       {haloes.map((halo) => (
         <Animated.View
           key={halo.tint}
@@ -225,7 +227,7 @@ export function MacrosOrb({
           >
             {caption}
           </Text>
-        ) : null}
+        ) : <Icon name="leaf" size={diameter * .27} tint={referencePalette.tone24} />}
       </Pressable>
     </View>
   );
@@ -251,13 +253,14 @@ export function FoodCard({
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected }}
       style={{
-        width: 172, minHeight: 196, borderRadius: 20,
+        width: '30%', maxWidth: 210, minHeight: 202, borderRadius: 22,
         backgroundColor: color.surface,
         // The pick is ringed in white, as in the reference; the others recede.
         borderWidth: selected ? 2 : 1,
-        borderColor: selected ? color.textPrimary : color.surfaceMuted,
+        borderColor: selected ? color.textPrimary : color.borderStrong,
         opacity: selected ? 1 : 0.72,
-        overflow: 'hidden', marginHorizontal: space.sm,
+        marginHorizontal: 4, paddingBottom: selected ? 14 : 0,
+        shadowColor: selected ? referencePalette.tone21 : referencePalette.tone0, shadowOpacity: selected ? .65 : 0, shadowRadius: 12, shadowOffset: { width: 0, height: 0 }, elevation: selected ? 8 : 0,
       }}
     >
       {/* Image panel. Present even with no photograph, so real product imagery
@@ -270,15 +273,13 @@ export function FoodCard({
           alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <Text style={{ color: color.textMuted, fontSize: 28, fontWeight: '600' }}>
-          {name.slice(0, 1).toUpperCase()}
-        </Text>
+        <FoodArt name={name} size={100} />
       </View>
 
       <View style={{ paddingHorizontal: space.md, paddingBottom: space.md }}>
         <Text
           numberOfLines={2}
-          style={{ color: color.textPrimary, fontSize: 15, textAlign: 'center' }}
+          style={{ color: color.textPrimary, fontSize: 17, fontWeight: '500', textAlign: 'center' }}
         >
           {name}
         </Text>
@@ -294,6 +295,7 @@ export function FoodCard({
           </Text>
         ) : null}
       </View>
+      {selected ? <View style={{ position: 'absolute', bottom: -16, alignSelf: 'center', backgroundColor: color.textPrimary, borderRadius: 20, flexDirection: 'row', gap: 6, alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8 }}><Icon name="check" size={16} tint={color.surface} /><Text style={{ color: color.surface, fontWeight: '600' }}>Selected</Text></View> : null}
     </Pressable>
   );
 }
@@ -363,7 +365,8 @@ export function MicButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={{
-        width: 52, height: 52, borderRadius: 26,
+        width: 76, height: 76, borderRadius: 38,
+        backgroundColor: color.surfaceMuted,
         borderWidth: 1,
         borderColor: active ? color.orbSpectrumA : color.textMuted,
         alignItems: 'center', justifyContent: 'center',
@@ -372,13 +375,13 @@ export function MicButton({
       {/* Drawn from primitives rather than shipping an icon font for one glyph. */}
       <View
         style={{
-          width: 11, height: 18, borderRadius: 6,
+          width: 16, height: 26, borderRadius: 8,
           backgroundColor: active ? color.orbSpectrumA : color.textSecondary,
         }}
       />
       <View
         style={{
-          width: 17, height: 6, borderBottomLeftRadius: 9,
+          width: 25, height: 10, borderBottomLeftRadius: 9,
           borderBottomRightRadius: 9, borderWidth: 1.5, borderTopWidth: 0,
           borderColor: active ? color.orbSpectrumA : color.textSecondary,
           marginTop: 2,
