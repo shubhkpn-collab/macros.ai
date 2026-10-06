@@ -52,6 +52,7 @@ export function App(
   viewModelRef.current = vm;
 
   const [listening, setListening] = useState(false);
+  const [voiceFeedback, setVoiceFeedback] = useState<string | null>(null);
   // Smoothed microphone amplitude for the orb waveform, 0–1.
   const [level, setLevel] = useState(0);
   // Increments once per wake acknowledgement; the orb pulses on change.
@@ -77,6 +78,7 @@ export function App(
    */
   useEffect(() => {
     const offResult = voice.speechPort.onResult((t) => {
+      setVoiceFeedback(null);
       setListening(false);
       setLevel(0);
       voice.handleTranscript(t);
@@ -87,7 +89,8 @@ export function App(
       refresh();
     });
     // A speech failure is never surfaced raw; the touch path simply remains.
-    const offError = voice.speechPort.onError(() => {
+    const offError = voice.speechPort.onError((reason) => {
+      setVoiceFeedback(reason === 'no_speech' ? 'No speech heard. Tap the microphone and try again.' : reason === 'network' ? 'Speech recognition needs a connection. Check the tablet network and try again.' : reason === 'permission_denied' ? 'Microphone permission is needed for voice commands.' : 'Android speech recognition is unavailable. Touch controls still work.');
       setListening(false);
       voice.handleRecognitionEnded();
       voice.markSpeechFinished(null);
@@ -147,9 +150,11 @@ export function App(
    */
   const screenActions = useMemo(() => ({
     ...actions,
+    voiceFeedback,
     onOrbPress: () => {
       // The outcome is authoritative: a refusal settles the orb immediately
       // instead of leaving it on "Listening…" for an event that never comes.
+      setVoiceFeedback(null);
       void voice.toggleListening().then((outcome) => {
         setListening(outcome === 'started');
         if (outcome === 'refused') Alert.alert('Voice unavailable', 'Android speech recognition is unavailable or microphone access was denied. You can still search and log food using the touch controls.');
@@ -160,7 +165,7 @@ export function App(
     isSpeaking: voice.isSpeaking(),
     micLevel: level,
     wakePulse,
-  }), [actions, voice, listening, level, wakePulse, tick]);
+  }), [actions, voice, listening, level, wakePulse, tick, voiceFeedback]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>

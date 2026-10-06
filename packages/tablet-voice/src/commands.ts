@@ -14,6 +14,10 @@ export const VOICE_COMMANDS_VERSION = 'voice-commands@1.0.0';
 export type VoiceIntent =
   | { readonly kind: 'request_guidance' }
   | { readonly kind: 'choose_option'; readonly index: number }
+  | { readonly kind: 'search_food'; readonly query: string }
+  | { readonly kind: 'manual_weight'; readonly grams: number }
+  | { readonly kind: 'use_weight' }
+  | { readonly kind: 'change_weight' }
   | { readonly kind: 'log' }
   | { readonly kind: 'cancel' }
   | { readonly kind: 'unrecognized' };
@@ -43,9 +47,9 @@ export function containsWakePhrase(text: string): boolean {
 
 /** Ordinal words the demo needs. Deliberately short — this is not a parser. */
 const ORDINALS: ReadonlyArray<readonly [RegExp, number]> = [
-  [/\b(option|number|the)?\s*(one|1|a|first)\b/, 0],
-  [/\b(option|number|the)?\s*(two|2|b|second)\b/, 1],
-  [/\b(option|number|the)?\s*(three|3|c|third)\b/, 2],
+  [/^(?:choose |select |pick )?(?:option |number |the )?(one|1|a|first)(?: one)?$/, 0],
+  [/^(?:choose |select |pick )?(?:option |number |the )?(two|2|b|second)(?: one)?$/, 1],
+  [/^(?:choose |select |pick )?(?:option |number |the )?(three|3|c|third)(?: one)?$/, 2],
 ];
 
 /**
@@ -69,7 +73,24 @@ export function interpretVoiceCommand(
     return { kind: 'cancel' };
   }
 
-  if (/\b(log it|log that|log this|save it|confirm)\b/.test(text)) {
+  const search = /^(?:search(?: for)?|find|add)(?: food)? (.+)$/.exec(text);
+  if (search?.[1] !== undefined) return { kind: 'search_food', query: search[1] };
+
+  // Preserve the decimal point in a dictated weight; a unit is mandatory.
+  const weightText = stripWakePhrase(transcript.toLowerCase().replace(/[!,?]/g, '').trim());
+  const weight = /^(?:(?:weight(?: is)?|it weighs|use|enter) )?(\d+(?:\.\d+)?) (?:g|grams?)\.?$/.exec(weightText);
+  if (weight?.[1] !== undefined) {
+    const grams = Number(weight[1]);
+    if (Number.isFinite(grams) && grams > 0) return { kind: 'manual_weight', grams };
+  }
+  // Numeric or unit-bearing phrases must never accidentally select an ordinal.
+  if (/\b(?:grams?|kilograms?|kg|g|weight|weighs)\b/.test(text)) {
+    if (/^(?:use|capture)(?: the)? (?:scale|current|stable) weight$/.test(text)) return { kind: 'use_weight' };
+    if (/^(?:change|edit)(?: the)? weight$/.test(text)) return { kind: 'change_weight' };
+    return { kind: 'unrecognized' };
+  }
+
+  if (/^(?:please )?(log it|log that|log this|save it|confirm)(?: please)?$/.test(text)) {
     return { kind: 'log' };
   }
 

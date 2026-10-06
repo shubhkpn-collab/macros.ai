@@ -63,7 +63,7 @@ describe('DEMO — spoken commands map to existing intents', () => {
 
   test('the parser holds no nutrition or catalog authority', () => {
     const source = code('packages', 'tablet-voice', 'src', 'commands.ts');
-    for (const banned of ['kcal', 'protein', 'gram', 'search(', 'recommendFood',
+    for (const banned of ['kcal', 'protein', '.search(', 'recommendFood',
                           'calculateNutrition']) {
       assert.equal(source.toLowerCase().includes(banned.toLowerCase()), false,
         `the parser references ${banned}`);
@@ -488,4 +488,30 @@ describe('REFERENCE — Home follows the supplied frames', () => {
       assert.equal(code.includes(banned), false, `Home shows ${banned}`);
     }
   });
+});
+
+
+describe('Spoken food search and portion input', () => {
+  test('search is an explicit input intent and does not select a food', () => {
+    assert.deepEqual(interpretVoiceCommand('Hey Macros, search for firm tofu', 3), { kind: 'search_food', query: 'firm tofu' });
+    assert.deepEqual(interpretVoiceCommand('find brown bread', 0), { kind: 'search_food', query: 'brown bread' });
+  });
+  test('weight retains decimals and requires a positive value and explicit unit', () => {
+    assert.deepEqual(interpretVoiceCommand('Hey Macros, 94.5 grams', 3), { kind: 'manual_weight', grams: 94.5 });
+    assert.deepEqual(interpretVoiceCommand('it weighs 100 grams', 3), { kind: 'manual_weight', grams: 100 });
+    for (const phrase of ['-10 grams', '0 grams', '1 kilogram', 'weight is 1.2.3 grams']) {
+      assert.equal(interpretVoiceCommand(phrase, 3).kind, 'unrecognized', phrase);
+    }
+  });
+  test('scale capture and edit are distinct intents', () => {
+    assert.deepEqual(interpretVoiceCommand('use scale weight', 3), { kind: 'use_weight' });
+    assert.deepEqual(interpretVoiceCommand('change weight', 3), { kind: 'change_weight' });
+  });
+});
+
+
+test('negated or ambiguous phrases cannot confirm or select', () => {
+  for (const phrase of ["do not confirm", "don't log it", "do not select option one", "maybe option two later", "how do I confirm"]) {
+    assert.equal(interpretVoiceCommand(phrase, 3).kind, 'unrecognized', phrase);
+  }
 });

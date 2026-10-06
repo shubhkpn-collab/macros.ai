@@ -6,6 +6,8 @@ The preview supports catalog search, food selection, manual portion weight, revi
 
 This is a development host with a synthetic catalog, simulated scale and no real account. Local demo storage is unencrypted. Physical Bluetooth scales, production authentication and live cloud guidance require their production adapters and configuration. Native voice uses the Android speech service when available; touch controls remain available.
 
+Voice testing walkthrough: [tablet voice test](../../docs/tablet-voice-test.md).
+
 ## Installable preview
 
 An ARM64 APK is provided separately as `macros-ai-tablet-preview.apk`. It includes its JavaScript bundle and runs without a development server. It is signed with the Android template's development key, not a Play Store release key.

@@ -140,15 +140,33 @@ export class VoiceCoordinator {
     this.levels.reset();
     this.level = 0;
     const vm = this.deps.viewModel();
-    const candidates = vm.guidance.candidates;
-    const intent = interpretVoiceCommand(transcript, candidates.length);
+    const options = vm.screen === 'food_options' || vm.screen === 'weighing' ? vm.options : [];
+    const candidates = vm.screen === 'home' ? vm.guidance.candidates : [];
+    const intent = interpretVoiceCommand(transcript, options.length || candidates.length);
 
     switch (intent.kind) {
+      case 'search_food':
+        if (vm.screen === 'home') this.deps.actions.onAddFood();
+        else if (vm.screen !== 'food_search') return;
+        this.deps.actions.onSearchFood(intent.query);
+        return;
+      case 'manual_weight':
+        if (vm.screen === 'weighing') this.deps.actions.onEnterManualWeight(intent.grams);
+        return;
+      case 'use_weight':
+        if (vm.screen === 'weighing' && vm.scale.canCommitWeight) this.deps.actions.onUseWeight();
+        return;
+      case 'change_weight':
+        if (vm.screen === 'review') this.deps.actions.onChangeWeight();
+        return;
       case 'request_guidance':
+        if (vm.screen !== 'home') return;
         // THE existing intent — the same one the button calls.
         this.deps.actions.onRequestGuidance();
         return;
       case 'choose_option': {
+        const option = options[intent.index];
+        if (option !== undefined) { this.deps.actions.onSelectOption(option.productVersionId); return; }
         const chosen = candidates[intent.index];
         if (chosen === undefined || vm.guidance.envelopeId === null) return;
         this.deps.actions.onChooseGuidanceCandidate(
@@ -156,6 +174,7 @@ export class VoiceCoordinator {
         return;
       }
       case 'log':
+        if (vm.screen !== 'review') return;
         this.deps.actions.onLog();
         return;
       case 'cancel':

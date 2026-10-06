@@ -37,6 +37,7 @@ interface Guidance {
 
 /** Stands in for the tablet: view model, React effect, native events. */
 class DemoHarness {
+  screen: 'home' | 'review' = 'home';
   readonly guidance: Guidance = {
     envelopeId: null, text: '', phase: 'idle', candidates: [],
   };
@@ -89,7 +90,7 @@ class DemoHarness {
     const actions = {
       onRequestGuidance: () => { this.intents.push('request_guidance'); },
       onChooseGuidanceCandidate: (id: string) => { this.intents.push(`choose:${id}`); },
-      onLog: () => { this.intents.push('log'); },
+      onLog: () => { this.intents.push('log'); this.screen = 'home'; },
       onCancel: () => { this.intents.push('cancel'); },
     };
 
@@ -108,7 +109,7 @@ class DemoHarness {
     this.coordinator = new Coordinator({
       speech: speech as never,
       actions: actions as never,
-      viewModel: () => ({ guidance: this.guidance }) as never,
+      viewModel: () => ({ screen: this.screen, guidance: this.guidance, options: [] }) as never,
       ...(withPremium ? { premium: premium as never } : {}),
     });
   }
@@ -188,6 +189,7 @@ describe('INVESTOR FLOW — the full demo, twice', () => {
     assert.deepEqual(h.intents.slice(-1), ['choose:chicken@v1']);
 
     await h.coordinator.toggleListening();
+    h.screen = 'review';
     h.coordinator.handleTranscript('log it');
     assert.deepEqual(h.intents.slice(-1), ['log']);
 

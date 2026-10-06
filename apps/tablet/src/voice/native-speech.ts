@@ -29,11 +29,12 @@ interface NativeSpeech {
  */
 async function ensureMicrophonePermission(): Promise<boolean> {
   try {
+    if (await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO)) return true;
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
       {
         title: 'Microphone',
-        message: 'MACROS listens only while you hold the button.',
+        message: 'Tap the microphone to start listening. MACROS stops after your command or when you tap it again.',
         buttonPositive: 'Allow',
       },
     );
@@ -49,8 +50,6 @@ export function createNativeSpeechPort(): SpeechPort {
   if (native === undefined) return UNAVAILABLE_SPEECH;
 
   const emitter = new NativeEventEmitter(native as never);
-  let permissionChecked = false;
-  let permitted = false;
 
   return {
     async isAvailable() {
@@ -69,10 +68,7 @@ export function createNativeSpeechPort(): SpeechPort {
      * indefinitely. The caller now learns the outcome and can settle.
      */
     startListening: async () => {
-      if (!permissionChecked) {
-        permitted = await ensureMicrophonePermission();
-        permissionChecked = true;
-      }
+      const permitted = await ensureMicrophonePermission();
       if (!permitted) return 'permission_denied';
       try {
         native.startListening();
