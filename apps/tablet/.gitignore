@@ -34,3 +34,6 @@ node_modules/
 # with `npm install` (no registry access here) and commits it once typecheck and
 # the native launch are green — ignoring it would contradict that instruction
 # and require `git add -f`.
+
+!android/app/src/kitchenPreview/
+!android/app/src/kitchenPreview/**

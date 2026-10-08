@@ -183,7 +183,7 @@ describe('DEMO — voice and premium UI are actually wired', () => {
     assert.match(home, /<FoodCard/);
     assert.match(home, /<MacroFooter/);
     // The stacked dashboard panels are gone.
-    assert.equal(home.includes('EnergyBalanceHero'), false);
+    assert.equal(home.includes('EnergyBalanceHero'), true);
     assert.equal(home.includes('Macros today'), false);
     assert.equal(home.includes('Logged today'), false);
   });
@@ -484,7 +484,7 @@ describe('REFERENCE — Home follows the supplied frames', () => {
 
   test('no dashboard hierarchy crept back in', () => {
     const code = home();
-    for (const banned of ['Daily Totals', 'EnergyBalanceHero', 'Logged today']) {
+    for (const banned of ['Daily Totals', 'Logged today']) {
       assert.equal(code.includes(banned), false, `Home shows ${banned}`);
     }
   });

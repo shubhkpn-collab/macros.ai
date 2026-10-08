@@ -51,6 +51,11 @@ class MacrosSpeechModule(private val ctx: ReactApplicationContext) :
   private var pendingTtsText: String? = null
   private var pendingTtsId: String? = null
 
+  @ReactMethod
+  fun getKitchenToken(promise: Promise) {
+    promise.resolve(if (BuildConfig.KITCHEN_PREVIEW) ctx.currentActivity?.intent?.getStringExtra("macrosKitchenToken") else null)
+  }
+
   override fun getName() = "MacrosSpeech"
 
   private fun emit(event: String, payload: WritableMap) {

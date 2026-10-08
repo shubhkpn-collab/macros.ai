@@ -316,7 +316,7 @@ describe('UX-1 DESIGN SYSTEM — one presentation authority', () => {
 
   test('native rendering and storage dependencies are declared', () => {
     const pkg = JSON.parse(readFileSync(repoPath('apps', 'tablet', 'package.json'), 'utf8'));
-    assert.deepEqual(Object.keys(pkg.dependencies).sort(), ['@react-native-async-storage/async-storage', 'react', 'react-native', 'react-native-svg']);
+    assert.deepEqual(Object.keys(pkg.dependencies).sort(), ['@react-native-async-storage/async-storage', 'react', 'react-native', 'react-native-svg', 'react-native-webrtc']);
     assert.equal(pkg.dependencies['react-native'], '0.81.1');
     // No icon, gradient or UI library crept in.
     const all = JSON.stringify({ ...pkg.dependencies, ...pkg.devDependencies });

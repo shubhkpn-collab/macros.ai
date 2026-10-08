@@ -46,6 +46,8 @@ const MACROS_OWNED = [
   // Debug-only local cleartext policy. The RN template ships its own debug
   // manifest, so these must survive hydration or the acceptance run silently
   // loses its network permission.
+  'android/app/src/kitchenPreview/AndroidManifest.xml',
+  'android/app/src/kitchenPreview/res/xml/network_security.xml',
   'android/app/src/debug/AndroidManifest.xml',
   'android/app/src/debug/res/xml/network_security.xml',
   // MACROS-owned native modules. The RN template does not create these, and a
@@ -162,6 +164,11 @@ if (registrations !== 1) {
   fail(`expected exactly one MacrosSpeechPackage registration, found ${registrations}`);
 }
 
+const appGradle = join(APP_DIR, 'android/app/build.gradle');
+const kitchenApply = "\napply from: new File(rootProject.projectDir, '../../../tools/android-kitchen-build.gradle')\n";
+if (!readFileSync(appGradle, 'utf8').includes('android-kitchen-build.gradle')) {
+  writeFileSync(appGradle, readFileSync(appGradle, 'utf8') + kitchenApply);
+}
 rmSync(scratch, { recursive: true, force: true });
 
 say('');

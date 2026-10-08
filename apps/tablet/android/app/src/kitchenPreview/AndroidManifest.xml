@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+  <!-- USB kitchen preview only. Release does not merge this policy. -->
+  <application android:networkSecurityConfig="@xml/network_security" tools:replace="android:networkSecurityConfig" />
+</manifest>

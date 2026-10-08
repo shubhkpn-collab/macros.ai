@@ -21,6 +21,8 @@ import {
 } from './status.js';
 
 export interface ScreenActions {
+  onConversation?: () => void;
+  conversationActive?: boolean;
   /** Push-to-talk. Falls back to the guidance intent when voice is absent. */
   onOrbPress?: () => void;
   voiceFeedback?: string | null;
@@ -121,6 +123,8 @@ export function HomeScreen(
     {offered.length > 0 ? <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'center', marginTop: 28, marginBottom: 20 }}>{offered.map(c => <FoodCard key={c.productVersionId} name={c.displayName} selected={vm.selectedFood !== null && vm.selectedFood.productVersionId === c.productVersionId} onPress={() => { if (guidance.envelopeId !== null) actions.onChooseGuidanceCandidate(c.productVersionId, guidance.envelopeId); }} accessibilityLabel={`Choose ${c.displayName}`} />)}</View> : <Pressable accessibilityRole="button" accessibilityLabel="Search for a food" onPress={actions.onAddFood} style={({ pressed }) => ({ width: '100%', marginTop: 30, borderWidth: 1, borderColor: color.borderStrong, borderRadius: 24, padding: 30, backgroundColor: pressed ? color.surfaceActive : color.surface, alignItems: 'center' })}><Icon name="search" size={32} tint={color.macroProtein} /><Text style={{ color: color.textPrimary, fontSize: 23, fontWeight: '600', marginTop: 14 }}>Find your food</Text><Text style={{ color: color.textMuted, fontSize: 16, marginTop: 8 }}>Search the catalog or ask Macros for an idea</Text></Pressable>}
     {guidance.text.length > 0 ? <View accessibilityLiveRegion="polite" style={{ marginTop: 18, backgroundColor: color.surface, padding: 18, borderRadius: 22, width: '100%' }}><Text style={{ color: color.textSecondary, fontSize: 18, lineHeight: 26, textAlign: 'center' }}>{guidance.text}</Text></View> : null}
     <View style={{ flexDirection: 'row', marginTop: 24, gap: 12 }}><Pressable accessibilityRole="button" accessibilityLabel="Add food" onPress={actions.onAddFood} style={{ padding: 16, borderRadius: 26, backgroundColor: color.surfaceMuted, flexDirection: 'row', gap: 10, alignItems: 'center' }}><Icon name="plus" size={20} /><Text style={{ color: color.textPrimary, fontSize: 17 }}>Add food</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel="Suggest a food" disabled={guidance.phase === 'thinking'} onPress={actions.onRequestGuidance} style={{ padding: 16, borderRadius: 26, backgroundColor: color.surfaceMuted, flexDirection: 'row', gap: 10, alignItems: 'center', opacity: guidance.phase === 'thinking' ? .5 : 1 }}><Icon name="leaf" size={20} /><Text style={{ color: color.textPrimary, fontSize: 17 }}>Suggest a food</Text></Pressable></View>
+    {actions.onConversation ? <View style={{ width: '100%', marginTop: 24 }}><PrimaryAction accessibilityLabel="Toggle kitchen voice conversation" label={actions.conversationActive ? 'End kitchen conversation' : 'Start kitchen conversation'} onPress={actions.onConversation} /><Text style={{ color: color.textMuted, textAlign: 'center', marginTop: 10 }}>AI voice • listens while connected • ends after 5 minutes</Text></View> : null}
+    {vm.energy !== null ? <EnergyBalanceHero energy={vm.energy} /> : null}
     <MacroFooter vm={vm} />
   </ScrollView>
   );

@@ -1,0 +1,13 @@
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+const adb = process.env.ANDROID_HOME ? `${process.env.ANDROID_HOME}/platform-tools/adb` : 'adb';
+const token = readFileSync('.env.realtime.connection', 'utf8').trim();
+if (!/^[a-f0-9]{64}$/.test(token)) throw new Error('Start the kitchen backend first.');
+const devices = execFileSync(adb, ['devices'], {encoding:'utf8'}).split('\n').filter(line => /\tdevice$/.test(line));
+if (devices.length !== 1) throw new Error('Connect exactly one authorized Android phone.');
+const serial = devices[0].split('\t')[0];
+const run = args => execFileSync(adb, ['-s', serial, ...args], {stdio:'pipe'});
+run(['reverse', 'tcp:8791', 'tcp:8791']);
+run(['shell', 'am', 'force-stop', 'com.macrostablet']);
+run(['shell', 'am', 'start', '-n', 'com.macrostablet/.MainActivity', '--es', 'macrosKitchenToken', token]);
+console.log('USB kitchen preview connected. Tap Start kitchen conversation in MACROS.');

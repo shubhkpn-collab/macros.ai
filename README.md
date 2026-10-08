@@ -48,3 +48,7 @@ The canonical energy equation is `BMR + ACTIVE ENERGY + TEF`. Existing policy an
 ## Recovery and verification
 
 See [repository recovery](docs/REPOSITORY-RECOVERY.md) for the chosen snapshot, alternate histories, and validation scope. No license has been added; repository publication alone does not grant an open-source license.
+
+### Kitchen voice on Android (USB preview)
+
+See [the kitchen voice setup guide](docs/voice/KITCHEN-SETUP.md) for the private Mac backend, project API key setup, and phone test steps. The voice assistant reads synthetic demo state; food logging still uses the existing confirmation flow.

@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, SafeAreaView, StatusBar } from 'react-native';
+import { Alert, AppState, SafeAreaView, StatusBar } from 'react-native';
 import { color } from '@macros/tablet-view-model';
 import { TabletShell } from './components/screens.js';
 import type { GuidanceDeps } from '@macros/tablet-app-core';
 import type { PremiumSpeechTransport } from '@macros/tablet-voice';
 import { createActions, type AuthHostPort } from './actions.js';
 import { createNativeSpeechPort } from './voice/native-speech.js';
+import { KitchenConversation } from './voice/kitchen-realtime.js';
 import { VoiceCoordinator } from './voice/voice-coordinator.js';
 import { renderModel, type TabletComposition } from './composition.js';
 
@@ -50,6 +51,17 @@ export function App(
   // BEFORE the coordinator that closes over it.
   const viewModelRef = useRef(vm);
   viewModelRef.current = vm;
+
+  const [conversationActive, setConversationActive] = useState(false);
+  const [conversationStatus, setConversationStatus] = useState<string | null>(null);
+  const conversation = useMemo(() => new KitchenConversation(
+    () => renderModel(composition, hasActiveSession),
+    (text, active) => { setConversationStatus(text); setConversationActive(active); },
+  ), [composition, hasActiveSession]);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', state => { if (state !== 'active') conversation.stop(); });
+    return () => { sub.remove(); conversation.stop(); };
+  }, [conversation]);
 
   const [listening, setListening] = useState(false);
   const [voiceFeedback, setVoiceFeedback] = useState<string | null>(null);
@@ -141,8 +153,8 @@ export function App(
    * coordinator sat ready to speak it.
    */
   useEffect(() => {
-    voice.speakGuidanceIfNew();
-  }, [voice, vm.guidance.envelopeId, vm.guidance.text, vm.guidance.phase]);
+    if (!conversationActive) voice.speakGuidanceIfNew();
+  }, [voice, vm.guidance.envelopeId, vm.guidance.text, vm.guidance.phase, conversationActive]);
 
   /**
    * Screen-facing actions: the shared set plus push-to-talk. Defined after the
@@ -150,10 +162,16 @@ export function App(
    */
   const screenActions = useMemo(() => ({
     ...actions,
-    voiceFeedback,
+    voiceFeedback: conversationActive ? conversationStatus : voiceFeedback ?? conversationStatus,
+    conversationActive,
+    onConversation: () => {
+      if (conversationActive) conversation.stop();
+      else { voice.speechPort.stopListening(); voice.speechPort.stopSpeaking(); setListening(false); void conversation.start(); }
+    },
     onOrbPress: () => {
       // The outcome is authoritative: a refusal settles the orb immediately
       // instead of leaving it on "Listening…" for an event that never comes.
+      conversation.stop();
       setVoiceFeedback(null);
       void voice.toggleListening().then((outcome) => {
         setListening(outcome === 'started');
@@ -165,7 +183,7 @@ export function App(
     isSpeaking: voice.isSpeaking(),
     micLevel: level,
     wakePulse,
-  }), [actions, voice, listening, level, wakePulse, tick, voiceFeedback]);
+  }), [actions, voice, listening, level, wakePulse, tick, voiceFeedback, conversation, conversationActive, conversationStatus]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>

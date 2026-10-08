@@ -5,3 +5,4 @@ export * from './shared-device-auth.js';
 export * from './guidance-route.js';
 export * from './guidance-admission.js';
 export * from './voice-route.js';
+export * from './kitchen-voice-route.js';

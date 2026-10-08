@@ -19,7 +19,9 @@
     "guidance:acceptance:backend": "node --import tsx tools/guidance-acceptance/run-backend.ts",
     "postgres:guidance-validate": "node --import tsx tools/postgres-validation/validate-guidance-admission.ts",
     "investor:demo": "bash tools/investor-demo/run.sh",
-    "check:tablet-imports": "node --import tsx tools/check-tablet-imports.ts"
+    "check:tablet-imports": "node --import tsx tools/check-tablet-imports.ts",
+    "voice:backend": "node --import tsx tools/kitchen-realtime-server.ts",
+    "voice:phone": "node tools/connect-kitchen-phone.mjs"
   },
   "engines": {
     "node": ">=22.0.0",

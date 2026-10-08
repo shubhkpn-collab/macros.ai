@@ -1,0 +1,11 @@
+// Applied inside the generated app build before Android creates variants.
+android {
+    defaultConfig { buildConfigField 'boolean', 'KITCHEN_PREVIEW', 'false' }
+    buildTypes {
+        kitchenPreview {
+            initWith release
+            matchingFallbacks = ['release']
+            buildConfigField 'boolean', 'KITCHEN_PREVIEW', 'true'
+        }
+    }
+}
