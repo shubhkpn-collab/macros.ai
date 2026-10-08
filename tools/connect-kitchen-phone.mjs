@@ -10,4 +10,4 @@ const run = args => execFileSync(adb, ['-s', serial, ...args], {stdio:'pipe'});
 run(['reverse', 'tcp:8791', 'tcp:8791']);
 run(['shell', 'am', 'force-stop', 'com.macrostablet']);
 run(['shell', 'am', 'start', '-n', 'com.macrostablet/.MainActivity', '--es', 'macrosKitchenToken', token]);
-console.log('USB kitchen preview connected. Tap Start kitchen conversation in MACROS.');
+console.log('USB kitchen preview connected. Tap Talk to Macros in MACROS.');

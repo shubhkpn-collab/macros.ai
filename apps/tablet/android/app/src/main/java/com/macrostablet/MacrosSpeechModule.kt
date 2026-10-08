@@ -1,6 +1,8 @@
 package com.macrostablet
 
 import android.content.Intent
+import android.media.AudioManager
+import android.content.Context
 import android.media.MediaPlayer
 import android.util.Base64
 import android.os.Bundle
@@ -54,6 +56,36 @@ class MacrosSpeechModule(private val ctx: ReactApplicationContext) :
   @ReactMethod
   fun getKitchenToken(promise: Promise) {
     promise.resolve(if (BuildConfig.KITCHEN_PREVIEW) ctx.currentActivity?.intent?.getStringExtra("macrosKitchenToken") else null)
+  }
+
+  private var previousAudioMode: Int? = null
+  private var previousSpeaker: Boolean? = null
+
+  @ReactMethod
+  fun beginKitchenAudio(promise: Promise) {
+    ctx.runOnUiQueueThread {
+      try {
+        val audio = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        if (previousAudioMode == null) {
+          previousAudioMode = audio.mode
+          previousSpeaker = audio.isSpeakerphoneOn
+        }
+        audio.mode = AudioManager.MODE_IN_COMMUNICATION
+        audio.isSpeakerphoneOn = true
+        promise.resolve(null)
+      } catch (_: Exception) { promise.reject("audio_unavailable", "Audio output unavailable") }
+    }
+  }
+
+  @ReactMethod
+  fun endKitchenAudio() {
+    ctx.runOnUiQueueThread {
+      val audio = ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+      previousAudioMode?.let { audio.mode = it }
+      previousSpeaker?.let { audio.isSpeakerphoneOn = it }
+      previousAudioMode = null
+      previousSpeaker = null
+    }
   }
 
   override fun getName() = "MacrosSpeech"

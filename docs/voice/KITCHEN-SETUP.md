@@ -1,6 +1,6 @@
 # MACROS kitchen voice: local Android preview
 
-This preview adds an OpenAI Realtime audio conversation that reads MACROS' current energy, macros, portion review and validated suggestions. It is prompted to stay on kitchen nutrition. Topic prompting is not a guaranteed topic firewall. Its only tool is read-only; it has no tool for changing scale measurements or committing a food log. Spoken model answers can still be wrong; verify numbers against the screen. Use the existing food review/Confirm flow to log food. Current nutrition and activity are synthetic development data, not your personal measurements.
+This preview adds an OpenAI Realtime audio conversation that reads MACROS' current energy, macros, portion review and validated suggestions. It is prompted to stay on kitchen nutrition. Topic prompting is not a guaranteed topic firewall. Its tools search and select catalog foods, review a spoken manual portion, capture a connected stable scale, request validated guidance and confirm a food log through the existing controller. A log requires a fresh independent final audio transcription of “confirm” or “log it” while the same portion review is visible. Cancelled model responses and duplicate tool calls cannot log food. Spoken answers can still be wrong; verify numbers against the screen. Current nutrition and activity are synthetic development data, not your personal measurements.
 
 ## Account setup (one time)
 
@@ -34,14 +34,14 @@ npm run voice:phone
 
 This forwards the phone's localhost port over USB and launches the app with a random, temporary MACROS preview token. That token is not your OpenAI key. Restarting the backend rotates the token, so run `voice:phone` again. The phone still needs internet access for WebRTC audio to OpenAI. A normal release ignores this preview token and blocks localhost HTTP.
 
-On the home screen tap **Start kitchen conversation** and allow microphone access. You can interrupt the assistant by speaking. Tap **End kitchen conversation** to stop audio. Backgrounding the app also stops the microphone. Each preview conversation ends after five minutes; reconnect if needed. This duration limit reduces accidental long sessions but is not an account spending limit.
+Tap **Talk to Macros**, the home orb, or the large microphone and allow microphone access. You can interrupt the assistant by speaking. Tap the persistent **End conversation** control to stop audio. Backgrounding the app also stops the microphone. Each preview conversation ends after twenty minutes; reconnect if needed. This duration limit reduces accidental long sessions but is not an account spending limit.
 
 Try:
 
 - “What should I eat next based on my protein today?”
 - “Explain my current energy balance and my end-of-day budget.”
 - “Assume I burn 2500 calories today and want a 300-calorie deficit. What intake would that imply?” (2200 kcal is a planning assumption, not a measured burn or a configured profile.)
-- Search and log a food through the existing controls, then ask “What changed?”
+- Say “I am having cooked chicken,” choose an offered option, say “186 grams,” hear the portion review, then say “confirm.” Ask “What changed?” without tapping again.
 - Ask something unrelated; check that the assistant redirects to kitchen nutrition.
 - End the call and verify that the Android microphone indicator disappears.
 

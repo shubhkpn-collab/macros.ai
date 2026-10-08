@@ -745,12 +745,13 @@ describe('REAL ANDROID RUNTIME FIXES — observed in the emulator', () => {
     const manifest = read('android', 'app', 'src', 'main', 'AndroidManifest.xml');
     assert.match(manifest, /<uses-permission android:name="android\.permission\.INTERNET" \/>/);
     // No unrelated permissions crept in. This list is deliberate: RECORD_AUDIO
-    // for push-to-talk, the Android 12+ Bluetooth pair for the scale, and the
+    // for audio input, MODIFY_AUDIO_SETTINGS for voice speaker routing, Bluetooth for the scale, and the
     // legacy trio capped at API 30. Anything else is creep and should fail.
     const perms = [...manifest.matchAll(/uses-permission android:name="([^"]+)"/g)].map((m) => m[1]);
     assert.deepEqual(perms, [
       'android.permission.INTERNET',
       'android.permission.RECORD_AUDIO',
+      'android.permission.MODIFY_AUDIO_SETTINGS',
       'android.permission.BLUETOOTH_SCAN',
       'android.permission.BLUETOOTH_CONNECT',
       'android.permission.BLUETOOTH',

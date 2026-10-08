@@ -51,4 +51,4 @@ See [repository recovery](docs/REPOSITORY-RECOVERY.md) for the chosen snapshot, 
 
 ### Kitchen voice on Android (USB preview)
 
-See [the kitchen voice setup guide](docs/voice/KITCHEN-SETUP.md) for the private Mac backend, project API key setup, and phone test steps. The voice assistant reads synthetic demo state; food logging still uses the existing confirmation flow.
+See [the kitchen voice setup guide](docs/voice/KITCHEN-SETUP.md) for the private Mac backend, project API key setup, and phone test steps. The continuous voice assistant reads synthetic demo state and uses kitchen tools for food selection, portions and spoken confirmation through the existing controller.

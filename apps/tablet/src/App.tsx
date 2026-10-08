@@ -6,6 +6,8 @@ import type { GuidanceDeps } from '@macros/tablet-app-core';
 import type { PremiumSpeechTransport } from '@macros/tablet-voice';
 import { createActions, type AuthHostPort } from './actions.js';
 import { createNativeSpeechPort } from './voice/native-speech.js';
+import { KitchenActions } from './voice/kitchen-actions.js';
+import type { KitchenPhase } from '@macros/tablet-voice';
 import { KitchenConversation } from './voice/kitchen-realtime.js';
 import { VoiceCoordinator } from './voice/voice-coordinator.js';
 import { renderModel, type TabletComposition } from './composition.js';
@@ -53,13 +55,19 @@ export function App(
   viewModelRef.current = vm;
 
   const [conversationActive, setConversationActive] = useState(false);
+  const [conversationPhase, setConversationPhase] = useState<KitchenPhase>('idle');
   const [conversationStatus, setConversationStatus] = useState<string | null>(null);
+  const kitchenActions = useMemo(() => new KitchenActions({
+    controller: composition.controller,
+    state: () => renderModel(composition, hasActiveSession), changed: refresh,
+    ...(guidance !== undefined ? {guidance} : {}),
+  }), [composition, hasActiveSession, guidance, refresh]);
   const conversation = useMemo(() => new KitchenConversation(
-    () => renderModel(composition, hasActiveSession),
-    (text, active) => { setConversationStatus(text); setConversationActive(active); },
-  ), [composition, hasActiveSession]);
+    kitchenActions,
+    (text, active, phase) => { setConversationStatus(text); setConversationActive(active); setConversationPhase(phase); },
+  ), [kitchenActions]);
   useEffect(() => {
-    const sub = AppState.addEventListener('change', state => { if (state !== 'active') conversation.stop(); });
+    const sub = AppState.addEventListener('change', state => { if (state !== 'active') conversation.background(); });
     return () => { sub.remove(); conversation.stop(); };
   }, [conversation]);
 
@@ -153,8 +161,8 @@ export function App(
    * coordinator sat ready to speak it.
    */
   useEffect(() => {
-    if (!conversationActive) voice.speakGuidanceIfNew();
-  }, [voice, vm.guidance.envelopeId, vm.guidance.text, vm.guidance.phase, conversationActive]);
+    if (!conversationActive && conversationStatus === null) voice.speakGuidanceIfNew();
+  }, [voice, vm.guidance.envelopeId, vm.guidance.text, vm.guidance.phase, conversationActive, conversationStatus]);
 
   /**
    * Screen-facing actions: the shared set plus push-to-talk. Defined after the
@@ -164,10 +172,20 @@ export function App(
     ...actions,
     voiceFeedback: conversationActive ? conversationStatus : voiceFeedback ?? conversationStatus,
     conversationActive,
+    conversationPhase,
     onConversation: () => {
       setVoiceFeedback(null);
       if (conversationActive) conversation.stop();
-      else { voice.speechPort.stopListening(); voice.speechPort.stopSpeaking(); setListening(false); void conversation.start(); }
+      else {
+        setListening(false);
+        setConversationStatus('Starting kitchen voice…');
+        setConversationPhase('connecting');
+        setConversationActive(true);
+        void conversation.start().catch(() => {
+          setConversationActive(false); setConversationPhase('error');
+          setConversationStatus('Voice could not start. End the conversation and try again.');
+        });
+      }
     },
     onOrbPress: () => {
       // The outcome is authoritative: a refusal settles the orb immediately
@@ -184,7 +202,7 @@ export function App(
     isSpeaking: voice.isSpeaking(),
     micLevel: level,
     wakePulse,
-  }), [actions, voice, listening, level, wakePulse, tick, voiceFeedback, conversation, conversationActive, conversationStatus]);
+  }), [actions, voice, listening, level, wakePulse, tick, voiceFeedback, conversation, conversationActive, conversationStatus, conversationPhase]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>

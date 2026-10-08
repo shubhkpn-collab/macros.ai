@@ -9,6 +9,7 @@
 
   <!-- Push-to-talk. Denied permission degrades to touch; it never crashes. -->
   <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
   <!--
     BLE scale. Android 12+ splits Bluetooth into runtime permissions;
