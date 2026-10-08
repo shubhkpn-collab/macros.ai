@@ -25,18 +25,24 @@ export class KitchenConversation {
     this.stop();
     const generation = this.generation;
     const live = () => generation === this.generation;
+    let stage = 'USB setup';
+    this.status('Starting kitchen voice…', true);
+    console.info('[macros-kitchen] start');
     try {
       const token: unknown = await NativeModules.MacrosSpeech?.getKitchenToken();
       if (!live()) return;
       if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token)) {
         this.status('Kitchen voice needs the USB backend setup. Voice commands still work.', false); return;
       }
-      const permission = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
+      stage = 'microphone permission';
+      const permission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO) ? PermissionsAndroid.RESULTS.GRANTED : await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
       if (!live()) return;
       if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
         this.status('Allow microphone access to start a conversation.', false); return;
       }
       this.status('Connecting kitchen voice…', true);
+      stage = 'audio capture';
+      console.info('[macros-kitchen] audio capture');
       const stream = await mediaDevices.getUserMedia({audio: true, video: false});
       if (!live()) { stream.getTracks().forEach(track => track.stop()); return; }
       this.stream = stream;
@@ -51,7 +57,7 @@ export class KitchenConversation {
         send({type:'response.create'});
       };
       channel.onclose = () => { if (live()) this.stop(); };
-      channel.onmessage = event => {
+      channel.onmessage = (event: unknown) => {
         if (!live()) return;
         let data: Record<string, unknown>;
         try { data = JSON.parse(String((event as unknown as {data: unknown}).data)); } catch { return; }
@@ -79,11 +85,14 @@ export class KitchenConversation {
         }
         if (data.type === 'input_audio_buffer.speech_started') this.status('Listening… kitchen conversation live', true);
       };
+      stage = 'audio connection';
       const offer = await peer.createOffer({});
       if (!live()) return;
       await peer.setLocalDescription(offer);
       const abort = new AbortController(); this.abort = abort;
       const handshakeTimer = setTimeout(() => abort.abort(), 25_000);
+      stage = 'backend handshake';
+      console.info('[macros-kitchen] backend handshake');
       let response: Response;
       try {
         response = await fetch('http://127.0.0.1:8791/voice/conversation', {
@@ -92,7 +101,8 @@ export class KitchenConversation {
         });
       } finally { clearTimeout(handshakeTimer); }
       if (!live()) return;
-      if (!response.ok) throw new Error('unavailable');
+      console.info('[macros-kitchen] handshake HTTP', response.status);
+      if (!response.ok) { stage = `backend handshake (HTTP ${response.status})`; throw new Error('unavailable'); }
       const answer = await response.json() as {sdp?:unknown};
       if (!live()) return;
       if (typeof answer.sdp !== 'string') throw new Error('invalid answer');
@@ -102,7 +112,8 @@ export class KitchenConversation {
     } catch {
       if (!live()) return;
       this.stop();
-      this.status('Kitchen voice unavailable. Check the Mac backend, API key and phone network.', false);
+      console.info('[macros-kitchen] failed stage', stage);
+      this.status(`Kitchen voice failed at ${stage}. Check the Mac connection and try again.`, false);
     }
   }
 }
