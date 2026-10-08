@@ -165,6 +165,7 @@ export function App(
     voiceFeedback: conversationActive ? conversationStatus : voiceFeedback ?? conversationStatus,
     conversationActive,
     onConversation: () => {
+      setVoiceFeedback(null);
       if (conversationActive) conversation.stop();
       else { voice.speechPort.stopListening(); voice.speechPort.stopSpeaking(); setListening(false); void conversation.start(); }
     },
