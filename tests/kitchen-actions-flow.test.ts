@@ -73,3 +73,10 @@ test('late transcription can authorize the same current review, but not an inter
   await h.portion();h.actions.speechStarted('second-confirm');const interrupted=h.execute('confirm_food_log');
   h.actions.speechStarted('new-turn');h.actions.transcript('second-confirm','confirm');assert.ok('error' in await interrupted);
 });
+test('knowledge retrieval works during review without changing a pending food or granting log authority',async()=>{
+  const h=await harness();await h.portion();const review=h.state().review;
+  const result=await h.execute('retrieve_nutrition_knowledge',{query:'How does my calorie deficit budget work?'});
+  assert.equal(result.status,'matched');assert.deepEqual(h.state().review,review);
+  assert.ok('error' in await h.execute('confirm_food_log'));
+  assert.ok('error' in await h.execute('retrieve_nutrition_knowledge',{query:'food',userId:'other'}));
+});

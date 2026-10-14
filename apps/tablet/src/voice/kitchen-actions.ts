@@ -1,6 +1,6 @@
 import type { TabletViewModel } from '@macros/tablet-view-model';
 import type { GuidanceDeps, TabletAppController } from '@macros/tablet-app-core';
-import { explicitFoodConfirmation, spokenGrams } from '@macros/tablet-voice';
+import { explicitFoodConfirmation, spokenGrams, retrieveKitchenKnowledge } from '@macros/tablet-voice';
 
 export interface KitchenActionDeps {
   controller: Pick<TabletAppController, 'searchFood'|'selectProduct'|'enterManualWeight'|'requestStableWeight'|'confirmFoodLog'|'cancelFoodFlow'|'refreshDashboard'|'requestFoodGuidance'|'chooseGuidanceCandidate'>;
@@ -59,7 +59,7 @@ export class KitchenActions {
       if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return {error:'Invalid tool arguments'};
       args = parsed as Record<string,unknown>;
     } catch {return {error:'Invalid tool arguments'};}
-    const expected = name === 'search_food' ? ['query'] : name === 'select_food' ? ['productVersionId'] : name === 'set_spoken_portion' ? ['grams'] : [];
+    const expected = (name === 'search_food' || name === 'retrieve_nutrition_knowledge') ? ['query'] : name === 'select_food' ? ['productVersionId'] : name === 'set_spoken_portion' ? ['grams'] : [];
     if (Object.keys(args).length !== expected.length || Object.keys(args).some(key => !expected.includes(key))) return {error:'Unexpected tool arguments'};
     const epoch = this.epoch;
     const vm = this.deps.state();
@@ -69,6 +69,9 @@ export class KitchenActions {
     try {
       switch (name) {
         case 'get_kitchen_state': return this.snapshot();
+        case 'retrieve_nutrition_knowledge':
+          if (typeof args.query !== 'string') return {error:'A knowledge question is required'};
+          return {...retrieveKitchenKnowledge(args.query)};
         case 'search_food':
           if (typeof args.query !== 'string' || !args.query.trim() || args.query.length > 120) return {error:'Say a food name'};
           if (!['home','food_search','food_options','logged'].includes(vm.screen)) return {error:'Finish or cancel the current portion first'};

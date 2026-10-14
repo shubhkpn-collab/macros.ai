@@ -5,6 +5,7 @@ const tool = (name: string, description: string, properties: Record<string, unkn
   parameters: required.length ? {type:'object', properties, required, additionalProperties:false} : noArgs,
 });
 export const KITCHEN_TOOLS = [
+  tool('retrieve_nutrition_knowledge', 'Retrieve cited MACROS explanations of nutrition workflow, energy balance and macro policies. Use for explanatory questions. Not a source of personal values or food nutrient facts; no match means the curated knowledge does not cover the question.', {query:{type:'string'}}, ['query']),
   tool('get_kitchen_state', 'Read current energy, remaining macros, food options, portion review and scale state. Use these numbers; do not calculate nutrition yourself.'),
   tool('search_food', 'Search the food catalog for what the user is preparing. Returns actual options; ask about brand or raw/cooked preparation when ambiguous.', {query:{type:'string'}}, ['query']),
   tool('select_food', 'Select an actual productVersionId returned by search_food or validated guidance, after the user chooses it. Never invent an id.', {productVersionId:{type:'string'}}, ['productVersionId']),
