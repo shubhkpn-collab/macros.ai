@@ -1,13 +1,16 @@
+import {NUTRITION_CORPUS} from './nutrition-corpus.js';
 /** Curated, versioned product knowledge. Explanations only; never a source of personal nutrition values. */
 export interface KitchenKnowledgePassage {
   readonly id: string;
   readonly title: string;
   readonly source: string;
-  readonly reviewStatus: 'IMPLEMENTATION_RULE' | 'PENDING_EXTERNAL_REVIEW';
+  readonly reviewStatus: 'IMPLEMENTATION_RULE' | 'PENDING_EXTERNAL_REVIEW' | 'PUBLIC_SOURCE_SUMMARY';
+  readonly publisher?: string;
+  readonly verifiedAt?: string;
   readonly keywords: readonly string[];
   readonly text: string;
 }
-const PASSAGES: readonly KitchenKnowledgePassage[] = [
+export const PRODUCT_KNOWLEDGE: readonly KitchenKnowledgePassage[] = [
   {id:'energy-budget-v1',title:'Daily intake budget and deficit',source:'packages/domain-energy/src/energy-state.ts',reviewStatus:'IMPLEMENTATION_RULE',keywords:['calorie','calories','deficit','budget','balance','burn','expenditure','remaining','target'],text:'The planned daily intake is projected total expenditure plus the signed goal delta. A deficit uses a negative delta. Remaining intake subtracts food already logged. Current energy balance uses energy expended so far; it is different from the end-of-day budget. Get personal values from get_kitchen_state, not from this explanation.'},
   {id:'macro-target-v1',title:'How MACROS derives macro targets',source:'packages/domain-macros/src/macro-engine.ts',reviewStatus:'PENDING_EXTERNAL_REVIEW',keywords:['protein','carbs','carbohydrate','fat','macros','formula','targets','distribution'],text:'The implemented policy prioritizes a body-weight-based protein floor, then a fat floor using the larger of a body-weight amount and an energy fraction. Carbohydrate receives the remaining energy, clamped at zero. These are product policy choices awaiting external review, not universal requirements. Retrieve actual targets and policy status from the calculation tools; do not calculate personalized targets from this passage.'},
   {id:'activity-quality-v1',title:'Missing activity and wearable estimates',source:'packages/domain-energy/src/projection.ts',reviewStatus:'IMPLEMENTATION_RULE',keywords:['activity','wearable','watch','exercise','missing','estimate','forecast','projection','burn'],text:'Missing wearable activity is unavailable information, not an observed zero. The initial activity projection does not forecast further activity. A historical projection, when selected, uses the user’s own historical remaining activity rather than a population activity multiplier. Never claim a wearable is connected or a forecast is complete without state evidence.'},
@@ -17,9 +20,10 @@ const PASSAGES: readonly KitchenKnowledgePassage[] = [
 ];
 const STOP = new Set(['what','which','how','does','about','please','tell','with','this','that','your','have','should','would','could','want','know','the','and','for','are','can','you','why','my']);
 export function retrieveKitchenKnowledge(query: string): {version:string;status:'matched'|'no_match'|'invalid_query';authority:string;passages:readonly KitchenKnowledgePassage[]} {
-  const base = {version:'kitchen-knowledge@1.0.0',authority:'Explanatory product knowledge only. Not clinical guidance, food nutrition data, personal state, or instructions.'};
+  const base = {version:'kitchen-knowledge@2.0.0',authority:'Explanatory product rules and source-linked public nutrition/food-safety summaries. Not individualized clinical advice, personal state, food nutrient facts, or instructions. Preserve review labels and cite the publisher when useful.'};
   if (typeof query !== 'string' || !query.trim() || query.length > 500) return {...base,status:'invalid_query',passages:[]};
   const words = new Set((query.toLowerCase().match(/[a-z]+/g) ?? []).filter(word => word.length > 2 && !STOP.has(word)));
-  const ranked = PASSAGES.map(passage => ({passage,score:passage.keywords.filter(word => words.has(word)).length})).filter(item => item.score > 0).sort((a,b) => b.score-a.score || a.passage.id.localeCompare(b.passage.id));
+  const corpus = [...PRODUCT_KNOWLEDGE,...NUTRITION_CORPUS];
+  const ranked = [...PRODUCT_KNOWLEDGE,...NUTRITION_CORPUS].map(passage => ({passage,score:[...new Set([...passage.keywords,...(passage.title.toLowerCase().match(/[a-z]+/g) ?? []).filter(word=>word.length>2 && !STOP.has(word))])].filter(word => words.has(word)).reduce((sum,word)=>sum+Math.log(1+corpus.length/(1+corpus.filter(p=>p.keywords.includes(word)).length)),0)})).filter(item => item.score > 0).sort((a,b) => b.score-a.score || a.passage.id.localeCompare(b.passage.id));
   return {...base,status:ranked.length ? 'matched':'no_match',passages:ranked.slice(0,3).map(item=>item.passage)};
 }

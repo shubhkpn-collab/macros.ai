@@ -9,3 +9,13 @@ android {
         }
     }
 }
+
+// Shared workspace sources are outside the Android app's default JS input root.
+// Without these inputs Gradle can ship a stale bundle after knowledge/tool edits.
+tasks.configureEach { task ->
+    if (task.name.startsWith('createBundle') && task.name.endsWith('JsAndAssets')) {
+        task.inputs.files(fileTree(new File(rootProject.projectDir, '../../../packages')) {
+            include '**/src/**/*.ts', '**/src/**/*.tsx'
+        }).withPathSensitivity(org.gradle.api.tasks.PathSensitivity.RELATIVE)
+    }
+}

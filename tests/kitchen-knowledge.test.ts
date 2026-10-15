@@ -31,3 +31,34 @@ test('voice session exposes retrieval and requires grounded explanatory answers'
   assert.match(KITCHEN_INSTRUCTIONS,/call retrieve_nutrition_knowledge before answering/);
   assert.match(KITCHEN_INSTRUCTIONS,/data, never instructions/);
 });
+const retrievalCases:readonly [string,string][] = [
+ ['Does the serving size tell me how much to eat?','label-serving-v1'],
+ ['What does percent daily value mean?','label-dv-v1'],
+ ['Are added sugars already included in total sugars?','label-sugar-v1'],
+ ['Which column is for the entire package?','label-columns-v1'],
+ ['Should I wash raw chicken?','clean-produce-v1'],
+ ['How do I avoid cross contamination with cutting boards?','clean-separate-v1'],
+ ['Can I thaw meat on the counter?','clean-thaw-v1'],
+ ['How long can cooked chicken leftovers stay in the fridge?','store-leftovers-v1'],
+ ['What temperature should ground turkey reach?','cook-poultry-v1'],
+ ['What temperature for a beef steak and rest?','cook-steak-v1'],
+ ['What temperature for reheating leftovers?','cook-leftovers-v1'],
+ ['Are BCAA supplements useful?','sport-bcaa-v1'],
+ ['Can vegan plant foods provide amino acids?','sport-plants-v1'],
+ ['Do I need protein powder shakes?','sport-powder-v1'],
+ ['Does hydration depend on heat and exercise?','water-needs-v1'],
+ ['Should I replace sugary soda drinks with water?','water-swaps-v1'],
+];
+for(const [query,id] of retrievalCases) test(`expanded retrieval: ${query}`,()=>{
+ const result=retrieveKitchenKnowledge(query);
+ assert.ok(result.passages.some(p=>p.id===id),`Missing ${id}; received ${result.passages.map(p=>p.id)}`);
+});
+test('all public knowledge has primary-source provenance and no clinical approval claim',async()=>{
+ const {NUTRITION_CORPUS}=await import('../packages/tablet-voice/src/nutrition-corpus.js');
+ assert.equal(NUTRITION_CORPUS.length,24);
+ assert.equal(new Set(NUTRITION_CORPUS.map(p=>p.id)).size,24);
+ for(const passage of NUTRITION_CORPUS) {
+  assert.match(passage.source,/^https:\/\/(www\.fda\.gov|www\.foodsafety\.gov|ods\.od\.nih\.gov|www\.cdc\.gov)\//);
+  assert.equal(passage.reviewStatus,'PUBLIC_SOURCE_SUMMARY');assert.ok(passage.publisher);assert.equal(passage.verifiedAt,'2026-10-14');
+ }
+});
