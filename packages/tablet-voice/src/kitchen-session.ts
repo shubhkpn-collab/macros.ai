@@ -1,6 +1,7 @@
 export type KitchenPhase = 'idle'|'connecting'|'listening'|'thinking'|'speaking'|'error';
 export interface KitchenSessionPorts {
   send(event: unknown): void;
+  usage?(value: unknown): void;
   execute(name: string, args: string, current: () => boolean): Promise<Record<string,unknown>>;
   speechStarted(itemId: string): void;
   transcript(itemId: string, text: string): void;
@@ -67,9 +68,10 @@ export class KitchenSession {
       this.ports.end(); return;
     }
     if (data.type !== 'response.done') return;
-    const response = data.response as {id?:unknown;status?:unknown;output?:unknown} | undefined;
+    const response = data.response as {id?:unknown;status?:unknown;output?:unknown;usage?:unknown} | undefined;
     if (typeof response?.id !== 'string' || this.completed.has(response.id)) return;
     this.completed.add(response.id);
+    this.ports.usage?.(response.usage);
     if (this.completed.size > 200) {this.ports.end();return;}
     const turn = this.responses.get(response.id);
     this.responses.delete(response.id);

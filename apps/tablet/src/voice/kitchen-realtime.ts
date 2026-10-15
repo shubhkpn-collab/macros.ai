@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { emptyPilotUsage, addPilotUsage } from '@macros/tablet-voice';
 import { AppState, NativeModules, PermissionsAndroid } from 'react-native';
 import { mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-native-webrtc';
 import { KitchenSession, type KitchenPhase } from '@macros/tablet-voice';
@@ -10,6 +12,9 @@ interface KitchenAudioNative {
 }
 /** One continuous audio session; no Android SpeechRecognizer or TTS in this path. */
 export class KitchenConversation {
+  private pilotUsage = emptyPilotUsage();
+  private pilotStartedAt: number | null = null;
+  private pilotWrites: Promise<void> = Promise.resolve();
   private peer: RTCPeerConnection | null = null;
   private stream: Awaited<ReturnType<typeof mediaDevices.getUserMedia>> | null = null;
   private abort: AbortController | null = null;
@@ -23,6 +28,16 @@ export class KitchenConversation {
   private native(): KitchenAudioNative | undefined {return NativeModules.MacrosSpeech as KitchenAudioNative | undefined;}
   background(): void {if (!this.permissionPrompt) this.stop();}
   stop(): void {
+    if (this.pilotStartedAt !== null) {
+      const record = {version:1,endedAt:new Date().toISOString(),durationSeconds:Math.max(0,Math.round((Date.now()-this.pilotStartedAt)/1000)),...this.pilotUsage};
+      this.pilotStartedAt = null;
+      // Local bounded diagnostics only. No audio, transcript, food, identity or credential data.
+      this.pilotWrites = this.pilotWrites.then(async () => {
+        const saved = await AsyncStorage.getItem('macros.voice-pilot.v1');
+        let rows: unknown = [];try {rows=JSON.parse(saved ?? '[]');} catch { /* discard malformed diagnostics */ }
+        await AsyncStorage.setItem('macros.voice-pilot.v1',JSON.stringify([...(Array.isArray(rows)?rows:[]).slice(-99),record]));
+      }).catch(() => { /* Diagnostics must never interfere with microphone shutdown. */ });
+    }
     this.generation++;
     this.session?.close(); this.session = null;
     this.actions.reset();
@@ -76,6 +91,7 @@ export class KitchenConversation {
       stream.getTracks().forEach(track => peer.addTrack(track,stream));
       const channel = peer.createDataChannel('oai-events'); this.channel = channel;
       const session = new KitchenSession({
+        usage: value => {this.pilotUsage = addPilotUsage(this.pilotUsage,value);},
         send: event => {if (live() && channel.readyState === 'open') channel.send(JSON.stringify(event));},
         execute: (name,args,current) => this.actions.execute(name,args,() => live() && current()),
         speechStarted: id => this.actions.speechStarted(id),
@@ -89,6 +105,8 @@ export class KitchenConversation {
         if (this.connectingTimeout) clearTimeout(this.connectingTimeout);
         this.connectingTimeout = null;
         this.timeout = setTimeout(() => this.stop(),20 * 60_000);
+        this.pilotUsage = emptyPilotUsage();
+        this.pilotStartedAt = Date.now();
         session.ready();
       };
       channel.onclose = () => {if (live()) fail('Voice connection closed. Tap to reconnect.');};
