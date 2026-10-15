@@ -17,6 +17,19 @@ export const TOKEN_VERSION = 'tablet-tokens@2.0.0';
  * anywhere else would make a real problem unremarkable.
  */
 export const color = {
+  referenceLight0: '#FFB62F',
+  referenceLight1: '#26B9EE',
+  referenceLight2: '#FF568B',
+  referenceLight3: '#F1FCFF',
+  referenceLight4: '#122A38',
+  referenceLight5: '#0A1723',
+  referenceLight6: '#030B10',
+  referenceLight7: '#35CFEA',
+  referenceLight8: '#7975D9',
+  referenceLight9: '#D7E6FF',
+  referenceLight10: '#BCC6E4',
+  referenceLight11: '#040D13',
+  referenceLight12: '#9BAEC6',
   /** The appliance canvas. Near-black, slightly warm, never pure #000. */
   canvas: '#08121C',
   /** Raised content: heroes, cards, fields. */

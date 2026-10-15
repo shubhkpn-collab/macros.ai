@@ -29,7 +29,7 @@ export function Ring({ label, value, goal, fraction, size = 104 }: { label: stri
   return <View accessible accessibilityLabel={`${label}: ${value}${goal === undefined ? '' : ` of ${goal}`}`} style={{ alignItems: 'center', flex: 1, minWidth: 76 }}>
     <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
       <Svg width={size} height={size} viewBox="0 0 100 100" style={StyleSheet.absoluteFill}>
-        <Defs><LinearGradient id={id} x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor={tint} /><Stop offset="1" stopColor={label === 'Calories' ? referencePalette.tone25 : tint} /></LinearGradient></Defs>
+        <Defs><LinearGradient id={id} x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor={tint} /><Stop offset="1" stopColor={label === 'Calories' ? color.referenceLight0 : label === 'Protein' ? color.referenceLight1 : label === 'Fat' ? color.referenceLight2 : tint} /></LinearGradient></Defs>
         <Circle cx="50" cy="50" r={r} fill="none" stroke={referencePalette.tone5} strokeWidth="7" />
         {fraction !== null && fraction > 0 ? <Circle cx="50" cy="50" r={r} fill="none" stroke={`url(#${id})`} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${length * fraction} ${length}`} rotation="-90" origin="50,50" /> : null}
       </Svg>
@@ -60,8 +60,28 @@ export function PrismaticGlow({ size = 190 }: { size?: number }) {
       <LinearGradient id={`${id}r`} x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor={referencePalette.tone7} /><Stop offset="0.35" stopColor={referencePalette.tone18} /><Stop offset="0.7" stopColor={referencePalette.tone23} /><Stop offset="1" stopColor={referencePalette.tone9} /></LinearGradient>
     </Defs>
     <Circle cx="100" cy="100" r="100" fill={`url(#${id}g)`} />
-    <Circle cx="100" cy="100" r="57" fill={referencePalette.tone11} fillOpacity=".18" stroke={`url(#${id}r)`} strokeWidth="12" strokeOpacity=".12" />
-    <Circle cx="100" cy="100" r="54" fill="none" stroke={`url(#${id}r)`} strokeWidth="5" strokeOpacity=".4" />
-    <Circle cx="100" cy="100" r="51" fill="none" stroke={`url(#${id}r)`} strokeWidth="2" />
+    <Circle cx="100" cy="100" r="57" fill={referencePalette.tone11} fillOpacity=".18" stroke={`url(#${id}r)`} strokeWidth="28" strokeOpacity=".13" />
+    <Circle cx="100" cy="100" r="54" fill="none" stroke={`url(#${id}r)`} strokeWidth="10" strokeOpacity=".4" />
+    <Circle cx="100" cy="100" r="51" fill="none" stroke={`url(#${id}r)`} strokeWidth="3" /><Circle cx="100" cy="100" r="50" fill="none" stroke={color.referenceLight3} strokeWidth="1" strokeOpacity=".88" />
+  </Svg>;
+}
+
+/** Screen-space illumination, independent of layout and all touch targets. */
+export function KitchenAtmosphere() {
+  const id = useId().replace(/:/g, '');
+  return <Svg pointerEvents="none" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 800 1200" style={StyleSheet.absoluteFill}>
+    <Defs>
+      <LinearGradient id={`${id}base`} x1="0" y1="0" x2=".65" y2="1"><Stop offset="0" stopColor={color.referenceLight4}/><Stop offset=".43" stopColor={color.referenceLight5}/><Stop offset="1" stopColor={color.referenceLight6}/></LinearGradient>
+      <RadialGradient id={`${id}cyan`} cx=".35" cy=".14" rx=".6" ry=".42"><Stop offset="0" stopColor={color.referenceLight7} stopOpacity=".14"/><Stop offset="1" stopColor={color.referenceLight7} stopOpacity="0"/></RadialGradient>
+      <RadialGradient id={`${id}violet`} cx=".83" cy="0" rx=".65" ry=".4"><Stop offset="0" stopColor={color.referenceLight8} stopOpacity=".2"/><Stop offset="1" stopColor={color.referenceLight8} stopOpacity="0"/></RadialGradient>
+    </Defs>
+    <Rect width="800" height="1200" fill={`url(#${id}base)`}/><Rect width="800" height="1200" fill={`url(#${id}cyan)`}/><Rect width="800" height="1200" fill={`url(#${id}violet)`}/>
+  </Svg>;
+}
+export function GlassSheen({selected=false}:{selected?:boolean}) {
+  const id=useId().replace(/:/g,'');
+  return <Svg pointerEvents="none" width="100%" height="100%" preserveAspectRatio="none" style={StyleSheet.absoluteFill}>
+    <Defs><LinearGradient id={id} x1="0" y1="0" x2=".6" y2="1"><Stop offset="0" stopColor={color.referenceLight9} stopOpacity={selected?'.2':'.09'}/><Stop offset=".35" stopColor={color.referenceLight10} stopOpacity=".04"/><Stop offset="1" stopColor={color.referenceLight11} stopOpacity=".2"/></LinearGradient></Defs>
+    <Rect width="100%" height="100%" rx="22" fill={`url(#${id})`}/>
   </Svg>;
 }

@@ -13,7 +13,7 @@ import { ScaleWeightDisplay } from './ScaleWeightDisplay.js';
 import {
   FoodCard, MacroRing, MacrosOrb, MicButton, type OrbState,
 } from './MacrosOrb.js';
-import { Icon, IconButton, Ring } from './ReferenceKit.js';
+import { Icon, IconButton, Ring, KitchenAtmosphere } from './ReferenceKit.js';
 import { DashboardScreen, GoalSheet } from './DashboardScreen.js';
 import { FoodOptionCard } from './FoodOptionCard.js';
 import {
@@ -117,18 +117,17 @@ export function HomeScreen(
     : guidance.phase === 'thinking' ? 'thinking' : actions.isSpeaking === true ? 'speaking' : 'idle';
   const offered = [...guidance.candidates, ...guidance.alternatives].filter((c,i,all) => all.findIndex(other => other.productVersionId === c.productVersionId) === i).slice(0,3);
   return (
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 32, paddingTop: 48, alignItems: 'center', maxWidth: 760, width: '100%', alignSelf: 'center' }}>
-    <MacrosOrb state={orbState} size={124} accessibilityLabel="Ask Macros what to eat" onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} disabled={!vm.offline.canLog || vm.voice === 'logging'} level={actions.micLevel ?? 0} wakePulse={actions.wakePulse ?? 0} />
-    <Text accessibilityRole="header" style={{ color: color.textPrimary, fontSize: 42, fontStyle: 'italic', fontWeight: '700', marginTop: 32 }}>Hey! Macros</Text>
-    <Text style={{ color: color.textSecondary, fontSize: 23, textAlign: 'center', marginTop: 10, lineHeight: 31 }}>{orbState === 'listening' ? 'Listening…' : orbState === 'thinking' ? 'Thinking…' : 'What are you eating today?'}</Text>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1, justifyContent: 'space-evenly', padding: 32, paddingTop: 28, alignItems: 'center', maxWidth: 760, width: '100%', alignSelf: 'center' }}>
+    <MacrosOrb state={orbState} size={188} accessibilityLabel="Ask Macros what to eat" onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} disabled={!vm.offline.canLog || vm.voice === 'logging'} level={actions.micLevel ?? 0} wakePulse={actions.wakePulse ?? 0} />
+    <Text accessibilityRole="header" style={{ color: color.textPrimary, fontSize: 48, fontStyle: 'italic', fontWeight: '700', marginTop: 24 }}>Hey! Macros</Text>
+    <Text style={{ color: color.textSecondary, fontSize: 28, fontStyle: 'italic', textAlign: 'center', marginTop: 10, lineHeight: 36 }}>{orbState === 'listening' ? 'Listening…' : orbState === 'thinking' ? 'Thinking…' : 'What are you eating today?'}</Text>
     <View style={{ marginVertical: 24 }}><MicButton active={orbState === 'listening'} onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} accessibilityLabel="Speak to Macros" /></View>
     {actions.voiceFeedback ? <Text accessibilityLiveRegion="polite" style={{ color: color.textSecondary, fontSize: 16, textAlign: 'center', marginBottom: 16 }}>{actions.voiceFeedback}</Text> : null}
     <Text style={{ color: color.textSecondary, fontSize: 17 }}>{vm.scale.displayWeight === null ? 'Select a food, then weigh your portion' : `Current weight: ${vm.scale.displayWeight}`}</Text>
     {offered.length > 0 ? <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'center', marginTop: 28, marginBottom: 20 }}>{offered.map(c => <FoodCard key={c.productVersionId} name={c.displayName} selected={vm.selectedFood !== null && vm.selectedFood.productVersionId === c.productVersionId} onPress={() => { if (guidance.envelopeId !== null) actions.onChooseGuidanceCandidate(c.productVersionId, guidance.envelopeId); }} accessibilityLabel={`Choose ${c.displayName}`} />)}</View> : <Pressable accessibilityRole="button" accessibilityLabel="Search for a food" onPress={actions.onAddFood} style={({ pressed }) => ({ width: '100%', marginTop: 30, borderWidth: 1, borderColor: color.borderStrong, borderRadius: 24, padding: 30, backgroundColor: pressed ? color.surfaceActive : color.surface, alignItems: 'center' })}><Icon name="search" size={32} tint={color.macroProtein} /><Text style={{ color: color.textPrimary, fontSize: 23, fontWeight: '600', marginTop: 14 }}>Find your food</Text><Text style={{ color: color.textMuted, fontSize: 16, marginTop: 8 }}>Search the catalog or ask Macros for an idea</Text></Pressable>}
     {guidance.text.length > 0 ? <View accessibilityLiveRegion="polite" style={{ marginTop: 18, backgroundColor: color.surface, padding: 18, borderRadius: 22, width: '100%' }}><Text style={{ color: color.textSecondary, fontSize: 18, lineHeight: 26, textAlign: 'center' }}>{guidance.text}</Text></View> : null}
     <View style={{ flexDirection: 'row', marginTop: 24, gap: 12 }}><Pressable accessibilityRole="button" accessibilityLabel="Add food" onPress={actions.onAddFood} style={{ padding: 16, borderRadius: 26, backgroundColor: color.surfaceMuted, flexDirection: 'row', gap: 10, alignItems: 'center' }}><Icon name="plus" size={20} /><Text style={{ color: color.textPrimary, fontSize: 17 }}>Add food</Text></Pressable><Pressable accessibilityRole="button" accessibilityLabel="Suggest a food" disabled={guidance.phase === 'thinking'} onPress={actions.onRequestGuidance} style={{ padding: 16, borderRadius: 26, backgroundColor: color.surfaceMuted, flexDirection: 'row', gap: 10, alignItems: 'center', opacity: guidance.phase === 'thinking' ? .5 : 1 }}><Icon name="leaf" size={20} /><Text style={{ color: color.textPrimary, fontSize: 17 }}>Suggest a food</Text></Pressable></View>
-    {actions.onConversation ? <View style={{ width: '100%', marginTop: 24 }}><PrimaryAction accessibilityLabel="Toggle kitchen voice conversation" label={actions.conversationActive ? 'End kitchen conversation' : 'Start kitchen conversation'} onPress={actions.onConversation} /><Text style={{ color: color.textMuted, textAlign: 'center', marginTop: 10 }}>AI voice • speak naturally and interrupt anytime • microphone on while connected</Text></View> : null}
-    {vm.energy !== null ? <EnergyBalanceHero energy={vm.energy} /> : null}
+    {vm.energy !== null ? <Text style={{color:color.textMuted,fontSize:15,textAlign:'center',marginTop:20}}>{vm.energy.semantic}</Text> : null}
     <MacroFooter vm={vm} />
   </ScrollView>
   );
@@ -273,7 +272,7 @@ export function WeighingScreen(
         </Text>
       )}
 
-      <MacrosOrb state={actions.isListening ? 'listening' : 'idle'} size={100} accessibilityLabel="Speak while weighing food" onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} level={actions.micLevel ?? 0} />
+      <MacrosOrb state={actions.conversationActive ? actions.conversationPhase === 'speaking' ? 'speaking' : actions.conversationPhase === 'thinking' || actions.conversationPhase === 'connecting' ? 'thinking' : 'listening' : actions.isListening ? 'listening' : 'idle'} size={100} accessibilityLabel="Speak while weighing food" onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} level={actions.micLevel ?? 0} />
       <View style={{ marginTop: 28 }}><MicButton active={actions.conversationActive === true || actions.isListening === true} onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} accessibilityLabel="Speak to Macros while weighing" /></View>
       <Text accessibilityLiveRegion="polite" style={{ color: color.textPrimary, fontSize: 26, fontWeight: '600', marginTop: 22 }}>
         {weight === null ? 'Enter your portion weight' : `Current weight: ${weight}`}
@@ -496,6 +495,7 @@ export function TabletShell(
 
   return (
     <View style={{ flex: 1, backgroundColor: color.canvas }}>
+      <KitchenAtmosphere />
       {developmentNotice !== null ? <DevelopmentBanner notice={developmentNotice} /> : null}
 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12 }}>
@@ -503,7 +503,7 @@ export function TabletShell(
         <Text style={{ color: color.textPrimary, fontSize: 24, fontWeight: '700', fontStyle: 'italic' }}>Hey! Macros</Text>
         <View style={{ flexDirection: 'row' }}><IconButton name="mic" label={actions.conversationActive ? "End kitchen conversation" : "Start kitchen conversation"} active={actions.conversationActive === true || actions.isListening === true} onPress={actions.onConversation ?? actions.onOrbPress ?? actions.onRequestGuidance} /><IconButton name="search" label="Search foods" onPress={actions.onAddFood} /><IconButton name="menu" label="Open app menu" onPress={() => { Alert.alert('Macros', 'Choose a screen', [{ text: 'Home', onPress: () => { actions.onCancel(); setPage('home'); } }, { text: 'Dashboard', onPress: () => { actions.onCancel(); setPage('dashboard'); } }, { text: 'Cancel', style: 'cancel' }]); }} /></View>
       </View>
-      {actions.onConversation ? <View style={{ paddingHorizontal: 20, paddingBottom: 12 }}><PrimaryAction accessibilityLabel={actions.conversationActive ? 'End conversation and turn microphone off' : 'Start continuous kitchen voice'} label={actions.conversationActive ? 'End conversation' : 'Talk to Macros'} onPress={actions.onConversation} /></View> : null}
+      {actions.onConversation && actions.conversationActive ? <Pressable accessibilityRole="button" accessibilityLabel="End conversation and turn microphone off" onPress={actions.onConversation} style={{alignSelf:'center',borderRadius:24,borderWidth:1,borderColor:color.border,paddingHorizontal:24,paddingVertical:12,marginBottom:8,backgroundColor:color.surface}}><Text style={{color:color.textPrimary}}>End conversation</Text></Pressable> : null}
       <Text accessibilityLiveRegion="polite" style={{ color: color.textMuted, textAlign: 'center', paddingHorizontal: 24, paddingBottom: 10, fontSize: 14 }}>{actions.voiceFeedback ?? (actions.isListening ? 'Listening… speak your command' : vm.screen === 'home' || vm.screen === 'food_search' ? 'Tap the microphone: “Search for tofu” or “What should I eat?”' : vm.screen === 'food_options' ? 'Tap the microphone: “Option one”, “Option two”, or “Cancel”' : vm.screen === 'weighing' ? 'Tap the microphone: “94.5 grams” or “Use scale weight”' : vm.screen === 'review' ? 'Check your portion, then tap the microphone and say “Confirm”' : 'Food logged')}</Text>
       {vm.screen === 'home' ? <View style={{ flexDirection: 'row', alignSelf: 'center', backgroundColor: color.surface, borderRadius: 30, padding: 5, marginBottom: 10 }}>
         {(['home', 'dashboard'] as const).map(tab => <Pressable key={tab} accessibilityRole="tab" accessibilityState={{ selected: page === tab }} accessibilityLabel={tab === 'home' ? 'Home tab' : 'Dashboard tab'} onPress={() => setPage(tab)} style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingHorizontal: 22, paddingVertical: 14, borderRadius: 26, backgroundColor: page === tab ? color.surfaceActive : 'transparent' }}><Icon name={tab} size={18} tint={page === tab ? color.macroProtein : color.textMuted} /><Text style={{ color: page === tab ? color.textPrimary : color.textMuted, fontSize: 16 }}>{tab === 'home' ? 'Home' : 'Dashboard'}</Text></Pressable>)}

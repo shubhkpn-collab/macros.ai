@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, Easing, Pressable, Text, View } from 'react-native';
 import { referencePalette, color, space, type } from '@macros/tablet-view-model';
-import { FoodArt, Icon, PrismaticGlow } from './ReferenceKit.js';
+import { FoodArt, Icon, PrismaticGlow, GlassSheen } from './ReferenceKit.js';
 import { SEGMENT_COUNT, segmentAngle, segmentHeights } from '@macros/tablet-voice';
 
 /**
@@ -123,7 +123,7 @@ export function MacrosOrb({
 
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      {state === 'idle' ? <View pointerEvents="none" style={{ position: 'absolute' }}><PrismaticGlow size={diameter * 1.7} /></View> : null}
+      <View pointerEvents="none" style={{ position: 'absolute' }}><PrismaticGlow size={diameter * 2.15} /></View>
       {haloes.map((halo) => (
         <Animated.View
           key={halo.tint}
@@ -131,11 +131,11 @@ export function MacrosOrb({
           style={{
             position: 'absolute',
             width: halo.size, height: halo.size, borderRadius: halo.size / 2,
-            borderWidth: 2, borderColor: halo.tint,
+            borderWidth: 1, borderColor: halo.tint,
             // The wake beat brightens the existing haloes rather than adding a
             // new element, so the acknowledgement stays part of the same orb.
             opacity: Animated.multiply(
-              Animated.add(glow, Animated.multiply(wake, 0.35)), halo.a),
+              Animated.add(glow, Animated.multiply(wake, 0.35)), state === 'idle' ? halo.a * .18 : halo.a),
             transform: [{ scale: breathe }],
           }}
         />
@@ -253,33 +253,34 @@ export function FoodCard({
       accessibilityLabel={accessibilityLabel}
       accessibilityState={{ selected }}
       style={{
-        width: '30%', maxWidth: 210, minHeight: 202, borderRadius: 22,
+        width: '30%', maxWidth: 210, minHeight: 246, borderRadius: 22,
         backgroundColor: color.surface,
         // The pick is ringed in white, as in the reference; the others recede.
-        borderWidth: selected ? 2 : 1,
+        borderWidth: selected ? 3 : 1,
         borderColor: selected ? color.textPrimary : color.borderStrong,
-        opacity: selected ? 1 : 0.72,
+        opacity: selected ? 1 : 0.86,
         marginHorizontal: 4, paddingBottom: selected ? 14 : 0,
-        shadowColor: selected ? referencePalette.tone21 : referencePalette.tone0, shadowOpacity: selected ? .65 : 0, shadowRadius: 12, shadowOffset: { width: 0, height: 0 }, elevation: selected ? 8 : 0,
+        shadowColor: selected ? referencePalette.tone21 : referencePalette.tone0, shadowOpacity: selected ? .65 : 0, shadowRadius: 20, shadowOffset: { width: 0, height: 0 }, elevation: selected ? 8 : 0,
       }}
     >
+      <GlassSheen selected={selected} />
       {/* Image panel. Present even with no photograph, so real product imagery
           drops in later without a second layout pass — and no external URL is
           invented in the meantime. */}
       <View
         style={{
-          height: 106, margin: space.sm, borderRadius: 14,
-          backgroundColor: color.surfaceMuted,
+          height: 138, margin: space.sm, borderRadius: 14,
+          backgroundColor: 'transparent',
           alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <FoodArt name={name} size={100} />
+        <FoodArt name={name} size={128} />
       </View>
 
       <View style={{ paddingHorizontal: space.md, paddingBottom: space.md }}>
         <Text
           numberOfLines={2}
-          style={{ color: color.textPrimary, fontSize: 17, fontWeight: '500', textAlign: 'center' }}
+          style={{ color: color.textPrimary, fontSize: 20, fontWeight: '500', fontStyle: 'italic', textAlign: 'center' }}
         >
           {name}
         </Text>
@@ -365,28 +366,15 @@ export function MicButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       style={{
-        width: 76, height: 76, borderRadius: 38,
+        width: 96, height: 96, borderRadius: 48,
         backgroundColor: color.surfaceMuted,
         borderWidth: 1,
-        borderColor: active ? color.orbSpectrumA : color.textMuted,
+        borderColor: active ? color.orbSpectrumA : color.referenceLight12,
+        shadowColor: color.orbSpectrumA, shadowOpacity: .35, shadowRadius: 18, shadowOffset: {width:0,height:0}, elevation: 4,
         alignItems: 'center', justifyContent: 'center',
       }}
     >
-      {/* Drawn from primitives rather than shipping an icon font for one glyph. */}
-      <View
-        style={{
-          width: 16, height: 26, borderRadius: 8,
-          backgroundColor: active ? color.orbSpectrumA : color.textSecondary,
-        }}
-      />
-      <View
-        style={{
-          width: 25, height: 10, borderBottomLeftRadius: 9,
-          borderBottomRightRadius: 9, borderWidth: 1.5, borderTopWidth: 0,
-          borderColor: active ? color.orbSpectrumA : color.textSecondary,
-          marginTop: 2,
-        }}
-      />
+      <GlassSheen selected={active} /><Icon name="mic" size={44} tint={active ? color.orbSpectrumA : color.textPrimary} />
     </Pressable>
   );
 }

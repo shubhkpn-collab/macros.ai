@@ -183,7 +183,8 @@ describe('DEMO — voice and premium UI are actually wired', () => {
     assert.match(home, /<FoodCard/);
     assert.match(home, /<MacroFooter/);
     // The stacked dashboard panels are gone.
-    assert.equal(home.includes('EnergyBalanceHero'), true);
+    assert.equal(home.includes('EnergyBalanceHero'), false);
+    assert.match(home, /vm.energy.semantic/);
     assert.equal(home.includes('Macros today'), false);
     assert.equal(home.includes('Logged today'), false);
   });
@@ -435,12 +436,12 @@ describe('REFERENCE — Home follows the supplied frames', () => {
       .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   };
 
-  test('the orb sits ABOVE the greeting, compact', () => {
+  test('the reference orb sits ABOVE the greeting with a larger luminous presence', () => {
     const code = home();
     // The frames place the ring at the top with the title beneath it; the orb
     // is the signature here, the food cards are what the eye should land on.
     assert.ok(code.indexOf('<MacrosOrb') < code.indexOf('Hey! Macros'));
-    assert.match(code, /size=\{124\}/);
+    assert.match(code, /size=\{188\}/);
   });
 
   test('the greeting, question, microphone and weight line are in order', () => {
@@ -474,7 +475,7 @@ describe('REFERENCE — Home follows the supplied frames', () => {
     assert.match(code, /selected=\{vm\.selectedFood !== null && vm\.selectedFood\.productVersionId === c\.productVersionId\}/);
     const orb = read('apps', 'tablet', 'src', 'components', 'MacrosOrb.tsx');
     assert.match(orb, /borderColor: selected \? color\.textPrimary/);
-    assert.match(orb, /opacity: selected \? 1 : 0\.72/);
+    assert.match(orb, /opacity: selected \? 1 : 0\.86/);
   });
 
   test('the weight line appears only when the scale has one', () => {
