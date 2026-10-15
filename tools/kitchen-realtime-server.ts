@@ -9,7 +9,17 @@ function setting(name: string): string {
   return settings.split('\n').find(line => line.startsWith(`${name}=`))?.slice(name.length + 1).trim() ?? '';
 }
 const key = setting('OPENAI_API_KEY');
-const provider = createKitchenRealtimeProvider(key, setting('OPENAI_REALTIME_MODEL') || 'gpt-realtime-2.1');
+const diagnosticFetch: typeof fetch = async (input, init) => {
+  const response = await fetch(input, init);
+  if (!response.ok) {
+    // Only bounded provider codes, never credentials, SDP, user audio or raw messages.
+    const body = await response.clone().json().catch(() => null) as {error?:{code?:unknown;param?:unknown}} | null;
+    const safe = (value: unknown) => typeof value === 'string' && /^[a-zA-Z0-9_.-]{1,80}$/.test(value) ? value : 'unspecified';
+    console.error(`Voice provider rejected session: HTTP ${response.status}, code=${safe(body?.error?.code)}, parameter=${safe(body?.error?.param)}`);
+  }
+  return response;
+};
+const provider = createKitchenRealtimeProvider(key, setting('OPENAI_REALTIME_MODEL') || 'gpt-realtime-2.1', diagnosticFetch);
 const token = randomBytes(32).toString('hex');
 // Scoped preview token, not an OpenAI key. Ignored file, owner-only permissions.
 writeFileSync('.env.realtime.connection', token, { mode: 0o600 });
