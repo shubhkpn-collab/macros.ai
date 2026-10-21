@@ -1,86 +1,18 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
-import {
-  color, radius, space, touch, type, type FoodOptionView,
-} from '@macros/tablet-view-model';
+import {Pressable,Text,View} from 'react-native';
+import {color,space,type FoodOptionView} from '@macros/tablet-view-model';
+import {FoodArt,GlassSheen} from './ReferenceKit.js';
 
-/**
- * One candidate food.
- *
- * `optionLabel` comes straight from orchestration, so the "B" a person says and
- * the "B" they see are the same B by construction. Preparation state is given
- * real prominence: raw and cooked chicken differ by roughly a third in energy,
- * and quietly picking the wrong one is the single most damaging mistake this
- * screen could make.
- */
-export function FoodOptionCard(
-  { option, onSelect }: { option: FoodOptionView; onSelect: (id: string) => void },
-): React.JSX.Element {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={
-        `Option ${option.optionLabel}. ${option.displayName}. `
-        + `${option.brand !== null ? `${option.brand}. ` : ''}${option.preparationState}`
-      }
-      onPress={() => onSelect(option.productVersionId)}
-      style={({ pressed }) => ({
-        minHeight: touch.cardMinHeight,
-        borderRadius: radius.lg,
-        backgroundColor: pressed ? color.surfaceActive : color.surface,
-        borderWidth: 1,
-        borderColor: pressed ? color.accent : color.border,
-        paddingVertical: space.lg,
-        paddingHorizontal: space.lg,
-        marginBottom: space.md,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: space.lg,
-      })}
-    >
-      <View style={{
-        width: touch.minTarget, height: touch.minTarget, borderRadius: radius.md,
-        backgroundColor: color.surfaceMuted, borderWidth: 1, borderColor: color.border,
-        alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Text style={{
-          color: color.accent, fontSize: type.metric.size, fontWeight: '700',
-        }}>
-          {option.optionLabel}
-        </Text>
-      </View>
-
-      <View style={{ flex: 1 }}>
-        <Text
-          numberOfLines={2}
-          style={{ color: color.textPrimary, fontSize: type.metric.size, fontWeight: '600' }}
-        >
-          {option.displayName}
-        </Text>
-
-        {option.brand !== null ? (
-          <Text style={{ color: color.textSecondary, fontSize: type.body.size, marginTop: space.xxs }}>
-            {option.brand}
-          </Text>
-        ) : null}
-
-        <View style={{
-          alignSelf: 'flex-start', marginTop: space.sm,
-          paddingHorizontal: space.md, paddingVertical: space.xxs,
-          borderRadius: radius.pill,
-          backgroundColor: option.preparationMatters ? 'transparent' : color.surfaceMuted,
-          borderWidth: 1,
-          borderColor: option.preparationMatters ? color.warning : color.border,
-        }}>
-          <Text style={{
-            color: option.preparationMatters ? color.warning : color.textSecondary,
-            fontSize: type.caption.size,
-          }}>
-            {option.preparationState}
-            {option.preparationMatters ? ' · check preparation' : ''}
-          </Text>
-        </View>
-      </View>
-    </Pressable>
-  );
+/** The exact option label comes from search orchestration, shared with spoken selection. */
+export function FoodOptionCard({option,onSelect}:{option:FoodOptionView;onSelect:(id:string)=>void}):React.JSX.Element {
+  return <Pressable accessibilityRole="button" accessibilityLabel={`Option ${option.optionLabel}. ${option.displayName}. ${option.brand!==null?`${option.brand}. `:''}${option.preparationState}`}
+    onPress={()=>onSelect(option.productVersionId)} style={({pressed})=>({width:'30%',minWidth:168,maxWidth:244,minHeight:300,borderRadius:22,borderWidth:1,borderColor:pressed?color.textPrimary:color.borderStrong,backgroundColor:pressed?color.surfaceActive:color.surface,margin:6,padding:space.md,alignItems:'center'})}>
+    <GlassSheen selected={false}/>
+    <View style={{alignSelf:'flex-start',borderRadius:18,backgroundColor:color.surfaceMuted,paddingHorizontal:14,paddingVertical:8}}><Text style={{color:color.macroProtein,fontSize:20,fontWeight:'700'}}>Option {option.optionLabel}</Text></View>
+    <View style={{marginTop:12,marginBottom:8}}><FoodArt name={option.displayName} size={120}/></View>
+    <Text style={{color:color.textPrimary,fontSize:22,fontStyle:'italic',fontWeight:'600',textAlign:'center'}}>{option.displayName}</Text>
+    {option.brand!==null?<Text style={{color:color.textSecondary,fontSize:16,textAlign:'center',marginTop:6}}>{option.brand}</Text>:null}
+    <View style={{borderRadius:18,borderWidth:1,borderColor:option.preparationMatters?color.warning:color.border,paddingHorizontal:12,paddingVertical:7,marginTop:12}}><Text style={{color:option.preparationMatters?color.warning:color.textSecondary,fontSize:15,textAlign:'center'}}>{option.preparationState}{option.preparationMatters?' · check preparation':''}</Text></View>
+    <Text style={{color:color.textMuted,fontSize:12,marginTop:10}}>Illustration · say option {option.optionLabel}</Text>
+  </Pressable>;
 }

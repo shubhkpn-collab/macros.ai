@@ -55,10 +55,24 @@ for(const [query,id] of retrievalCases) test(`expanded retrieval: ${query}`,()=>
 });
 test('all public knowledge has primary-source provenance and no clinical approval claim',async()=>{
  const {NUTRITION_CORPUS}=await import('../packages/tablet-voice/src/nutrition-corpus.js');
- assert.equal(NUTRITION_CORPUS.length,24);
- assert.equal(new Set(NUTRITION_CORPUS.map(p=>p.id)).size,24);
+ assert.equal(NUTRITION_CORPUS.length,34);
+ assert.equal(new Set(NUTRITION_CORPUS.map(p=>p.id)).size,34);
  for(const passage of NUTRITION_CORPUS) {
-  assert.match(passage.source,/^https:\/\/(www\.fda\.gov|www\.foodsafety\.gov|ods\.od\.nih\.gov|www\.cdc\.gov)\//);
-  assert.equal(passage.reviewStatus,'PUBLIC_SOURCE_SUMMARY');assert.ok(passage.publisher);assert.equal(passage.verifiedAt,'2026-10-14');
+  assert.match(passage.source,/^https:\/\/(www\.fda\.gov|www\.foodsafety\.gov|ods\.od\.nih\.gov|www\.cdc\.gov|www\.canada\.ca|fdc\.nal\.usda\.gov)\//);
+  assert.equal(passage.reviewStatus,'PUBLIC_SOURCE_SUMMARY');assert.ok(passage.publisher);assert.ok(['2026-10-14','2026-10-21'].includes(passage.verifiedAt??''));
  }
+});
+for(const [query,id] of [
+ ['What are major allergens including sesame?','allergy-major-v1'],
+ ['Where should I check ingredients for allergens?','allergy-label-v1'],
+ ['Does shared equipment cause allergen cross contact?','allergy-contact-v1'],
+ ['What are balanced plate proportions?','plate-proportions-v1'],
+ ['Are frozen canned and dried foods useful for variety?','plate-variety-v1'],
+ ['How do plate proportions work with mixed dishes in a bowl?','plate-mixed-v1'],
+ ['Are the pictured plate portion sizes a prescription?','plate-portion-v1'],
+ ['Are branded USDA database values laboratory measurements?','fdc-types-v1'],
+ ['What if a branded product label changed?','fdc-updates-v1'],
+ ['How do USDA descriptions distinguish raw and cooked food?','fdc-preparation-v1'],
+] as const)test(`new knowledge coverage: ${query}`,()=>{
+ assert.ok(retrieveKitchenKnowledge(query).passages.some(p=>p.id===id),id);
 });

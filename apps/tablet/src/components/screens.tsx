@@ -195,10 +195,11 @@ export function FoodOptionsScreen(
         color: color.textPrimary, fontSize: type.screenTitle.size,
         fontWeight: '600', paddingTop: space.lg, paddingBottom: space.lg,
       }}>
-        Which one?
+        Which one are you having?
       </Text>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <Text style={{color:color.textSecondary,fontSize:20,marginBottom:16}}>Say “select option A”, “option B”, or tap a card.</Text>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{flexDirection:'row',flexWrap:'wrap',justifyContent:'center',paddingBottom:24}}>
         {vm.options.map((o) => (
           <FoodOptionCard key={o.productVersionId} option={o} onSelect={actions.onSelectOption} />
         ))}

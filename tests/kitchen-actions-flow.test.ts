@@ -80,3 +80,20 @@ test('knowledge retrieval works during review without changing a pending food or
   assert.ok('error' in await h.execute('confirm_food_log'));
   assert.ok('error' in await h.execute('retrieve_nutrition_knowledge',{query:'food',userId:'other'}));
 });
+test('voice chooses the same displayed product card by letter without logging it',async()=>{
+ const h=await harness();await h.execute('search_food',{query:'chicken'});
+ const option=h.state().options[1];assert.ok(option);
+ h.actions.speechStarted('choice');h.actions.transcript('choice',`select option ${option.optionLabel}`);
+ await h.execute('select_food_option',{optionLabel:option.optionLabel});
+ assert.equal(h.state().selectedFood?.productVersionId,option.productVersionId);assert.equal(h.state().screen,'weighing');
+ assert.equal(h.controller.getState().dashboard!.intake.kcal,0);
+});
+test('voice card selection refuses invented letters, mismatched speech and changed offers',async()=>{
+ const h=await harness();await h.execute('search_food',{query:'chicken'});
+ h.actions.speechStarted('choice');h.actions.transcript('choice','select option A');
+ assert.ok('error' in await h.execute('select_food_option',{optionLabel:'B'}));
+ assert.ok('error' in await h.execute('select_food_option',{optionLabel:'Z'}));
+ await h.execute('search_food',{query:'tofu'});
+ assert.ok('error' in await h.execute('select_food_option',{optionLabel:'A'}));
+ assert.equal(h.state().selectedFood,null);
+});

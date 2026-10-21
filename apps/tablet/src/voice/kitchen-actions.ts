@@ -1,6 +1,6 @@
 import type { TabletViewModel } from '@macros/tablet-view-model';
 import type { GuidanceDeps, TabletAppController } from '@macros/tablet-app-core';
-import { explicitFoodConfirmation, spokenGrams, retrieveKitchenKnowledge } from '@macros/tablet-voice';
+import { explicitFoodConfirmation, spokenGrams, KitchenKnowledgeLibrary, spokenFoodOption } from '@macros/tablet-voice';
 
 export interface KitchenActionDeps {
   controller: Pick<TabletAppController, 'searchFood'|'selectProduct'|'enterManualWeight'|'requestStableWeight'|'confirmFoodLog'|'cancelFoodFlow'|'refreshDashboard'|'requestFoodGuidance'|'chooseGuidanceCandidate'>;
@@ -9,13 +9,16 @@ export interface KitchenActionDeps {
   guidance?: GuidanceDeps;
   now?: () => number;
 }
-interface AudioTurn { id: string; fingerprint: string | null; session: number; transcript: string | null; receivedAt: number; consumed: boolean }
+const optionFingerprint=(vm:TabletViewModel):string|null=>['food_options','food_search'].includes(vm.screen)&&vm.options.length>0 ? JSON.stringify([vm.sessionGeneration,vm.flowId,vm.searchQuery,vm.options]) : null;
+interface AudioTurn { options:string|null; id: string; fingerprint: string | null; session: number; transcript: string | null; receivedAt: number; consumed: boolean }
 export function reviewFingerprint(vm: TabletViewModel): string | null {
   return vm.screen === 'review' && vm.review !== null && vm.selectedFood !== null
     ? JSON.stringify([vm.sessionGeneration, vm.flowId, vm.selectedFood.productVersionId, vm.review]) : null;
 }
 /** All writes go through the existing controller. Model output is never log authorization. */
 export class KitchenActions {
+  private knowledge = new KitchenKnowledgeLibrary();
+  updateKnowledge(snapshot:unknown):boolean {return this.knowledge.accept(snapshot);}
   private turn: AudioTurn | null = null;
   private waiters = new Set<() => void>();
   private epoch = 0;
@@ -26,7 +29,7 @@ export class KitchenActions {
     this.epoch++;
     this.waiters.forEach(resolve => resolve()); this.waiters.clear();
     const vm = this.deps.state();
-    this.turn = {id, fingerprint:reviewFingerprint(vm), session:vm.sessionGeneration, transcript:null, receivedAt:this.now(), consumed:false};
+    this.turn = {id, options:optionFingerprint(vm), fingerprint:reviewFingerprint(vm), session:vm.sessionGeneration, transcript:null, receivedAt:this.now(), consumed:false};
   }
   transcript(id: string, text: string): void {
     if (this.turn?.id !== id || this.turn.transcript !== null || text.length > 2000) return;
@@ -59,7 +62,7 @@ export class KitchenActions {
       if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) return {error:'Invalid tool arguments'};
       args = parsed as Record<string,unknown>;
     } catch {return {error:'Invalid tool arguments'};}
-    const expected = (name === 'search_food' || name === 'retrieve_nutrition_knowledge') ? ['query'] : name === 'select_food' ? ['productVersionId'] : name === 'set_spoken_portion' ? ['grams'] : [];
+    const expected = (name === 'search_food' || name === 'retrieve_nutrition_knowledge') ? ['query'] : name === 'select_food_option' ? ['optionLabel'] : name === 'select_food' ? ['productVersionId'] : name === 'set_spoken_portion' ? ['grams'] : [];
     if (Object.keys(args).length !== expected.length || Object.keys(args).some(key => !expected.includes(key))) return {error:'Unexpected tool arguments'};
     const epoch = this.epoch;
     const vm = this.deps.state();
@@ -71,13 +74,23 @@ export class KitchenActions {
         case 'get_kitchen_state': return this.snapshot();
         case 'retrieve_nutrition_knowledge':
           if (typeof args.query !== 'string') return {error:'A knowledge question is required'};
-          return {...retrieveKitchenKnowledge(args.query)};
+          return {...this.knowledge.retrieve(args.query)};
         case 'search_food':
           if (typeof args.query !== 'string' || !args.query.trim() || args.query.length > 120) return {error:'Say a food name'};
           if (!['home','food_search','food_options','logged'].includes(vm.screen)) return {error:'Finish or cancel the current portion first'};
           if (vm.screen === 'logged') controller.cancelFoodFlow();
           await controller.searchFood(args.query.trim());
           break;
+        case 'select_food_option': {
+          if(typeof args.optionLabel!=='string'||!['A','B','C','D'].includes(args.optionLabel)||!['food_options','food_search'].includes(vm.screen))return {error:'Choose a currently displayed card'};
+          await this.waitForTranscript();
+          if(!current())return {error:'Audio turn changed'};
+          const options=optionFingerprint(this.deps.state());
+          if(!this.turn||!options||this.turn.options!==options||spokenFoodOption(this.turn.transcript??'')!==args.optionLabel||this.now()-this.turn.receivedAt>30_000)return {error:'Please say select option A, B, C or D for the current cards'};
+          const choice=this.deps.state().options.find(o=>o.optionLabel===args.optionLabel);
+          if(!choice)return {error:'That option is not displayed'};
+          await controller.selectProduct(choice.productVersionId);break;
+        }
         case 'select_food': {
           if (typeof args.productVersionId !== 'string') return {error:'Choose an offered food'};
           if (vm.screen === 'home' && vm.guidance.envelopeId !== null) {

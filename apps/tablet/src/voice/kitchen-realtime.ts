@@ -5,6 +5,8 @@ import { mediaDevices, RTCPeerConnection, RTCSessionDescription } from 'react-na
 import { KitchenSession, type KitchenPhase } from '@macros/tablet-voice';
 import type { KitchenActions } from './kitchen-actions.js';
 
+import {syncKitchenKnowledge} from './knowledge-cache.js';
+
 interface KitchenAudioNative {
   getKitchenToken(): Promise<string | null>;
   beginKitchenAudio(): Promise<void>;
@@ -70,6 +72,9 @@ export class KitchenConversation {
       if (typeof token !== 'string' || !/^[a-f0-9]{64}$/.test(token)) {
         fail('Connect this phone to the Mac voice backend over USB, then start again.');return;
       }
+      stage = 'knowledge sync';
+      await syncKitchenKnowledge(token,snapshot=>this.actions.updateKnowledge(snapshot),live);
+      if (!live()) return;
       stage = 'microphone permission';
       let permitted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
       if (!live()) return;

@@ -4,6 +4,8 @@ import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createKitchenRealtimeProvider, validOffer } from '../packages/voice-openai/src/realtime.js';
 
+import {MASTER_KNOWLEDGE} from '../packages/tablet-voice/src/knowledge-library.js';
+
 const settings = readFileSync('.env.realtime.local', 'utf8');
 function setting(name: string): string {
   return settings.split('\n').find(line => line.startsWith(`${name}=`))?.slice(name.length + 1).trim() ?? '';
@@ -35,6 +37,9 @@ const server = createServer(async (req, res) => {
   }
   if (req.method === 'GET' && req.url === '/health') {
     respond(200, { configured: key.length > 0, preview: true }); return;
+  }
+  if (req.method === 'GET' && req.url === '/knowledge/nutrition') {
+    respond(200, MASTER_KNOWLEDGE); return;
   }
   if (req.method !== 'POST' || req.url !== '/voice/conversation') {
     respond(404, { error: 'Not found' }); return;

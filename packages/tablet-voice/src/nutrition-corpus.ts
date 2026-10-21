@@ -449,5 +449,200 @@ export const NUTRITION_CORPUS: readonly KitchenKnowledgePassage[] = [
       "habit"
     ],
     "text": "Keeping water available, carrying a reusable bottle and choosing water with meals can help build a hydration routine. These are general habits rather than a medical fluid prescription."
+  },
+  {
+    "id": "allergy-major-v1",
+    "title": "Recognizing major food allergens",
+    "source": "https://www.fda.gov/food/buy-store-serve-safe-food/food-allergies-what-you-need-know",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "FDA",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "allergen",
+      "allergens",
+      "allergy",
+      "allergies",
+      "sesame",
+      "peanuts",
+      "wheat",
+      "dairy",
+      "soy",
+      "shellfish"
+    ],
+    "text": "US labeling recognizes milk, eggs, fish, crustacean shellfish, tree nuts, peanuts, wheat, soybeans and sesame as major allergens. Other foods can also cause allergies; the list is not exhaustive."
+  },
+  {
+    "id": "allergy-label-v1",
+    "title": "Checking ingredients for allergens",
+    "source": "https://www.fda.gov/food/buy-store-serve-safe-food/food-allergies-what-you-need-know",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "FDA",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "allergy",
+      "allergen",
+      "ingredients",
+      "contains",
+      "label",
+      "package",
+      "packaging"
+    ],
+    "text": "Check the current package ingredient list and allergen declaration. Major allergen sources must be identified under applicable US labeling rules. A generic catalog entry cannot certify a specific package as safe."
+  },
+  {
+    "id": "allergy-contact-v1",
+    "title": "Allergen cross-contact and uncertainty",
+    "source": "https://www.fda.gov/food/buy-store-serve-safe-food/food-allergies-what-you-need-know",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "FDA",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "allergen",
+      "allergy",
+      "cross",
+      "contact",
+      "may",
+      "contain",
+      "shared",
+      "equipment",
+      "safe"
+    ],
+    "text": "Unintended allergen contact can occur during preparation or manufacturing. Do not infer that a food is safe from its name or photo. Follow the person\u2019s allergy-management plan and clarify uncertain ingredients."
+  },
+  {
+    "id": "plate-proportions-v1",
+    "title": "A balanced meal plate",
+    "source": "https://www.canada.ca/en/health-canada/services/food-guide/eating-support/cooking/make-healthy-meals-plate.html",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "Health Canada",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "balanced",
+      "balance",
+      "plate",
+      "vegetables",
+      "fruit",
+      "grains",
+      "protein",
+      "meal"
+    ],
+    "text": "Health Canada presents a plate with half vegetables and fruit, one-quarter whole grains and one-quarter protein foods. These proportions are a general reference, not a prescribed personal calorie or macro target."
+  },
+  {
+    "id": "plate-variety-v1",
+    "title": "Flexible ingredients for meals",
+    "source": "https://www.canada.ca/en/health-canada/services/food-guide/eating-support/cooking/make-healthy-meals-plate.html",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "Health Canada",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "fresh",
+      "frozen",
+      "canned",
+      "dried",
+      "vegetables",
+      "fruit",
+      "variety",
+      "budget"
+    ],
+    "text": "Healthy food choices can include fresh, frozen, canned and dried foods. Choose variety and foods you enjoy; the guide\u2019s pictured foods are examples rather than the only permitted ingredients."
+  },
+  {
+    "id": "plate-mixed-v1",
+    "title": "Mixed dishes and bowl meals",
+    "source": "https://www.canada.ca/en/health-canada/services/food-guide/eating-support/cooking/make-healthy-meals-plate.html",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "Health Canada",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "mixed",
+      "dish",
+      "dishes",
+      "bowl",
+      "bowls",
+      "curry",
+      "stir",
+      "fry",
+      "soup",
+      "meal"
+    ],
+    "text": "Meal proportions can guide choices in bowls and mixed dishes as well as on plates. Consider the ingredients together rather than requiring each food group to occupy a separate compartment."
+  },
+  {
+    "id": "plate-portion-v1",
+    "title": "Plate pictures are not portion prescriptions",
+    "source": "https://www.canada.ca/en/health-canada/services/food-guide/eating-support/cooking/make-healthy-meals-plate.html",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "Health Canada",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "portion",
+      "portions",
+      "plate",
+      "picture",
+      "pictures",
+      "amount",
+      "grams",
+      "size"
+    ],
+    "text": "The size of foods pictured in Canada\u2019s guide is not a recommended quantity for one sitting. Use personal needs and the application\u2019s measured portion and target tools for actual amounts."
+  },
+  {
+    "id": "fdc-types-v1",
+    "title": "Different types of food composition evidence",
+    "source": "https://fdc.nal.usda.gov/faq/",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "USDA FoodData Central",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "usda",
+      "fdc",
+      "foundation",
+      "branded",
+      "database",
+      "data",
+      "nutrient",
+      "evidence",
+      "label"
+    ],
+    "text": "FoodData Central combines multiple data types. Branded-food values originate from product-label information, while other datasets serve different purposes. Do not treat every entry as an identical laboratory measurement."
+  },
+  {
+    "id": "fdc-updates-v1",
+    "title": "Changing branded product data",
+    "source": "https://fdc.nal.usda.gov/faq/",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "USDA FoodData Central",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "brand",
+      "branded",
+      "product",
+      "reformulation",
+      "changed",
+      "label",
+      "update",
+      "database"
+    ],
+    "text": "FoodData Central accommodates changes in branded foods. Product identity and the current package matter when comparing data. MACROS should use the selected catalog version rather than silently substituting another food."
+  },
+  {
+    "id": "fdc-preparation-v1",
+    "title": "Matching raw and cooked food descriptions",
+    "source": "https://fdc.nal.usda.gov/Foundation_Foods_Documentation/",
+    "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+    "publisher": "USDA FoodData Central",
+    "verifiedAt": "2026-10-21",
+    "keywords": [
+      "raw",
+      "cooked",
+      "preparation",
+      "usda",
+      "description",
+      "cooking",
+      "food",
+      "database"
+    ],
+    "text": "Foundation Foods descriptions include characteristics such as raw or cooked state. Match the description to the food being weighed. A related-looking entry is not evidence that its nutrient values apply to your portion."
   }
 ];
