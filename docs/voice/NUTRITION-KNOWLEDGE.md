@@ -1,6 +1,6 @@
 # Nutrition knowledge in continuous voice
 
-The continuous audio session now exposes `retrieve_nutrition_knowledge`. It retrieves up to three versioned, source-linked passages from a curated local corpus of 40 passages: six existing product-rule explanations and 34 public-source summaries. Coverage includes the energy budget, macro policy, activity quality, portions, confirmation, next-food workflow, labels, hydration, sports-protein questions, and food safety.
+The continuous audio session now exposes `retrieve_nutrition_knowledge`. It retrieves up to three versioned, source-linked passages from a curated local corpus of 45 passages: six existing product-rule explanations and 39 public-source summaries. Coverage includes the energy budget, macro policy, activity quality, portions, confirmation, next-food workflow, labels, hydration, sports-protein questions, and food safety.
 
 This is a small lexical retrieval implementation, not an embeddings service, a comprehensive clinical nutrition library, or a complete ingestion of historical chats. Its corpus contains authored implementation summaries and source-linked public guidance, not clinician-approved advice. Public passages carry PUBLIC_SOURCE_SUMMARY, a publisher and a verification date. Macro policy passages explicitly retain `PENDING_EXTERNAL_REVIEW`; implementation availability does not imply clinical approval.
 
@@ -49,3 +49,5 @@ Snapshots have a closed schema, bounded sizes, unique IDs, source-host allowlist
 Naming a food triggers the existing catalog search tool. The food-options screen displays the actual matches as labeled glass cards. `select_food_option` accepts A/B/C/D (or recognized spoken ordinals), checks the latest finalized audio transcript against the same current options, and selects the corresponding real product ID. A changed offer set or mismatched spoken letter is refused. Selecting a card never logs food; portion review and fresh explicit confirmation still apply.
 
 The cards currently display labeled illustrations. Real catalog product photographs are not populated, and the corpus is not a source of product images or nutrient facts. Touch selection works without the voice provider. The voice model must still choose the correct tool; actual audio recognition and orchestration need a funded live test.
+
+Revision 4 adds five label-literacy passages covering fiber, sodium, micronutrients, the general energy reference, and absent Daily Value percentages. Source: the FDA Nutrition Facts explainer, fetched October 21, 2026. These are explanatory summaries, not new personal targets.

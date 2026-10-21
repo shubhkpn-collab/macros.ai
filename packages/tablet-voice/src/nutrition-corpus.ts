@@ -645,4 +645,82 @@ export const NUTRITION_CORPUS: readonly KitchenKnowledgePassage[] = [
     ],
     "text": "Foundation Foods descriptions include characteristics such as raw or cooked state. Match the description to the food being weighed. A related-looking entry is not evidence that its nutrient values apply to your portion."
   }
+,
+{
+  "id": "label-fiber-v1",
+  "title": "Dietary fiber on labels",
+  "source": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+  "publisher": "FDA",
+  "verifiedAt": "2026-10-21",
+  "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+  "keywords": [
+    "fiber",
+    "fibre",
+    "dietary",
+    "digestion"
+  ],
+  "text": "FDA identifies dietary fiber as a nutrient to get more of. Compare serving amounts before comparing fiber values."
+},
+{
+  "id": "label-sodium-v1",
+  "title": "Sodium when comparing foods",
+  "source": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+  "publisher": "FDA",
+  "verifiedAt": "2026-10-21",
+  "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+  "keywords": [
+    "sodium",
+    "salt",
+    "salty",
+    "compare"
+  ],
+  "text": "FDA identifies sodium as a nutrient to limit. Compare sodium for equivalent portions; a larger portion changes the amount consumed."
+},
+{
+  "id": "label-micronutrients-v1",
+  "title": "Micronutrients beyond macros",
+  "source": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+  "publisher": "FDA",
+  "verifiedAt": "2026-10-21",
+  "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+  "keywords": [
+    "micronutrients",
+    "vitamin",
+    "calcium",
+    "iron",
+    "potassium"
+  ],
+  "text": "FDA highlights vitamin D, calcium, iron and potassium alongside fiber. Meeting calorie and macro totals alone does not describe every aspect of food quality."
+},
+{
+  "id": "label-reference-energy-v1",
+  "title": "The 2000 calorie label reference",
+  "source": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+  "publisher": "FDA",
+  "verifiedAt": "2026-10-21",
+  "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+  "keywords": [
+    "2000",
+    "reference",
+    "calorie",
+    "needs"
+  ],
+  "text": "The label uses 2,000 calories as a general reference. Individual energy needs vary with personal characteristics and activity; this reference is not a personal target."
+},
+{
+  "id": "label-dv-missing-v1",
+  "title": "Missing Daily Value percentages",
+  "source": "https://www.fda.gov/food/nutrition-facts-label/how-understand-and-use-nutrition-facts-label",
+  "publisher": "FDA",
+  "verifiedAt": "2026-10-21",
+  "reviewStatus": "PUBLIC_SOURCE_SUMMARY",
+  "keywords": [
+    "missing",
+    "percentage",
+    "trans",
+    "sugars",
+    "dv"
+  ],
+  "text": "Some nutrients, including total sugars and trans fat, have no percent Daily Value on the label. A missing percentage does not mean the food contains none of that nutrient."
+}
 ];

@@ -6,14 +6,14 @@ const clone=()=>JSON.parse(JSON.stringify(MASTER_KNOWLEDGE));
 test('public master passes validation and retains provenance on offline retrieval',()=>{
  assert.ok(validateKnowledgeSnapshot(MASTER_KNOWLEDGE));
  const library=new KitchenKnowledgeLibrary();const result=library.retrieve('What are the major allergens including sesame?');
- assert.ok(result.passages.some(p=>p.id==='allergy-major-v1'));assert.equal(result.revision,3);
+ assert.ok(result.passages.some(p=>p.id==='allergy-major-v1'));assert.equal(result.revision,4);
  assert.equal(library.retrieve('How does my calorie deficit budget work?').passages[0]?.id,'energy-budget-v1');
 });
 test('a newer snapshot persists in memory; corrupt or older snapshots cannot replace it',()=>{
- const library=new KitchenKnowledgeLibrary();const next=clone();next.revision=4;
- assert.equal(library.accept(next),true);assert.equal(library.current().revision,4);
- assert.equal(library.accept(MASTER_KNOWLEDGE),false);assert.equal(library.accept({...next,revision:4}),false);
- assert.equal(library.accept({...next,revision:5,passages:[]}),false);assert.equal(library.current().revision,4);
+ const library=new KitchenKnowledgeLibrary();const next=clone();next.revision=5;
+ assert.equal(library.accept(next),true);assert.equal(library.current().revision,5);
+ assert.equal(library.accept(MASTER_KNOWLEDGE),false);assert.equal(library.accept({...next,revision:5}),false);
+ assert.equal(library.accept({...next,revision:6,passages:[]}),false);assert.equal(library.current().revision,5);
  const exposed=library.current() as unknown as {passages:unknown[]};exposed.passages.length=0;
  assert.ok(library.current().passages.length>0);
 });

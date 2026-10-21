@@ -6,7 +6,7 @@ export interface KnowledgeSnapshot {
   readonly revision:number;
   readonly passages:readonly KitchenKnowledgePassage[];
 }
-export const MASTER_KNOWLEDGE:KnowledgeSnapshot={schemaVersion:1,revision:3,passages:NUTRITION_CORPUS};
+export const MASTER_KNOWLEDGE:KnowledgeSnapshot={schemaVersion:1,revision:4,passages:NUTRITION_CORPUS};
 const hosts=new Set(['www.fda.gov','www.foodsafety.gov','ods.od.nih.gov','www.cdc.gov','www.canada.ca','fdc.nal.usda.gov']);
 const record=(v:unknown):v is Record<string,unknown>=>v!==null && typeof v==='object' && !Array.isArray(v);
 const text=(v:unknown,max:number):v is string=>typeof v==='string' && v.trim().length>0 && v.length<=max;

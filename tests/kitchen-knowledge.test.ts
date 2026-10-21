@@ -55,8 +55,8 @@ for(const [query,id] of retrievalCases) test(`expanded retrieval: ${query}`,()=>
 });
 test('all public knowledge has primary-source provenance and no clinical approval claim',async()=>{
  const {NUTRITION_CORPUS}=await import('../packages/tablet-voice/src/nutrition-corpus.js');
- assert.equal(NUTRITION_CORPUS.length,34);
- assert.equal(new Set(NUTRITION_CORPUS.map(p=>p.id)).size,34);
+ assert.equal(NUTRITION_CORPUS.length,39);
+ assert.equal(new Set(NUTRITION_CORPUS.map(p=>p.id)).size,39);
  for(const passage of NUTRITION_CORPUS) {
   assert.match(passage.source,/^https:\/\/(www\.fda\.gov|www\.foodsafety\.gov|ods\.od\.nih\.gov|www\.cdc\.gov|www\.canada\.ca|fdc\.nal\.usda\.gov)\//);
   assert.equal(passage.reviewStatus,'PUBLIC_SOURCE_SUMMARY');assert.ok(passage.publisher);assert.ok(['2026-10-14','2026-10-21'].includes(passage.verifiedAt??''));
@@ -76,3 +76,9 @@ for(const [query,id] of [
 ] as const)test(`new knowledge coverage: ${query}`,()=>{
  assert.ok(retrieveKitchenKnowledge(query).passages.some(p=>p.id===id),id);
 });
+
+test("Why compare dietary fiber on labels?",()=>assert.ok(retrieveKitchenKnowledge("Why compare dietary fiber on labels?").passages.some(p=>p.id==="label-fiber-v1")));
+test("How should I compare sodium in equivalent portions?",()=>assert.ok(retrieveKitchenKnowledge("How should I compare sodium in equivalent portions?").passages.some(p=>p.id==="label-sodium-v1")));
+test("What micronutrients like calcium iron and potassium matter?",()=>assert.ok(retrieveKitchenKnowledge("What micronutrients like calcium iron and potassium matter?").passages.some(p=>p.id==="label-micronutrients-v1")));
+test("Is the 2000 calorie reference my personal target?",()=>assert.ok(retrieveKitchenKnowledge("Is the 2000 calorie reference my personal target?").passages.some(p=>p.id==="label-reference-energy-v1")));
+test("Why is the percentage missing for trans fat?",()=>assert.ok(retrieveKitchenKnowledge("Why is the percentage missing for trans fat?").passages.some(p=>p.id==="label-dv-missing-v1")));
