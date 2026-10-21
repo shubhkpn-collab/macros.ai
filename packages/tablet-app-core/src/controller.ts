@@ -440,7 +440,7 @@ export class TabletAppController {
     const searchGeneration = this.searchGeneration;
 
     const [catalog, recentProductVersionIds] = await Promise.all([
-      this.env.repositories.products.listSearchable(),
+      this.env.repositories.products.searchCandidates?.(query) ?? this.env.repositories.products.listSearchable(),
       this.env.repositories.foodLogs.listRecentProductVersionIds(this.state.subject.userId, 20),
     ]);
 

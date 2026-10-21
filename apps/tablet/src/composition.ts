@@ -1,3 +1,4 @@
+import type {GroceryImage} from '../../../packages/catalog-runtime/src/grocery-products.js';
 import type { TabletAppController } from '@macros/tablet-app-core';
 import type { OfflineCapabilities } from '@macros/domain-offline-sync';
 import type { SwitchState } from '@macros/domain-household';
@@ -58,6 +59,7 @@ export interface SwitchStateReader {
 
 export interface TabletComposition {
   readonly controller: TabletAppController;
+  foodImages?():Readonly<Record<string,GroceryImage>>;
   readonly coordinator: SwitchStateReader;
   readonly ports: TabletPorts;
   /** Capabilities derived by the offline domain — never inferred in the UI. */
@@ -79,12 +81,14 @@ export function renderModel(
   hasActiveSession: boolean,
 ): TabletViewModel {
   if (!hasActiveSession) return lockedViewModel();
-  return buildViewModel({
+  const model=buildViewModel({
     app: composition.controller.getState(),
     capabilities: composition.capabilities(),
     switchState: composition.coordinator.getState(),
     recent: composition.recentFoods(),
   });
+  const images=composition.foodImages?.()??{};
+  return {...model,options:model.options.map(option=>({...option,productImage:images[option.productVersionId]??null}))};
 }
 
 /**

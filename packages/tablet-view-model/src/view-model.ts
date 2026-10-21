@@ -65,6 +65,9 @@ export interface MacroView {
 }
 
 export interface FoodOptionView {
+  readonly servingLabel?:string|null;
+  readonly catalogSource?:string|null;
+  readonly productImage?:{readonly url:string;readonly sourceUrl:string;readonly attribution:string;readonly license:string}|null;
   /** MUST equal the orchestration label: spoken "Option B" selects this row. */
   readonly optionLabel: string;
   readonly productVersionId: string;
@@ -345,6 +348,8 @@ export function buildViewModel(input: ViewModelInput): TabletViewModel {
     brand: (r.productVersion as { brandName?: string | null }).brandName ?? null,
     preparationState: r.productVersion.preparationState,
     preparationMatters: r.preparationStateDisambiguates,
+    servingLabel: (r.productVersion as {labelFacts?:{servingLabel?:string}}).labelFacts?.servingLabel??null,
+    catalogSource: (r.productVersion as {source?:{kind?:string}}).source?.kind==='usda_branded'?'USDA FoodData Central':null,
   }));
 
   const preview = app.addFood.preview;

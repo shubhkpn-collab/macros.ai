@@ -1,3 +1,4 @@
+import {searchGroceries} from './grocery-search.js';
 /** Local USB preview only. Not a production authentication server. */
 import { createServer } from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
@@ -37,6 +38,12 @@ const server = createServer(async (req, res) => {
   }
   if (req.method === 'GET' && req.url === '/health') {
     respond(200, { configured: key.length > 0, preview: true }); return;
+  }
+  if (req.method === 'GET' && req.url?.startsWith('/grocery/search?')) {
+    const query=new URL(req.url,'http://localhost').searchParams.get('q')??'';
+    if(query.trim().length<2||query.length>100){respond(400,{error:'Enter a food name of 2 to 100 characters'});return;}
+    try{respond(200,{products:await searchGroceries(query,setting('USDA_API_KEY')),source:'USDA FoodData Central',inventoryVerified:false});}
+    catch{respond(503,{error:'Grocery search unavailable; cached foods still work'});}return;
   }
   if (req.method === 'GET' && req.url === '/knowledge/nutrition') {
     respond(200, MASTER_KNOWLEDGE); return;

@@ -1,3 +1,4 @@
+import {GroceryCatalog} from './grocery-catalog-host.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   TabletAppController, DevScaleAdapter, appSubjectFrom,
@@ -41,7 +42,7 @@ import { toFoodCardView, type FoodCardView } from '@macros/tablet-view-model';
 export const DEVELOPMENT_HOST_VERSION = 'development-tablet-host@1.0.0';
 
 const DEVELOPMENT_NOTICE =
-  'DEVELOPMENT BUILD — synthetic data, local storage, no real account';
+  'DEVELOPMENT BUILD — demo profile/scale; USDA grocery lookup; no real account';
 
 class SystemClock {
   now(): never { return new Date().toISOString() as never; }
@@ -77,11 +78,12 @@ export async function createDevelopmentHost(
   const { auth } = options;
   const repositories = {
     foodLogs: await LocalFoodLogRepository.open(AsyncStorage, 'macros.preview.food-logs.v1'),
-    products: new InMemoryProductVersionRepository(
-      DEV_PRODUCTS, DEV_CATALOG_HEADS),
+    products: new GroceryCatalog(new InMemoryProductVersionRepository(
+      DEV_PRODUCTS, DEV_CATALOG_HEADS)),
     profiles: new InMemoryUserProfileRepository(),
     goals: await LocalEnergyGoalRepository.open(AsyncStorage, 'macros.preview.goals.v1'),
   };
+  await repositories.products.open();
   // BOTH are required before refreshDashboard(): a profile alone yields
   // goal_missing and a blank Home.
   await repositories.profiles.append(DEV_PROFILE);
@@ -119,6 +121,7 @@ export async function createDevelopmentHost(
 
   const composition: TabletComposition = {
     controller,
+    foodImages:()=>repositories.products.images(),
     coordinator: { getState: () => activeSwitchState(DEV_USER_ID, 1) },
     ports,
     capabilities: () => deriveCapabilities({
@@ -131,7 +134,7 @@ export async function createDevelopmentHost(
       if (state.dashboard === null) return [];
       return repositories.foodLogs.snapshot(state.subject.userId, state.dashboard.localDate)
         .slice().reverse().map(item => ({
-          displayName: DEV_PRODUCTS.find(p => p.productVersionId === item.productVersionId)?.displayName ?? 'Food',
+          displayName: repositories.products.name(item.productVersionId)??DEV_PRODUCTS.find(p => p.productVersionId === item.productVersionId)?.displayName ?? 'Logged food',
           kcal: item.nutritionSnapshot.totals.kcal, grams: item.weightCapture.grams,
         }));
     },

@@ -8,13 +8,13 @@ import {deriveCapabilities} from '@macros/domain-offline-sync';
 import {activeSwitchState} from '@macros/domain-household';
 import {instant} from '@macros/contracts';
 import {PROFILE_MALE_35,SYNTHETIC_PRODUCTS,SYNTHETIC_CATALOG_HEADS,SYNTHETIC_STABILITY_POLICY,TEST_TEF_POLICY,activeEnergy,USER_A} from '@macros/testkit';
-async function harness() {
+async function harness(remoteProducts?:InMemoryProductVersionRepository) {
   const mod = await import('../apps/tablet/src/voice/kitchen-actions.js') as unknown as {
     KitchenActions?: typeof import('../apps/tablet/src/voice/kitchen-actions.js').KitchenActions;
     default?: {KitchenActions: typeof import('../apps/tablet/src/voice/kitchen-actions.js').KitchenActions};
   };
   const KitchenActions = mod.KitchenActions ?? mod.default!.KitchenActions;
-  const repos = {foodLogs:new InMemoryFoodLogRepository(),products:new InMemoryProductVersionRepository(SYNTHETIC_PRODUCTS,SYNTHETIC_CATALOG_HEADS),profiles:new InMemoryUserProfileRepository(),goals:new InMemoryEnergyGoalRepository()};
+  const repos = {foodLogs:new InMemoryFoodLogRepository(),products:remoteProducts??new InMemoryProductVersionRepository(SYNTHETIC_PRODUCTS,SYNTHETIC_CATALOG_HEADS),profiles:new InMemoryUserProfileRepository(),goals:new InMemoryEnergyGoalRepository()};
   await repos.profiles.append(PROFILE_MALE_35);
   await repos.goals.append({goalVersionId:'goal',userId:USER_A,effectiveFrom:instant('2026-01-01T00:00:00Z'),goal:'lose',targetDeltaKcal:-300});
   let sequence=0;let now=1000;
@@ -96,4 +96,25 @@ test('voice card selection refuses invented letters, mismatched speech and chang
  await h.execute('search_food',{query:'tofu'});
  assert.ok('error' in await h.execute('select_food_option',{optionLabel:'A'}));
  assert.equal(h.state().selectedFood,null);
+});
+
+test('grocery candidate lookup is shared by voice search, visible cards and confirmed logging',async()=>{
+ const {readFileSync}=await import('node:fs');
+ const seed=JSON.parse(readFileSync('data/grocery-preview-seed.json','utf8'));
+ const version=seed.products[0].version;
+ let searched='';
+ class GroceryRepository extends InMemoryProductVersionRepository {
+  async searchCandidates(query:string){searched=query;return this.listSearchable();}
+ }
+ const repo=new GroceryRepository([version],[{productId:version.productId,currentProductVersionId:version.productVersionId,isActive:true,updatedAt:version.effectiveFrom}]);
+ const h=await harness(repo);
+ h.actions.speechStarted('grocery');h.actions.transcript('grocery',version.displayName);
+ await h.execute('search_food',{query:version.displayName});assert.equal(searched,version.displayName);
+ assert.equal(h.state().options[0]?.productVersionId,version.productVersionId);
+ h.actions.speechStarted('choice');h.actions.transcript('choice','Select option A');
+ assert.equal((await h.execute('select_food_option',{optionLabel:'A'})).error,undefined);
+ h.actions.speechStarted('grams');h.actions.transcript('grams','32 grams');await h.execute('set_spoken_portion',{grams:32});
+ assert.equal(h.state().review?.grams,32);assert.equal(h.controller.getState().dashboard!.intake.kcal,0);
+ h.actions.speechStarted('save');h.actions.transcript('save','Yes log it');assert.equal((await h.execute('confirm_food_log')).logged,true);
+ assert.ok(h.controller.getState().dashboard!.intake.kcal>0);
 });

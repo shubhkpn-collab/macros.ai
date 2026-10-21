@@ -59,6 +59,8 @@ export interface ProductVersionRepository {
    * meaning, but they never appear in search results.
    */
   listSearchable(): Promise<readonly ProductVersion[]>;
+  /** Optional bounded remote candidate lookup; versions still resolve through this repository. */
+  searchCandidates?(query:string): Promise<readonly ProductVersion[]>;
 }
 
 export interface UserProfileRepository {

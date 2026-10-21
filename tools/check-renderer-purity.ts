@@ -35,6 +35,7 @@ const SCAN_ROOTS = [join(REPO_ROOT, 'apps')];
  */
 const HOST_FILES = new Set([
   'apps/tablet/src/development-host.ts',
+  'apps/tablet/src/grocery-catalog-host.ts',
   'apps/tablet/src/composition.ts',
 ]);
 const violations: string[] = [];

@@ -1,0 +1,80 @@
+{
+  "purpose": "Pilot discovery targets, not verified inventory or achieved coverage",
+  "stores": [
+    {
+      "store": "Walmart",
+      "queries": [
+        "Great Value tofu",
+        "Great Value yogurt",
+        "Great Value eggs",
+        "Great Value bread",
+        "Great Value oats",
+        "Great Value rice",
+        "Great Value peanut butter",
+        "Great Value almonds",
+        "Great Value chicken",
+        "Great Value milk"
+      ]
+    },
+    {
+      "store": "Costco",
+      "queries": [
+        "Kirkland tofu",
+        "Kirkland yogurt",
+        "Kirkland eggs",
+        "Kirkland bread",
+        "Kirkland oats",
+        "Kirkland rice",
+        "Kirkland peanut butter",
+        "Kirkland almonds",
+        "Kirkland chicken",
+        "Kirkland milk"
+      ]
+    },
+    {
+      "store": "Jewel-Osco",
+      "queries": [
+        "Signature Select tofu",
+        "Signature Select yogurt",
+        "Signature Select eggs",
+        "Signature Select bread",
+        "Signature Select oats",
+        "Signature Select rice",
+        "Signature Select peanut butter",
+        "Signature Select almonds",
+        "Signature Select chicken",
+        "Signature Select milk"
+      ]
+    },
+    {
+      "store": "Whole Foods",
+      "queries": [
+        "365 tofu",
+        "365 yogurt",
+        "365 eggs",
+        "365 bread",
+        "365 oats",
+        "365 rice",
+        "365 peanut butter",
+        "365 almonds",
+        "365 chicken",
+        "365 milk"
+      ]
+    },
+    {
+      "store": "Trader Joe\u2019s",
+      "queries": [
+        "Trader Joe's tofu",
+        "Trader Joe's yogurt",
+        "Trader Joe's eggs",
+        "Trader Joe's bread",
+        "Trader Joe's oats",
+        "Trader Joe's rice",
+        "Trader Joe's peanut butter",
+        "Trader Joe's almonds",
+        "Trader Joe's chicken",
+        "Trader Joe's milk"
+      ]
+    }
+  ]
+}

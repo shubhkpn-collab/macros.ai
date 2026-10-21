@@ -1,0 +1,369 @@
+{
+  "source": "USDA FoodData Central API",
+  "retrievedAt": "2026-10-21",
+  "scope": "Small fetched preview sample, not retailer coverage",
+  "products": [
+    {
+      "barcode": "078742067070",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2119705",
+        "productVersionId": "fdc-branded-2119705@b3e6d7172521e5002d4f9b93",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER COOKIE MIX, PEANUT BUTTER",
+        "brandName": "GREAT VALUE",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 423,
+          "proteinG": 7.69,
+          "carbohydrateG": 73.1,
+          "fatG": 13.5
+        },
+        "labelFacts": {
+          "servingGrams": 26,
+          "servingLabel": "3 Tbsp",
+          "ingredientsText": "ENRICHED BLEACHED FLOUR (BLEACHED WHEAT FLOUR, NIACIN, IRON [REDUCED IRON], THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), SUGAR, PEANUT BUTTER (ROASTED PEANUTS, DEXTROSE, HYDROGENATED VEGETABLE OILS [COTTONSEED, SOYBEAN, RAPESEED], SALT), BROWN SUGAR, VEGETABLE SHORTENING (CONTAINS ONE OR MORE OF THE FOLLOWING: CANOLA AND/OR PALM OIL) WITH PRESERVATIVE (TBHQ). CONTAINS 2% OR LESS OF EACH OF THE FOLLOWING: DEXTROSE, SALT, NATURAL AND ARTIFICIAL FLAVOR, LEAVENING (BAKING SODA), CALCIUM SILICATE."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2119705",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-b3e6d7172521e5002d4f9b93"
+        },
+        "effectiveFrom": "2021-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "078742277066",
+      "image": {
+        "url": "https://images.openfoodfacts.org/images/products/007/874/227/7066/front_en.3.400.jpg",
+        "sourceUrl": "https://world.openfoodfacts.org/product/0078742277066",
+        "attribution": "Photo: Open Food Facts contributors",
+        "license": "CC-BY-SA-3.0"
+      },
+      "version": {
+        "productId": "fdc-branded-2329039",
+        "productVersionId": "fdc-branded-2329039@4455ab7c265a2a7f175b7ef4",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER CREME PIE, PEANUT BUTTER",
+        "brandName": "GREAT VALUE",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 441,
+          "proteinG": 5.15,
+          "carbohydrateG": 35.3,
+          "fatG": 32.4
+        },
+        "labelFacts": {
+          "servingGrams": 136,
+          "servingLabel": "0.2 pie",
+          "ingredientsText": "NON-DAIRY WHIPPED TOPPING (WATER, HYDROGENATED PALM KERNEL OIL, HIGH FRUCTOSE CORN SYRUP, SUGAR, SODIUM CASEINATE, ARTIFICIAL FLAVOR, DEXTROSE, POLYSORBATE 60, SORBITAN MONOSTEARATE, GUAR GUM, XANTHAN GUM, BETA-CAROTENE [COLOR]), ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), SUGAR, PEANUT BUTTER (DRY ROASTED PEANUTS, SUGAR HYDROGENATED RAPESEED AND COTTONSEED OIL, SALT), VEGETABLE OIL SHORTENING (PALM OIL, SOYBEAN OIL), MARGARINE (PALM OIL, WATER, SALT, MONO-AND DIGLYCERIDES, ARTIFICIAL BUTTER FLAVOR, ANNATTO EXTRACT [COLOR], CALCIUM DISODIUM EDTA [PRESERVATIVE], VITAMIN A PALMITATE), EGGS, WATER, PEANUTS, CONTAINS LESS THAN 2% OF SEMI-SWEET CHOCOLATE (SUGAR, UNSWEETENED CHOCOLATE, COCOA BUTTER, MILKFAT, SOY LECITHIN, NATURAL VANILLA EXTRACT), SALT, DEXTROSE, DISTILLED MONOGLYCERIDES, SOY LECITHIN, DOUGH CONDITIONER (WHEY, L-CYSTEINE HYDROCHLORIDE), POTASSIUM SORBATE (PRESERVATIVE), SODIUM PROPIONATE (PRESERVATIVE)."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2329039",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-4455ab7c265a2a7f175b7ef4"
+        },
+        "effectiveFrom": "2022-06-21T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "078742147468",
+      "image": {
+        "url": "https://images.openfoodfacts.org/images/products/007/874/214/7468/front_en.17.400.jpg",
+        "sourceUrl": "https://world.openfoodfacts.org/product/0078742147468",
+        "attribution": "Photo: Open Food Facts contributors",
+        "license": "CC-BY-SA-3.0"
+      },
+      "version": {
+        "productId": "fdc-branded-2100823",
+        "productVersionId": "fdc-branded-2100823@56941306948b3748220e54ef",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER WAFER BARS, PEANUT BUTTER",
+        "brandName": "GREAT VALUE",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 536,
+          "proteinG": 7.14,
+          "carbohydrateG": 57.1,
+          "fatG": 28.6
+        },
+        "labelFacts": {
+          "servingGrams": 28,
+          "servingLabel": "1 ONZ",
+          "ingredientsText": "PEANUT BUTTER (PEANUTS, SALT, HYDROGENATED VEGETABLE OIL [COTTONSEED OIL, CANOLA OIL, AND/OR SOYBEAN OIL]), SUGAR, ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMINE MONONITRATE [VITAMIN B1], RIBOFLAVIN [VITAMIN B2], FOLIC ACID), DEXTROSE, HYDROGENATED PALM KERNEL OIL, VEGETABLE SHORTENING (PALM AND SOYBEAN OIL), COCOA, CONTAINS 2% OR LESS OF EACH OF THE FOLLOWING: WATER, SOY LECITHIN, SOYBEAN OIL, SALT, LEAVENING (BAKING SODA, AMMONIUM BICARBONATE), NATURAL AND ARTIFICIAL FLAVOR, MONO- AND DIGLYCERIDES, POLYSORBATE 60, NON FAT MILK, PRESERVATIVES (SODIUM PROPIONATE, SORBIC ACID)."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2100823",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-56941306948b3748220e54ef"
+        },
+        "effectiveFrom": "2021-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "041318210231",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2025704",
+        "productVersionId": "fdc-branded-2025704@c045e4112afe4dc6cbdd1dc8",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "SCHNUCKS",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 562,
+          "proteinG": 21.9,
+          "carbohydrateG": 25,
+          "fatG": 46.9
+        },
+        "labelFacts": {
+          "servingGrams": 32,
+          "servingLabel": "2 Tbsp",
+          "ingredientsText": "PEANUT, SUGAR, HYDROGENATED VEGETABLE OIL (RAPESEED, COTTONSEED, SOYBEAN), DEXTROSE, SALT, MOLASSES, AND MONOGLYCERIDES."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2025704",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-c045e4112afe4dc6cbdd1dc8"
+        },
+        "effectiveFrom": "2021-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "051907142843",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2096697",
+        "productVersionId": "fdc-branded-2096697@89daaa53442b3ef77ddaeef2",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "EARTH O'SWEET",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 594,
+          "proteinG": 25,
+          "carbohydrateG": 21.9,
+          "fatG": 50
+        },
+        "labelFacts": {
+          "servingGrams": 32,
+          "servingLabel": "2 Tbsp",
+          "ingredientsText": "DRY ROASTED PEANUTS."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2096697",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-89daaa53442b3ef77ddaeef2"
+        },
+        "effectiveFrom": "2021-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "072488982024",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2063079",
+        "productVersionId": "fdc-branded-2063079@7599ae6dac5b3007c2979514",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "TORN & GLASSER",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 583,
+          "proteinG": 25,
+          "carbohydrateG": 22.2,
+          "fatG": 50
+        },
+        "labelFacts": {
+          "servingGrams": 36,
+          "servingLabel": "2 Tbsp",
+          "ingredientsText": "PEANUTS."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2063079",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-7599ae6dac5b3007c2979514"
+        },
+        "effectiveFrom": "2021-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "030684701092",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2062585",
+        "productVersionId": "fdc-branded-2062585@e8b04ab6e03b1dba566e0df3",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "HARMONY FARMS",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 633,
+          "proteinG": 20,
+          "carbohydrateG": 23.3,
+          "fatG": 50
+        },
+        "labelFacts": {
+          "servingGrams": 30,
+          "servingLabel": "2 Tbsp",
+          "ingredientsText": "DRY ROASTED BLANCHED ORGANIC PEANUTS, ORGANIC PALM OIL, ORGANIC SUGAR, SALT."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2062585",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-e8b04ab6e03b1dba566e0df3"
+        },
+        "effectiveFrom": "2021-10-28T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "022224500418",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-1945605",
+        "productVersionId": "fdc-branded-1945605@b8b54ae94f8a9bd7e1344f30",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "SWEET CHAOS",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 500,
+          "proteinG": 6.67,
+          "carbohydrateG": 70,
+          "fatG": 20
+        },
+        "labelFacts": {
+          "servingGrams": 30,
+          "servingLabel": "0.667 CUP | ABOUT",
+          "ingredientsText": "CONFECTIONERY COATING (SUGAR, PALM KERNEL OIL, COCOA POWDER, WHOLE MILK POWDER, NONFAT DRY MILK, SOY LECITHIN, SALT), KETTLE CORN (SUGAR, POPCORN, CORN SYRUP, SUNFLOWER OIL, SOY LECITHIN, SALT, BAKING SODA), PEANUT BUTTER CUPS (MILK CHOCOLATE (SUGAR, COCOA BUTTER, CHOCOLATE, MILK, SOY LECITHIN, VANILLA), PEANUTS, SUGAR, PALM KERNEL OIL, LACTOSE, CORNSTARCH (PROCESSING AID), SALT, SOY LECITHIN), COATED PRETZEL (CONFECTIONERY COATING (SUGAR, PALM KERNEL OIL, PARTIALLY DEFATTED PEANUT FLOUR, NONFAT DRY MILK, PEANUT OIL, SALT, SOY LECITHIN), PRETZEL (ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), CORN SYRUP, SALT, YEAST)), PRETZEL (ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), CORN SYRUP, SALT, YEAST)."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "1945605",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-b8b54ae94f8a9bd7e1344f30"
+        },
+        "effectiveFrom": "2021-07-29T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "041415539860",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2424027",
+        "productVersionId": "fdc-branded-2424027@1a0cb5230b31fb4e0d1bc4be",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "PUBLIX",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 562,
+          "proteinG": 25,
+          "carbohydrateG": 15.6,
+          "fatG": 50
+        },
+        "labelFacts": {
+          "servingGrams": 32,
+          "servingLabel": "2 Tbsp",
+          "ingredientsText": "DRY ROASTED PEANUTS."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2424027",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-1a0cb5230b31fb4e0d1bc4be"
+        },
+        "effectiveFrom": "2022-12-22T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "064777812457",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-1868012",
+        "productVersionId": "fdc-branded-1868012@22b19643818260d44cef7cf8",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER",
+        "brandName": "JOHNVINCE FOODS",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 594,
+          "proteinG": 25,
+          "carbohydrateG": 21.9,
+          "fatG": 50
+        },
+        "labelFacts": {
+          "servingGrams": 32,
+          "servingLabel": "2 Tbsp",
+          "ingredientsText": "DRY ROASTED PEANUTS, SALT."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "1868012",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-22b19643818260d44cef7cf8"
+        },
+        "effectiveFrom": "2021-07-29T00:00:00.000Z"
+      }
+    },
+    {
+      "barcode": "078742443201",
+      "image": null,
+      "version": {
+        "productId": "fdc-branded-2482950",
+        "productVersionId": "fdc-branded-2482950@bb0351d8dd21285c874428aa",
+        "versionNo": 1,
+        "displayName": "PEANUT BUTTER COOKIES, PEANUT BUTTER",
+        "brandName": "FRESHNESS GUARANTEED",
+        "preparationState": "as_sold",
+        "basis": {
+          "kind": "per_100g",
+          "kcal": 450,
+          "proteinG": 7.5,
+          "carbohydrateG": 57.5,
+          "fatG": 20
+        },
+        "labelFacts": {
+          "servingGrams": 40,
+          "servingLabel": "1 cookie",
+          "ingredientsText": "WHEAT FLOUR, BROWN SUGAR (BEET SUGAR, CANE SYRUPS), PEANUT BUTTER (DRY ROASTED PEANUTS, DEXTROSE, PALM OIL, SALT), MARGARINE (VEGETABLE OIL [CANOLA OIL, COTTONSEED OIL AND/OR SOYBEAN OIL], PALM OIL, WATER, SALT, MONO-AND DIGLYCERIDES [MONO-AND DIGLYCERIDES, TOCOPHEROLS {ANTIOXIDANT}, ASCORBIC ACID {ANTIOXIDANT}, CITRIC ACID {ANTIOXIDANT}], SOY LECITHIN {AN EMULSIFIER], NATURAL FLAVOR, ANNATTO EXTRACT (COLOR], TURMERIC OLEORESIN [COLOR], VITAMIN A PALMITATE), PEANUT BUTTER FLAVORED GEMS (PEANUT FLAVORED CONFECTIONARY COATING (SUGAR, PALM KERNEL OIL, PALM OIL, PARTIALLY DEFATTED PEANUT FLOUR, NONFAT DRY MILK SOLIDS, PEANUTS, DEXTROSE, SOY LECITHIN {AN EMULSIFIER}, SALTI, SUGAR, LESS THAN 1% OF ARTIFICIAL COLORING (YELLOW 5 LAKE, YELLOW 6 LAKE, YELLOW 6, BLUE 2 LAKE, RED 40 LAKE], GUM ACACIA, CORN SYRUP, CARNAUBA WAX), SUGAR, EGGS, PEANUT DROPS (SUGAR, PALM KERNEL OIL, PARTIALLY DEFATTED PEANUT FLOUR, DEXTROSE, NONFAT MILK, PALM OIL, SALT, SOY LECITHIN [AN EMULSIFIER]), WATER, BAKING SODA, SALT."
+        },
+        "source": {
+          "kind": "usda_branded",
+          "sourceId": "2482950",
+          "verificationStatus": "auto_validated",
+          "licenseClass": "public_domain_cc0",
+          "releaseId": "fdc-api-bb0351d8dd21285c874428aa"
+        },
+        "effectiveFrom": "2023-02-16T00:00:00.000Z"
+      }
+    }
+  ]
+}
