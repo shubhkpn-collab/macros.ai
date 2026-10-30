@@ -21,3 +21,7 @@ test('untrusted cache values cannot bypass missing nutrient or volume guards',()
  assert.equal(validGroceryProduct({...p,version:{...p.version,basis:{...p.version.basis,kind:'per_100ml'}}}),false);
  assert.equal(validGroceryProduct({...p,version:{...p.version,source:{...p.version.source,kind:'synthetic_test'}}}),false);
 });
+test('explicit USDA GRM gram unit is accepted without treating millilitres as grams',()=>{
+ const raw={...row(),servingSizeUnit:'GRM'};assert.ok(normalizeFdcGrocery(raw,'abcdef123456'));
+ assert.equal(normalizeFdcGrocery({...raw,servingSizeUnit:'MLT'},'abcdef123456'),null);
+});

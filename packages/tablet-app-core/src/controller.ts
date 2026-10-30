@@ -4,6 +4,7 @@ import {
   type Instant,
   type ProductVersion,
   type WeightCapture,
+  type StableWeightCandidate,
 } from '@macros/contracts';
 import { calculateNutrition } from '@macros/domain-nutrition';
 import {
@@ -62,6 +63,7 @@ import {
 export const TABLET_APP_CORE_VERSION = 'tablet-app-core@1.0.0';
 
 export interface AppEnvironment {
+  readonly onFoodLogged?:(entry:{logId:string;productVersionId:string;displayName:string;grams:number;kcal:number;proteinG:number;carbohydrateG:number;fatG:number;sessionGeneration:number})=>void;
   readonly repositories: PersistedLoopRepositories;
   readonly clock: Clock;
   readonly ids: IdGenerator;
@@ -104,6 +106,9 @@ const previewOf = (product: ProductVersion, capture: WeightCapture) => {
 export class TabletAppController {
   private state: AppState;
   private captureState: WeightCaptureState;
+  private bowlBaseline:StableWeightCandidate|null=null;
+  private bowlPending:StableWeightCandidate|null=null;
+  private bowlGeneration=-1;
   private flowCounter = 0;
   /** Only the NEWEST search in the current flow may update results. */
   private searchGeneration = 0;
@@ -462,7 +467,8 @@ export class TabletAppController {
     const response = resilientSearch(catalog, vocabulary, {
       text: query, limit: 4, recentProductVersionIds,
     });
-    const results = response.results;
+    const offered=this.env.repositories.products.offeredCandidates?.(query);
+    const results:readonly FoodSearchResult[]=offered && offered.length<=4 ? offered.map((p,i)=>({productVersion:{productVersionId:p.productVersionId,displayName:p.displayName,preparationState:p.preparationState,...(p.brandName?{brandName:p.brandName}:{})},score:1,matchKind:'exact',optionLabel:String.fromCharCode(65+i),preparationStateDisambiguates:false})) : response.results;
 
     // A corrected or uncertain query must never be silently promoted into a
     // confident different food. The flow records what happened so the UI can
@@ -614,12 +620,22 @@ export class TabletAppController {
     // 'no_candidate' means the intent is armed and will fire when it settles.
   }
 
+  getBowlState(){return {active:this.bowlBaseline!==null&&this.bowlGeneration===this.state.sessionGeneration,baselineGrams:this.bowlGeneration===this.state.sessionGeneration?this.bowlBaseline?.grams??null:null};}
+  endBowl():void{this.bowlBaseline=null;this.bowlPending=null;}
+  setBowlBaseline():boolean{
+    const candidate=this.captureState.candidate;
+    if(!candidate||!this.state.scale.connected)return false;
+    const age=Date.parse(this.env.clock.now())-Date.parse(candidate.observedAt);if(age<0||age>30000)return false;
+    this.bowlBaseline=candidate;this.bowlPending=null;this.bowlGeneration=this.state.sessionGeneration;return true;
+  }
+
   /** Manual fallback. Never fabricates scale provenance. */
   enterManualWeight(grams: number): void {
     if (!Number.isFinite(grams) || grams <= 0) {
       this.patchFlow({ error: err('invalid_manual_weight', 'Enter a weight greater than zero.') });
       return;
     }
+    this.endBowl();
     // The user has chosen manual. An armed scale intent must not fire later and
     // silently replace that choice when the platform happens to settle.
     this.cancelOutstandingCaptureIntent();
@@ -628,6 +644,16 @@ export class TabletAppController {
   }
 
   private acceptCapture(capture: WeightCapture): void {
+    if(capture.source==='scale'&&this.bowlBaseline){
+      const baseline=this.bowlBaseline;
+      const candidate:StableWeightCandidate|null=capture.deviceId&&capture.bootId&&capture.sequence!==undefined&&capture.tareGeneration!==undefined&&capture.evidence&&capture.stabilityPolicyVersion&&capture.representativeMethod&&capture.resolutionGrams!==undefined&&capture.resolutionQuantization?{grams:capture.grams,observedAt:capture.candidateObservedAt??capture.capturedAt,deviceId:capture.deviceId,bootId:capture.bootId,sequence:capture.sequence,tareGeneration:capture.tareGeneration,evidence:capture.evidence,stabilityPolicyVersion:capture.stabilityPolicyVersion,representativeMethod:capture.representativeMethod,resolutionGrams:capture.resolutionGrams,resolutionQuantization:capture.resolutionQuantization}:null;
+      if(!candidate||this.bowlGeneration!==this.state.sessionGeneration||candidate.deviceId!==baseline.deviceId||candidate.bootId!==baseline.bootId||candidate.tareGeneration!==baseline.tareGeneration||candidate.sequence<=baseline.sequence||candidate.grams<=baseline.grams){
+        this.patchFlow({error:err('capture_rejected','Bowl reading changed or no ingredient was added. Set the bowl baseline again.')});return;
+      }
+      const grams=candidate.grams-baseline.grams;
+      this.bowlPending=candidate;
+      capture={...capture,grams:grams as WeightCapture['grams'],representativeMethod:'stable_bowl_difference',bowlDifference:{baseline,gross:candidate}};
+    }
     // The weight attempt is over; the next placement gets a fresh id.
     if (this.state.addFood.captureRequestId !== null) this.patchFlow({ captureRequestId: null });
     const selected = this.state.addFood.selected;
@@ -651,6 +677,7 @@ export class TabletAppController {
    * a moment later and the abandoned attempt captures anyway.
    */
   cancelWeight(): void {
+    this.bowlPending=null;
     this.cancelOutstandingCaptureIntent();
     this.patchFlow({
       weightCapture: null,
@@ -721,6 +748,7 @@ export class TabletAppController {
       return;
     }
 
+    if(this.bowlPending){const gross=this.bowlPending;this.bowlBaseline=gross;this.bowlPending=null;this.captureState=reduceCapture(this.captureState,{kind:'bowl_capture_confirmed',at:this.env.clock.now(),deviceId:gross.deviceId,bootId:gross.bootId,tareGeneration:gross.tareGeneration,sequence:gross.sequence,grams:gross.grams},this.env.stabilityPolicy).state;}
     this.patch({
       dashboard: {
         localDate: result.localDate,
@@ -748,11 +776,13 @@ export class TabletAppController {
      * before cancelFoodFlow ran. This uses the same authoritative mechanism as
      * clearGuidance so all three move together.
      */
+    if(result.outcome==='appended'){try{this.env.onFoodLogged?.({logId:submissionId,productVersionId:flow.selected.productVersionId,displayName:flow.selected.displayName,grams:flow.weightCapture.grams,...previewOf(flow.selected,flow.weightCapture),sessionGeneration:generation});}catch{/* An observer cannot undo an already persisted log. */}}
     this.clearGuidance();
   }
 
   /** Cancel leaves persisted logs untouched and commits nothing. */
   cancelFoodFlow(): void {
+    if(this.bowlPending)this.endBowl();
     this.cancelOutstandingCaptureIntent();
     this.flowCounter += 1;
     /**

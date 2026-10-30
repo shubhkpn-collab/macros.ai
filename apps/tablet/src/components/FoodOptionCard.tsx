@@ -20,6 +20,6 @@ export function FoodOptionCard({option,onSelect}:{option:FoodOptionView;onSelect
     <View style={{borderRadius:18,borderWidth:1,borderColor:option.preparationMatters?color.warning:color.border,paddingHorizontal:12,paddingVertical:7,marginTop:12}}><Text style={{color:option.preparationMatters?color.warning:color.textSecondary,fontSize:15,textAlign:'center'}}>{option.preparationState}{option.preparationMatters?' · check preparation':''}</Text></View>
     <Text style={{color:color.textMuted,fontSize:12,marginTop:10}}>{image&&!imageFailed?'Product photo':'Illustration · photo unavailable'} · say option {option.optionLabel}</Text>
     {image&&!imageFailed?<Text accessibilityRole="link" onPress={event=>{event.stopPropagation();void Linking.openURL(image.sourceUrl);}} style={{fontSize:10,color:color.textMuted,marginTop:5,textAlign:'center'}}>{image.attribution}</Text>:null}
-    {image&&!imageFailed?<Text accessibilityRole="link" onPress={event=>{event.stopPropagation();void Linking.openURL('https://creativecommons.org/licenses/by-sa/3.0/');}} style={{fontSize:10,color:color.textMuted,marginTop:3}}>{image.license}</Text>:null}
+    {image&&!imageFailed?<Text accessibilityRole="link" onPress={event=>{event.stopPropagation();void Linking.openURL(image.license==='CC-BY-SA-3.0'?'https://creativecommons.org/licenses/by-sa/3.0/':image.sourceUrl);}} style={{fontSize:10,color:color.textMuted,marginTop:3}}>{image.license}</Text>:null}
   </Pressable>;
 }

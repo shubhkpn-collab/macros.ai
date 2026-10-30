@@ -1,3 +1,5 @@
+import {MealPrepCatalog,OVERNIGHT_DEMO} from '../../../packages/catalog-runtime/src/meal-prep-catalog.js';
+import {MealPrepSession} from '@macros/tablet-voice';
 import {KITCHEN_LIBRARY} from '../../../packages/catalog-runtime/src/kitchen-library.generated.js';
 import {GroceryCatalog} from './grocery-catalog-host.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -77,14 +79,16 @@ export async function createDevelopmentHost(
   options: DevelopmentHostOptions,
 ): Promise<TabletHost> {
   const { auth } = options;
+  const mealPrep=new MealPrepSession();
+  const grocery=new GroceryCatalog(new InMemoryProductVersionRepository([...DEV_PRODUCTS,...KITCHEN_LIBRARY],[...DEV_CATALOG_HEADS,...KITCHEN_LIBRARY.map(p=>({productId:p.productId,currentProductVersionId:p.productVersionId,isActive:true,updatedAt:p.effectiveFrom}))]));
+  await grocery.open();
   const repositories = {
     foodLogs: await LocalFoodLogRepository.open(AsyncStorage, 'macros.preview.food-logs.v1'),
-    products: new GroceryCatalog(new InMemoryProductVersionRepository(
-      [...DEV_PRODUCTS, ...KITCHEN_LIBRARY], [...DEV_CATALOG_HEADS, ...KITCHEN_LIBRARY.map(p=>({productId:p.productId,currentProductVersionId:p.productVersionId,isActive:true,updatedAt:p.effectiveFrom}))])),
+    products: new MealPrepCatalog(grocery,()=>mealPrep.enabled()),
     profiles: new InMemoryUserProfileRepository(),
     goals: await LocalEnergyGoalRepository.open(AsyncStorage, 'macros.preview.goals.v1'),
   };
-  await repositories.products.open();
+
   // BOTH are required before refreshDashboard(): a profile alone yields
   // goal_missing and a blank Home.
   await repositories.profiles.append(DEV_PROFILE);
@@ -95,6 +99,7 @@ export async function createDevelopmentHost(
   const controller = new TabletAppController(
     {
       repositories,
+      onFoodLogged:(entry:{logId:string;productVersionId:string;displayName:string;grams:number;kcal:number;proteinG:number;carbohydrateG:number;fatG:number;sessionGeneration:number})=>mealPrep.record(entry,entry.sessionGeneration),
       clock: new SystemClock() as never,
       ids: new SequentialIds(),
       policies: { tefPolicy: { status: 'available', policy: DEV_TEF_POLICY } },
@@ -122,7 +127,8 @@ export async function createDevelopmentHost(
 
   const composition: TabletComposition = {
     controller,
-    foodImages:()=>repositories.products.images(),
+    mealPrep,
+    foodImages:()=>({...grocery.images(),...Object.fromEntries(OVERNIGHT_DEMO.map(p=>[p.version.productVersionId,p.image]))}),
     coordinator: { getState: () => activeSwitchState(DEV_USER_ID, 1) },
     ports,
     capabilities: () => deriveCapabilities({
@@ -135,7 +141,7 @@ export async function createDevelopmentHost(
       if (state.dashboard === null) return [];
       return repositories.foodLogs.snapshot(state.subject.userId, state.dashboard.localDate)
         .slice().reverse().map(item => ({
-          displayName: repositories.products.name(item.productVersionId)??DEV_PRODUCTS.find(p => p.productVersionId === item.productVersionId)?.displayName ?? 'Logged food',
+          displayName: OVERNIGHT_DEMO.find(p=>p.version.productVersionId===item.productVersionId)?.version.displayName??grocery.name(item.productVersionId)??DEV_PRODUCTS.find(p => p.productVersionId === item.productVersionId)?.displayName ?? 'Logged food',
           kcal: item.nutritionSnapshot.totals.kcal, grams: item.weightCapture.grams,
         }));
     },

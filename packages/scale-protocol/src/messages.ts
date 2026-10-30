@@ -114,6 +114,7 @@ export type ScaleCommandLifecycleEvent = {
  * after the weight has already stabilized.
  */
 export type CaptureIntentEvent =
+  | {readonly kind:'bowl_capture_confirmed';readonly at:Instant;readonly deviceId:string;readonly bootId:string;readonly tareGeneration:number;readonly sequence:number;readonly grams:number}
   | { readonly kind: 'capture_requested'; readonly requestId: string; readonly at: Instant }
   | { readonly kind: 'capture_cancelled'; readonly requestId: string; readonly at: Instant }
   | { readonly kind: 'manual_entry'; readonly at: Instant; readonly grams: number };

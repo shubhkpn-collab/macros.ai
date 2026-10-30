@@ -8,3 +8,5 @@ export * from './kitchen-knowledge.js';
 export * from './pilot-usage.js';
 export * from './knowledge-library.js';
 export * from './knowledge-sync.js';
+
+export * from './meal-prep.js';

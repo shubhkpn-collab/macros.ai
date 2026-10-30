@@ -45,6 +45,8 @@ export interface StableWeightCandidate {
 }
 
 export interface WeightCapture {
+  /** Original stable readings when net food mass is derived from a shared bowl. */
+  readonly bowlDifference?: {readonly baseline:StableWeightCandidate;readonly gross:StableWeightCandidate};
   readonly grams: Grams;
   /** Scale and manual captures remain distinguishable forever. */
   readonly source: WeightSource;

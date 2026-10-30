@@ -1,11 +1,12 @@
 import type { TabletViewModel } from '@macros/tablet-view-model';
 import type { GuidanceDeps, TabletAppController } from '@macros/tablet-app-core';
-import { explicitFoodConfirmation, spokenGrams, KitchenKnowledgeLibrary, spokenFoodOption } from '@macros/tablet-voice';
+import { explicitFoodConfirmation, spokenGrams, KitchenKnowledgeLibrary, spokenFoodOption, type MealPrepSession, spokenNamedFood } from '@macros/tablet-voice';
 
 export interface KitchenActionDeps {
-  controller: Pick<TabletAppController, 'searchFood'|'selectProduct'|'enterManualWeight'|'requestStableWeight'|'confirmFoodLog'|'cancelFoodFlow'|'refreshDashboard'|'requestFoodGuidance'|'chooseGuidanceCandidate'>;
+  controller: Pick<TabletAppController, 'searchFood'|'selectProduct'|'enterManualWeight'|'requestStableWeight'|'confirmFoodLog'|'cancelFoodFlow'|'refreshDashboard'|'requestFoodGuidance'|'chooseGuidanceCandidate'|'setBowlBaseline'|'endBowl'|'getBowlState'>;
   state(): TabletViewModel;
   changed(): void;
+  mealPrep?:MealPrepSession;
   guidance?: GuidanceDeps;
   now?: () => number;
 }
@@ -38,11 +39,22 @@ export class KitchenActions {
     this.turn.receivedAt = this.now();
     this.waiters.forEach(resolve => resolve()); this.waiters.clear();
   }
+  async startMealPrep(fromSpeech=false,live:()=>boolean=()=>true):Promise<void>{
+    const epoch=this.epoch;
+    if(fromSpeech)await this.waitForTranscript();
+    if(epoch!==this.epoch||!live())return;
+    const stated=fromSpeech&&this.turn&&this.now()-this.turn.receivedAt<=30000?spokenGrams(this.turn.transcript??''):null;
+    this.deps.controller.cancelFoodFlow();this.deps.controller.endBowl();
+    this.deps.mealPrep?.start(this.deps.state().sessionGeneration);
+    await this.deps.controller.searchFood('quaker oats');
+    const vm=this.deps.state();this.portionEvidence=stated===null?null:{grams:stated,flowId:vm.flowId,session:vm.sessionGeneration,at:this.now()};this.deps.changed();
+  }
   snapshot(): Record<string, unknown> {
     const vm = this.deps.state();
     if (vm.screen === 'locked') return {error:'Member session is locked'};
     return {
-      dataNotice:'Synthetic nutrition/activity preview. Scale integration is not connected in this host.',
+      dataNotice:'Demo profile/activity. Food facts carry source provenance. This preview has no physical scale transport.',
+      mealPrep:this.deps.mealPrep?.snapshot(vm.sessionGeneration)??null,bowl:this.deps.controller.getBowlState(),
       screen:vm.screen, energy:vm.energy, daily:vm.daily, macros:vm.macros,
       options:vm.options, scale:vm.scale, selectedFood:vm.selectedFood, review:vm.review,
       pendingSpokenGrams:this.portionEvidence && this.portionEvidence.flowId===vm.flowId && this.portionEvidence.session===vm.sessionGeneration && this.now()-this.portionEvidence.at<=120_000 ? this.portionEvidence.grams : null,
@@ -74,6 +86,15 @@ export class KitchenActions {
     try {
       switch (name) {
         case 'get_kitchen_state': return this.snapshot();
+        case 'start_meal_prep':
+          if(!this.deps.mealPrep)return {error:'Meal prep is not configured'};
+          await this.startMealPrep(true,current);break;
+        case 'set_bowl_baseline':
+          if(!controller.setBowlBaseline())return {error:'Place the empty bowl on a connected scale and wait for a stable reading first.'};
+          break;
+        case 'finish_meal_prep':
+          if(['weighing','review'].includes(vm.screen))return {error:'Confirm or cancel the pending ingredient before finishing the meal.'};
+          controller.cancelFoodFlow();controller.endBowl();this.deps.mealPrep?.finish();break;
         case 'retrieve_nutrition_knowledge':
           if (typeof args.query !== 'string') return {error:'A knowledge question is required'};
           return {...this.knowledge.retrieve(args.query)};
@@ -100,6 +121,10 @@ export class KitchenActions {
         }
         case 'select_food': {
           if (typeof args.productVersionId !== 'string') return {error:'Choose an offered food'};
+          if(this.deps.mealPrep?.enabled()){
+            await this.waitForTranscript();if(!current())return {error:'Audio turn changed'};
+            if(!this.turn||this.now()-this.turn.receivedAt>30000||this.turn.options!==optionFingerprint(this.deps.state())||spokenNamedFood(this.turn.transcript??'',this.deps.state().options)!==args.productVersionId)return {error:'Say one visible brand or a specific variant, or choose option A, B, C or D.'};
+          }
           if (vm.screen === 'home' && vm.guidance.envelopeId !== null) {
             const candidate = [...vm.guidance.candidates,...vm.guidance.alternatives].find(c => c.productVersionId === args.productVersionId);
             if (!candidate) return {error:'That food was not offered'};

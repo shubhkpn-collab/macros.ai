@@ -60,6 +60,7 @@ export interface ProductVersionRepository {
    */
   listSearchable(): Promise<readonly ProductVersion[]>;
   /** Optional bounded remote candidate lookup; versions still resolve through this repository. */
+  offeredCandidates?(query:string): readonly ProductVersion[]|null;
   searchCandidates?(query:string): Promise<readonly ProductVersion[]>;
 }
 

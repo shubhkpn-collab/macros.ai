@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Image, Pressable, Text, View } from 'react-native';
 import { referencePalette, color, space, type } from '@macros/tablet-view-model';
 import { FoodArt, Icon, PrismaticGlow, GlassSheen } from './ReferenceKit.js';
 import { SEGMENT_COUNT, segmentAngle, segmentHeights } from '@macros/tablet-voice';
@@ -238,14 +238,17 @@ export function MacrosOrb({
  * and a bright ring when selected.
  */
 export function FoodCard({
-  name, detail, selected = false, onPress, accessibilityLabel,
+  name, detail, selected = false, onPress, accessibilityLabel, imageUrl,
 }: {
   readonly name: string;
+  readonly imageUrl?: string|undefined;
   readonly detail?: string;
   readonly selected?: boolean;
   readonly onPress: () => void;
   readonly accessibilityLabel: string;
 }): React.JSX.Element {
+  const [failed,setFailed]=useState(false);
+  useEffect(()=>setFailed(false),[imageUrl]);
   return (
     <Pressable
       onPress={onPress}
@@ -274,7 +277,7 @@ export function FoodCard({
           alignItems: 'center', justifyContent: 'center',
         }}
       >
-        <FoodArt name={name} size={128} />
+        {imageUrl&&!failed?<Image source={{uri:imageUrl}} accessibilityLabel={`${name} package photo`} style={{width:128,height:128,borderRadius:12}} resizeMode="contain" onError={()=>setFailed(true)}/>:<FoodArt name={name} size={128} />}
       </View>
 
       <View style={{ paddingHorizontal: space.md, paddingBottom: space.md }}>

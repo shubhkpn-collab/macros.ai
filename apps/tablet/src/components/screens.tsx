@@ -21,6 +21,9 @@ import {
 } from './status.js';
 
 export interface ScreenActions {
+  onStartMealPrep?:()=>void;
+  onSetBowl?:()=>void;
+  onFinishMealPrep?:()=>void;
   onConversation?: () => void;
   conversationActive?: boolean;
   conversationPhase?: 'idle'|'connecting'|'listening'|'thinking'|'speaking'|'error';
@@ -279,7 +282,7 @@ export function WeighingScreen(
         {weight === null ? 'Enter your portion weight' : `Current weight: ${weight}`}
       </Text>
       <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'center', marginTop: 28, marginBottom: 24 }}>
-        {weightCards.map(card => <FoodCard key={card.productVersionId} name={card.displayName} detail={card.preparationState} selected={selected !== null && card.productVersionId === selected.productVersionId} onPress={() => { if (selected !== null && card.productVersionId === selected.productVersionId) setShowManual(true); else actions.onSelectOption(card.productVersionId); }} accessibilityLabel={`Choose ${card.displayName} for this portion`} />)}
+        {weightCards.map(card => <FoodCard key={card.productVersionId} name={card.displayName} imageUrl={vm.options.find(o=>o.productVersionId===card.productVersionId)?.productImage?.url} detail={card.preparationState} selected={selected !== null && card.productVersionId === selected.productVersionId} onPress={() => { if (selected !== null && card.productVersionId === selected.productVersionId) setShowManual(true); else actions.onSelectOption(card.productVersionId); }} accessibilityLabel={`Choose ${card.displayName} for this portion`} />)}
       </View>
       <View style={{ flexDirection: 'row', backgroundColor: color.surface, borderRadius: 30, marginTop: 12 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Unselect food" onPress={actions.onCancel} style={{ padding: 18, flexDirection: 'row', alignItems: 'center', gap: 10 }}><Icon name="close" size={20} /><Text style={{ color: color.textSecondary, fontSize: 17 }}>Unselect food</Text></Pressable>
@@ -510,6 +513,14 @@ export function TabletShell(
         {(['home', 'dashboard'] as const).map(tab => <Pressable key={tab} accessibilityRole="tab" accessibilityState={{ selected: page === tab }} accessibilityLabel={tab === 'home' ? 'Home tab' : 'Dashboard tab'} onPress={() => setPage(tab)} style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingHorizontal: 22, paddingVertical: 14, borderRadius: 26, backgroundColor: page === tab ? color.surfaceActive : 'transparent' }}><Icon name={tab} size={18} tint={page === tab ? color.macroProtein : color.textMuted} /><Text style={{ color: page === tab ? color.textPrimary : color.textMuted, fontSize: 16 }}>{tab === 'home' ? 'Home' : 'Dashboard'}</Text></Pressable>)}
       </View> : null}
 
+      {actions.onStartMealPrep&&!vm.mealPrep?.active&&vm.screen==='home'?<Pressable accessibilityRole="button" onPress={actions.onStartMealPrep} style={{alignSelf:'center',padding:12,marginBottom:8,borderRadius:18,borderWidth:1,borderColor:color.borderStrong}}><Text style={{color:color.macroProtein}}>Start overnight oats demo</Text></Pressable>:null}
+      {vm.mealPrep?<View style={{paddingHorizontal:24,paddingVertical:10,backgroundColor:color.surface,borderRadius:18,marginHorizontal:18,marginBottom:10}}>
+        <Text style={{color:color.textPrimary,fontSize:18,fontWeight:'700'}}>{vm.mealPrep.title} · {vm.mealPrep.items.length} ingredients confirmed</Text>
+        <Text style={{color:color.textSecondary,marginTop:5}}>{Math.round(vm.mealPrep.totals.kcal)} kcal · Protein {vm.mealPrep.totals.proteinG.toFixed(1)} g · Carbs {vm.mealPrep.totals.carbohydrateG.toFixed(1)} g · Fat {vm.mealPrep.totals.fatG.toFixed(1)} g</Text>
+        {vm.mealPrep.active&&vm.screen==='home'?<View style={{flexDirection:'row',flexWrap:'wrap',gap:6,marginTop:8}}>{['quaker oats','blueberries','strawberries','peanut butter','milk','dark chocolate','protein powder'].map(q=><Pressable key={q} accessibilityRole="button" accessibilityLabel={`Show ${q} demo choices`} onPress={()=>actions.onSearchFood(q)} style={{padding:8,borderRadius:12,backgroundColor:color.surfaceActive}}><Text style={{color:color.textSecondary}}>{q}</Text></Pressable>)}</View>:null}
+        {vm.mealPrep.active&&actions.onFinishMealPrep?<Pressable accessibilityRole="button" onPress={actions.onFinishMealPrep} style={{paddingTop:8}}><Text style={{color:color.textSecondary}}>Finish meal prep</Text></Pressable>:null}
+        {vm.mealPrep.active&&actions.onSetBowl?<Pressable accessibilityRole="button" onPress={actions.onSetBowl} style={{paddingTop:8}}><Text style={{color:color.macroProtein}}>Set stable bowl baseline before adding food</Text></Pressable>:null}
+      </View>:null}
       {vm.offline.message !== null ? (
         <View style={{ paddingHorizontal: space.xl, paddingBottom: space.sm }}>
           <OfflineStatus offline={vm.offline} />

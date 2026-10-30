@@ -42,6 +42,7 @@ export function App(
 
   const actions = useMemo(() => createActions({
     controller: composition.controller,
+    ...(composition.mealPrep?{mealPrep:composition.mealPrep}:{}),
     ...(guidance !== undefined ? { guidance } : {}),
     auth,
     activity: () => composition.currentActivity(),
@@ -88,7 +89,7 @@ export function App(
     actions,
     viewModel: () => viewModelRef.current,
     ...(premiumSpeech !== undefined ? { premium: premiumSpeech } : {}),
-  }), [actions, premiumSpeech]);
+  }), [actions, kitchenActions, premiumSpeech]);
 
   /**
    * Every path that ends listening returns the orb to idle: a final result,
@@ -170,6 +171,9 @@ export function App(
    */
   const screenActions = useMemo(() => ({
     ...actions,
+    onStartMealPrep:()=>{void kitchenActions.startMealPrep();},
+    onFinishMealPrep:()=>{void kitchenActions.execute('finish_meal_prep','{}').then(r=>setVoiceFeedback(typeof r.error==='string'?r.error:'Meal prep complete. Your confirmed totals are shown.'));},
+    onSetBowl:()=>{void kitchenActions.execute('set_bowl_baseline','{}').then(r=>{setVoiceFeedback(typeof r.error==='string'?r.error:'Bowl baseline set. Add the next ingredient.');});},
     voiceFeedback: conversationActive ? conversationStatus : voiceFeedback ?? conversationStatus,
     conversationActive,
     conversationPhase,
@@ -202,7 +206,7 @@ export function App(
     isSpeaking: voice.isSpeaking(),
     micLevel: level,
     wakePulse,
-  }), [actions, voice, listening, level, wakePulse, tick, voiceFeedback, conversation, conversationActive, conversationStatus, conversationPhase]);
+  }), [actions, kitchenActions, voice, listening, level, wakePulse, tick, voiceFeedback, conversation, conversationActive, conversationStatus, conversationPhase]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>

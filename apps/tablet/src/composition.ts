@@ -1,4 +1,4 @@
-import type {GroceryImage} from '../../../packages/catalog-runtime/src/grocery-products.js';
+import type {MealPrepSession} from '@macros/tablet-voice';
 import type { TabletAppController } from '@macros/tablet-app-core';
 import type { OfflineCapabilities } from '@macros/domain-offline-sync';
 import type { SwitchState } from '@macros/domain-household';
@@ -59,7 +59,8 @@ export interface SwitchStateReader {
 
 export interface TabletComposition {
   readonly controller: TabletAppController;
-  foodImages?():Readonly<Record<string,GroceryImage>>;
+  readonly mealPrep?:MealPrepSession;
+  foodImages?():Readonly<Record<string,{url:string;sourceUrl:string;attribution:string;license:string}>>;
   readonly coordinator: SwitchStateReader;
   readonly ports: TabletPorts;
   /** Capabilities derived by the offline domain — never inferred in the UI. */
@@ -88,7 +89,7 @@ export function renderModel(
     recent: composition.recentFoods(),
   });
   const images=composition.foodImages?.()??{};
-  return {...model,options:model.options.map(option=>({...option,productImage:images[option.productVersionId]??null}))};
+  return {...model,mealPrep:composition.mealPrep?.snapshot(model.sessionGeneration)??null,options:model.options.map(option=>({...option,productImage:images[option.productVersionId]??null}))};
 }
 
 /**

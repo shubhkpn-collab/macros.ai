@@ -6,7 +6,7 @@ const object=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&
 const finite=(v:unknown):v is number=>typeof v==='number'&&Number.isFinite(v)&&v>=0;
 /** USDA search rows declare nutrient amounts per 100g. Volume-only products are not made weighable. */
 export function normalizeFdcGrocery(raw:unknown,fingerprint:string):GroceryProduct|null {
- if(!object(raw)||raw.dataType!=='Branded'||!Number.isSafeInteger(raw.fdcId)||typeof raw.description!=='string'||!raw.description.trim()||raw.description.length>300||!Array.isArray(raw.foodNutrients)||raw.marketCountry!=='United States'||raw.servingSizeUnit!=='g'||!finite(raw.servingSize)||raw.servingSize<=0||typeof raw.gtinUpc!=='string'||!normalizeGtin(raw.gtinUpc).ok||!/^[-a-z0-9]{8,80}$/.test(fingerprint))return null;
+ if(!object(raw)||raw.dataType!=='Branded'||!Number.isSafeInteger(raw.fdcId)||typeof raw.description!=='string'||!raw.description.trim()||raw.description.length>300||!Array.isArray(raw.foodNutrients)||raw.marketCountry!=='United States'||!['g','GRM','GM'].includes(String(raw.servingSizeUnit))||!finite(raw.servingSize)||raw.servingSize<=0||typeof raw.gtinUpc!=='string'||!normalizeGtin(raw.gtinUpc).ok||!/^[-a-z0-9]{8,80}$/.test(fingerprint))return null;
  if(typeof raw.discontinuedDate==='string'&&raw.discontinuedDate)return null;
  const read=(id:number,unit:string):number|null=>{
   const rows=raw.foodNutrients as unknown[];const hits=rows.filter(v=>object(v)&&v.nutrientId===id);

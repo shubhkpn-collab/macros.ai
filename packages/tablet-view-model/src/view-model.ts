@@ -171,6 +171,7 @@ export interface DailyView {
 }
 
 export interface TabletViewModel {
+  readonly mealPrep?:{active:boolean;title:string;items:readonly {displayName:string;grams:number}[];totals:{grams:number;kcal:number;proteinG:number;carbohydrateG:number;fatG:number}}|null;
   readonly screen: Screen;
   readonly daily: DailyView | null;
   readonly guidance: GuidanceView;

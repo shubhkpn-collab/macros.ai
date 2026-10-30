@@ -272,6 +272,13 @@ export function reduceCapture(
       });
     }
 
+    case 'bowl_capture_confirmed': {
+      const session=state.session;
+      if(state.phase!=='awaiting_clear'||!session||state.pendingCommand||state.lastStatus!=='ok'||session.deviceId!==event.deviceId||session.bootId!==event.bootId||session.tareGeneration!==event.tareGeneration||session.lastSequence===null||!Number.isSafeInteger(event.sequence)||event.sequence<0||event.sequence>session.lastSequence||!Number.isFinite(event.grams)||event.grams<=0||!Number.isFinite(Date.parse(event.at)))return out(from,state);
+      // The application has persisted this ingredient. A bowl can remain on the
+      // platform; new stable samples are still required for the next increment.
+      return out(from,invalidateCandidate(state,'stabilizing'));
+    }
     case 'disconnected': {
       if (!validateDisconnectedEvent(event).ok) return out(from, state);
       // A disconnect for a different device must not drop this one.

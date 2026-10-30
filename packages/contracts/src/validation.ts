@@ -170,6 +170,16 @@ export function validateWeightCapture(
     }
   }
 
+  if(w.bowlDifference!==undefined){
+    if(!w.bowlDifference||!w.bowlDifference.baseline||!w.bowlDifference.gross){issues.push(issue('bowlDifference','invalid_combination','bowl capture evidence is required'));}
+    else {
+    const {baseline,gross}=w.bowlDifference;
+    if(w.source!=='scale'||!Number.isFinite(baseline.grams)||!Number.isFinite(gross.grams)||baseline.grams<0||gross.grams<=baseline.grams||Math.abs(w.grams-(gross.grams-baseline.grams))>0.000001||baseline.deviceId!==gross.deviceId||baseline.bootId!==gross.bootId||baseline.tareGeneration!==gross.tareGeneration||gross.sequence<=baseline.sequence||w.deviceId!==gross.deviceId||w.bootId!==gross.bootId||w.sequence!==gross.sequence||w.tareGeneration!==gross.tareGeneration){
+      issues.push(issue('bowlDifference','invalid_combination','bowl increments require matching scale sessions and the exact positive difference'));
+    }
+    }
+  }
+
   if (w.source === 'manual') {
     // Manual weight carries only truthful provenance. It must never imply that
     // a stability policy or stability evidence produced the number.
