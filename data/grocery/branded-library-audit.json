@@ -1,0 +1,260 @@
+{
+  "products": 246327,
+  "invalidProducts": 0,
+  "photoMetadataRecords": 50898,
+  "invalidImages": 0,
+  "orphanImages": 0,
+  "searches": [
+    {
+      "query": "Quaker oats",
+      "returned": 16,
+      "withPhotos": 11,
+      "examples": [
+        {
+          "name": "GROUND OATS",
+          "brand": "QUAKER",
+          "barcode": "00803275305005"
+        },
+        {
+          "name": "STEEL CUT OATS",
+          "brand": "QUAKER",
+          "barcode": "00030000563052"
+        },
+        {
+          "name": "ROLLED OVERNIGHT OATS",
+          "brand": "QUAKER",
+          "barcode": "00030000568859"
+        },
+        {
+          "name": "QUICK 1-MINUTE GLUTEN FREE OATS",
+          "brand": "QUAKER",
+          "barcode": "00030000566343"
+        }
+      ]
+    },
+    {
+      "query": "Great Value peanut butter",
+      "returned": 16,
+      "withPhotos": 9,
+      "examples": [
+        {
+          "name": "CREAMY PEANUT BUTTER, CREAMY",
+          "brand": "GREAT VALUE",
+          "barcode": "00078742113784"
+        },
+        {
+          "name": "CREAMY PEANUT BUTTER, CREAMY",
+          "brand": "GREAT VALUE",
+          "barcode": "00078742370033"
+        },
+        {
+          "name": "CREAMY PEANUT BUTTER, CREAMY",
+          "brand": "GREAT VALUE",
+          "barcode": "00078742155425"
+        },
+        {
+          "name": "CREAMY PEANUT BUTTER, CREAMY",
+          "brand": "GREAT VALUE",
+          "barcode": "00078742370019"
+        }
+      ]
+    },
+    {
+      "query": "Kirkland almonds",
+      "returned": 5,
+      "withPhotos": 5,
+      "examples": [
+        {
+          "name": "COCOA DUSTED ALMONDS, COCOA",
+          "brand": "KIRKLAND SIGNATURE",
+          "barcode": "00096619277742"
+        },
+        {
+          "name": "DRY ROASTED ALMONDS, SEA SALT",
+          "brand": "KIRKLAND SIGNATURE",
+          "barcode": "00096619723829"
+        },
+        {
+          "name": "ANCIENT GRAINS GRANOLA WITH ALMONDS",
+          "brand": "KIRKLAND SIGNATURE",
+          "barcode": "00096619994700"
+        },
+        {
+          "name": "MILK CHOCOLATE ALMONDS, MILK CHOCOLATE",
+          "brand": "KIRKLAND",
+          "barcode": "00096619376056"
+        }
+      ]
+    },
+    {
+      "query": "Chobani yogurt",
+      "returned": 16,
+      "withPhotos": 1,
+      "examples": [
+        {
+          "name": "GREEK YOGURT",
+          "brand": "CHOBANI",
+          "barcode": "00818290014467"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": "CHOBANI",
+          "barcode": "00894700010441"
+        },
+        {
+          "name": "GREEK YOGURT",
+          "brand": "CHOBANI",
+          "barcode": "00894700010038"
+        },
+        {
+          "name": "GREEK YOGURT, PLAIN",
+          "brand": "CHOBANI",
+          "barcode": "00818290011305"
+        }
+      ]
+    },
+    {
+      "query": "Tyson chicken",
+      "returned": 16,
+      "withPhotos": 2,
+      "examples": [
+        {
+          "name": "GROUND CHICKEN",
+          "brand": "TYSON",
+          "barcode": "00075620559719"
+        },
+        {
+          "name": "CHICKEN BREAST",
+          "brand": "TYSON",
+          "barcode": "00023700038326"
+        },
+        {
+          "name": "CHICKEN THIGHS",
+          "brand": "Tyson Foods, Inc.",
+          "barcode": "00075620558095"
+        },
+        {
+          "name": "TYSON, CHICKEN WINGS",
+          "brand": "TYSON",
+          "barcode": "00240874309032"
+        }
+      ]
+    },
+    {
+      "query": "Barilla pasta",
+      "returned": 16,
+      "withPhotos": 3,
+      "examples": [
+        {
+          "name": "READY PASTA",
+          "brand": "BARILLA",
+          "barcode": "00076808007466"
+        },
+        {
+          "name": "READY PASTA",
+          "brand": "Barilla G & R F.Lli S.P.A.",
+          "barcode": "00076808008180"
+        },
+        {
+          "name": "PASTA, FARFALLE",
+          "brand": "BARILLA",
+          "barcode": "00076808011128"
+        },
+        {
+          "name": "BARILLA, PASTA, ROTINI",
+          "brand": "BARILLA",
+          "barcode": "00076808534122"
+        }
+      ]
+    },
+    {
+      "query": "Bobs Red Mill flour",
+      "returned": 0,
+      "withPhotos": 0,
+      "examples": []
+    },
+    {
+      "query": "rice",
+      "returned": 16,
+      "withPhotos": 2,
+      "examples": [
+        {
+          "name": "RICE",
+          "brand": "WINDMILL RICE",
+          "barcode": "00817367010166"
+        },
+        {
+          "name": "RICE",
+          "brand": "WEIS",
+          "barcode": "00041497208814"
+        },
+        {
+          "name": "RICE",
+          "brand": "RICESELECT",
+          "barcode": "00074401630630"
+        },
+        {
+          "name": "RICE",
+          "brand": "RICO",
+          "barcode": "00743709001137"
+        }
+      ]
+    },
+    {
+      "query": "tofu",
+      "returned": 16,
+      "withPhotos": 10,
+      "examples": [
+        {
+          "name": "TOFU",
+          "brand": "WILDWOOD",
+          "barcode": "00030871302156"
+        },
+        {
+          "name": "TOFU",
+          "brand": "AZUMAYA",
+          "barcode": "00074326000129"
+        },
+        {
+          "name": "TOFU",
+          "brand": "AZUMAYA",
+          "barcode": "00074326000143"
+        },
+        {
+          "name": "TOFU",
+          "brand": "MANNA PROTEIN",
+          "barcode": "00028346094026"
+        }
+      ]
+    },
+    {
+      "query": "bread",
+      "returned": 16,
+      "withPhotos": 3,
+      "examples": [
+        {
+          "name": "BREAD",
+          "brand": "OLDMILL BREAD CO.",
+          "barcode": "00664541000013"
+        },
+        {
+          "name": "BREAD",
+          "brand": "STONE MILL BREAD",
+          "barcode": "00756778331135"
+        },
+        {
+          "name": "BREAD",
+          "brand": "CONCHAS",
+          "barcode": "00896911002031"
+        },
+        {
+          "name": "BREAD",
+          "brand": "HOLSUM",
+          "barcode": "00850532000487"
+        }
+      ]
+    }
+  ],
+  "networkCalls": 0,
+  "scope": "Full local index and exact photo-metadata join validation; not manual package review or all-image HTTP validation"
+}

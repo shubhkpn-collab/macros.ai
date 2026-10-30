@@ -1,0 +1,15 @@
+{
+  "release": "USDA October 2026",
+  "archive": "FoodData_Central_branded_food_json_2026-10-29.zip",
+  "archiveSha256": "149e0bce3477e90953d90b65b1af69b16407bfadc86926a9f4e16ba7dc227f4e",
+  "recordsRead": 434001,
+  "acceptedRecords": 246328,
+  "rejectedRecords": 187673,
+  "malformed": 0,
+  "uniqueBarcodes": 246327,
+  "brands": 28454,
+  "photoCoverage": "Measured separately; package photos are not part of USDA",
+  "scope": "US market, active, valid GTIN, gram-based servings and complete plausible macros",
+  "duplicatePolicy": "For identical GTIN keep newest publication, then highest source id; no name-based merge",
+  "inventoryVerified": false
+}

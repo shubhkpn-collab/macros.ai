@@ -1,0 +1,23 @@
+{
+  "source": "Open Food Facts official TSV export",
+  "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz",
+  "exportSha256": "295d13f0a1f8243fb50e4c18ff81567df7470b2c5b57b88140a78f8046df4c55",
+  "databaseLicense": "ODbL-1.0",
+  "imageLicense": "CC-BY-SA-3.0",
+  "counts": {
+    "rowsRead": 4883869,
+    "barcodeMatches": 222360,
+    "missingImage": 171462,
+    "matchedPhotoRows": 50898
+  },
+  "catalogProducts": 246327,
+  "photoMetadataRecords": 50898,
+  "photoCoveragePercent": 20.66,
+  "imageFilesDownloaded": 0,
+  "limitations": [
+    "Exact barcode match is product identity evidence, not a manual visual review",
+    "Image URLs can expire or packages can change",
+    "Missing photos remain labeled illustrations",
+    "No retailer inventory verified"
+  ]
+}

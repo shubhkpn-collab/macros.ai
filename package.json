@@ -22,10 +22,13 @@
     "check:tablet-imports": "node --import tsx tools/check-tablet-imports.ts",
     "voice:backend": "node --import tsx tools/kitchen-realtime-server.ts",
     "voice:phone": "node tools/connect-kitchen-phone.mjs",
-    "catalog:kitchen:build": "node --import tsx tools/build-kitchen-library.ts"
+    "catalog:kitchen:build": "node --import tsx tools/build-kitchen-library.ts",
+    "catalog:branded:build": "node --import tsx tools/build-branded-library.ts",
+    "catalog:photos:import": "python3 tools/import-branded-photos.py",
+    "catalog:branded:audit": "node --import tsx tools/audit-branded-library.ts"
   },
   "engines": {
-    "node": ">=22.0.0",
+    "node": ">=22.13.0",
     "npm": ">=10.0.0"
   },
   "devDependencies": {
