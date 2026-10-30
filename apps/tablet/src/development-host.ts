@@ -1,3 +1,4 @@
+import {KITCHEN_LIBRARY} from '../../../packages/catalog-runtime/src/kitchen-library.generated.js';
 import {GroceryCatalog} from './grocery-catalog-host.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -79,7 +80,7 @@ export async function createDevelopmentHost(
   const repositories = {
     foodLogs: await LocalFoodLogRepository.open(AsyncStorage, 'macros.preview.food-logs.v1'),
     products: new GroceryCatalog(new InMemoryProductVersionRepository(
-      DEV_PRODUCTS, DEV_CATALOG_HEADS)),
+      [...DEV_PRODUCTS, ...KITCHEN_LIBRARY], [...DEV_CATALOG_HEADS, ...KITCHEN_LIBRARY.map(p=>({productId:p.productId,currentProductVersionId:p.productVersionId,isActive:true,updatedAt:p.effectiveFrom}))])),
     profiles: new InMemoryUserProfileRepository(),
     goals: await LocalEnergyGoalRepository.open(AsyncStorage, 'macros.preview.goals.v1'),
   };

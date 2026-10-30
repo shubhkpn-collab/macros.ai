@@ -1,0 +1,95 @@
+{
+  "source": "Checked-in USDA seed; original archives have not been re-downloaded or revalidated by this build",
+  "seedSha256": "982db1c705997e560e063634ab69157c99b3017e7f193009da889b9263acd93e",
+  "inputRecords": 6877,
+  "accepted": 6877,
+  "rejected": 0,
+  "rejectedIds": [],
+  "categories": {
+    "Finfish and Shellfish Products": 258,
+    "Beverages": 252,
+    "Fruits and Fruit Juices": 383,
+    "Dairy and Egg Products": 310,
+    "Nut and Seed Products": 151,
+    "Legumes and Legume Products": 309,
+    "Vegetables and Vegetable Products": 867,
+    "American Indian/Alaska Native Foods": 106,
+    "Soups, Sauces, and Gravies": 214,
+    "Poultry Products": 373,
+    "Sweets": 227,
+    "Fats and Oils": 216,
+    "Breakfast Cereals": 188,
+    "Cereal Grains and Pasta": 222,
+    "Baked Products": 518,
+    "Lamb, Veal, and Game Products": 464,
+    "Beef Products": 961,
+    "Fast Foods": 178,
+    "Pork Products": 331,
+    "Snacks": 126,
+    "Spices and Herbs": 31,
+    "Meals, Entrees, and Side Dishes": 68,
+    "Sausages and Luncheon Meats": 83,
+    "Restaurant Foods": 41
+  },
+  "preparationCounts": {
+    "raw": 1480,
+    "cooked": 2194,
+    "as_sold": 3203
+  },
+  "coverage": [
+    {
+      "query": "oats",
+      "matches": 27
+    },
+    {
+      "query": "tomatoes",
+      "matches": 19
+    },
+    {
+      "query": "rice",
+      "matches": 97
+    },
+    {
+      "query": "chicken",
+      "matches": 308
+    },
+    {
+      "query": "milk",
+      "matches": 266
+    },
+    {
+      "query": "tofu",
+      "matches": 34
+    },
+    {
+      "query": "egg",
+      "matches": 84
+    },
+    {
+      "query": "lentils",
+      "matches": 8
+    },
+    {
+      "query": "salmon",
+      "matches": 45
+    },
+    {
+      "query": "potatoes",
+      "matches": 97
+    },
+    {
+      "query": "olive oil",
+      "matches": 4
+    },
+    {
+      "query": "banana",
+      "matches": 29
+    }
+  ],
+  "limitations": [
+    "Generic ingredient library, not retailer inventory",
+    "No generic food photos or exact branded-product guarantee",
+    "No density or raw-to-cooked conversion inferred",
+    "Source release retained; unknown publication date represented by epoch, not a freshness claim"
+  ]
+}

@@ -22,9 +22,10 @@ export class KitchenActions {
   private turn: AudioTurn | null = null;
   private waiters = new Set<() => void>();
   private epoch = 0;
+  private portionEvidence: {grams:number;flowId:TabletViewModel["flowId"];session:number;at:number}|null = null;
   constructor(private deps: KitchenActionDeps) {}
   private now(): number { return this.deps.now?.() ?? Date.now(); }
-  reset(): void { this.epoch++; this.turn = null; this.waiters.forEach(resolve => resolve()); this.waiters.clear(); }
+  reset(): void { this.epoch++; this.turn = null; this.portionEvidence = null; this.waiters.forEach(resolve => resolve()); this.waiters.clear(); }
   speechStarted(id: string): void {
     this.epoch++;
     this.waiters.forEach(resolve => resolve()); this.waiters.clear();
@@ -44,6 +45,7 @@ export class KitchenActions {
       dataNotice:'Synthetic nutrition/activity preview. Scale integration is not connected in this host.',
       screen:vm.screen, energy:vm.energy, daily:vm.daily, macros:vm.macros,
       options:vm.options, scale:vm.scale, selectedFood:vm.selectedFood, review:vm.review,
+      pendingSpokenGrams:this.portionEvidence && this.portionEvidence.flowId===vm.flowId && this.portionEvidence.session===vm.sessionGeneration && this.now()-this.portionEvidence.at<=120_000 ? this.portionEvidence.grams : null,
       guidance:vm.guidance, error:vm.error === null ? null : 'Kitchen action failed; check the screen',
     };
   }
@@ -79,7 +81,12 @@ export class KitchenActions {
           if (typeof args.query !== 'string' || !args.query.trim() || args.query.length > 120) return {error:'Say a food name'};
           if (!['home','food_search','food_options','logged'].includes(vm.screen)) return {error:'Finish or cancel the current portion first'};
           if (vm.screen === 'logged') controller.cancelFoodFlow();
+          await this.waitForTranscript();
+          if (!current()) return {error:'Audio turn changed'};
+          const stated = this.turn && this.now()-this.turn.receivedAt<=30_000 ? spokenGrams(this.turn.transcript ?? '') : null;
+          this.portionEvidence = null;
           await controller.searchFood(args.query.trim());
+          if (current() && stated !== null) this.portionEvidence = {grams:stated,flowId:this.deps.state().flowId,session:vm.sessionGeneration,at:this.now()};
           break;
         case 'select_food_option': {
           if(typeof args.optionLabel!=='string'||!['A','B','C','D'].includes(args.optionLabel)||!['food_options','food_search'].includes(vm.screen))return {error:'Choose a currently displayed card'};
@@ -104,11 +111,18 @@ export class KitchenActions {
           break;
         }
         case 'set_spoken_portion': {
-          if (vm.screen !== 'weighing') return {error:'Choose a food before giving its portion'};
+          if (!['weighing','review'].includes(vm.screen)) return {error:'Choose a food before giving its portion'};
           await this.waitForTranscript();
           if (!current()) return {error:'Audio turn changed'};
-          const stated = spokenGrams(this.turn?.transcript ?? '');
+          const transcript = this.turn?.transcript ?? '';
+          const latest = spokenGrams(transcript);
+          const memory = this.portionEvidence;
+          // A new numeric, negative or ambiguous statement must never revive an older amount.
+          const useMemory = !/[0-9]|\b(?:grams?|g|not|no|cancel|instead|actually)\b/i.test(transcript);
+          const remembered = useMemory && memory && memory.flowId === vm.flowId && memory.session === vm.sessionGeneration && this.now()-memory.at<=120_000 ? memory.grams : null;
+          const stated = latest ?? remembered;
           if (stated === null || args.grams !== stated || this.now() - (this.turn?.receivedAt ?? 0) > 30_000) return {error:'Please state one portion in grams, for example 180 grams'};
+          this.portionEvidence = null;
           controller.enterManualWeight(stated);
           break;
         }
@@ -126,6 +140,7 @@ export class KitchenActions {
             return {error:'Read back the CURRENT food and grams, then ask the user to say confirm in a new turn. No food was logged.'};
           }
           turn.consumed = true;
+          this.portionEvidence = null;
           await controller.confirmFoodLog();
           if (!current()) return {error:'Session changed while saving; read current state before proceeding'};
           const result = this.deps.state();
@@ -134,7 +149,7 @@ export class KitchenActions {
           await controller.refreshDashboard();
           if (!current()) return {error:'Session changed'};
           this.deps.changed();
-          return {logged:true,state:this.snapshot(),next:'Read the updated macros and ask whether the user wants a next-food suggestion.'};
+          return {logged:true,state:this.snapshot(),next:'Briefly acknowledge the saved ingredient. Continue the cooking conversation; offer guidance only when useful or requested.'};
         }
         case 'recommend_next_food':
           if (!this.deps.guidance) return {error:'Validated meal guidance is unavailable',state:this.snapshot()};
@@ -142,7 +157,7 @@ export class KitchenActions {
           if (!['home','logged'].includes(vm.screen)) return {error:'Finish or cancel the current portion first'};
           await controller.requestFoodGuidance(this.deps.guidance);
           break;
-        case 'cancel_food': controller.cancelFoodFlow(); break;
+        case 'cancel_food': this.portionEvidence = null; controller.cancelFoodFlow(); break;
         default: return {error:'Unknown kitchen action'};
       }
       if (!current()) return {error:'Conversation changed; read current state'};

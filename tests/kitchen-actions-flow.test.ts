@@ -118,3 +118,68 @@ test('grocery candidate lookup is shared by voice search, visible cards and conf
  h.actions.speechStarted('save');h.actions.transcript('save','Yes log it');assert.equal((await h.execute('confirm_food_log')).logged,true);
  assert.ok(h.controller.getState().dashboard!.intake.kcal>0);
 });
+
+test('natural yes confirms only a fresh review; corrections require a new confirmation',async()=>{
+ const h=await harness();await h.portion();
+ h.actions.speechStarted('correction');h.actions.transcript('correction','Actually make it 180 grams');
+ assert.equal((await h.execute('set_spoken_portion',{grams:180})).error,undefined);
+ assert.equal(h.state().review?.grams,180);
+ assert.ok('error' in await h.execute('confirm_food_log'));
+ h.actions.speechStarted('yes');h.actions.transcript('yes','Yes.');
+ assert.equal((await h.execute('confirm_food_log')).logged,true);
+ assert.ok('error' in await h.execute('confirm_food_log'));
+});
+test('real ingredient library supports successive foods in one session without duplicate logs',async()=>{
+ const {KITCHEN_LIBRARY}=await import('../packages/catalog-runtime/src/kitchen-library.generated.js');
+ const foods=['tomatoes','rice','chicken'].map(query=>KITCHEN_LIBRARY.find(p=>p.displayName.toLowerCase().includes(query)&&p.preparationState==='raw')!);
+ assert.ok(foods.every(Boolean));
+ const repo=new InMemoryProductVersionRepository(foods,foods.map(p=>({productId:p.productId,currentProductVersionId:p.productVersionId,isActive:true,updatedAt:p.effectiveFrom})));
+ const h=await harness(repo);let expected=0;
+ for(const [i,p] of foods.entries()){
+  h.actions.speechStarted(`food-${i}`);h.actions.transcript(`food-${i}`,`Log 100 grams of ${p.displayName}`);
+  await h.execute('search_food',{query:p.displayName});
+  await h.execute('select_food',{productVersionId:p.productVersionId});
+  assert.equal((await h.execute('set_spoken_portion',{grams:100})).error,undefined);
+  expected+=h.state().review!.kcal;
+  h.actions.speechStarted(`confirm-${i}`);h.actions.transcript(`confirm-${i}`,'yes');
+  assert.equal((await h.execute('confirm_food_log')).logged,true);
+ }
+ assert.equal(h.controller.getState().dashboard!.intake.kcal,expected);
+ const logs=await h.repos.foodLogs.listByLocalDate(USER_A,h.controller.getState().dashboard!.localDate);assert.equal(logs.length,3);
+});
+
+test('amount spoken before card selection is retained only for the same pending food',async()=>{
+ const h=await harness();
+ h.actions.speechStarted('initial');h.actions.transcript('initial','Log 80 grams of chicken');
+ await h.execute('search_food',{query:'chicken'});
+ h.actions.speechStarted('choice');h.actions.transcript('choice','Option A');
+ await h.execute('select_food_option',{optionLabel:'A'});
+ assert.equal((await h.execute('set_spoken_portion',{grams:80})).error,undefined);
+ assert.equal(h.state().review?.grams,80);
+ assert.ok('error' in await h.execute('confirm_food_log'));
+ await h.execute('cancel_food');
+ await h.execute('search_food',{query:'chicken'});
+ await h.execute('select_food',{productVersionId:h.state().options[0]!.productVersionId});
+ h.actions.speechStarted('later');h.actions.transcript('later','Option A');
+ assert.ok('error' in await h.execute('set_spoken_portion',{grams:80}));
+});
+test('ambiguous newer quantity cannot fall back to an older spoken amount',async()=>{
+ const h=await harness();
+ h.actions.speechStarted('initial');h.actions.transcript('initial','80 grams of chicken');
+ await h.execute('search_food',{query:'chicken'});
+ await h.execute('select_food',{productVersionId:h.state().options[0]!.productVersionId});
+ h.actions.speechStarted('ambiguous');h.actions.transcript('ambiguous','Actually 100 grams or 120 grams');
+ assert.ok('error' in await h.execute('set_spoken_portion',{grams:80}));
+ assert.equal(h.state().screen,'weighing');
+});
+
+test('full offline catalog returns real options for everyday kitchen searches',async()=>{
+ const {KITCHEN_LIBRARY}=await import('../packages/catalog-runtime/src/kitchen-library.generated.js');
+ const repo=new InMemoryProductVersionRepository(KITCHEN_LIBRARY,KITCHEN_LIBRARY.map(p=>({productId:p.productId,currentProductVersionId:p.productVersionId,isActive:true,updatedAt:p.effectiveFrom})));
+ const h=await harness(repo);
+ for(const query of ['oats','tomatoes','rice','chicken','tofu','milk','lentils','salmon']){
+  await h.execute('search_food',{query});
+  assert.ok(h.state().options.length>0,query);
+  assert.ok(h.state().options.some(o=>o.displayName.toLowerCase().includes(query)),query);
+ }
+});

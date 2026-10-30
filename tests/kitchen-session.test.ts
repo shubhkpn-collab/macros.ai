@@ -35,13 +35,14 @@ test('transcripts are final, current and processed once; explicit end shuts sess
   assert.deepEqual(h.transcripts,['end conversation']);assert.equal(h.ended(),true);
 });
 test('confirmation rejects negative, ambiguous and quoted requests',()=>{
-  for (const text of ['do not log it','I said confirm yesterday','maybe confirm','yes','confirm or cancel','don’t confirm']) assert.equal(explicitFoodConfirmation(text),false,text);
-  for (const text of ['Confirm.','Log it','Yes, log it please']) assert.equal(explicitFoodConfirmation(text),true,text);
+  for (const text of ['do not log it','I said confirm yesterday','maybe confirm','yes but change it','confirm or cancel','don’t confirm']) assert.equal(explicitFoodConfirmation(text),false,text);
+  for (const text of ['Confirm.','Log it','Yes, log it please','Yes.','Yes please']) assert.equal(explicitFoodConfirmation(text),true,text);
 });
 test('manual portions require one positive spoken amount with grams; no invented or conflicting weight',()=>{
   assert.equal(spokenGrams('I have 186 grams of chicken'),186);
   assert.equal(spokenGrams('94.5 g'),94.5);
-  for (const text of ['186','0 grams','not 186 grams','186 grams or 100 grams','actually 180 grams','-180 grams']) assert.equal(spokenGrams(text),null,text);
+  assert.equal(spokenGrams('Actually make it 180 grams'),180);
+  for (const text of ['186','0 grams','not 186 grams','186 grams or 100 grams','-180 grams']) assert.equal(spokenGrams(text),null,text);
 });
 
 test('interruption during an awaited tool prevents its late result from continuing speech',async()=>{

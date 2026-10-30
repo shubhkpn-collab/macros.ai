@@ -21,7 +21,8 @@
     "investor:demo": "bash tools/investor-demo/run.sh",
     "check:tablet-imports": "node --import tsx tools/check-tablet-imports.ts",
     "voice:backend": "node --import tsx tools/kitchen-realtime-server.ts",
-    "voice:phone": "node tools/connect-kitchen-phone.mjs"
+    "voice:phone": "node tools/connect-kitchen-phone.mjs",
+    "catalog:kitchen:build": "node --import tsx tools/build-kitchen-library.ts"
   },
   "engines": {
     "node": ">=22.0.0",
