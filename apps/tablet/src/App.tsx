@@ -210,8 +210,8 @@ export function App(
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: color.canvas }}>
-      <StatusBar barStyle="light-content" backgroundColor={color.canvas} />
-      <TabletShell vm={vm} actions={screenActions} developmentNotice={developmentNotice} />
+      <StatusBar hidden animated />
+      <KitchenOS vm={vm} actions={screenActions} developmentNotice={developmentNotice} />
     </SafeAreaView>
   );
 }
