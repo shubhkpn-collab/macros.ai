@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, AppState, SafeAreaView, StatusBar } from 'react-native';
 import { color } from '@macros/tablet-view-model';
-import { TabletShell } from './components/screens.js';
+import { KitchenOS } from './components/KitchenOS.js';
 import type { GuidanceDeps } from '@macros/tablet-app-core';
 import type { PremiumSpeechTransport } from '@macros/tablet-voice';
 import { createActions, type AuthHostPort } from './actions.js';
